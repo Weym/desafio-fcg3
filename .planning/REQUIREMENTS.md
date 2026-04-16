@@ -166,21 +166,76 @@
 
 ## Traceability
 
-*Mapeamento de requisitos para fases do roadmap — preenchido pelo roadmapper.*
+*Mapeamento de requisitos para fases do roadmap — gerado pelo roadmapper em 2026-04-15.*
 
-| REQ-ID | Fase |
-|--------|------|
-| INFRA-01..04 | — |
-| AUTH-01..05 | — |
-| STU-01..07 | — |
-| COURSE-01..02, CURR-01..02 | — |
-| COURSE-03 | — |
-| ENROLL-01..08, ENROLL-STAFF-01..03 | — |
-| GRADES-01..04 | — |
-| DOCS-01..04 | — |
-| APPT-01..04, APPT-STAFF-01 | — |
-| STAFF-01 | — |
-| WH-01..05, CHAT-01..03 | — |
-| MCP-01..05 | — |
-| AI-01..05 | — |
-| TEST-01..05 | — |
+| REQ-ID | Fase | Status |
+|--------|------|--------|
+| INFRA-01 | Phase 1: Infrastructure & Schema | Pending |
+| INFRA-02 | Phase 1: Infrastructure & Schema | Pending |
+| INFRA-03 | Phase 1: Infrastructure & Schema | Pending |
+| INFRA-04 | Phase 1: Infrastructure & Schema | Pending |
+| AUTH-01 | Phase 2: Authentication | Pending |
+| AUTH-02 | Phase 2: Authentication | Pending |
+| AUTH-03 | Phase 2: Authentication | Pending |
+| AUTH-04 | Phase 2: Authentication | Pending |
+| AUTH-05 | Phase 2: Authentication | Pending |
+| STU-01 | Phase 3: Business Feature Slices | Pending |
+| STU-02 | Phase 3: Business Feature Slices | Pending |
+| STU-03 | Phase 3: Business Feature Slices | Pending |
+| STU-04 | Phase 3: Business Feature Slices | Pending |
+| STU-05 | Phase 3: Business Feature Slices | Pending |
+| STU-06 | Phase 3: Business Feature Slices | Pending |
+| STU-07 | Phase 3: Business Feature Slices | Pending |
+| COURSE-01 | Phase 3: Business Feature Slices | Pending |
+| COURSE-02 | Phase 3: Business Feature Slices | Pending |
+| COURSE-03 | Phase 3: Business Feature Slices | Pending |
+| CURR-01 | Phase 3: Business Feature Slices | Pending |
+| CURR-02 | Phase 3: Business Feature Slices | Pending |
+| ENROLL-01 | Phase 3: Business Feature Slices | Pending |
+| ENROLL-02 | Phase 3: Business Feature Slices | Pending |
+| ENROLL-03 | Phase 3: Business Feature Slices | Pending |
+| ENROLL-04 | Phase 3: Business Feature Slices | Pending |
+| ENROLL-05 | Phase 3: Business Feature Slices | Pending |
+| ENROLL-06 | Phase 3: Business Feature Slices | Pending |
+| ENROLL-07 | Phase 3: Business Feature Slices | Pending |
+| ENROLL-08 | Phase 3: Business Feature Slices | Pending |
+| ENROLL-STAFF-01 | Phase 3: Business Feature Slices | Pending |
+| ENROLL-STAFF-02 | Phase 3: Business Feature Slices | Pending |
+| ENROLL-STAFF-03 | Phase 3: Business Feature Slices | Pending |
+| GRADES-01 | Phase 3: Business Feature Slices | Pending |
+| GRADES-02 | Phase 3: Business Feature Slices | Pending |
+| GRADES-03 | Phase 3: Business Feature Slices | Pending |
+| GRADES-04 | Phase 3: Business Feature Slices | Pending |
+| DOCS-01 | Phase 3: Business Feature Slices | Pending |
+| DOCS-02 | Phase 3: Business Feature Slices | Pending |
+| DOCS-03 | Phase 3: Business Feature Slices | Pending |
+| DOCS-04 | Phase 3: Business Feature Slices | Pending |
+| APPT-01 | Phase 3: Business Feature Slices | Pending |
+| APPT-02 | Phase 3: Business Feature Slices | Pending |
+| APPT-03 | Phase 3: Business Feature Slices | Pending |
+| APPT-04 | Phase 3: Business Feature Slices | Pending |
+| APPT-STAFF-01 | Phase 3: Business Feature Slices | Pending |
+| STAFF-01 | Phase 3: Business Feature Slices | Pending |
+| MCP-01 | Phase 4: MCP Server | Pending |
+| MCP-02 | Phase 4: MCP Server | Pending |
+| MCP-03 | Phase 4: MCP Server | Pending |
+| MCP-04 | Phase 4: MCP Server | Pending |
+| MCP-05 | Phase 4: MCP Server | Pending |
+| AI-01 | Phase 5: AI Service | Pending |
+| AI-02 | Phase 5: AI Service | Pending |
+| AI-03 | Phase 5: AI Service | Pending |
+| AI-04 | Phase 5: AI Service | Pending |
+| AI-05 | Phase 5: AI Service | Pending |
+| WH-01 | Phase 6: WhatsApp Webhook & Integration | Pending |
+| WH-02 | Phase 6: WhatsApp Webhook & Integration | Pending |
+| WH-03 | Phase 6: WhatsApp Webhook & Integration | Pending |
+| WH-04 | Phase 6: WhatsApp Webhook & Integration | Pending |
+| WH-05 | Phase 6: WhatsApp Webhook & Integration | Pending |
+| CHAT-01 | Phase 6: WhatsApp Webhook & Integration | Pending |
+| CHAT-02 | Phase 6: WhatsApp Webhook & Integration | Pending |
+| CHAT-03 | Phase 6: WhatsApp Webhook & Integration | Pending |
+| TEST-01 | Phase 6: WhatsApp Webhook & Integration | Pending |
+| TEST-02 | Phase 6: WhatsApp Webhook & Integration | Pending |
+| TEST-03 | Phase 6: WhatsApp Webhook & Integration | Pending |
+| TEST-04 | Phase 6: WhatsApp Webhook & Integration | Pending |
+| TEST-05 | Phase 6: WhatsApp Webhook & Integration | Pending |
