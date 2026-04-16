@@ -7,14 +7,13 @@
 ```
 desafio-fcg3/                   # Monorepo root
 ├── backend/                    # Python FastAPI backend service
-│   ├── src/
-│   │   ├── features/           # Vertical slices — one dir per feature
-│   │   │   ├── auth/           # Auth slice (scaffolded, empty)
-│   │   │   └── enrollment/     # Enrollment slice (scaffolded, empty)
-│   │   ├── infrastructure/     # DB connections, external service clients (empty)
-│   │   ├── shared/             # Shared utilities, middleware, base types (empty)
-│   │   └── main.py             # FastAPI application entry point (empty)
-│   └── .gitignore
+│   └── src/
+│       ├── features/           # Vertical slices — one dir per feature
+│       │   ├── auth/           # Auth slice (scaffolded, empty)
+│       │   └── enrollment/     # Enrollment slice (scaffolded, empty)
+│       ├── infrastructure/     # DB connections, external service clients (empty)
+│       ├── shared/             # Shared utilities, middleware, base types (empty)
+│       └── main.py             # FastAPI application entry point (empty)
 │
 ├── mobile/                     # Flutter mobile application
 │   ├── lib/
@@ -45,14 +44,10 @@ desafio-fcg3/                   # Monorepo root
 ├── .planning/                  # GSD planning workspace
 │   └── codebase/               # Codebase analysis documents (this directory)
 │
-├── biome.json                  # Biome linter/formatter config (root-level)
 ├── docker-compose.yml          # Multi-service Docker orchestration (empty)
 ├── .fvmrc                      # Flutter Version Manager version pin
 └── README.md                   # Project overview and run instructions
 ```
-
-> **Note:** The `ai_service/` (LangChain) and `mcp_server/` directories shown in documentation
-> do not exist yet. They are planned but not yet scaffolded.
 
 ---
 
@@ -60,8 +55,7 @@ desafio-fcg3/                   # Monorepo root
 
 **`backend/src/features/`:**
 - Purpose: Vertical slices — each feature is a self-contained unit
-- Contains: Per-feature subdirectories, each with `controllers/`, `services/`, `routes.py` (or `routes.ts` per original README — actual extension TBD once implemented)
-- Key files: `backend/src/features/auth/`, `backend/src/features/enrollment/`
+- Contains: Per-feature subdirectories, each with `controllers/`, `services/`, `routes.py`
 - Currently: Both feature directories contain only `.gitkeep` — scaffolding only
 
 **`backend/src/infrastructure/`:**
@@ -76,7 +70,7 @@ desafio-fcg3/                   # Monorepo root
 
 **`mobile/lib/screens/`:**
 - Purpose: Full-screen Flutter widgets mapped to app navigation routes
-- Planned screens: Login, Home, Chat History, Chat Detail, Action Tracker, Documents, Notifications
+- Planned screens: Login, Home, Chat History, Chat Detail, Action Tracker, Documents
 - Currently: Empty (`.gitkeep` only)
 
 **`mobile/lib/components/`:**
@@ -105,7 +99,6 @@ desafio-fcg3/                   # Monorepo root
 - `mobile/lib/main.dart`: Flutter app root widget and entry point
 
 **Configuration:**
-- `biome.json`: Biome linter/formatter settings (root level — likely for any JS/TS tooling)
 - `docker-compose.yml`: Docker Compose service definitions (currently empty)
 - `.fvmrc`: Flutter version pin managed by FVM
 
@@ -143,8 +136,7 @@ desafio-fcg3/                   # Monorepo root
 **New backend feature slice:**
 - Create directory: `backend/src/features/[feature_name]/`
 - Add: `controllers/`, `services/`, `routes.py`
-- Register routes in: `backend/src/main.py` (or a central `routes.py` if created)
-- Follow existing slice pattern: `backend/src/features/auth/` and `backend/src/features/enrollment/`
+- Register routes in: `backend/src/routes.py`
 
 **New API endpoint:**
 - Implement in the relevant feature slice under `backend/src/features/[feature]/`

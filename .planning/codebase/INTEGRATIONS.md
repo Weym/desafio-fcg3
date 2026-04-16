@@ -46,7 +46,7 @@
 **JWT Sessions:**
 - Standard Bearer JWT (`Authorization: Bearer {token}`)
 - Session revocation via `jti` field (UUID stored in `sessions` table, not the full token)
-- Two user types: `student` and `staff` (roles: admin, coordinator, secretary)
+- Two user types: `student` and `staff` (roles: coordinator, secretary)
 
 **Internal Service Auth:**
 - MCP Server authenticates to FastAPI using a static service token: `X-Service-Token: {MCP_SERVICE_TOKEN}`
@@ -107,7 +107,7 @@
 ## CI/CD & Deployment
 
 **Hosting:**
-- Docker / LXC (Linux containers) on self-managed server
+- Docker (Linux containers) on self-managed server
 
 **CI Pipeline:**
 - None detected

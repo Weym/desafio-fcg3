@@ -119,7 +119,7 @@
 ### `students.semester` is manually updated — no automated progression
 
 - Files: `docs/database.md` (`students` table, `semester` column)
-- Why fragile: The `semester` column is documented as "Atualizado manualmente via admin ou script de inicio de semestre". If this update is missed or run with errors, semester-dependent logic (available courses, prerequisite checks) will return incorrect results for all students.
+- Why fragile: The `semester` column is documented as "Atualizado manualmente via staff ou script de inicio de semestre". If this update is missed or run with errors, semester-dependent logic (available courses, prerequisite checks) will return incorrect results for all students.
 - Safe modification: Any code touching `semester`-dependent queries must never assume the value is current. Add a validation endpoint that staff can run to verify semester data before academic period operations.
 - Test coverage: No tests exist for this domain.
 

@@ -222,7 +222,7 @@ Atualiza aluno. **Requer autenticacao (staff).**
 
 ### `DELETE /students/{id}`
 
-Remove aluno (soft delete). **Requer autenticacao (admin).**
+Remove aluno (soft delete). **Requer autenticacao (staff).**
 
 ---
 
@@ -630,9 +630,9 @@ Cancela agendamento. **Requer autenticacao. Aceita X-Service-Token (MCP).**
 
 ---
 
-## Admin / CRM
+## Staff / CRM
 
-### `GET /admin/dashboard`
+### `GET /staff/dashboard`
 
 Dashboard com KPIs. **Requer autenticacao (staff).**
 
@@ -655,21 +655,21 @@ Dashboard com KPIs. **Requer autenticacao (staff).**
 
 ---
 
-### `GET /admin/enrollment-periods`
+### `GET /staff/enrollment-periods`
 
 Lista todos os periodos de matricula. **Requer autenticacao (staff).**
 
 ---
 
-### `POST /admin/enrollment-periods`
+### `POST /staff/enrollment-periods`
 
-Cria periodo de matricula. **Requer autenticacao (admin).**
+Cria periodo de matricula. **Requer autenticacao (staff).**
 
 ---
 
-### `PUT /admin/enrollment-periods/{id}`
+### `PUT /staff/enrollment-periods/{id}`
 
-Atualiza periodo. **Requer autenticacao (admin).**
+Atualiza periodo. **Requer autenticacao (staff).**
 
 ---
 

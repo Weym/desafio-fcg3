@@ -18,7 +18,7 @@
 ## System Layers
 
 **Mobile Frontend (Flutter):**
-- Purpose: Client-facing app (student) and staff/admin CRM interface
+- Purpose: Client-facing app (student) and staff CRM interface
 - Location: `mobile/lib/`
 - Contains: Screens, components, shared utilities, core config
 - Depends on: FastAPI REST API via HTTPS + JWT
@@ -98,7 +98,7 @@
 - Purpose: Each feature owns its full stack — routes, business logic, and data access
 - Planned structure per slice: `controllers/`, `services/`, `routes.ts` (README describes TypeScript, but actual runtime is Python/FastAPI)
 - Current slices (empty scaffolding): `backend/src/features/auth/`, `backend/src/features/enrollment/`
-- Note: `backend/src/main.py` is the entry point — framework is FastAPI (Python), not Express/TypeScript as described in the original README
+- Note: `backend/src/main.py` is the entry point — framework is FastAPI (Python)
 
 **MCP Tool Schema:**
 - Purpose: Defines the interface LangChain agent uses for tool calls
@@ -154,7 +154,7 @@
 - Service token validated in FastAPI middleware before any endpoint processing
 
 **Authorization:**
-- Role-based: `student`, `staff`, `admin` — enforced per endpoint
+- Role-based: `student`, `staff` — enforced per endpoint
 - Endpoints accessible by MCP are marked to accept `X-Service-Token` as alternative auth
 
 **Async Processing:**

@@ -37,7 +37,6 @@
 **Build/Dev:**
 - Docker Compose - Multi-container orchestration (`docker-compose.yml` present, empty — not yet written)
 - FVM (Flutter Version Manager) - Flutter version pinning via `.fvmrc` (`flutter: 3.41.6`)
-- Biome 2.4.10 - JavaScript/TypeScript linting and formatting (`biome.json` at project root — for potential frontend tooling)
 
 ## Key Dependencies
 
@@ -58,10 +57,9 @@
 - Configured via environment variables (no `.env` files present yet)
 - Critical vars: `MCP_SERVICE_TOKEN` (internal service auth), `WHATSAPP_TOKEN`, `DATABASE_URL`, embedding model config
 - `MCP_SERVICE_TOKEN` is never committed to source — env-only per `docs/mcp.md`
-- `.gitignore` files present at `backend/.gitignore` and root `.gitignore`
+- `.gitignore` files present on root `.gitignore`
 
 **Build:**
-- `biome.json` — Biome formatter/linter config at project root (tabs, double quotes, organize imports)
 - `.fvmrc` — Flutter version pinning (`flutter: 3.41.6`)
 - `mobile/pubspec.yaml` — Flutter package manifest
 - Docker Compose at `docker-compose.yml` (currently empty, to be written)
@@ -76,7 +74,7 @@
 - PostgreSQL 16 with pgvector extension
 
 **Production:**
-- Docker / LXC containerization
+- Docker containerization
 - 4 containers: `fastapi-app:8000`, `langchain-service:8001`, `mcp-server:8002`, `postgres:5432`
 - Networks: `app-network` (API + AI services) and `data-network` (postgres)
 - Embedding model: `text-embedding-3-small` (OpenAI) — vector dimension 1536

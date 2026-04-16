@@ -131,7 +131,7 @@
 
 ## Pipeline de Ingestão de Documentos — _nova seção_
 
-**O que mudou:** Seção inteiramente nova com estrutura de pastas, comando de execução e comportamento do script. Roadmap pós-MVP com endpoint admin.
+**O que mudou:** Seção inteiramente nova com estrutura de pastas, comando de execução e comportamento do script. Roadmap pós-MVP com endpoint staff.
 **Por quê:** Era o gap mais crítico da documentação — a base de conhecimento não se popula sozinha. Sem documentar como os PDFs e markdowns da secretaria entram no PGVector, ninguém saberia o que fazer na Semana 2 do cronograma.
 
 ## Fluxo: Matrícula em Disciplinas

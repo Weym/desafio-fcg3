@@ -291,7 +291,7 @@ python scripts/ingest.py --source ./knowledge --chunk-size 500 --overlap 50
 4. Persiste os vetores em `pgvector` com metadados (`source`, `category`, `chunk_index`)
 5. Exibe relatorio: total de documentos, chunks gerados, tempo de execucao
 
-> **Roadmap pos-MVP:** Endpoint `POST /admin/knowledge-base/upload` para upload via
+> **Roadmap pos-MVP:** Endpoint `POST /staff/knowledge-base/upload` para upload via
 > painel do Fornecedor, sem necessidade de acesso tecnico ao servidor.
 
 ---

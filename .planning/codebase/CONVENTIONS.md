@@ -7,7 +7,7 @@
 The backend source code is in early scaffolding. The only source file is
 `backend/src/main.py`, which is currently empty. All conventions below are
 **prescriptive** — derived from the design documentation, code snippets in
-`docs/mcp.md`, and the `biome.json` linter config at the project root.
+`docs/mcp.md`.
 
 ## Language and Runtime
 
@@ -180,13 +180,9 @@ Never hardcode it. Never expose it in tool schemas.
 **Soft deletes:**
 - Students use `status = 'inactive'` — no physical delete
 
-## Code Style (biome.json at `/biome.json`)
+## Code Style
 
-The `biome.json` is configured for the project root and applies to
-JavaScript/TypeScript (tooling scripts, if any). Python code style is not
-covered by Biome.
-
-For Python:
+Python:
 - Follow PEP 8
 - Indent with 4 spaces (standard Python convention)
 - Line length: no explicit constraint defined — follow PEP 8 default (79-99)

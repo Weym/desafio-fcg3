@@ -49,7 +49,7 @@ erDiagram
 | email | VARCHAR(255) | UNIQUE, NOT NULL | Email institucional |
 | phone | VARCHAR(20) | UNIQUE | Telefone (WhatsApp) |
 | registration_number | VARCHAR(20) | UNIQUE, NOT NULL | Numero de matricula |
-| semester | INTEGER | NOT NULL, DEFAULT 1 | Periodo atual (1-8). Atualizado manualmente via admin ou script de inicio de semestre. |
+| semester | INTEGER | NOT NULL, DEFAULT 1 | Periodo atual (1-8). Atualizado manualmente via staff ou script de inicio de semestre. |
 | status | VARCHAR(20) | NOT NULL, DEFAULT 'active' | active, inactive, graduated, locked |
 | enrollment_year | INTEGER | NOT NULL | Ano de ingresso |
 | curriculum_id | UUID | FK -> curriculum.id | Curriculo que o aluno segue |
@@ -82,7 +82,7 @@ erDiagram
 | name | VARCHAR(255) | NOT NULL | Nome completo |
 | email | VARCHAR(255) | UNIQUE, NOT NULL | Email |
 | phone | VARCHAR(20) | | Telefone |
-| role | VARCHAR(50) | NOT NULL | admin, coordinator, secretary |
+| role | VARCHAR(50) | NOT NULL | staff, coordinator, secretary |
 | created_at | TIMESTAMP | NOT NULL, DEFAULT NOW() | |
 | updated_at | TIMESTAMP | NOT NULL, DEFAULT NOW() | |
 
@@ -393,7 +393,7 @@ WHERE expires_at < NOW();
 Executar periodicamente via `docker exec` ou tarefa agendada no servidor.
 
 > **Roadmap pos-MVP:** Habilitar `pg_cron` no container PostgreSQL e agendar a limpeza
-> diariamente junto com a implementacao do endpoint admin.
+> diariamente junto com a implementacao do endpoint staff.
 
 ---
 
