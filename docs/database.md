@@ -212,12 +212,26 @@ erDiagram
 
 ---
 
+### `resources` - Recursos
+
+| Coluna | Tipo | Constraints | Descricao |
+|--------|------|-------------|-----------|
+| id | UUID | PK | |
+| name | VARCHAR(100) | NOT NULL | Ex: "Sala 101" | |
+| resource_type | VARCHAR(20) | NOT NULL | room, lab, equipment | |
+| capacity | INTEGER | Capacidade de pessoas | |
+| location | VARCHAR(255) | Localizacao | |
+| is_available | BOOLEAN | NOT NULL, DEFAULT true | |
+| created_at | TIMESTAMP | NOT NULL, DEFAULT NOW() | |
+
+---
+
 ### `scheduling_slots` - Slots de Agendamento
 
 | Coluna | Tipo | Constraints | Descricao |
 |--------|------|-------------|-----------|
 | id | UUID | PK | |
-| staff_id | UUID | FK -> staff.id, NOT NULL | Responsavel |
+| resource_id | UUID | FK -> resources.id, NOT NULL | Responsavel | |
 | date | DATE | NOT NULL | |
 | start_time | TIME | NOT NULL | |
 | end_time | TIME | NOT NULL | |
