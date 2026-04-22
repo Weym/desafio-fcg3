@@ -4,7 +4,7 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 1
 status: context_gathered
-last_updated: "2026-04-20T20:17:07.014Z"
+last_updated: "2026-04-22T20:32:45.078Z"
 progress:
   total_phases: 6
   completed_phases: 0
@@ -33,7 +33,7 @@ progress:
 
 **Phase 1 — Infrastructure & Schema**
 Context gathered. Next action: Run `/gsd-plan-phase 1` to create the execution plan.
-Resume file: .planning/phases/04-mcp-server/04-CONTEXT.md
+Resume file: .planning/phases/05-ai-service/05-CONTEXT.md
 
 ## Accumulated Context
 
