@@ -74,14 +74,17 @@
 4. Student can view grades per discipline and full academic history; CRA is calculated correctly (credit-weighted, excluding in-progress and locked statuses, safe against division by zero); staff can post and update grades.
 5. Student can request documents and list their statuses; staff can update document status and attach a file URL; student can book, view, and cancel appointments; staff can create scheduling slots.
 
-### Plans
-- [ ] Plan 3.1: Students slice — CRUD endpoints, academic summary (`STU-06`), available courses list with prerequisite filter (`STU-07`), staff-only guards
-- [ ] Plan 3.2: Courses & curriculum slice — course listing/detail, recursive CTE prerequisite tree (`COURSE-03`), curriculum endpoints
-- [ ] Plan 3.3: Enrollment slice — enrollment period management (staff), draft-confirm flow, course drop and lock, prerequisite and period validation, IDOR ownership checks
-- [ ] Plan 3.4: Grades slice — grades by discipline/period, full history, CRA calculation, staff grade entry; integration tests (TEST-02, TEST-03)
-- [ ] Plan 3.5: Documents slice — student document request and listing, staff status update + file URL
-- [ ] Plan 3.6: Appointments slice — slot creation (staff), slot availability query, booking with SELECT FOR UPDATE, cancellation, listing
-- [ ] Plan 3.7: Staff dashboard — KPI aggregation endpoint (`STAFF-01`): total students, active enrollments, pending documents, upcoming appointments, active chat sessions, enrollment period status
+**Plans:** 8 plans
+
+Plans:
+- [ ] 03-01-PLAN.md — Shared infrastructure: pagination, error handling, dual-auth, IDOR protection, base CRUD service
+- [ ] 03-02-PLAN.md — Students slice: CRUD, academic summary (STU-06), available courses with prereq filter (STU-07)
+- [ ] 03-03-PLAN.md — Courses & curriculum slice: listing, detail, recursive CTE prerequisite tree (COURSE-03), curriculum endpoints
+- [ ] 03-04-PLAN.md — Enrollment slice: period management, draft-confirm flow, course drop/lock, prereq+period validation, IDOR checks
+- [ ] 03-05-PLAN.md — Grades slice: grades by discipline/period, transcript, CRA calculation (D-07/D-08), staff grade entry
+- [ ] 03-06-PLAN.md — Documents slice: student request/listing, staff status update + file URL
+- [ ] 03-07-PLAN.md — Appointments slice: slot creation, availability query, SELECT FOR UPDATE booking, cancellation
+- [ ] 03-08-PLAN.md — Staff dashboard: KPI aggregation (total students, active enrollments, pending docs, appointments, chat sessions)
 
 ---
 
