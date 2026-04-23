@@ -4,7 +4,7 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 1
 status: context_gathered
-last_updated: "2026-04-22T20:32:45.078Z"
+last_updated: "2026-04-23T18:30:04.322Z"
 progress:
   total_phases: 6
   completed_phases: 0
@@ -33,7 +33,7 @@ progress:
 
 **Phase 1 — Infrastructure & Schema**
 Context gathered. Next action: Run `/gsd-plan-phase 1` to create the execution plan.
-Resume file: .planning/phases/05-ai-service/05-CONTEXT.md
+Resume file: .planning/phases/06-whatsapp-webhook-integration/06-CONTEXT.md
 
 ## Accumulated Context
 
