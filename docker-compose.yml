@@ -45,6 +45,7 @@ services:
       FASTAPI_URL: ${FASTAPI_URL}
     volumes:
       - ./backend/src:/app/src
+      - ./backend/scripts:/app/scripts
     depends_on:
       postgres:
         condition: service_healthy
