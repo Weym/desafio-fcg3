@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 current_phase: 01
-status: verifying
-last_updated: "2026-04-24T14:42:19.683Z"
-last_activity: 2026-04-24
+status: executing
+last_updated: "2026-04-24T15:02:29.411Z"
+last_activity: 2026-04-24 -- Phase 01 planning complete
 progress:
   total_phases: 6
-  completed_phases: 1
-  total_plans: 31
+  completed_phases: 0
+  total_plans: 32
   completed_plans: 6
   percent: 19
 ---
@@ -19,9 +19,9 @@ progress:
 ## Current Position
 
 Phase: 1 of 6 (Infrastructure & Schema)
-Plan: 6 of 6
-Status: Phase complete — ready for verification
-Last activity: 2026-04-24
+Plan: 6 of 7
+Status: Ready to execute
+Last activity: 2026-04-24 -- Phase 01 planning complete
 
 Progress: [██░░░░░░░░] 19%
 
@@ -31,7 +31,7 @@ Progress: [██░░░░░░░░] 19%
 |------|----------|-------|-------|
 
 **Current Phase:** 01
-**Status:** Phase complete — ready for verification
+**Status:** Ready to execute
 **Last Updated:** 2026-04-24
 | Phase 01-infrastructure-schema P06 | 8 min | 2 tasks | 4 files |
 
@@ -39,7 +39,7 @@ Progress: [██░░░░░░░░] 19%
 
 | Phase | Name | Status |
 |-------|------|--------|
-| 1 | Infrastructure & Schema | complete |
+| 1 | Infrastructure & Schema | gap_closure_planned |
 | 2 | Authentication | planning |
 | 3 | Business Feature Slices | not_started |
 | 4 | MCP Server | not_started |
@@ -48,8 +48,9 @@ Progress: [██░░░░░░░░] 19%
 
 ## Current Focus
 
-**Phase 2 — Authentication**
-Phase 1 complete. Next action: Run `/gsd-plan-phase 2` to create the execution plan.
+**Phase 1 — Infrastructure & Schema gap closure**
+Verification reopened Phase 1 after runtime PostgreSQL authentication drift broke `alembic upgrade head` and `python -m scripts.seed` from `fastapi-app`.
+Next action: Run `/gsd-execute-phase 01 --gaps-only` to execute `01-07-PLAN.md`.
 Resume file: None
 
 ## Accumulated Context
@@ -60,6 +61,7 @@ Recent decisions affecting current work:
 
 - [Phase 01]: Preserved D-05 by clarifying the existing Docker Compose bootstrap flow instead of replacing it.
 - [Phase 01]: Preserved D-08 by limiting the fix to documentation and keeping AI/MCP as Phase 1 healthcheck stubs.
+- [Phase 01]: Gap closure plan 01-07 restores Docker runtime DB authentication without deleting the persisted volume or bypassing Alembic/seed commands.
 
 ### Key Decisions Pending
 

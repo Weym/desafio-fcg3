@@ -38,6 +38,8 @@
 - [x] Plan 1.3: Environment configuration — `.env.example` with all variables; `config.py` / `settings.py` with Pydantic BaseSettings
 - [x] Plan 1.4: Seed script — `scripts/seed.py` loading curriculum, courses, and prerequisites for CC 8-semester program
 - [x] Plan 1.5: Gap closure — repair backend import path so `fastapi-app` starts healthy in Docker
+- [x] Plan 1.6: Gap closure — clarify Phase 1 cold-start verification evidence in UAT/validation/bootstrap docs
+- [ ] Plan 1.7: Gap closure — restore Docker runtime PostgreSQL credentials so `alembic upgrade head` and `python -m scripts.seed` work again from `fastapi-app`
 
 ---
 
@@ -163,7 +165,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Infrastructure & Schema | 5/5 | Complete | 2026-04-24 |
+| 1. Infrastructure & Schema | 6/7 | In gap closure | 2026-04-24 |
 | 2. Authentication | 0/4 | Not started | - |
 | 3. Business Feature Slices | 0/7 | Not started | - |
 | 4. MCP Server | 0/4 | Planned | - |
