@@ -100,11 +100,13 @@ class Settings(BaseSettings):
         default="HS256",
         description="JWT signing algorithm.",
     )
-    jwt_expiration_hours: int = Field(
-        default=24,
-        ge=1,
-        le=168,
-        description="JWT expiration time in hours.",
+    jwt_access_expiry_seconds: int = Field(
+        default=3600,
+        description="JWT access token TTL in seconds (D-01: 1 hour).",
+    )
+    jwt_refresh_expiry_seconds: int = Field(
+        default=2592000,
+        description="JWT refresh token TTL in seconds (D-01: 30 days).",
     )
 
     mcp_service_token: str = Field(
@@ -133,6 +135,28 @@ class Settings(BaseSettings):
     resend_api_key: str = Field(
         pattern=r"^re_",
         description="Resend API key.",
+    )
+    resend_from: str = Field(
+        default="Academia <no-reply@test.invalid>",
+        description="Resend sender address (e.g. 'Academia <no-reply@domain>').",
+    )
+
+    otp_expiry_seconds: int = Field(
+        default=300,
+        description="OTP code TTL in seconds (SC-1: 5 min).",
+    )
+    otp_max_attempts: int = Field(
+        default=3,
+        description="Max wrong OTP attempts before invalidation (SC-3).",
+    )
+
+    rate_limit_email: str = Field(
+        default="5/15 minutes",
+        description="slowapi rate limit string per email (D-13).",
+    )
+    rate_limit_ip: str = Field(
+        default="20/15 minutes",
+        description="slowapi rate limit string per IP (D-14).",
     )
 
     llm_provider: Literal["openai", "gemini"] = Field(
