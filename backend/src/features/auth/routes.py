@@ -6,15 +6,19 @@ Enumeration protection: D-08 — identical response for registered and unregiste
 
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import JSONResponse
+from jose import JWTError
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.infrastructure.config import get_settings
 from src.infrastructure.database import get_db_session
 from src.shared.rate_limit import limiter
+from src.shared.auth import get_current_user, CurrentUser
 from src.features.auth.schemas import (
+    MeResponse,
+    RefreshPayload,
     RequestCodePayload,
     RequestCodeResponse,
     VerifyCodePayload,
@@ -128,6 +132,81 @@ async def verify_code(
     return TokenPair(
         access_token=pair.access.token,
         refresh_token=pair.refresh.token,
+        token_type="bearer",
+        expires_in=settings.jwt_access_expiry_seconds,
+    )
+
+
+@router.post("/logout", status_code=200)
+async def logout(
+    current_user: CurrentUser = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db_session),
+) -> dict:
+    """D-11: revoke ONLY the current jti. Other active sessions remain valid."""
+    await session_service.revoke(db, current_user.jti)
+    await db.commit()
+    return {"message": "Logged out"}
+
+
+@router.get("/me", response_model=MeResponse, status_code=200)
+async def me(current_user: CurrentUser = Depends(get_current_user)) -> MeResponse:
+    """D-05: payload is rich enough that we don't query the DB — token IS the source."""
+    return MeResponse(
+        id=str(current_user.id),
+        email=current_user.email,
+        name=current_user.name,
+        role=current_user.role,
+    )
+
+
+@router.post("/refresh", response_model=TokenPair, status_code=200)
+async def refresh(
+    payload: RefreshPayload,
+    db: AsyncSession = Depends(get_db_session),
+) -> TokenPair:
+    """D-02, D-03, D-16: silent renewal with rotation and replay detection."""
+    # 1. Decode + validate signature
+    try:
+        claims = jwt_service.decode(payload.refresh_token)
+    except JWTError:
+        raise HTTPException(401, {"error": {"code": "invalid_token",
+                                            "message": "Invalid or expired refresh token"}})
+    # 2. Only refresh-typed tokens may refresh
+    if claims.get("typ") != "refresh":
+        raise HTTPException(401, {"error": {"code": "invalid_token",
+                                            "message": "Not a refresh token"}})
+    # 3. Extract jti, user_id, role
+    from uuid import UUID as _UUID
+    try:
+        old_jti = _UUID(claims["jti"])
+        user_id = _UUID(claims["sub"])
+    except (KeyError, ValueError):
+        raise HTTPException(401, {"error": {"code": "invalid_token", "message": "Payload malformed"}})
+    role = claims.get("role", "")
+    # 4. Look up the user (D-09) to rebuild a full enriched access token (D-05)
+    user = None
+    qs = await db.execute(select(Student).where(Student.id == user_id))
+    student = qs.scalar_one_or_none()
+    if student is not None:
+        user = student
+    else:
+        qst = await db.execute(select(Staff).where(Staff.id == user_id))
+        user = qst.scalar_one_or_none()
+    if user is None:
+        raise HTTPException(401, {"error": {"code": "invalid_token", "message": "User not found"}})
+    # 5. Issue new pair
+    new_pair = jwt_service.issue_token_pair(user_id, role, user.name, user.email)
+    # 6. Rotate under SELECT FOR UPDATE (P-03). ValueError -> replay attempt -> 401.
+    try:
+        await session_service.rotate_refresh(db, old_jti, new_pair, user_id)
+    except ValueError:
+        await db.rollback()
+        raise HTTPException(401, {"error": {"code": "refresh_token_revoked",
+                                            "message": "Refresh token already used or expired"}})
+    await db.commit()
+    return TokenPair(
+        access_token=new_pair.access.token,
+        refresh_token=new_pair.refresh.token,
         token_type="bearer",
         expires_in=settings.jwt_access_expiry_seconds,
     )
