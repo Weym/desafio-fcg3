@@ -2,6 +2,18 @@ services:
   postgres:
     image: pgvector/pgvector:pg16
     container_name: fcg3-postgres
+    entrypoint:
+      - /bin/bash
+      - -ceu
+      - |
+          docker-entrypoint.sh postgres &
+          postgres_pid=$$!
+          trap 'kill -TERM "$$postgres_pid"; wait "$$postgres_pid"' INT TERM
+          until pg_isready -h 127.0.0.1 -U postgres -d postgres >/dev/null 2>&1; do
+            sleep 1
+          done
+          bash /docker-entrypoint-initdb.d/reconcile_dev_credentials.sh
+          wait "$$postgres_pid"
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -10,8 +22,9 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./backend/docker/postgres/reconcile_dev_credentials.sh:/docker-entrypoint-initdb.d/reconcile_dev_credentials.sh:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "PGPASSWORD=${POSTGRES_PASSWORD} psql -h 127.0.0.1 -U ${POSTGRES_USER} -d ${POSTGRES_DB} -tAc 'SELECT 1' >/dev/null"]
       interval: 5s
       timeout: 3s
       retries: 5
@@ -28,6 +41,8 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
       DATABASE_URL: ${DATABASE_URL}
       ALEMBIC_DATABASE_URL: ${ALEMBIC_DATABASE_URL}
       MCP_SERVICE_TOKEN: ${MCP_SERVICE_TOKEN}
@@ -69,6 +84,8 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
       DATABASE_URL: ${DATABASE_URL}
       ALEMBIC_DATABASE_URL: ${ALEMBIC_DATABASE_URL}
       MCP_SERVICE_TOKEN: ${MCP_SERVICE_TOKEN}
@@ -109,6 +126,8 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
       DATABASE_URL: ${DATABASE_URL}
       ALEMBIC_DATABASE_URL: ${ALEMBIC_DATABASE_URL}
       MCP_SERVICE_TOKEN: ${MCP_SERVICE_TOKEN}

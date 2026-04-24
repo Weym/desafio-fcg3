@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-import os
 from logging.config import fileConfig
 
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
+from src.infrastructure.config import build_database_url
 from src.infrastructure.models import Base
 
 config = context.config
@@ -15,15 +15,11 @@ if config.config_file_name is not None:
 
 
 def get_sync_database_url() -> str:
-    db_url = os.getenv("ALEMBIC_DATABASE_URL")
-    if db_url:
-        return db_url
-
-    db_url = os.getenv(
-        "DATABASE_URL",
-        "postgresql+asyncpg://fcg3:changeme@localhost:5432/fcg3",
+    return build_database_url(
+        env_var="ALEMBIC_DATABASE_URL",
+        driver="sync",
+        fallback_env_var="DATABASE_URL",
     )
-    return db_url.replace("postgresql+asyncpg://", "postgresql://", 1)
 
 
 config.set_main_option("sqlalchemy.url", get_sync_database_url())

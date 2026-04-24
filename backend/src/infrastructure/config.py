@@ -1,8 +1,71 @@
+import os
 from functools import lru_cache
 from typing import Literal, Self
+from urllib.parse import quote_plus
 
 from pydantic import Field, PostgresDsn, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+DEFAULT_POSTGRES_DB = "fcg3"
+DEFAULT_POSTGRES_HOST = "postgres"
+DEFAULT_POSTGRES_PASSWORD = "change_me_in_production"
+DEFAULT_POSTGRES_PORT = 5432
+DEFAULT_POSTGRES_USER = "fcg3"
+
+
+def _normalize_database_url(database_url: str, *, driver: str | None) -> str:
+    if driver == "sync":
+        return database_url.replace("postgresql+asyncpg://", "postgresql://", 1).replace(
+            "postgresql+psycopg://",
+            "postgresql://",
+            1,
+        )
+
+    if driver == "asyncpg":
+        return database_url.replace("postgresql://", "postgresql+asyncpg://", 1).replace(
+            "postgresql+psycopg://",
+            "postgresql+asyncpg://",
+            1,
+        )
+
+    if driver == "psycopg":
+        return database_url.replace("postgresql://", "postgresql+psycopg://", 1).replace(
+            "postgresql+asyncpg://",
+            "postgresql+psycopg://",
+            1,
+        )
+
+    return database_url
+
+
+def build_database_url(
+    *,
+    env_var: str,
+    driver: Literal["asyncpg", "psycopg", "sync"],
+    fallback_env_var: str | None = None,
+) -> str:
+    explicit_database_url = os.getenv(env_var)
+    if explicit_database_url:
+        return _normalize_database_url(explicit_database_url, driver=driver)
+
+    if fallback_env_var:
+        fallback_database_url = os.getenv(fallback_env_var)
+        if fallback_database_url:
+            return _normalize_database_url(fallback_database_url, driver=driver)
+
+    postgres_user = os.getenv("POSTGRES_USER", DEFAULT_POSTGRES_USER)
+    postgres_password = os.getenv("POSTGRES_PASSWORD", DEFAULT_POSTGRES_PASSWORD)
+    postgres_host = os.getenv("POSTGRES_HOST", DEFAULT_POSTGRES_HOST)
+    postgres_port = os.getenv("POSTGRES_PORT", str(DEFAULT_POSTGRES_PORT))
+    postgres_db = os.getenv("POSTGRES_DB", DEFAULT_POSTGRES_DB)
+
+    scheme = "postgresql" if driver == "sync" else f"postgresql+{driver}"
+
+    return (
+        f"{scheme}://{quote_plus(postgres_user)}:{quote_plus(postgres_password)}"
+        f"@{postgres_host}:{postgres_port}/{quote_plus(postgres_db)}"
+    )
 
 
 class Settings(BaseSettings):
@@ -112,6 +175,43 @@ class Settings(BaseSettings):
             )
 
         return self
+
+    @model_validator(mode="before")
+    @classmethod
+    def apply_database_url_defaults(cls, data: object) -> object:
+        if not isinstance(data, dict):
+            return data
+
+        values = dict(data)
+        values.setdefault(
+            "database_url",
+            build_database_url(env_var="DATABASE_URL", driver="asyncpg"),
+        )
+        values.setdefault(
+            "alembic_database_url",
+            build_database_url(
+                env_var="ALEMBIC_DATABASE_URL",
+                driver="sync",
+                fallback_env_var="DATABASE_URL",
+            ),
+        )
+        values.setdefault(
+            "database_url_mcp",
+            build_database_url(
+                env_var="DATABASE_URL_MCP",
+                driver="asyncpg",
+                fallback_env_var="DATABASE_URL",
+            ),
+        )
+        values.setdefault(
+            "database_url_ai",
+            build_database_url(
+                env_var="DATABASE_URL_AI",
+                driver="psycopg",
+                fallback_env_var="DATABASE_URL",
+            ),
+        )
+        return values
 
 
 @lru_cache

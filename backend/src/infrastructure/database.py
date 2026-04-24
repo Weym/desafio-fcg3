@@ -1,14 +1,15 @@
-import os
 from collections.abc import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 
+from src.infrastructure.config import build_database_url
+
 
 def get_database_url() -> str:
-    return os.getenv(
-        "DATABASE_URL",
-        "postgresql+asyncpg://fcg3:changeme@postgres:5432/fcg3",
+    return build_database_url(
+        env_var="DATABASE_URL",
+        driver="asyncpg",
     )
 
 
