@@ -1,6 +1,6 @@
 """Route handlers for the Students feature slice.
 
-7 endpoints covering all STU-* requirements:
+9 endpoints covering all STU-* and student-scoped GRADES requirements:
 - GET /students — staff only, paginated with search/semester/status filters (STU-01)
 - GET /students/{id} — authenticated, IDOR-safe (STU-05)
 - POST /students — staff only (STU-02)
@@ -8,6 +8,8 @@
 - DELETE /students/{id} — staff only, soft delete (STU-04)
 - GET /students/{id}/academic-summary — dual-auth, MCP-accessible (STU-06)
 - GET /students/{id}/available-courses — dual-auth, MCP-accessible (STU-07)
+- GET /students/{id}/grades — dual-auth, MCP-accessible (GRADES-01)
+- GET /students/{id}/transcript — dual-auth, MCP-accessible (GRADES-02)
 """
 
 from __future__ import annotations
@@ -179,3 +181,55 @@ async def get_available_courses(
 
     courses = await student_service.get_available_courses(db, student_id)
     return {"data": [c.model_dump() for c in courses]}
+
+
+# ------------------------------------------------------------------
+# GRADES-01: GET /students/{id}/grades — dual-auth (MCP)
+# ------------------------------------------------------------------
+
+@router.get("/{student_id}/grades", response_model=None)
+async def get_student_grades(
+    student_id: UUID,
+    semester_year: str | None = Query(
+        default=None,
+        description="Filter by semester year (e.g. 2025.1)",
+    ),
+    user: UserContext = Depends(get_current_user_or_service),
+    db: AsyncSession = Depends(get_db_session),
+) -> dict:
+    """Student grades with optional semester filter. Accepts X-Service-Token (MCP).
+
+    T-03-21: check_ownership prevents students from viewing others' grades.
+    """
+    if user.role != "staff":
+        check_ownership(student_id, user)
+
+    from src.features.grades.services import grade_service
+
+    grades = await grade_service.get_student_grades(
+        db, student_id, semester_year=semester_year,
+    )
+    return {"data": [g.model_dump() for g in grades]}
+
+
+# ------------------------------------------------------------------
+# GRADES-02: GET /students/{id}/transcript — dual-auth (MCP)
+# ------------------------------------------------------------------
+
+@router.get("/{student_id}/transcript", response_model=None)
+async def get_student_transcript(
+    student_id: UUID,
+    user: UserContext = Depends(get_current_user_or_service),
+    db: AsyncSession = Depends(get_db_session),
+) -> dict:
+    """Full academic transcript with CRA. Accepts X-Service-Token (MCP).
+
+    T-03-23: defense-in-depth, even MCP requests check ownership (D-05).
+    """
+    if user.role != "staff":
+        check_ownership(student_id, user)
+
+    from src.features.grades.services import grade_service
+
+    transcript = await grade_service.get_transcript(db, student_id)
+    return transcript.model_dump()
