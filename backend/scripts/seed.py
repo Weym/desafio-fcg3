@@ -272,6 +272,36 @@ def calculate_grade_final(grade_1: Decimal | None, grade_2: Decimal | None) -> D
     return None
 
 
+def validate_seed_shapes() -> None:
+    semesters = {semester for *_prefix, semester, _required in COURSES_DATA}
+    if len(COURSES_DATA) != 40:
+        raise ValueError(f"Expected 40 seeded courses, found {len(COURSES_DATA)}")
+    if semesters != set(range(1, 9)):
+        raise ValueError(f"Expected semesters 1-8, found {sorted(semesters)}")
+
+    adjacency: dict[str, set[str]] = {}
+    for course_code, prerequisite_code in PREREQUISITE_DATA:
+        adjacency.setdefault(course_code, set()).add(prerequisite_code)
+        adjacency.setdefault(prerequisite_code, set())
+
+    visited: set[str] = set()
+    active_stack: set[str] = set()
+
+    def visit(node: str) -> None:
+        if node in active_stack:
+            raise ValueError(f"Prerequisite cycle detected at {node}")
+        if node in visited:
+            return
+        active_stack.add(node)
+        for dependency in adjacency.get(node, set()):
+            visit(dependency)
+        active_stack.remove(node)
+        visited.add(node)
+
+    for course_code in adjacency:
+        visit(course_code)
+
+
 def period_dates(semester_year: str) -> tuple[date, date]:
     year_text, term_text = semester_year.split(".")
     year = int(year_text)
@@ -484,6 +514,7 @@ async def main() -> None:
     print("⚠️  WARNING: This script TRUNCATES and recreates development seed data.")
     print("⚠️  Affected tables: " + ", ".join(WARNING_TABLES))
     print("🌱 Starting destructive seed...")
+    validate_seed_shapes()
 
     async with async_session() as session:
         await truncate_seed_tables(session)
