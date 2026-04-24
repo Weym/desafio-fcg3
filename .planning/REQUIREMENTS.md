@@ -10,7 +10,7 @@
 
 ### Infraestrutura
 
-- [ ] **INFRA-01**: Sistema pode ser iniciado com `docker compose up` — 4 containers sobem com healthchecks (postgres+pgvector, fastapi-app, langchain-service, mcp-server)
+- [x] **INFRA-01**: Sistema pode ser iniciado com `docker compose up` — 4 containers sobem com healthchecks (postgres+pgvector, fastapi-app, langchain-service, mcp-server)
 - [ ] **INFRA-02**: Schema completo do banco (17 tabelas + HNSW index) é criado via Alembic migrations (migration #001: extensão pgvector)
 - [ ] **INFRA-03**: `.env.example` documenta todas as variáveis de ambiente necessárias (DATABASE_URL, MCP_SERVICE_TOKEN, WHATSAPP_TOKEN, WHATSAPP_APP_SECRET, RESEND_API_KEY, LLM_PROVIDER, LLM_MODEL, OPENAI_API_KEY)
 - [ ] **INFRA-04**: Seed data do currículo de Ciência da Computação (8 períodos, ~40 disciplinas com pré-requisitos) está disponível e pode ser executado via script
@@ -170,7 +170,7 @@
 
 | REQ-ID | Fase | Status |
 |--------|------|--------|
-| INFRA-01 | Phase 1: Infrastructure & Schema | Pending |
+| INFRA-01 | Phase 1: Infrastructure & Schema | Complete |
 | INFRA-02 | Phase 1: Infrastructure & Schema | Pending |
 | INFRA-03 | Phase 1: Infrastructure & Schema | Pending |
 | INFRA-04 | Phase 1: Infrastructure & Schema | Pending |
