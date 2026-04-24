@@ -1,0 +1,19 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: detect-private-key
+
+  - repo: local
+    hooks:
+      - id: alembic-check
+        name: alembic-check
+        entry: pwsh -NoProfile -Command "Set-Location backend; python -m alembic check"
+        language: system
+        pass_filenames: false
+        files: ^backend/
+
+# Recommended local setup:
+# 1. Run `pre-commit install`
+# 2. Keep real secrets only in `.env` or your secret manager
+# 3. Do not commit `.env` or copied credentials files
