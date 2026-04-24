@@ -30,7 +30,11 @@ from src.features.auth.deps import body_parser, email_key_func
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
-settings = get_settings()
+# Rate-limit strings as defaults — evaluated at import time by @limiter.limit decorators.
+# These match the defaults in Settings (config.py). Dynamic overrides via env are applied
+# lazily by get_settings() inside each handler, not at decorator evaluation time.
+_RATE_LIMIT_EMAIL = "5/15 minutes"   # D-13
+_RATE_LIMIT_IP = "20/15 minutes"     # D-14
 
 
 def _utcnow_comparable(dt: datetime) -> datetime:
@@ -53,13 +57,14 @@ def _auth_error(status_code: int, code: str, message: str) -> JSONResponse:
 
 
 @router.post("/request-code", response_model=RequestCodeResponse, status_code=200)
-@limiter.limit(settings.rate_limit_email, key_func=email_key_func)  # D-13: 5/email/15min
-@limiter.limit(settings.rate_limit_ip)  # D-14: 20/IP/15min, default IP key
+@limiter.limit(_RATE_LIMIT_EMAIL, key_func=email_key_func)  # D-13: 5/email/15min
+@limiter.limit(_RATE_LIMIT_IP)  # D-14: 20/IP/15min, default IP key
 async def request_code(
     request: Request,
     _body: dict = Depends(body_parser),  # caches body for key_func
     db: AsyncSession = Depends(get_db_session),
 ) -> RequestCodeResponse:
+    settings = get_settings()
     # Parse the cached body into the schema (validates email format)
     payload = RequestCodePayload.model_validate(_body)
     # D-08: always generate + hash + persist for timing parity; only send if registered
@@ -165,6 +170,7 @@ async def refresh(
     db: AsyncSession = Depends(get_db_session),
 ) -> TokenPair:
     """D-02, D-03, D-16: silent renewal with rotation and replay detection."""
+    settings = get_settings()
     # 1. Decode + validate signature
     try:
         claims = jwt_service.decode(payload.refresh_token)
