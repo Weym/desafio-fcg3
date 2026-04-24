@@ -28,7 +28,7 @@ async def test_student_token_rejected_on_staff_route(app_with_probe, client, see
     await db_session.commit()
     r = await client.get("/_test/staff-only", headers={"Authorization": f"Bearer {tok.token}"})
     assert r.status_code == 403
-    assert r.json()["detail"]["error"]["code"] == "forbidden"
+    assert r.json()["error"]["code"] == "forbidden"
 
 
 @pytest.mark.asyncio
@@ -65,7 +65,7 @@ async def test_student_token_allowed_on_student_route(app_with_probe, client, se
 async def test_missing_authorization_header(app_with_probe, client):
     r = await client.get("/_test/staff-only")
     assert r.status_code == 401
-    assert r.json()["detail"]["error"]["code"] == "missing_token"
+    assert r.json()["error"]["code"] == "missing_token"
 
 
 @pytest.mark.asyncio
@@ -81,7 +81,7 @@ async def test_revoked_jti_rejected(app_with_probe, client, seed_users, db_sessi
     await db_session.commit()
     r = await client.get("/_test/staff-only", headers={"Authorization": f"Bearer {tok.token}"})
     assert r.status_code == 401
-    assert r.json()["detail"]["error"]["code"] == "token_revoked"
+    assert r.json()["error"]["code"] == "token_revoked"
 
 
 @pytest.mark.asyncio
@@ -89,7 +89,7 @@ async def test_tampered_signature_rejected(app_with_probe, client):
     bad = "Bearer eyJhbGciOiJIUzI1NiJ9.tampered.signature"
     r = await client.get("/_test/staff-only", headers={"Authorization": bad})
     assert r.status_code == 401
-    assert r.json()["detail"]["error"]["code"] == "invalid_token"
+    assert r.json()["error"]["code"] == "invalid_token"
 
 
 @pytest.mark.asyncio
@@ -105,4 +105,4 @@ async def test_refresh_token_rejected_on_authenticated_route(app_with_probe, cli
     await db_session.commit()
     r = await client.get("/_test/staff-only", headers={"Authorization": f"Bearer {tok.token}"})
     assert r.status_code == 401
-    assert r.json()["detail"]["error"]["code"] == "invalid_token"
+    assert r.json()["error"]["code"] == "invalid_token"

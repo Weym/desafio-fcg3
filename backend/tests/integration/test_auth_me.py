@@ -29,7 +29,7 @@ async def test_me_returns_profile_from_token_claims(client, seed_users, db_sessi
 async def test_me_returns_401_without_auth(client):
     r = await client.get("/auth/me")
     assert r.status_code == 401
-    assert r.json()["detail"]["error"]["code"] == "missing_token"
+    assert r.json()["error"]["code"] == "missing_token"
 
 
 @pytest.mark.asyncio
@@ -42,4 +42,4 @@ async def test_me_rejects_refresh_token(client, seed_users, db_session):
     await db_session.commit()
     r = await client.get("/auth/me", headers={"Authorization": f"Bearer {refresh_tok.token}"})
     assert r.status_code == 401
-    assert r.json()["detail"]["error"]["code"] == "invalid_token"
+    assert r.json()["error"]["code"] == "invalid_token"

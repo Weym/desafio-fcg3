@@ -51,7 +51,7 @@ async def test_logout_then_me_returns_401(client, seed_users, db_session):
     r2 = await client.get("/auth/me",
                           headers={"Authorization": f"Bearer {pair.access.token}"})
     assert r2.status_code == 401
-    assert r2.json()["detail"]["error"]["code"] == "token_revoked"
+    assert r2.json()["error"]["code"] == "token_revoked"
 
 
 @pytest.mark.asyncio

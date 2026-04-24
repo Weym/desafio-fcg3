@@ -1,4 +1,6 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.exceptions import HTTPException, RequestValidationError
+from fastapi.responses import JSONResponse
 from slowapi.errors import RateLimitExceeded
 
 from src.infrastructure.config import get_settings  # noqa: F401
@@ -15,6 +17,46 @@ app.add_middleware(BodyCacheMiddleware)
 # Rate limiting — slowapi
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)
+
+
+@app.exception_handler(HTTPException)
+async def normalize_http_exception(request: Request, exc: HTTPException) -> JSONResponse:
+    """Normalize HTTPException detail to the canonical error shape.
+
+    Routes use JSONResponse with {"error": {...}} directly, but FastAPI
+    dependencies (get_current_user, require_role, require_service_token) must
+    raise HTTPException — which wraps the body under "detail". This handler
+    unwraps it so ALL error responses share the canonical shape:
+    {"error": {"code": ..., "message": ...}}
+    """
+    body = exc.detail
+    # If detail is already our canonical shape, use it directly
+    if isinstance(body, dict) and "error" in body:
+        return JSONResponse(status_code=exc.status_code, content=body)
+    # Otherwise wrap it
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"error": {"code": "error", "message": str(body)}},
+    )
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
+    """WR-04: Normalize Pydantic/FastAPI validation errors to canonical shape.
+
+    Without this handler, malformed request bodies produce FastAPI's default
+    {"detail": [...]} shape instead of our canonical {"error": {...}}.
+    """
+    return JSONResponse(
+        status_code=422,
+        content={
+            "error": {
+                "code": "VALIDATION_ERROR",
+                "message": "Request validation failed",
+                "details": exc.errors(),
+            }
+        },
+    )
 
 # Routers
 app.include_router(auth_router)

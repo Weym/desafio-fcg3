@@ -46,7 +46,7 @@ async def test_refresh_replay_returns_401(client, seed_users, db_session):
     # Replay the SAME refresh token — D-03 rotation demands rejection
     r2 = await client.post("/auth/refresh", json={"refresh_token": pair.refresh.token})
     assert r2.status_code == 401
-    assert r2.json()["detail"]["error"]["code"] == "refresh_token_revoked"
+    assert r2.json()["error"]["code"] == "refresh_token_revoked"
 
 
 @pytest.mark.asyncio
@@ -55,7 +55,7 @@ async def test_refresh_with_access_token_rejected(client, seed_users, db_session
     # Submitting the ACCESS token to /auth/refresh must fail (typ check)
     r = await client.post("/auth/refresh", json={"refresh_token": pair.access.token})
     assert r.status_code == 401
-    assert r.json()["detail"]["error"]["code"] == "invalid_token"
+    assert r.json()["error"]["code"] == "invalid_token"
 
 
 @pytest.mark.asyncio
