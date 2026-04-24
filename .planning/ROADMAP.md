@@ -124,12 +124,14 @@ Plans:
 4. Setting `LLM_PROVIDER=gemini` in the environment switches the agent to Gemini without any code changes; setting `LLM_PROVIDER=openai` uses OpenAI — both produce valid responses.
 5. Running `python scripts/ingest.py` processes all five knowledge base documents (`matricula.md`, `regulamento.pdf`, `faq.md`, `calendario.md`, `curriculo.md`), generates embeddings, and stores chunks in `knowledge_base_chunks`.
 
-### Plans
-- [ ] Plan 5.1: AI service scaffold — `ai_service/` directory, `requirements.txt` with `langchain>=0.3`, `langchain-postgres>=0.0.9`, `psycopg[binary]>=3.1`, provider deps; psycopg3 PGVector connection
-- [ ] Plan 5.2: Knowledge base ingest — `scripts/ingest.py`, document chunking, `text-embedding-3-small` embeddings, PGVector storage, HNSW index validation
-- [ ] Plan 5.3: RAG pipeline — PGVector retriever with cosine threshold, query + retrieve + inject context pattern, threshold calibration with sample queries
-- [ ] Plan 5.4: ReAct agent — provider-agnostic LLM factory (`LLM_PROVIDER` env var), MCP tool binding, ConversationBufferWindowMemory rebuilt from DB (k=20), `max_iterations=5`, `max_execution_time=30.0`
-- [ ] Plan 5.5: AI service HTTP endpoint — FastAPI (or equivalent) endpoint that receives message + session_id, invokes agent, writes assistant reply to `chat_messages`
+**Plans:** 5 plans
+
+Plans:
+- [ ] 05-01-PLAN.md — AI service scaffold: FastAPI app, psycopg3 DB layer, LLM factory, system prompt, config
+- [ ] 05-02-PLAN.md — Knowledge base ingest: document chunking, text-embedding-3-small embeddings, PGVector storage
+- [ ] 05-03-PLAN.md — RAG pipeline: search_knowledge_base tool with pgvector cosine similarity, 0.75 threshold
+- [ ] 05-04-PLAN.md — ReAct agent: create_agent with MCP tool binding (langchain-mcp-adapters), conversation memory, provider-agnostic LLM
+- [ ] 05-05-PLAN.md — AI service /chat endpoint: receives message + session_id, invokes agent, saves response to chat_messages
 
 ---
 
@@ -162,5 +164,5 @@ Plans:
 | 2. Authentication | 0/4 | Not started | - |
 | 3. Business Feature Slices | 0/7 | Not started | - |
 | 4. MCP Server | 0/4 | Planned | - |
-| 5. AI Service | 0/5 | Not started | - |
+| 5. AI Service | 0/5 | Planned | - |
 | 6. WhatsApp Webhook & Integration | 0/4 | Not started | - |
