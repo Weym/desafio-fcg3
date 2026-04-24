@@ -66,3 +66,48 @@ async def revoke(db: AsyncSession, jti: UUID) -> None:
     await db.execute(
         update(SessionModel).where(SessionModel.jti == jti).values(used=True)
     )
+
+
+async def rotate_refresh(
+    db: AsyncSession,
+    old_refresh_jti: UUID,
+    new_pair: TokenPairResult,
+    user_id: UUID,
+) -> None:
+    """D-03: rotate refresh token. Called by POST /auth/refresh.
+
+    P-03 mitigation: SELECT ... FOR UPDATE on the old row. If already used OR missing,
+    the caller receives ValueError and must return 401.
+
+    Behavior when called:
+    - Lock the old refresh row FOR UPDATE
+    - If already used or expired -> raise ValueError('rotation_lost')
+    - Mark old refresh row used=True
+    - Also mark the sibling access row (linked via parent_jti) used=True — this forces
+      callers holding the old access token to re-authenticate via /auth/refresh as well
+    - Insert two new rows for the new pair (create_session_pair semantics)
+    """
+    q = await db.execute(
+        select(SessionModel).where(
+            SessionModel.jti == old_refresh_jti,
+            SessionModel.token_type == "refresh",
+        ).with_for_update()
+    )
+    old = q.scalar_one_or_none()
+    # tz-aware comparison — expires_at is tz-aware (datetime.utcnow() would raise TypeError)
+    if old is None or old.used or old.expires_at < datetime.now(timezone.utc):
+        raise ValueError("rotation_lost")
+    old.used = True
+    # Also invalidate the sibling access token (old.parent_jti points AT the access jti)
+    if old.parent_jti is not None:
+        sib = await db.execute(
+            select(SessionModel).where(
+                SessionModel.jti == old.parent_jti,
+                SessionModel.token_type == "access",
+            )
+        )
+        sib_row = sib.scalar_one_or_none()
+        if sib_row is not None:
+            sib_row.used = True
+    # Create the new pair
+    await create_session_pair(db, user_id, new_pair)
