@@ -101,11 +101,13 @@ Plans:
 4. Requests from MCP to FastAPI without a valid `X-Service-Token` (compared via `hmac.compare_digest`) are rejected with 401.
 5. On a 5xx response or timeout from FastAPI, MCP retries exactly once; 4xx responses are not retried.
 
-### Plans
-- [ ] Plan 4.1: MCP service scaffold — `mcp-server/` directory, `FastMCP` application, streamable-http server setup, `X-Service-Token` validation dependency, asyncpg session factory
-- [ ] Plan 4.2: Tool implementations (group A) — `get_student_info`, `get_available_courses`, `get_curriculum`, `get_course_prerequisites`, `get_enrollment_period`, `get_grades`, `get_academic_history`
-- [ ] Plan 4.3: Tool implementations (group B) — `enroll_courses`, `confirm_enrollment`, `drop_course`, `lock_enrollment`, `request_document`, `get_available_slots`, `book_appointment`, `cancel_appointment`, `get_appointments`
-- [ ] Plan 4.4: session context injection & logging — student_id extraction from session, mcp_action_logs writes, retry policy, integration test (TEST-05)
+**Plans:** 4 plans
+
+Plans:
+- [ ] 04-01-PLAN.md — MCP scaffold: FastMCP app, settings, asyncpg pool, httpx client, healthcheck, session resolver, tool call middleware (logging + retry)
+- [ ] 04-02-PLAN.md — Read-only tools (Group A): get_student_info, get_available_courses, get_grades, get_transcript, get_curriculum, get_course_prerequisites, get_enrollment_period
+- [ ] 04-03-PLAN.md — Write/action tools (Group B): create_enrollment, confirm_enrollment, drop_course, lock_enrollment, request_document, get_document_status, get_available_slots, book_appointment, cancel_appointment
+- [ ] 04-04-PLAN.md — Integration tests: session resolution, middleware retry/logging, tool schema validation, student_id absence, X-Service-Token verification
 
 ---
 
@@ -159,6 +161,6 @@ Plans:
 | 1. Infrastructure & Schema | 0/4 | Not started | - |
 | 2. Authentication | 0/4 | Not started | - |
 | 3. Business Feature Slices | 0/7 | Not started | - |
-| 4. MCP Server | 0/4 | Not started | - |
+| 4. MCP Server | 0/4 | Planned | - |
 | 5. AI Service | 0/5 | Not started | - |
 | 6. WhatsApp Webhook & Integration | 0/4 | Not started | - |
