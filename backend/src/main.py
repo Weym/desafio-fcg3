@@ -14,6 +14,11 @@ from src.features.auth.deps import BodyCacheMiddleware
 from src.features.auth.routes import router as auth_router
 from src.features.students.routes import router as students_router
 from src.features.courses.routes import courses_router, curriculum_router
+from src.features.enrollment.routes import (
+    enrollment_periods_router,
+    enrollments_router,
+    staff_enrollment_router,
+)
 
 
 @asynccontextmanager
@@ -81,6 +86,9 @@ app.include_router(auth_router)
 app.include_router(students_router, prefix="/api/v1")
 app.include_router(courses_router, prefix="/api/v1")
 app.include_router(curriculum_router, prefix="/api/v1")
+app.include_router(enrollment_periods_router, prefix="/api/v1")
+app.include_router(enrollments_router, prefix="/api/v1")
+app.include_router(staff_enrollment_router, prefix="/api/v1")
 
 
 @app.get("/health")
