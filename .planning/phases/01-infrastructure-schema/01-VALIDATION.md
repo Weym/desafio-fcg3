@@ -89,6 +89,21 @@ Phase 1 now has committed pytest-based validation under `backend/tests/phase_01/
 | Resolved | 4 |
 | Escalated | 0 |
 
+## Validation Audit 2026-04-24 (Recheck)
+
+| Metric | Count |
+|--------|-------|
+| Gaps found | 0 |
+| Resolved | 0 |
+| Escalated | 0 |
+
+Re-ran the full Phase 1 automated suite:
+
+- `pytest backend/tests/phase_01/test_phase_01_stack.py -v`
+- `pytest backend/tests/phase_01/test_phase_01_schema_seed.py -v`
+
+Current result: `8/8` tests passing, including live `alembic upgrade head`, `alembic check`, and repeatable `python -m scripts.seed` coverage against the running Docker stack.
+
 ---
 
 ## Validation Sign-Off
