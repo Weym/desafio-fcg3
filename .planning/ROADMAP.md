@@ -148,11 +148,13 @@ Plans:
 4. Sending the same WhatsApp message ID twice results in only one `chat_messages` row (deduplication by `whatsapp_message_id`).
 5. Staff can list chat sessions and view messages for any session; staff can view MCP action logs for a session showing tool calls, parameters, and reasoning.
 
-### Plans
-- [ ] Plan 6.1: Webhook handler — `POST /webhook/whatsapp` (body read via `request.body()` before any parsing), HMAC-SHA256 validation, message save, `asyncio.create_task` + `add_done_callback`, `GET /webhook/whatsapp` challenge response
-- [ ] Plan 6.2: Message routing — text vs. media branching, media standard replies by type, wamid deduplication, background task session management
-- [ ] Plan 6.3: Chat visibility endpoints — `GET /chat/sessions` (staff, filter by student/status), `GET /chat/sessions/{id}/messages`, `GET /chat/sessions/{id}/mcp-logs` (staff)
-- [ ] Plan 6.4: Test suite — TEST-01 (auth flow), TEST-02 (enrollment IDOR), TEST-03 (CRA calculation), TEST-04 (webhook HMAC + dedup + media), TEST-05 (X-Service-Token middleware)
+**Plans:** 4 plans
+
+Plans:
+- [ ] 06-01-PLAN.md — Webhook core: WhatsApp client, HMAC validation, GET/POST endpoints, verification state migration, message routing
+- [ ] 06-02-PLAN.md — Background processing: AI service integration, retry/fallback, per-session lock, session lifecycle, pg_cron auto-close
+- [ ] 06-03-PLAN.md — Chat visibility: staff endpoints for sessions, messages, and MCP action logs
+- [ ] 06-04-PLAN.md — Test suite: TEST-04 (HMAC + dedup + media), TEST-05 (service token), verification state, background tasks, chat visibility
 
 ---
 
@@ -165,4 +167,4 @@ Plans:
 | 3. Business Feature Slices | 0/7 | Not started | - |
 | 4. MCP Server | 0/4 | Planned | - |
 | 5. AI Service | 0/5 | Planned | - |
-| 6. WhatsApp Webhook & Integration | 0/4 | Not started | - |
+| 6. WhatsApp Webhook & Integration | 0/4 | Planned | - |
