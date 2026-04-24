@@ -58,6 +58,14 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         },
     )
 
+# Startup hooks
+@app.on_event("startup")
+async def _configure_resend() -> None:
+    """Set Resend API key once at startup rather than on every OTP call."""
+    import resend
+    resend.api_key = get_settings().resend_api_key
+
+
 # Routers
 app.include_router(auth_router)
 

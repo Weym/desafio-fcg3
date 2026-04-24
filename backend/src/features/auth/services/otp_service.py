@@ -59,7 +59,6 @@ async def generate_and_send_code(session: AsyncSession, email: str) -> Generated
     Plaintext is never logged.
     """
     settings = get_settings()
-    resend.api_key = settings.resend_api_key
 
     plaintext = _generate_code()
     salt = secrets.token_hex(16)  # 32-char hex string
