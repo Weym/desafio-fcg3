@@ -73,7 +73,14 @@ async def request_code(
     return RequestCodeResponse(message="Codigo enviado", expires_in=settings.otp_expiry_seconds)
 
 
-@router.post("/verify-code", response_model=TokenPair, status_code=200)
+@router.post(
+    "/verify-code",
+    response_model=TokenPair,
+    status_code=200,
+    responses={
+        401: {"description": "Invalid or expired code, or max attempts reached"},
+    },
+)
 async def verify_code(
     payload: VerifyCodePayload,
     db: AsyncSession = Depends(get_db_session),
@@ -164,7 +171,14 @@ async def me(current_user: CurrentUser = Depends(get_current_user)) -> MeRespons
     )
 
 
-@router.post("/refresh", response_model=TokenPair, status_code=200)
+@router.post(
+    "/refresh",
+    response_model=TokenPair,
+    status_code=200,
+    responses={
+        401: {"description": "Invalid, expired, or already-used refresh token"},
+    },
+)
 async def refresh(
     payload: RefreshPayload,
     db: AsyncSession = Depends(get_db_session),
