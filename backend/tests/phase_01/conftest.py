@@ -5,11 +5,30 @@ import subprocess
 import sys
 from collections.abc import Sequence
 from pathlib import Path
+from urllib.parse import quote_plus
 
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 BACKEND_ROOT = REPO_ROOT / "backend"
-LOCAL_DATABASE_URL = "postgresql+asyncpg://fcg3:changeme@localhost:5432/fcg3"
+
+
+def get_postgres_setting(key: str, default: str) -> str:
+    return os.environ.get(key, default)
+
+
+def build_database_url(*, driver: str = "asyncpg", host: str = "localhost") -> str:
+    postgres_user = get_postgres_setting("POSTGRES_USER", "fcg3")
+    postgres_password = get_postgres_setting(
+        "POSTGRES_PASSWORD",
+        "change_me_in_production",
+    )
+    postgres_db = get_postgres_setting("POSTGRES_DB", "fcg3")
+    postgres_port = get_postgres_setting("POSTGRES_PORT", "5432")
+    scheme = "postgresql" if driver == "sync" else f"postgresql+{driver}"
+    return (
+        f"{scheme}://{quote_plus(postgres_user)}:{quote_plus(postgres_password)}"
+        f"@{host}:{postgres_port}/{quote_plus(postgres_db)}"
+    )
 
 
 def run_command(
@@ -53,9 +72,9 @@ def query_postgres(sql: str) -> str:
             "postgres",
             "psql",
             "-U",
-            "fcg3",
+            get_postgres_setting("POSTGRES_USER", "fcg3"),
             "-d",
-            "fcg3",
+            get_postgres_setting("POSTGRES_DB", "fcg3"),
             "-t",
             "-A",
             "-c",
@@ -93,7 +112,7 @@ def backend_python_env(*, include_settings: bool) -> dict[str, str]:
     if include_settings:
         env.update(
             {
-                "DATABASE_URL": LOCAL_DATABASE_URL,
+                "DATABASE_URL": build_database_url(driver="asyncpg", host="localhost"),
                 "JWT_SECRET": "x" * 32,
                 "MCP_SERVICE_TOKEN": "y" * 32,
                 "WHATSAPP_TOKEN": "placeholder-whatsapp-token",
@@ -106,13 +125,21 @@ def backend_python_env(*, include_settings: bool) -> dict[str, str]:
     return env
 
 
-def run_seed() -> subprocess.CompletedProcess[str]:
-    env = os.environ.copy()
-    env["DATABASE_URL"] = LOCAL_DATABASE_URL
-    env["PYTHONIOENCODING"] = "utf-8"
+def run_fastapi_container_command(*args: str) -> subprocess.CompletedProcess[str]:
     return run_command(
-        [sys.executable, "-X", "utf8", "-m", "scripts.seed"],
-        cwd=BACKEND_ROOT,
-        env=env,
+        ["docker", "compose", "exec", "-T", "fastapi-app", *args],
+        cwd=REPO_ROOT,
         timeout=180,
     )
+
+
+def run_alembic_upgrade_head() -> subprocess.CompletedProcess[str]:
+    return run_fastapi_container_command("alembic", "upgrade", "head")
+
+
+def run_alembic_check() -> subprocess.CompletedProcess[str]:
+    return run_fastapi_container_command("alembic", "check")
+
+
+def run_seed() -> subprocess.CompletedProcess[str]:
+    return run_fastapi_container_command("python", "-m", "scripts.seed")

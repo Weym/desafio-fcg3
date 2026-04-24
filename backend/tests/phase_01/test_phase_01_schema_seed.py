@@ -2,7 +2,14 @@ from __future__ import annotations
 
 import sys
 
-from conftest import BACKEND_ROOT, assert_success, query_postgres, run_command, run_seed
+from conftest import (
+    BACKEND_ROOT,
+    assert_success,
+    query_postgres,
+    run_alembic_check,
+    run_alembic_upgrade_head,
+    run_seed,
+)
 
 sys.path.insert(0, str(BACKEND_ROOT))
 
@@ -25,10 +32,13 @@ def test_schema_metadata_and_live_database_expose_21_application_tables() -> Non
 
 
 def test_alembic_model_state_has_no_pending_upgrade_operations() -> None:
-    result = run_command([sys.executable, "-m", "alembic", "check"], cwd=BACKEND_ROOT)
-    combined_output = f"{result.stdout}\n{result.stderr}"
+    upgrade_result = run_alembic_upgrade_head()
+    assert_success(upgrade_result)
 
-    assert result.returncode == 0, combined_output
+    check_result = run_alembic_check()
+    combined_output = f"{check_result.stdout}\n{check_result.stderr}"
+
+    assert check_result.returncode == 0, combined_output
     assert "No new upgrade operations detected." in combined_output
 
 
