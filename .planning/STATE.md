@@ -4,7 +4,7 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 03
 status: planning
-last_updated: "2026-04-24T19:38:02.544Z"
+last_updated: "2026-04-24T23:00:00.000Z"
 last_activity: 2026-04-24
 progress:
   total_phases: 6
@@ -18,30 +18,30 @@ progress:
 
 ## Current Position
 
-Phase: 02 (authentication) — EXECUTING
+Phase: 03 (business-feature-slices) — NOT STARTED
 Plan: Not started
-Status: Executing Phase 02
+Status: Ready to plan
 Last activity: 2026-04-24
 
-Progress: [██░░░░░░░░] 22%
+Progress: [███░░░░░░░] 34%
 
 ## Performance Metrics
 
 | Plan | Duration | Tasks | Files |
 |------|----------|-------|-------|
-
-**Current Phase:** 03
-**Status:** Ready to plan
-**Last Updated:** 2026-04-24
 | Phase 01-infrastructure-schema P06 | 8 min | 2 tasks | 4 files |
 | Phase 01-infrastructure-schema P07 | 25 min | 2 tasks | 7 files |
+| Phase 02-authentication P01 | 10 min | 6 tasks | 26 files |
+| Phase 02-authentication P02 | 18 min | 6 tasks | 12 files |
+| Phase 02-authentication P03 | 3 min | 3 tasks | 5 files |
+| Phase 02-authentication P04 | 5 min | 6 tasks | 5 files |
 
 ## Phase Status
 
 | Phase | Name | Status |
 |-------|------|--------|
 | 1 | Infrastructure & Schema | complete |
-| 2 | Authentication | not_started |
+| 2 | Authentication | complete |
 | 3 | Business Feature Slices | not_started |
 | 4 | MCP Server | not_started |
 | 5 | AI Service | not_started |
@@ -49,9 +49,9 @@ Progress: [██░░░░░░░░] 22%
 
 ## Current Focus
 
-**Phase 1 complete; Phase 2 next**
-Phase 1 is complete, validated, and UAT-verified. Milestone M1 remains in progress because Phases 2-6 are still not implemented.
-Next action: Begin Phase 2 planning/execution with `/gsd-execute-phase 02`.
+**Phase 2 complete; Phase 3 next**
+Phase 2 is complete: all 4 plans executed, 47 tests green, security audit passed (24/24 threats closed, ASVS L1), code review fixes applied, UAT verified. Milestone M1 remains in progress because Phases 3-6 are still not implemented.
+Next action: Begin Phase 3 planning/execution with `/gsd-execute-phase 03`.
 Resume file: None
 
 ## Accumulated Context
@@ -66,6 +66,12 @@ Recent decisions affecting current work:
 - [Phase 01]: PostgreSQL startup now reconciles the configured role, password, and database on every container boot instead of requiring manual volume repair.
 - [Phase 01]: FastAPI runtime, Alembic, and test helpers now derive DSNs from one POSTGRES_* credential source while preserving explicit DATABASE_URL overrides.
 - [Phase 01]: Validation and UAT are both verified; Phase 1 is complete.
+- [Phase 02]: Settings module at `config.py` (not `settings.py`) — Phase 1 convention preserved.
+- [Phase 02]: Migration numbered 007a (not 003) — Phase 1 already used 003a-006a for business tables.
+- [Phase 02]: JSONResponse used instead of HTTPException for canonical error shape `{"error": {...}}`.
+- [Phase 02]: BodyCacheMiddleware added for slowapi sync key_func compatibility (P-01).
+- [Phase 02]: SQLite+aiosqlite test engine with ForUpdateArg compiler hook for PostgreSQL-free testing.
+- [Phase 02]: Security audit passed — 24/24 threats closed at ASVS Level 1.
 
 ### Key Decisions Pending
 

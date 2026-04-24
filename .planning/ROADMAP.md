@@ -10,7 +10,7 @@
 ## Phases
 
 - [x] **Phase 1: Infrastructure & Schema** — Docker Compose running, all application tables migrated, seed data loaded
-- [ ] **Phase 2: Authentication** — OTP email flow, JWT with roles, session revocation, auth middleware
+- [x] **Phase 2: Authentication** — OTP email flow, JWT with roles, session revocation, auth middleware
 - [ ] **Phase 3: Business Feature Slices** — All FastAPI feature endpoints (students, courses, enrollment, grades, documents, appointments, staff dashboard)
 - [ ] **Phase 4: MCP Server** — 16 tools over streamable-http, student_id injection, mcp_action_logs
 - [ ] **Phase 5: AI Service** — LangChain ReAct agent, RAG pipeline, provider-agnostic LLM, knowledge base ingest
@@ -57,10 +57,10 @@
 5. Authenticated user can call `GET /auth/me` and receive their own profile data.
 
 ### Plans
-- [ ] Plan 2.1: OTP request & email delivery — `POST /auth/request-code`, Resend integration, rate limiting, `verification_codes` table writes
-- [ ] Plan 2.2: OTP verification & JWT issuance — `POST /auth/verify-code`, attempt counting, code invalidation, JWT with role + jti, session creation
-- [ ] Plan 2.3: Auth middleware & dependencies — `get_current_user`, `require_role`, JWT validation, jti revocation check, `X-Service-Token` dependency for MCP routes
-- [ ] Plan 2.4: Session management — `POST /auth/logout`, `GET /auth/me`, integration tests (TEST-01 coverage)
+- [x] Plan 2.1: OTP request & email delivery — `POST /auth/request-code`, Resend integration, rate limiting, `verification_codes` table writes
+- [x] Plan 2.2: OTP verification & JWT issuance — `POST /auth/verify-code`, attempt counting, code invalidation, JWT with role + jti, session creation
+- [x] Plan 2.3: Auth middleware & dependencies — `get_current_user`, `require_role`, JWT validation, jti revocation check, `X-Service-Token` dependency for MCP routes
+- [x] Plan 2.4: Session management — `POST /auth/logout`, `GET /auth/me`, integration tests (TEST-01 coverage)
 
 ---
 
@@ -165,9 +165,9 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Infrastructure & Schema | 6/7 | In gap closure | 2026-04-24 |
-| 2. Authentication | 0/4 | Not started | - |
-| 3. Business Feature Slices | 0/7 | Not started | - |
+| 1. Infrastructure & Schema | 7/7 | Complete | 2026-04-24 |
+| 2. Authentication | 4/4 | Complete | 2026-04-24 |
+| 3. Business Feature Slices | 0/8 | Not started | - |
 | 4. MCP Server | 0/4 | Planned | - |
 | 5. AI Service | 0/5 | Planned | - |
 | 6. WhatsApp Webhook & Integration | 0/4 | Planned | - |
