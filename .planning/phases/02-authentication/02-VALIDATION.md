@@ -45,9 +45,9 @@ created: 2026-04-23
 | 2-02-02 | 02 | 2 | AUTH-02,AUTH-03 | T-02-01 / T-02-06 | `POST /auth/verify-code` — JWT with role/jti/exp issued; wrong code 3× triggers invalidate+auto-resend; expired doesn't count | integration | `cd backend && pytest tests/integration/test_auth_otp_flow.py -x` | ❌ W0 | ⬜ pending |
 | 2-03-01 | 03 | 2 | AUTH-02 | T-02-06 / T-02-07 | `get_current_user` validates sig, checks `jti` against sessions, returns 401 on revoked | unit+integration | `cd backend && pytest tests/unit/test_jwt_service.py tests/integration/test_auth_me.py -x` | ❌ W0 | ⬜ pending |
 | 2-03-02 | 03 | 2 | — | T-02-08 | `require_role("staff")` 403s students; `require_service_token` uses `hmac.compare_digest` | integration | `cd backend && pytest tests/integration/test_role_guard.py tests/integration/test_service_token.py -x` | ❌ W0 | ⬜ pending |
-| 2-04-01 | 04 | 3 | AUTH-04,AUTH-05 | T-02-06 | `/auth/logout` revokes current jti only; `/auth/me` returns profile from JWT | integration | `cd backend && pytest tests/integration/test_auth_logout.py tests/integration/test_auth_me.py -x` | ❌ W0 | ⬜ pending |
-| 2-04-02 | 04 | 3 | AUTH-02 | T-02-09 | `/auth/refresh` rotates refresh token; replay of old refresh returns 401 | integration | `cd backend && pytest tests/integration/test_auth_refresh_rotation.py -x` | ❌ W0 | ⬜ pending |
-| 2-04-03 | 04 | 3 | AUTH-01..05 | all | Full phase suite green (TEST-01 coverage scaffold for Phase 6) | integration | `cd backend && pytest tests/integration -x -q` | ❌ W0 | ⬜ pending |
+| 2-04-01 | 04 | 3 | AUTH-04,AUTH-05 | T-02-06 | `/auth/logout` revokes current jti only; `/auth/me` returns profile from JWT | integration | `cd backend && pytest tests/integration/test_auth_logout.py tests/integration/test_auth_me.py -x` | ✅ | ✅ green |
+| 2-04-02 | 04 | 3 | AUTH-02 | T-02-09 | `/auth/refresh` rotates refresh token; replay of old refresh returns 401 | integration | `cd backend && pytest tests/integration/test_auth_refresh_rotation.py -x` | ✅ | ✅ green |
+| 2-04-03 | 04 | 3 | AUTH-01..05 | all | Full phase suite green (TEST-01 coverage scaffold for Phase 6) | integration | `cd backend && pytest tests/integration -x -q` | ✅ | ✅ green |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
