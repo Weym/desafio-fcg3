@@ -41,6 +41,8 @@ curl http://localhost:8001/health
 curl http://localhost:8002/health
 ```
 
+Se `docker compose ps` ainda mostrar servicos em estado de transicao (`created`, `starting` ou equivalente), aguarde alguns segundos e rode o comando novamente por ate 60 segundos antes de declarar falha no cold start. Considere a stack realmente falha apenas se esse intervalo terminar sem os servicos estabilizarem ou se o `curl http://localhost:8000/health` nao responder com sucesso.
+
 ## Banco de dados
 
 Aplicar migrations:

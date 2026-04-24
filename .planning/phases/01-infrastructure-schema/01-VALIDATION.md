@@ -36,7 +36,7 @@ created: 2026-04-23
 
 - `docker compose up --build -d` is only an intermediate startup state for Phase 1 smoke verification.
 - Detached compose output alone is not sufficient evidence to fail the stack.
-- A post-start `docker compose ps` re-check is mandatory before judging stack health.
+- A post-start `docker compose ps` poll loop is mandatory before judging stack health: re-run it for up to 60 seconds until the services settle into healthy/running states or clearly stop progressing.
 - `curl http://localhost:8000/health` is required proof for the backend path in the Phase 1 cold-start smoke flow.
 
 ---

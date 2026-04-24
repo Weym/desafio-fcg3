@@ -3,7 +3,7 @@ status: diagnosed
 phase: 01-infrastructure-schema
 source: [01-01-SUMMARY.md, 01-02-SUMMARY.md, 01-03-SUMMARY.md, 01-04-SUMMARY.md, 01-05-SUMMARY.md]
 started: 2026-04-24T13:49:46.0302700Z
-updated: 2026-04-24T14:22:15.5523013Z
+updated: 2026-04-24T14:57:00Z
 ---
 
 ## Current Test
@@ -13,7 +13,7 @@ updated: 2026-04-24T14:22:15.5523013Z
 ## Tests
 
 ### 1. Cold Start Smoke Test
-expected: Stop any running containers, then start the stack from scratch with `docker compose up --build -d`. Treat the detached compose output as an intermediate startup state only. Before recording any failure, re-check the stack with `docker compose ps`, then call `curl http://localhost:8000/health`, and judge the cold-start result only from that post-start health evidence. The four services should boot without crashing, PostgreSQL should become healthy, and the backend health endpoint should respond with live JSON at `http://localhost:8000/health`.
+expected: Stop any running containers, then start the stack from scratch with `docker compose up --build -d`. Treat the detached compose output as an intermediate startup state only. Before recording any failure, spend up to 60 seconds re-running `docker compose ps` until the stack settles into healthy service states or clearly stops progressing, then call `curl http://localhost:8000/health`, and judge the cold-start result only from that post-start health evidence. The four services should boot without crashing, PostgreSQL should become healthy, and the backend health endpoint should respond with live JSON at `http://localhost:8000/health`.
 result: issue
 reported: "Historical UAT evidence stopped at the immediate detached `docker compose up --build -d` output (#32 [mcp-server] resolving provenance for metadata file #32 DONE 0.0s [+] up 7/7 ✔ Image desafio-fcg3-fastapi-app Built 3.3s ✔ Image desafio-fcg3-langchain-service Built 3.3s ✔ Image desafio-fcg3-mcp-server Built 3.3s ✔ Container fcg3-ai Created 0.2s ✔ Container fcg3-api Recreated 0.3s ✔ Container fcg3-mcp Created 0.2s ✔ Container fcg3-postgres Healthy 5.5s) without the required `docker compose ps` or backend `/health` follow-up evidence."
 severity: major
