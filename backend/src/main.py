@@ -13,6 +13,7 @@ from src.shared.exceptions import register_exception_handlers
 from src.features.auth.deps import BodyCacheMiddleware
 from src.features.auth.routes import router as auth_router
 from src.features.students.routes import router as students_router
+from src.features.courses.routes import courses_router, curriculum_router
 
 
 @asynccontextmanager
@@ -78,6 +79,8 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 # Routers
 app.include_router(auth_router)
 app.include_router(students_router, prefix="/api/v1")
+app.include_router(courses_router, prefix="/api/v1")
+app.include_router(curriculum_router, prefix="/api/v1")
 
 
 @app.get("/health")
