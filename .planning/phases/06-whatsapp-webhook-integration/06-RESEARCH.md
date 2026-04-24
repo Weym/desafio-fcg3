@@ -1,7 +1,7 @@
 # Phase 6 Research — WhatsApp Webhook & Integration
 
 **Phase:** 06-whatsapp-webhook-integration
-**Researched:** 2026-04-23
+**Researched:** 2026-04-23 (re-verified 2026-04-23)
 **Discovery Level:** Level 1 (Quick Verification)
 **Confidence:** HIGH
 
@@ -139,6 +139,60 @@ verified → unverified (session closed + new message → new session per D-13)
 | `WHATSAPP_VERIFY_TOKEN` | Webhook challenge verification | Self-defined |
 | `WHATSAPP_API_VERSION` | Graph API version (default: v18.0) | Self-defined |
 | `AI_SERVICE_URL` | LangChain service endpoint (http://langchain-service:8001) | Docker internal |
+
+---
+
+---
+
+## Validation Architecture
+
+### Test Framework
+- **Framework:** pytest 8.x + pytest-asyncio + httpx AsyncClient (same as Phase 2)
+- **Config:** `backend/pyproject.toml` — already created by Phase 1/2
+- **Quick run:** `cd backend && pytest tests/features/webhook -x -q`
+- **Full suite:** `cd backend && pytest -x -q`
+- **Estimated runtime:** ~8s webhook tests, ~35s full suite
+
+### Mock Strategy (D-17)
+- **WhatsApp Graph API:** Mock `httpx.AsyncClient` responses — no real Meta API calls in tests
+- **AI Service:** Mock `httpx.AsyncClient` POST to `AI_SERVICE_URL/chat` — return canned responses
+- **PostgreSQL:** Real test database with transaction rollback per test (reuses Phase 1 conftest)
+- **pg_cron:** Migration verified via Alembic check; actual cron execution is manual-only
+
+### Test File Structure
+```
+backend/tests/
+├── conftest.py                          # Phase 1/2 — shared DB + app fixtures
+├── features/
+│   ├── webhook/
+│   │   ├── conftest.py                  # Phase 6 — mock WA client, payload factory
+│   │   ├── test_webhook_hmac.py         # TEST-04: HMAC validation
+│   │   ├── test_webhook_dedup.py        # TEST-04: message deduplication
+│   │   ├── test_webhook_media.py        # TEST-04: media type responses
+│   │   ├── test_verification_state.py   # Verification state machine flow
+│   │   ├── test_background_task.py      # Background processing + retry
+│   │   ├── test_whatsapp_client.py      # WhatsApp client unit tests
+│   │   ├── test_phone_normalization.py  # D-04 phone matching
+│   │   └── test_session_lifecycle.py    # Session reuse + close + auto-close
+│   └── chat/
+│       ├── conftest.py                  # Phase 6 — staff JWT, seeded sessions
+│       └── test_chat_visibility.py      # Staff endpoints + authorization
+└── middleware/
+    └── test_service_token.py            # TEST-05: service token middleware
+```
+
+### Key Fixtures Needed
+- `mock_wa_client` — monkeypatch WhatsAppClient.send_text_message to capture outgoing messages
+- `webhook_payload_factory` — generate valid/invalid HMAC payloads (text, media, status)
+- `test_student_with_phone` — seeded student with phone number for lookup
+- `verified_session` / `unverified_session` — pre-created chat sessions in different states
+- `mock_ai_service` — httpx mock returning canned AI responses
+
+### Manual-Only Verifications
+- WhatsApp webhook registration (requires Meta Developer Dashboard + public URL)
+- Actual message delivery through WhatsApp
+- pg_cron job execution (requires Docker with pg_cron extension)
+- End-to-end verification flow on real WhatsApp
 
 ---
 
