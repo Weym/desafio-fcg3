@@ -6,7 +6,7 @@ Enumeration protection: D-08 — identical response for registered and unregiste
 
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, Request
 from fastapi.responses import JSONResponse
 from jose import JWTError
 from sqlalchemy import select
@@ -168,26 +168,24 @@ async def me(current_user: CurrentUser = Depends(get_current_user)) -> MeRespons
 async def refresh(
     payload: RefreshPayload,
     db: AsyncSession = Depends(get_db_session),
-) -> TokenPair:
+) -> TokenPair | JSONResponse:
     """D-02, D-03, D-16: silent renewal with rotation and replay detection."""
     settings = get_settings()
     # 1. Decode + validate signature
     try:
         claims = jwt_service.decode(payload.refresh_token)
     except JWTError:
-        raise HTTPException(401, {"error": {"code": "invalid_token",
-                                            "message": "Invalid or expired refresh token"}})
+        return _auth_error(401, "invalid_token", "Invalid or expired refresh token")
     # 2. Only refresh-typed tokens may refresh
     if claims.get("typ") != "refresh":
-        raise HTTPException(401, {"error": {"code": "invalid_token",
-                                            "message": "Not a refresh token"}})
+        return _auth_error(401, "invalid_token", "Not a refresh token")
     # 3. Extract jti, user_id, role
     from uuid import UUID as _UUID
     try:
         old_jti = _UUID(claims["jti"])
         user_id = _UUID(claims["sub"])
     except (KeyError, ValueError):
-        raise HTTPException(401, {"error": {"code": "invalid_token", "message": "Payload malformed"}})
+        return _auth_error(401, "invalid_token", "Payload malformed")
     role = claims.get("role", "")
     # 4. Look up the user (D-09) to rebuild a full enriched access token (D-05)
     user = None
@@ -199,7 +197,7 @@ async def refresh(
         qst = await db.execute(select(Staff).where(Staff.id == user_id))
         user = qst.scalar_one_or_none()
     if user is None:
-        raise HTTPException(401, {"error": {"code": "invalid_token", "message": "User not found"}})
+        return _auth_error(401, "invalid_token", "User not found")
     # 5. Issue new pair
     new_pair = jwt_service.issue_token_pair(user_id, role, user.name, user.email)
     # 6. Rotate under SELECT FOR UPDATE (P-03). ValueError -> replay attempt -> 401.
@@ -207,8 +205,7 @@ async def refresh(
         await session_service.rotate_refresh(db, old_jti, new_pair, user_id)
     except ValueError:
         await db.rollback()
-        raise HTTPException(401, {"error": {"code": "refresh_token_revoked",
-                                            "message": "Refresh token already used or expired"}})
+        return _auth_error(401, "refresh_token_revoked", "Refresh token already used or expired")
     await db.commit()
     return TokenPair(
         access_token=new_pair.access.token,
