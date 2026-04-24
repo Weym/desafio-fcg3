@@ -94,8 +94,12 @@ async def rotate_refresh(
         ).with_for_update()
     )
     old = q.scalar_one_or_none()
-    # tz-aware comparison — expires_at is tz-aware (datetime.utcnow() would raise TypeError)
-    if old is None or old.used or old.expires_at < datetime.now(timezone.utc):
+    # tz-aware comparison — normalize for both tz-aware (PostgreSQL) and naive (SQLite) datetimes
+    now_utc = datetime.now(timezone.utc)
+    if old is None or old.used:
+        raise ValueError("rotation_lost")
+    expires_at = old.expires_at if old.expires_at.tzinfo is not None else old.expires_at.replace(tzinfo=timezone.utc)
+    if expires_at < now_utc:
         raise ValueError("rotation_lost")
     old.used = True
     # Also invalidate the sibling access token (old.parent_jti points AT the access jti)
