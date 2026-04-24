@@ -38,7 +38,7 @@ class Enrollment(Base):
     __tablename__ = "enrollments"
     __table_args__ = (
         CheckConstraint(
-            "status IN ('draft', 'confirmed', 'cancelled')",
+            "status IN ('draft', 'confirmed', 'cancelled', 'locked')",
             name="ck_enrollments_status",
         ),
         Index("idx_enrollments_student", "student_id", "status"),
