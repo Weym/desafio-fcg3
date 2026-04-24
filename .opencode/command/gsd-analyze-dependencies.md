@@ -8,6 +8,7 @@ tools:
   grep: true
   question: true
 ---
+
 <objective>
 Analyze the phase dependency graph for the current milestone. For each phase pair, determine if there is a dependency relationship based on:
 - File overlap (phases that modify the same files must be ordered)
@@ -18,7 +19,7 @@ Then suggest `Depends on` updates to ROADMAP.md.
 </objective>
 
 <execution_context>
-@/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/analyze-dependencies.md
+@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/analyze-dependencies.md
 </execution_context>
 
 <context>
@@ -28,6 +29,6 @@ Run this command BEFORE `/gsd-manager` to fill in missing `Depends on` fields an
 </context>
 
 <process>
-Execute the analyze-dependencies workflow from @/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/analyze-dependencies.md end-to-end.
+Execute the analyze-dependencies workflow from @./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/analyze-dependencies.md end-to-end.
 Present dependency suggestions clearly and apply confirmed updates to ROADMAP.md.
 </process>

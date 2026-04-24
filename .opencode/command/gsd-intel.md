@@ -38,7 +38,7 @@ GSD > INTEL
 
 Intel system is disabled. To activate:
 
-  node /home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs config-set intel.enabled true
+  node ./desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs config-set intel.enabled true
 
 Then run /gsd-intel refresh to build the initial index.
 ```
@@ -49,13 +49,13 @@ Then run /gsd-intel refresh to build the initial index.
 
 Parse `$ARGUMENTS` to determine the operation mode:
 
-| Argument | Action |
-|----------|--------|
-| `query <term>` | Run inline query (Step 2a) |
-| `status` | Run inline status check (Step 2b) |
-| `diff` | Run inline diff check (Step 2c) |
-| `refresh` | Spawn intel-updater agent (Step 3) |
-| No argument or unknown | Show usage message |
+| Argument               | Action                             |
+| ---------------------- | ---------------------------------- |
+| `query <term>`         | Run inline query (Step 2a)         |
+| `status`               | Run inline status check (Step 2b)  |
+| `diff`                 | Run inline diff check (Step 2c)    |
+| `refresh`              | Spawn intel-updater agent (Step 3) |
+| No argument or unknown | Show usage message                 |
 
 **Usage message** (shown when no argument or unrecognized argument):
 
@@ -76,10 +76,11 @@ Modes:
 Run:
 
 ```bash
-node /home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs intel query <term>
+node ./desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs intel query <term>
 ```
 
 Parse the JSON output and display results:
+
 - If the output contains `"disabled": true`, display the disabled message from Step 1 and **STOP**
 - If no matches found, display: `No intel matches for '<term>'. Try /gsd-intel refresh to build the index.`
 - Otherwise, display matching entries grouped by intel file
@@ -91,10 +92,11 @@ Parse the JSON output and display results:
 Run:
 
 ```bash
-node /home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs intel status
+node ./desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs intel status
 ```
 
 Parse the JSON output and display each intel file with:
+
 - File name
 - Last `updated_at` timestamp
 - STALE or FRESH status (stale if older than 24 hours or missing)
@@ -106,10 +108,11 @@ Parse the JSON output and display each intel file with:
 Run:
 
 ```bash
-node /home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs intel diff
+node ./desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs intel diff
 ```
 
 Parse the JSON output and display:
+
 - Added entries since last snapshot
 - Removed entries since last snapshot
 - Changed entries since last snapshot
@@ -136,7 +139,7 @@ Task(
   prompt="You are the gsd-intel-updater agent. Your job is to analyze this codebase and write/update intelligence files in .planning/intel/.
 
 Project root: ${CWD}
-gsd-tools path: /home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs
+gsd-tools path: ./desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs
 
 Instructions:
 1. Analyze the codebase structure, dependencies, APIs, and architecture
@@ -160,10 +163,11 @@ Wait for the agent to complete.
 After the agent completes, run:
 
 ```bash
-node /home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs intel status
+node ./desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs intel status
 ```
 
 Display a summary showing:
+
 - Which intel files were written or updated
 - Last update timestamps
 - Overall health of the intel index

@@ -16,9 +16,9 @@ changes that are irrelevant to code review.
 </objective>
 
 <execution_context>
-@/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/pr-branch.md
+@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/pr-branch.md
 </execution_context>
 
 <process>
-Execute the pr-branch workflow from @/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/pr-branch.md end-to-end.
+Execute the pr-branch workflow from @./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/pr-branch.md end-to-end.
 </process>

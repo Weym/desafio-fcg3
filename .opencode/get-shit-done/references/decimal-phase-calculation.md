@@ -6,10 +6,11 @@ Calculate the next decimal phase number for urgent insertions.
 
 ```bash
 # Get next decimal phase after phase 6
-node "/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" phase next-decimal 6
+node "./desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" phase next-decimal 6
 ```
 
 Output:
+
 ```json
 {
   "found": true,
@@ -20,6 +21,7 @@ Output:
 ```
 
 With existing decimals:
+
 ```json
 {
   "found": true,
@@ -32,31 +34,32 @@ With existing decimals:
 ## Extract Values
 
 ```bash
-DECIMAL_PHASE=$(node "/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" phase next-decimal "${AFTER_PHASE}" --pick next)
-BASE_PHASE=$(node "/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" phase next-decimal "${AFTER_PHASE}" --pick base_phase)
+DECIMAL_PHASE=$(node "./desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" phase next-decimal "${AFTER_PHASE}" --pick next)
+BASE_PHASE=$(node "./desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" phase next-decimal "${AFTER_PHASE}" --pick base_phase)
 ```
 
 Or with --raw flag:
+
 ```bash
-DECIMAL_PHASE=$(node "/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" phase next-decimal "${AFTER_PHASE}" --raw)
+DECIMAL_PHASE=$(node "./desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" phase next-decimal "${AFTER_PHASE}" --raw)
 # Returns just: 06.1
 ```
 
 ## Examples
 
-| Existing Phases | Next Phase |
-|-----------------|------------|
-| 06 only | 06.1 |
-| 06, 06.1 | 06.2 |
-| 06, 06.1, 06.2 | 06.3 |
-| 06, 06.1, 06.3 (gap) | 06.4 |
+| Existing Phases      | Next Phase |
+| -------------------- | ---------- |
+| 06 only              | 06.1       |
+| 06, 06.1             | 06.2       |
+| 06, 06.1, 06.2       | 06.3       |
+| 06, 06.1, 06.3 (gap) | 06.4       |
 
 ## Directory Naming
 
 Decimal phase directories use the full decimal number:
 
 ```bash
-SLUG=$(node "/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" generate-slug "$DESCRIPTION" --raw)
+SLUG=$(node "./desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" generate-slug "$DESCRIPTION" --raw)
 PHASE_DIR=".planning/phases/${DECIMAL_PHASE}-${SLUG}"
 mkdir -p "$PHASE_DIR"
 ```

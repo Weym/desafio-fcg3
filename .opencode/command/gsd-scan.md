@@ -9,6 +9,7 @@ tools:
   agent: true
   question: true
 ---
+
 <objective>
 Run a focused codebase scan for a single area, producing targeted documents in `.planning/codebase/`.
 Accepts an optional `--focus` flag: `tech`, `arch`, `quality`, `concerns`, or `tech+arch` (default).
@@ -17,9 +18,9 @@ Lightweight alternative to `/gsd-map-codebase` — spawns one mapper agent inste
 </objective>
 
 <execution_context>
-@/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/scan.md
+@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/scan.md
 </execution_context>
 
 <process>
-Execute the scan workflow from @/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/scan.md end-to-end.
+Execute the scan workflow from @./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/scan.md end-to-end.
 </process>

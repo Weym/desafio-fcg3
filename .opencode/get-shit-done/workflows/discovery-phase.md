@@ -10,11 +10,11 @@ NOTE: For comprehensive ecosystem research ("how do experts build this"), use /g
 <depth_levels>
 **This workflow supports three depth levels:**
 
-| Level | Name         | Time      | Output                                       | When                                      |
-| ----- | ------------ | --------- | -------------------------------------------- | ----------------------------------------- |
-| 1     | Quick Verify | 2-5 min   | No file, proceed with verified knowledge     | Single library, confirming current syntax |
-| 2     | Standard     | 15-30 min | DISCOVERY.md                                 | Choosing between options, new integration |
-| 3     | Deep Dive    | 1+ hour   | Detailed DISCOVERY.md with validation gates  | Architectural decisions, novel problems   |
+| Level | Name         | Time      | Output                                      | When                                      |
+| ----- | ------------ | --------- | ------------------------------------------- | ----------------------------------------- |
+| 1     | Quick Verify | 2-5 min   | No file, proceed with verified knowledge    | Single library, confirming current syntax |
+| 2     | Standard     | 15-30 min | DISCOVERY.md                                | Choosing between options, new integration |
+| 3     | Deep Dive    | 1+ hour   | Detailed DISCOVERY.md with validation gates | Architectural decisions, novel problems   |
 
 **Depth is determined by plan-phase.md before routing here.**
 </depth_levels>
@@ -28,7 +28,7 @@ the agent's training data is 6-18 months stale. Always verify.
 2. **Official docs** - When Context7 lacks coverage
 3. **WebSearch LAST** - For comparisons and trends only
 
-See /home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/templates/discovery.md `<discovery_protocol>` for full protocol.
+See ./desafio-fcg3/src/backend/.opencode/get-shit-done/templates/discovery.md `<discovery_protocol>` for full protocol.
 </source_hierarchy>
 
 <process>
@@ -64,7 +64,6 @@ For: Single known library, confirming syntax/version still correct.
    ```
 
 3. Verify:
-
    - Current version matches expectations
    - API syntax unchanged
    - No breaking changes in recent versions
@@ -84,7 +83,6 @@ For: Choosing between options, new external integration.
 **Process:**
 
 1. **Identify what to discover:**
-
    - What options exist?
    - What are the key comparison criteria?
    - What's our specific use case?
@@ -100,15 +98,13 @@ For: Choosing between options, new external integration.
 3. **Official docs** for anything Context7 lacks.
 
 4. **WebSearch** for comparisons:
-
    - "[option A] vs [option B] {current_year}"
    - "[option] known issues"
    - "[option] with [our stack]"
 
 5. **Cross-verify:** Any WebSearch finding → confirm with Context7/official docs.
 
-6. **Create DISCOVERY.md** using /home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/templates/discovery.md structure:
-
+6. **Create DISCOVERY.md** using ./desafio-fcg3/src/backend/.opencode/get-shit-done/templates/discovery.md structure:
    - Summary with recommendation
    - Key findings per option
    - Code examples from Context7
@@ -126,41 +122,35 @@ For: Architectural decisions, novel problems, high-risk choices.
 
 **Process:**
 
-1. **Scope the discovery** using /home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/templates/discovery.md:
-
+1. **Scope the discovery** using ./desafio-fcg3/src/backend/.opencode/get-shit-done/templates/discovery.md:
    - Define clear scope
    - Define include/exclude boundaries
    - List specific questions to answer
 
 2. **Exhaustive Context7 research:**
-
    - All relevant libraries
    - Related patterns and concepts
    - Multiple topics per library if needed
 
 3. **Official documentation deep read:**
-
    - Architecture guides
    - Best practices sections
    - Migration/upgrade guides
    - Known limitations
 
 4. **WebSearch for ecosystem context:**
-
    - How others solved similar problems
    - Production experiences
    - Gotchas and anti-patterns
    - Recent changes/announcements
 
 5. **Cross-verify ALL findings:**
-
    - Every WebSearch claim → verify with authoritative source
    - Mark what's verified vs assumed
    - Flag contradictions
 
 6. **Create comprehensive DISCOVERY.md:**
-
-   - Full structure from /home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/templates/discovery.md
+   - Full structure from ./desafio-fcg3/src/backend/.opencode/get-shit-done/templates/discovery.md
    - Quality report with source attribution
    - Confidence by finding
    - If LOW confidence on any critical finding → add validation checkpoints
@@ -184,7 +174,7 @@ Ask: What do we need to learn before we can plan this phase?
   </step>
 
 <step name="create_discovery_scope">
-Use /home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/templates/discovery.md.
+Use ./desafio-fcg3/src/backend/.opencode/get-shit-done/templates/discovery.md.
 
 Include:
 
@@ -287,3 +277,4 @@ NOTE: DISCOVERY.md is NOT committed separately. It will be committed with phase 
 - Confidence gate passed
 - Ready to inform PLAN.md creation
 </success_criteria>
+```

@@ -13,15 +13,16 @@ tools:
 Safe git revert — roll back GSD phase or plan commits using the phase manifest, with dependency checks and a confirmation gate before execution.
 
 Three modes:
+
 - **--last N**: Show recent GSD commits for interactive selection
 - **--phase NN**: Revert all commits for a phase (manifest + git log fallback)
 - **--plan NN-MM**: Revert all commits for a specific plan
-</objective>
+  </objective>
 
 <execution_context>
-@/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/undo.md
-@/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/references/ui-brand.md
-@/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/references/gate-prompts.md
+@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/undo.md
+@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/ui-brand.md
+@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/gate-prompts.md
 </execution_context>
 
 <context>
@@ -29,5 +30,5 @@ $ARGUMENTS
 </context>
 
 <process>
-Execute the undo workflow from @/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/undo.md end-to-end.
+Execute the undo workflow from @./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/undo.md end-to-end.
 </process>

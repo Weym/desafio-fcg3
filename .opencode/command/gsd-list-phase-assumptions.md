@@ -16,7 +16,7 @@ Output: Conversational output only (no file creation) - ends with "What do you t
 </objective>
 
 <execution_context>
-@/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/list-phase-assumptions.md
+@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/list-phase-assumptions.md
 </execution_context>
 
 <context>

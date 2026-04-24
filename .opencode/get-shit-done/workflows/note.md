@@ -15,7 +15,7 @@ Read all files referenced by the invoking prompt's execution_context before star
 Notes are stored as individual markdown files:
 
 - **Project scope**: `.planning/notes/{YYYY-MM-DD}-{slug}.md` — used when `.planning/` exists in cwd
-- **Global scope**: `/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/notes/{YYYY-MM-DD}-{slug}.md` — fallback when no `.planning/`, or when `--global` flag is present
+- **Global scope**: `./desafio-fcg3/src/backend/.opencode/notes/{YYYY-MM-DD}-{slug}.md` — fallback when no `.planning/`, or when `--global` flag is present
 
 Each note file:
 
@@ -36,12 +36,12 @@ promoted: false
 <step name="parse_subcommand">
 **Parse subcommand from $ARGUMENTS (after stripping --global).**
 
-| Condition | Subcommand |
-|-----------|------------|
-| Arguments are exactly `list` (case-insensitive) | **list** |
-| Arguments are exactly `promote <N>` where N is a number | **promote** |
-| Arguments are empty (no text at all) | **list** |
-| Anything else | **append** (the text IS the note) |
+| Condition                                               | Subcommand                        |
+| ------------------------------------------------------- | --------------------------------- |
+| Arguments are exactly `list` (case-insensitive)         | **list**                          |
+| Arguments are exactly `promote <N>` where N is a number | **promote**                       |
+| Arguments are empty (no text at all)                    | **list**                          |
+| Anything else                                           | **append** (the text IS the note) |
 
 **Critical**: `list` is only a subcommand when it's the ENTIRE argument. `/gsd-note list of groceries` saves a note with text "list of groceries". Same for `promote` — only a subcommand when followed by exactly one number.
 </step>
@@ -50,7 +50,7 @@ promoted: false
 **Subcommand: append — create a timestamped note file.**
 
 1. Determine scope (project or global) per storage format above
-2. Ensure the notes directory exists (`.planning/notes/` or `/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/notes/`)
+2. Ensure the notes directory exists (`.planning/notes/` or `./desafio-fcg3/src/backend/.opencode/notes/`)
 3. Generate slug: first ~4 meaningful words of the note text, lowercase, hyphen-separated (strip articles/prepositions from the start)
 4. Generate filename: `{YYYY-MM-DD}-{slug}.md`
    - If a file with that name already exists, append `-2`, `-3`, etc.
@@ -59,16 +59,17 @@ promoted: false
    - Where `{scope}` is "project" or "global"
 
 **Constraints:**
+
 - **Never modify the note text** — capture verbatim, including typos
 - **Never ask questions** — just write and confirm
 - **Timestamp format**: Use local time, `YYYY-MM-DD HH:mm` (24-hour, no seconds)
-</step>
+  </step>
 
 <step name="list">
 **Subcommand: list — show notes from both scopes.**
 
 1. Glob `.planning/notes/*.md` (if directory exists) — project notes
-2. Glob `/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/notes/*.md` (if directory exists) — global notes
+2. Glob `./desafio-fcg3/src/backend/.opencode/notes/*.md` (if directory exists) — global notes
 3. For each file, read frontmatter to get `date` and `promoted` status
 4. Exclude files where `promoted: true` from active counts (but still show them, dimmed)
 5. Sort by date, number all active entries sequentially starting at 1
@@ -84,7 +85,7 @@ Project (.planning/notes/):
   2. [promoted] [2026-02-08 14:40] add rate limiting to the API endpoints
   3. [2026-02-08 15:10] consider adding a --dry-run flag to build
 
-Global (/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/notes/):
+Global (./desafio-fcg3/src/backend/.opencode/notes/):
   4. [2026-02-08 10:00] cross-project idea about shared config
 
 {count} active note(s). Use `/gsd-note promote <N>` to convert to a todo.
@@ -130,22 +131,24 @@ Promoted from quick note captured on {original date}.
 
 9. Mark the source note file as promoted: update its frontmatter to `promoted: true`
 10. Confirm: `Promoted note {N} to todo {id}: {note text}`
-</step>
+    </step>
 
 </process>
 
 <edge_cases>
+
 1. **"list" as note text**: `/gsd-note list of things` saves note "list of things" (subcommand only when `list` is the entire arg)
-2. **No `.planning/`**: Falls back to global `/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/notes/` — works in any directory
+2. **No `.planning/`**: Falls back to global `./desafio-fcg3/src/backend/.opencode/notes/` — works in any directory
 3. **Promote without project**: Warns that todos require `.planning/`, suggests `/gsd-new-project`
 4. **Large files**: `list` shows last 10 when >20 active entries
 5. **Duplicate slugs**: Append `-2`, `-3` etc. to filename if slug already used on same date
 6. **`--global` position**: Stripped from anywhere — `--global my idea` and `my idea --global` both save "my idea" globally
 7. **Promote already-promoted**: Tell user "Note {N} is already promoted" and stop
 8. **Empty note text after stripping flags**: Treat as `list` subcommand
-</edge_cases>
+   </edge_cases>
 
 <success_criteria>
+
 - [ ] Append: Note file written with correct frontmatter and verbatim text
 - [ ] Append: No questions asked — instant capture
 - [ ] List: Both scopes shown with sequential numbering
@@ -153,4 +156,4 @@ Promoted from quick note captured on {original date}.
 - [ ] Promote: Todo created with correct format
 - [ ] Promote: Source note marked as promoted
 - [ ] Global fallback: Works when no `.planning/` exists
-</success_criteria>
+      </success_criteria>

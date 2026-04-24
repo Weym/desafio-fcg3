@@ -12,56 +12,67 @@ Read all files referenced by the invoking prompt's execution_context before star
 Parse arguments and load project state:
 
 ```bash
-INIT=$(node "/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" init phase-op "${PHASE_ARG}")
+INIT=$(node "./desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" init phase-op "${PHASE_ARG}")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 
 Parse from init JSON: `phase_found`, `phase_dir`, `phase_number`, `phase_name`, `padded_phase`, `commit_docs`.
 
 Also load config for branching strategy:
+
 ```bash
-CONFIG=$(node "/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" state load)
+CONFIG=$(node "./desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" state load)
 ```
 
 Extract: `branching_strategy`, `branch_name`.
 
 Detect base branch for PRs and merges:
+
 ```bash
-BASE_BRANCH=$(node "/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" config-get git.base_branch 2>/dev/null || echo "")
+BASE_BRANCH=$(node "./desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" config-get git.base_branch 2>/dev/null || echo "")
 if [ -z "$BASE_BRANCH" ] || [ "$BASE_BRANCH" = "null" ]; then
   BASE_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's|^refs/remotes/origin/||')
   BASE_BRANCH="${BASE_BRANCH:-main}"
 fi
 ```
+
 </step>
 
 <step name="preflight_checks">
 Verify the work is ready to ship:
 
 1. **Verification passed?**
+
    ```bash
    VERIFICATION=$(cat ${PHASE_DIR}/*-VERIFICATION.md 2>/dev/null)
    ```
+
    Check for `status: passed` or `status: human_needed` (with human approval).
    If no VERIFICATION.md or status is `gaps_found`: warn and ask user to confirm.
 
 2. **Clean working tree?**
+
    ```bash
    git status --short
    ```
+
    If uncommitted changes exist: ask user to commit or stash first.
 
 3. **On correct branch?**
+
    ```bash
    CURRENT_BRANCH=$(git branch --show-current)
    ```
+
    If on `${BASE_BRANCH}`: warn — should be on a feature branch.
    If branching_strategy is `none`: offer to create a branch now.
 
 4. **Remote configured?**
+
    ```bash
    git remote -v | head -2
    ```
+
    Detect `origin` remote. If no remote: error — can't create PR.
 
 5. **`gh` CLI available?**
@@ -69,7 +80,7 @@ Verify the work is ready to ship:
    which gh && gh auth status 2>&1
    ```
    If `gh` not found or not authenticated: provide setup instructions and exit.
-</step>
+   </step>
 
 <step name="push_branch">
 Push the current branch to remote:
@@ -79,6 +90,7 @@ git push origin ${CURRENT_BRANCH} 2>&1
 ```
 
 If push fails (e.g., no upstream): set upstream:
+
 ```bash
 git push --set-upstream origin ${CURRENT_BRANCH} 2>&1
 ```
@@ -90,9 +102,11 @@ Report: "Pushed `{branch}` to origin ({commit_count} commits ahead of ${BASE_BRA
 Auto-generate a rich PR body from planning artifacts:
 
 **1. Title:**
+
 ```
 Phase {phase_number}: {phase_name}
 ```
+
 Or for milestone: `Milestone {version}: {name}`
 
 **2. Summary section:**
@@ -110,10 +124,12 @@ Read ROADMAP.md for phase goal. Read VERIFICATION.md for verification status.
 
 **3. Changes section:**
 For each SUMMARY.md in the phase directory:
+
 ```markdown
 ## Changes
 
 ### Plan {plan_id}: {plan_name}
+
 {one_liner from SUMMARY.md frontmatter}
 
 **Key files:**
@@ -121,6 +137,7 @@ For each SUMMARY.md in the phase directory:
 ```
 
 **4. Requirements section:**
+
 ```markdown
 ## Requirements Addressed
 
@@ -128,6 +145,7 @@ For each SUMMARY.md in the phase directory:
 ```
 
 **5. Testing section:**
+
 ```markdown
 ## Verification
 
@@ -136,11 +154,13 @@ For each SUMMARY.md in the phase directory:
 ```
 
 **6. Decisions section:**
+
 ```markdown
 ## Key Decisions
 
 {Decisions from STATE.md accumulated context relevant to this phase}
 ```
+
 </step>
 
 <step name="create_pr">
@@ -174,6 +194,7 @@ question:
 ```
 
 **If "Request review":**
+
 ```bash
 gh pr edit ${PR_NUMBER} --add-reviewer "${REVIEWER}"
 ```
@@ -186,14 +207,16 @@ Report the PR URL and suggest: "Review the diff at {url}/files"
 Update STATE.md to reflect the shipping action:
 
 ```bash
-node "/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" state update "Last Activity" "$(date +%Y-%m-%d)"
-node "/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" state update "Status" "Phase ${PHASE_NUMBER} shipped — PR #${PR_NUMBER}"
+node "./desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" state update "Last Activity" "$(date +%Y-%m-%d)"
+node "./desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" state update "Status" "Phase ${PHASE_NUMBER} shipped — PR #${PR_NUMBER}"
 ```
 
 If `commit_docs` is true:
+
 ```bash
-node "/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs(${padded_phase}): ship phase ${PHASE_NUMBER} — PR #${PR_NUMBER}" --files .planning/STATE.md
+node "./desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs(${padded_phase}): ship phase ${PHASE_NUMBER} — PR #${PR_NUMBER}" --files .planning/STATE.md
 ```
+
 </step>
 
 <step name="report">
@@ -209,12 +232,14 @@ Verification: ✓ Passed
 Requirements: {N} REQ-IDs addressed
 
 Next steps:
+
 - Review/approve PR
 - Merge when CI passes
 - /gsd-complete-milestone (if last phase in milestone)
 - /gsd-progress (to see what's next)
 
 ───────────────────────────────────────────────────────────────
+
 ```
 </step>
 
@@ -235,3 +260,4 @@ After shipping:
 - [ ] STATE.md updated with shipping status
 - [ ] User knows PR number and next steps
 </success_criteria>
+```

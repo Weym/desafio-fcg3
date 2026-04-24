@@ -18,8 +18,8 @@ Routes to the profile-user workflow which orchestrates the full flow: consent ga
 </objective>
 
 <execution_context>
-@/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/profile-user.md
-@/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/references/ui-brand.md
+@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/profile-user.md
+@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/ui-brand.md
 </execution_context>
 
 <context>
@@ -32,6 +32,7 @@ Flags from $ARGUMENTS:
 Execute the profile-user workflow end-to-end.
 
 The workflow handles all logic including:
+
 1. Initialization and existing profile detection
 2. Consent gate before session analysis
 3. Session scanning and data sufficiency checks
@@ -42,4 +43,4 @@ The workflow handles all logic including:
 8. Artifact selection (dev-preferences, AGENTS.md sections)
 9. Sequential artifact generation
 10. Summary with refresh diff (if applicable)
-</process>
+    </process>

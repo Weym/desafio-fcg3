@@ -7,6 +7,7 @@ tools:
   glob: true
   skill: true
 ---
+
 <objective>
 Check project progress, summarize recent work and what's ahead, then intelligently route to the next action - either executing an existing plan or creating the next one.
 
@@ -14,10 +15,10 @@ Provides situational awareness before continuing work.
 </objective>
 
 <execution_context>
-@/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/progress.md
+@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/progress.md
 </execution_context>
 
 <process>
-Execute the progress workflow from @/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/progress.md end-to-end.
+Execute the progress workflow from @./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/progress.md end-to-end.
 Preserve all routing logic (Routes A through F) and edge case handling.
 </process>

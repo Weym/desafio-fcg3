@@ -2,10 +2,10 @@
   "$schema": "https://opencode.ai/config.json",
   "permission": {
     "read": {
-      "/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/*": "allow"
+      "./desafio-fcg3/src/backend/.opencode/get-shit-done/*": "allow"
     },
     "external_directory": {
-      "/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/*": "allow"
+      "./desafio-fcg3/src/backend/.opencode/get-shit-done/*": "allow"
     }
   }
 }

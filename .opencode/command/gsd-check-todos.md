@@ -12,15 +12,16 @@ tools:
 List all pending todos, allow selection, load full context for the selected todo, and route to appropriate action.
 
 Routes to the check-todos workflow which handles:
+
 - Todo counting and listing with area filtering
 - Interactive selection with full context loading
 - Roadmap correlation checking
 - Action routing (work now, add to phase, brainstorm, create phase)
 - STATE.md updates and git commits
-</objective>
+  </objective>
 
 <execution_context>
-@/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/check-todos.md
+@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/check-todos.md
 </execution_context>
 
 <context>
@@ -30,9 +31,10 @@ Todo state and roadmap correlation are loaded in-workflow using `init todos` and
 </context>
 
 <process>
-**Follow the check-todos workflow** from `@/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/check-todos.md`.
+**Follow the check-todos workflow** from `@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/check-todos.md`.
 
 The workflow handles all logic including:
+
 1. Todo existence checking
 2. Area filtering
 3. Interactive listing and selection
@@ -41,4 +43,4 @@ The workflow handles all logic including:
 6. Action offering and execution
 7. STATE.md updates
 8. Git commits
-</process>
+   </process>

@@ -11,6 +11,7 @@ tools:
   task: true
   question: true
 ---
+
 <objective>
 Verify threat mitigations for a completed phase. Three states:
 - (A) SECURITY.md exists — audit and verify mitigations
@@ -21,7 +22,7 @@ Output: updated SECURITY.md.
 </objective>
 
 <execution_context>
-@/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/secure-phase.md
+@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/secure-phase.md
 </execution_context>
 
 <context>
@@ -29,6 +30,6 @@ Phase: $ARGUMENTS — optional, defaults to last completed phase.
 </context>
 
 <process>
-Execute @/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/secure-phase.md.
+Execute @./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/secure-phase.md.
 Preserve all workflow gates.
 </process>

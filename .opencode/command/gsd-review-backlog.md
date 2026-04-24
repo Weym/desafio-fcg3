@@ -15,14 +15,17 @@ milestone sequence or remove stale entries.
 <process>
 
 1. **List backlog items:**
+
    ```bash
    ls -d .planning/phases/999* 2>/dev/null || echo "No backlog items found"
    ```
 
 2. **Read ROADMAP.md** and extract all 999.x phase entries:
+
    ```bash
    cat .planning/ROADMAP.md
    ```
+
    Show each backlog item with its description, any accumulated context (CONTEXT.md, RESEARCH.md), and creation date.
 
 3. **Present the list to the user** via question:
@@ -33,7 +36,7 @@ milestone sequence or remove stale entries.
    - Find the next sequential phase number in the active milestone
    - Rename the directory from `999.x-slug` to `{new_num}-slug`:
      ```bash
-     NEW_NUM=$(node "/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" phase add "${DESCRIPTION}" --raw)
+     NEW_NUM=$(node "./desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" phase add "${DESCRIPTION}" --raw)
      ```
    - Move accumulated artifacts to the new phase directory
    - Update ROADMAP.md: move the entry from `## Backlog` section to the active phase list
@@ -45,11 +48,13 @@ milestone sequence or remove stale entries.
    - Remove the entry from ROADMAP.md `## Backlog` section
 
 6. **Commit changes:**
+
    ```bash
-   node "/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs: review backlog — promoted N, removed M" --files .planning/ROADMAP.md
+   node "./desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs: review backlog — promoted N, removed M" --files .planning/ROADMAP.md
    ```
 
 7. **Report summary:**
+
    ```
    ## 📋 Backlog Review Complete
 

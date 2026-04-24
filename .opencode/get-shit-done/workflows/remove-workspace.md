@@ -13,7 +13,7 @@ Read all files referenced by the invoking prompt's execution_context before star
 Extract workspace name from $ARGUMENTS.
 
 ```bash
-INIT=$(node "/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" init remove-workspace "$WORKSPACE_NAME")
+INIT=$(node "./desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" init remove-workspace "$WORKSPACE_NAME")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 
@@ -24,6 +24,7 @@ Parse JSON for: `workspace_name`, `workspace_path`, `has_manifest`, `strategy`, 
 First run `/gsd-list-workspaces` to show available workspaces, then ask:
 
 Use question:
+
 - header: "Remove Workspace"
 - question: "Which workspace do you want to remove?"
 - requireAnswer: true
@@ -50,6 +51,7 @@ Exit. Do NOT proceed.
 ## 3. Confirm Removal
 
 Use question:
+
 - header: "Confirm Removal"
 - question: "Remove workspace '$WORKSPACE_NAME' at $WORKSPACE_PATH? This will delete all files in the workspace directory. Type the workspace name to confirm:"
 - requireAnswer: true
@@ -68,6 +70,7 @@ git worktree remove "$WORKSPACE_PATH/$REPO_NAME" 2>&1 || true
 ```
 
 If `git worktree remove` fails, warn but continue:
+
 ```
 Warning: Could not remove worktree for $REPO_NAME — source repo may have been moved or deleted.
 ```

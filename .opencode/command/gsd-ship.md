@@ -9,6 +9,7 @@ tools:
   write: true
   question: true
 ---
+
 <objective>
 Bridge local completion → merged PR. After /gsd-verify-work passes, ship the work: push branch, create PR with auto-generated body, optionally trigger review, and track the merge.
 
@@ -16,7 +17,7 @@ Closes the plan → execute → verify → ship loop.
 </objective>
 
 <execution_context>
-@/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/ship.md
+@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/ship.md
 </execution_context>
 
-Execute the ship workflow from @/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/ship.md end-to-end.
+Execute the ship workflow from @./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/ship.md end-to-end.

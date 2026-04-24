@@ -11,14 +11,15 @@ tools:
 Add a new integer phase to the end of the current milestone in the roadmap.
 
 Routes to the add-phase workflow which handles:
+
 - Phase number calculation (next sequential integer)
 - Directory creation with slug generation
 - Roadmap structure updates
 - STATE.md roadmap evolution tracking
-</objective>
+  </objective>
 
 <execution_context>
-@/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/add-phase.md
+@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/add-phase.md
 </execution_context>
 
 <context>
@@ -28,9 +29,10 @@ Roadmap and state are resolved in-workflow via `init phase-op` and targeted tool
 </context>
 
 <process>
-**Follow the add-phase workflow** from `@/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/add-phase.md`.
+**Follow the add-phase workflow** from `@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/add-phase.md`.
 
 The workflow handles all logic including:
+
 1. Argument parsing and validation
 2. Roadmap existence checking
 3. Current milestone identification
@@ -39,4 +41,4 @@ The workflow handles all logic including:
 6. Phase directory creation
 7. Roadmap entry insertion
 8. STATE.md updates
-</process>
+   </process>

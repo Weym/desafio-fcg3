@@ -6,6 +6,7 @@ tools:
   read: true
   question: true
 ---
+
 <context>
 **Arguments:**
 - `<workspace-name>` (required) — Name of the workspace to remove
@@ -16,10 +17,10 @@ Remove a workspace directory after confirmation. For worktree strategy, runs `gi
 </objective>
 
 <execution_context>
-@/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/remove-workspace.md
-@/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/references/ui-brand.md
+@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/remove-workspace.md
+@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/ui-brand.md
 </execution_context>
 
 <process>
-Execute the remove-workspace workflow from @/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/remove-workspace.md end-to-end.
+Execute the remove-workspace workflow from @./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/remove-workspace.md end-to-end.
 </process>

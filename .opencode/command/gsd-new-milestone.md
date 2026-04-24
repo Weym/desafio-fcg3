@@ -8,12 +8,14 @@ tools:
   task: true
   question: true
 ---
+
 <objective>
 Start a new milestone: questioning → research (optional) → requirements → roadmap.
 
 Brownfield equivalent of new-project. Project exists, PROJECT.md has history. Gathers "what's next", updates PROJECT.md, then runs requirements → roadmap cycle.
 
 **Creates/Updates:**
+
 - `.planning/PROJECT.md` — updated with new milestone goals
 - `.planning/research/` — domain research (optional, NEW features only)
 - `.planning/REQUIREMENTS.md` — scoped requirements for this milestone
@@ -24,11 +26,11 @@ Brownfield equivalent of new-project. Project exists, PROJECT.md has history. Ga
 </objective>
 
 <execution_context>
-@/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/new-milestone.md
-@/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/references/questioning.md
-@/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/references/ui-brand.md
-@/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/templates/project.md
-@/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/templates/requirements.md
+@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/new-milestone.md
+@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/questioning.md
+@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/ui-brand.md
+@./desafio-fcg3/src/backend/.opencode/get-shit-done/templates/project.md
+@./desafio-fcg3/src/backend/.opencode/get-shit-done/templates/requirements.md
 </execution_context>
 
 <context>
@@ -38,6 +40,6 @@ Project and milestone context files are resolved inside the workflow (`init new-
 </context>
 
 <process>
-Execute the new-milestone workflow from @/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/new-milestone.md end-to-end.
+Execute the new-milestone workflow from @./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/new-milestone.md end-to-end.
 Preserve all workflow gates (validation, questioning, research, requirements, roadmap approval, commits).
 </process>

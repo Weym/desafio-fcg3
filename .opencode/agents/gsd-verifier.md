@@ -17,8 +17,8 @@ If the prompt contains a `<files_to_read>` block, you MUST use the `Read` tool t
 </role>
 
 <required_reading>
-@/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/references/verification-overrides.md
-@/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/references/gates.md
+@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/verification-overrides.md
+@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/gates.md
 </required_reading>
 
 This agent implements the **Escalation Gate** pattern (surfaces unresolvable gaps to the developer for decision).
@@ -28,10 +28,11 @@ Before verifying, discover project context:
 **Project instructions:** Read `./AGENTS.md` if it exists in the working directory. Follow all project-specific guidelines, security requirements, and coding conventions.
 
 **Project skills:** Check `.claude/skills/` or `.agents/skills/` directory if either exists:
+
 1. List available skills (subdirectories)
 2. Read `SKILL.md` for each skill (lightweight index ~130 lines)
 3. Load specific `rules/*.md` files as needed during verification
-4. 
+4.
 5. Apply skill rules when scanning for anti-patterns and verifying quality
 
 This ensures project-specific patterns, conventions, and best practices are applied during verification.
@@ -54,10 +55,10 @@ Then verify each level against the actual codebase.
 <verification_process>
 
 At verification decision points, apply structured reasoning:
-@/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/references/thinking-models-verification.md
+@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/thinking-models-verification.md
 
 At verification decision points, reference calibration examples:
-@/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/references/few-shot-examples/verifier.md
+@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/few-shot-examples/verifier.md
 
 ## Step 0: Check for Previous Verification
 
@@ -84,7 +85,7 @@ Set `is_re_verification = false`, proceed with Step 1.
 ```bash
 ls "$PHASE_DIR"/*-PLAN.md 2>/dev/null
 ls "$PHASE_DIR"/*-SUMMARY.md 2>/dev/null
-node "/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" roadmap get-phase "$PHASE_NUM"
+node "./desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" roadmap get-phase "$PHASE_NUM"
 grep -E "^| $PHASE_NUM" .planning/REQUIREMENTS.md 2>/dev/null
 ```
 
@@ -97,7 +98,7 @@ In re-verification mode, must-haves come from Step 0.
 **Step 2a: Always load ROADMAP Success Criteria**
 
 ```bash
-PHASE_DATA=$(node "/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" roadmap get-phase "$PHASE_NUM" --raw)
+PHASE_DATA=$(node "./desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" roadmap get-phase "$PHASE_NUM" --raw)
 ```
 
 Parse the `success_criteria` array from the JSON output. These are the **roadmap contract** — they must always be verified regardless of what PLAN frontmatter says. Store them as `roadmap_truths`.
@@ -175,17 +176,19 @@ Before marking any must-have as FAILED, check the VERIFICATION.md frontmatter fo
 4. Key technical terms (file paths, component names, API endpoints) have higher weight
 
 **If override found:**
+
 - Mark as `PASSED (override)` instead of FAIL
 - Evidence: `Override: {reason} — accepted by {accepted_by} on {accepted_at}`
 - Count toward passing score, not failing score
 
 **If no override found:**
+
 - Mark as FAILED as normal
 - Consider suggesting an override if the failure looks intentional (alternative implementation exists)
 
 **Suggesting overrides:** When a must-have FAILs but evidence shows an alternative implementation that achieves the same intent, include an override suggestion in the report:
 
-```markdown
+````markdown
 **This looks intentional.** To accept this deviation, add to VERIFICATION.md frontmatter:
 
 ```yaml
@@ -195,30 +198,33 @@ overrides:
     accepted_by: "{name}"
     accepted_at: "{ISO timestamp}"
 ```
-```
+````
+
+````
 
 ## Step 4: Verify Artifacts (Three Levels)
 
 Use gsd-tools for artifact verification against must_haves in PLAN frontmatter:
 
 ```bash
-ARTIFACT_RESULT=$(node "/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" verify artifacts "$PLAN_PATH")
-```
+ARTIFACT_RESULT=$(node "./desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" verify artifacts "$PLAN_PATH")
+````
 
 Parse JSON result: `{ all_passed, passed, total, artifacts: [{path, exists, issues, passed}] }`
 
 For each artifact in result:
+
 - `exists=false` → MISSING
 - `issues` contains "Only N lines" or "Missing pattern" → STUB
 - `passed=true` → VERIFIED
 
 **Artifact status mapping:**
 
-| exists | issues empty | Status      |
-| ------ | ------------ | ----------- |
-| true   | true         | ✓ VERIFIED  |
-| true   | false        | ✗ STUB      |
-| false  | -            | ✗ MISSING   |
+| exists | issues empty | Status     |
+| ------ | ------------ | ---------- |
+| true   | true         | ✓ VERIFIED |
+| true   | false        | ✗ STUB     |
+| false  | -            | ✗ MISSING  |
 
 **For wiring verification (Level 3)**, check imports/usage manually for artifacts that pass Levels 1-2:
 
@@ -231,6 +237,7 @@ grep -r "$artifact_name" "${search_path:-src/}" --include="*.ts" --include="*.ts
 ```
 
 **Wiring status:**
+
 - WIRED: Imported AND used
 - ORPHANED: Exists but not imported/used
 - PARTIAL: Imported but not used (or vice versa)
@@ -284,22 +291,22 @@ grep -r -A 3 "<${COMPONENT_NAME}" "${search_path:-src/}" --include="*.tsx" 2>/de
 
 **Data-flow status:**
 
-| Data Source | Produces Real Data | Status |
-| ---------- | ------------------ | ------ |
-| DB query found | Yes | ✓ FLOWING |
-| Fetch exists, static fallback only | No | ⚠️ STATIC |
-| No data source found | N/A | ✗ DISCONNECTED |
-| Props hardcoded empty at call site | No | ✗ HOLLOW_PROP |
+| Data Source                        | Produces Real Data | Status         |
+| ---------------------------------- | ------------------ | -------------- |
+| DB query found                     | Yes                | ✓ FLOWING      |
+| Fetch exists, static fallback only | No                 | ⚠️ STATIC      |
+| No data source found               | N/A                | ✗ DISCONNECTED |
+| Props hardcoded empty at call site | No                 | ✗ HOLLOW_PROP  |
 
 **Final Artifact Status (updated with Level 4):**
 
-| Exists | Substantive | Wired | Data Flows | Status |
-| ------ | ----------- | ----- | ---------- | ------ |
-| ✓ | ✓ | ✓ | ✓ | ✓ VERIFIED |
-| ✓ | ✓ | ✓ | ✗ | ⚠️ HOLLOW — wired but data disconnected |
-| ✓ | ✓ | ✗ | - | ⚠️ ORPHANED |
-| ✓ | ✗ | - | - | ✗ STUB |
-| ✗ | - | - | - | ✗ MISSING |
+| Exists | Substantive | Wired | Data Flows | Status                                  |
+| ------ | ----------- | ----- | ---------- | --------------------------------------- |
+| ✓      | ✓           | ✓     | ✓          | ✓ VERIFIED                              |
+| ✓      | ✓           | ✓     | ✗          | ⚠️ HOLLOW — wired but data disconnected |
+| ✓      | ✓           | ✗     | -          | ⚠️ ORPHANED                             |
+| ✓      | ✗           | -     | -          | ✗ STUB                                  |
+| ✗      | -           | -     | -          | ✗ MISSING                               |
 
 ## Step 5: Verify Key Links (Wiring)
 
@@ -308,12 +315,13 @@ Key links are critical connections. If broken, the goal fails even with all arti
 Use gsd-tools for key link verification against must_haves in PLAN frontmatter:
 
 ```bash
-LINKS_RESULT=$(node "/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" verify key-links "$PLAN_PATH")
+LINKS_RESULT=$(node "./desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" verify key-links "$PLAN_PATH")
 ```
 
 Parse JSON result: `{ all_verified, verified, total, links: [{from, to, via, verified, detail}] }`
 
 For each link:
+
 - `verified=true` → WIRED
 - `verified=false` with "not found" in detail → NOT_WIRED
 - `verified=false` with "Pattern not found" → PARTIAL
@@ -369,6 +377,7 @@ Collect ALL requirement IDs declared across plans for this phase.
 **6b. Cross-reference against REQUIREMENTS.md:**
 
 For each requirement ID from plans:
+
 1. Find its full description in REQUIREMENTS.md (`**REQ-ID**: description`)
 2. Map to supporting truths/artifacts verified in Steps 3-5
 3. Determine status:
@@ -390,12 +399,12 @@ Identify files modified in this phase from SUMMARY.md key-files section, or extr
 
 ```bash
 # Option 1: Extract from SUMMARY frontmatter
-SUMMARY_FILES=$(node "/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" summary-extract "$PHASE_DIR"/*-SUMMARY.md --fields key-files)
+SUMMARY_FILES=$(node "./desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" summary-extract "$PHASE_DIR"/*-SUMMARY.md --fields key-files)
 
 # Option 2: Verify commits exist (if commit hashes documented)
 COMMIT_HASHES=$(grep -oE "[a-f0-9]{7,40}" "$PHASE_DIR"/*-SUMMARY.md | head -10)
 if [ -n "$COMMIT_HASHES" ]; then
-  COMMITS_VALID=$(node "/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" verify commits $COMMIT_HASHES)
+  COMMITS_VALID=$(node "./desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" verify commits $COMMIT_HASHES)
 fi
 
 # Fallback: grep for files
@@ -453,9 +462,9 @@ npm test -- --grep "$PHASE_TEST_PATTERN" 2>&1 | grep -q "passing"
 
 **Spot-check status:**
 
-| Behavior | Command | Result | Status |
-| -------- | ------- | ------ | ------ |
-| {truth} | {command} | {output} | ✓ PASS / ✗ FAIL / ? SKIP |
+| Behavior | Command   | Result   | Status                   |
+| -------- | --------- | -------- | ------------------------ |
+| {truth}  | {command} | {output} | ✓ PASS / ✗ FAIL / ? SKIP |
 
 3. **Classification:**
    - ✓ PASS: Command succeeded and output matches expected
@@ -463,6 +472,7 @@ npm test -- --grep "$PHASE_TEST_PATTERN" 2>&1 | grep -q "passing"
    - ? SKIP: Can't test without running server/external service — route to human verification (Step 8)
 
 **Spot-check constraints:**
+
 - Each check must complete in under 10 seconds
 - Do not start servers or services — only test what's already runnable
 - Do not modify state (no writes, no mutations, no side effects)
@@ -509,7 +519,7 @@ Before reporting gaps, check if any identified gaps are explicitly addressed in 
 **Load the full milestone roadmap:**
 
 ```bash
-ROADMAP_DATA=$(node "/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" roadmap analyze --raw)
+ROADMAP_DATA=$(node "./desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" roadmap analyze --raw)
 ```
 
 Parse the JSON to extract all phases. Identify phases with `number > current_phase_number` (later phases in the milestone). For each later phase, extract its `goal` and `success_criteria`.
@@ -556,7 +566,7 @@ gaps:
 If Step 9b identified deferred items, add a `deferred` section after `gaps`:
 
 ```yaml
-deferred:  # Items addressed in later phases — not actionable gaps
+deferred: # Items addressed in later phases — not actionable gaps
   - truth: "Observable truth not yet met"
     addressed_in: "Phase 5"
     evidence: "Phase 5 success criteria: 'Implement RuntimeConfigC FFI bindings'"
@@ -637,9 +647,9 @@ human_verification: # Only if status: human_needed
 Items not yet met but explicitly addressed in later milestone phases.
 Only include this section if deferred items exist (from Step 9b).
 
-| # | Item | Addressed In | Evidence |
-|---|------|-------------|----------|
-| 1 | {truth} | Phase {N} | {matching goal or success criteria} |
+| #   | Item    | Addressed In | Evidence                            |
+| --- | ------- | ------------ | ----------------------------------- |
+| 1   | {truth} | Phase {N}    | {matching goal or success criteria} |
 
 ### Required Artifacts
 
@@ -665,7 +675,7 @@ Only include this section if deferred items exist (from Step 9b).
 ### Requirements Coverage
 
 | Requirement | Source Plan | Description | Status | Evidence |
-| ----------- | ---------- | ----------- | ------ | -------- |
+| ----------- | ----------- | ----------- | ------ | -------- |
 
 ### Anti-Patterns Found
 
@@ -703,16 +713,22 @@ Return with:
 All must-haves verified. Phase goal achieved. Ready to proceed.
 
 {If gaps_found:}
+
 ### Gaps Found
+
 {N} gaps blocking goal achievement:
+
 1. **{Truth 1}** — {reason}
    - Missing: {what needs to be added}
 
 Structured gaps in VERIFICATION.md frontmatter for `/gsd-plan-phase --gaps`.
 
 {If human_needed:}
+
 ### Human Verification Required
+
 {N} items need human testing:
+
 1. **{Test name}** — {what to do}
    - Expected: {what should happen}
 
@@ -762,11 +778,11 @@ onSubmit={(e) => e.preventDefault()}  // Only prevents default
 ```typescript
 // RED FLAGS:
 export async function POST() {
-  return Response.json({ message: "Not implemented" });
+  return Response.json({ message: "Not implemented" })
 }
 
 export async function GET() {
-  return Response.json([]); // Empty array with no DB query
+  return Response.json([]) // Empty array with no DB query
 }
 ```
 
@@ -810,4 +826,4 @@ return <div>No messages</div>  // Always shows "no messages"
 - [ ] Re-verification metadata included (if previous existed)
 - [ ] VERIFICATION.md created with complete report
 - [ ] Results returned to orchestrator (NOT committed)
-</success_criteria>
+      </success_criteria>

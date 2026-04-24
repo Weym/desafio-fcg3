@@ -10,6 +10,7 @@ tools:
   task: true
   question: true
 ---
+
 <objective>
 Conduct a retroactive 6-pillar visual audit. Produces UI-REVIEW.md with
 graded assessment (1-4 per pillar). Works on any project.
@@ -17,8 +18,8 @@ Output: {phase_num}-UI-REVIEW.md
 </objective>
 
 <execution_context>
-@/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/ui-review.md
-@/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/references/ui-brand.md
+@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/ui-review.md
+@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/ui-brand.md
 </execution_context>
 
 <context>
@@ -26,6 +27,6 @@ Phase: $ARGUMENTS — optional, defaults to last completed phase.
 </context>
 
 <process>
-Execute @/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/ui-review.md end-to-end.
+Execute @./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/ui-review.md end-to-end.
 Preserve all workflow gates.
 </process>

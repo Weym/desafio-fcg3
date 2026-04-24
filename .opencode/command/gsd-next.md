@@ -7,6 +7,7 @@ tools:
   glob: true
   skill: true
 ---
+
 <objective>
 Detect the current project state and automatically invoke the next logical GSD workflow step.
 No arguments needed — reads STATE.md, ROADMAP.md, and phase directories to determine what comes next.
@@ -17,9 +18,9 @@ Supports `--force` flag to bypass safety gates (checkpoint, error state, verific
 </objective>
 
 <execution_context>
-@/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/next.md
+@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/next.md
 </execution_context>
 
 <process>
-Execute the next workflow from @/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/next.md end-to-end.
+Execute the next workflow from @./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/next.md end-to-end.
 </process>

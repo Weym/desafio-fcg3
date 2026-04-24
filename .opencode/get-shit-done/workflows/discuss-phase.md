@@ -5,9 +5,9 @@ You are a thinking partner, not an interviewer. The user is the visionary — yo
 </purpose>
 
 <required_reading>
-@/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/references/domain-probes.md
-@/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/references/gate-prompts.md
-@/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/references/universal-anti-patterns.md
+@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/domain-probes.md
+@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/gate-prompts.md
+@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/universal-anti-patterns.md
 </required_reading>
 
 <downstream_awareness>
@@ -30,12 +30,14 @@ You are a thinking partner, not an interviewer. The user is the visionary — yo
 **User = founder/visionary. the agent = builder.**
 
 The user knows:
+
 - How they imagine it working
 - What it should look/feel like
 - What's essential vs nice-to-have
 - Specific behaviors or references they have in mind
 
 The user doesn't know (and shouldn't be asked):
+
 - Codebase patterns (researcher reads the code)
 - Technical risks (researcher identifies these)
 - Implementation approach (planner figures this out)
@@ -50,11 +52,13 @@ Ask about vision and implementation choices. Capture decisions for downstream ag
 The phase boundary comes from ROADMAP.md and is FIXED. Discussion clarifies HOW to implement what's scoped, never WHETHER to add new capabilities.
 
 **Allowed (clarifying ambiguity):**
+
 - "How should posts be displayed?" (layout, density, info shown)
 - "What happens on empty state?" (within the feature)
 - "Pull to refresh or manual?" (behavior choice)
 
 **Not allowed (scope creep):**
+
 - "Should we also add comments?" (new capability)
 - "What about search/filtering?" (new capability)
 - "Maybe include bookmarking?" (new capability)
@@ -62,6 +66,7 @@ The phase boundary comes from ROADMAP.md and is FIXED. Discussion clarifies HOW 
 **The heuristic:** Does this clarify how we implement what's already in the phase, or does it add a new capability that could be its own phase?
 
 **When user suggests scope creep:**
+
 ```
 "[Feature X] would be a new capability — that's its own phase.
 Want me to note it for the roadmap backlog?
@@ -105,17 +110,19 @@ Phase: "API documentation"
 **The key question:** What decisions would change the outcome that the user should weigh in on?
 
 **the agent handles these (don't ask):**
+
 - Technical implementation details
 - Architecture patterns
 - Performance optimization
 - Scope (roadmap defines this)
-</gray_area_identification>
+  </gray_area_identification>
 
 <answer_validation>
 **IMPORTANT: Answer validation** — After every question call, check if the response is empty or whitespace-only. If so:
+
 1. Retry the question once with the same parameters
 2. If still empty, present the options as a plain-text numbered list and ask the user to type their choice number
-Never proceed with an empty answer.
+   Never proceed with an empty answer.
 
 **Text mode (`workflow.text_mode: true` in config or `--text` flag):**
 When text mode is active, **do not use question at all**. Instead, present every
@@ -124,6 +131,7 @@ This is required for Claude Code remote sessions (`/rc` mode) where the the agen
 cannot forward TUI menu selections back to the host.
 
 Enable text mode:
+
 - Per-session: pass `--text` flag to any command (e.g., `/gsd-discuss-phase --text`)
 - Per-project: `gsd-tools config-set workflow.text_mode true`
 
@@ -138,9 +146,9 @@ Text mode applies to ALL workflows in the session, not just discuss-phase.
 Phase number from argument (required).
 
 ```bash
-INIT=$(node "/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" init phase-op "${PHASE}")
+INIT=$(node "./desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" init phase-op "${PHASE}")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
-AGENT_SKILLS_ADVISOR=$(node "/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-advisor 2>/dev/null)
+AGENT_SKILLS_ADVISOR=$(node "./desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-advisor 2>/dev/null)
 ```
 
 Parse JSON for: `commit_docs`, `phase_found`, `phase_dir`, `phase_number`, `phase_name`, `phase_slug`, `padded_phase`, `has_research`, `has_context`, `has_plans`, `has_verification`, `plan_count`, `roadmap_exists`, `planning_exists`, `response_language`.
@@ -148,21 +156,25 @@ Parse JSON for: `commit_docs`, `phase_found`, `phase_dir`, `phase_number`, `phas
 **If `response_language` is set:** All user-facing questions, prompts, and explanations in this workflow MUST be presented in `{response_language}`. This includes question labels, option text, gray area descriptions, and discussion summaries. Technical terms, code, and file paths remain in English. Subagent prompts stay in English — only user-facing output is translated.
 
 **If `phase_found` is false:**
+
 ```
 Phase [X] not found in roadmap.
 
 Use /gsd-progress ${GSD_WS} to see available phases.
 ```
+
 Exit workflow.
 
 **If `phase_found` is true:** Continue to check_existing.
 
 **Power mode** — If `--power` is present in ARGUMENTS:
+
 - Skip interactive questioning entirely
-- Read and execute @/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/discuss-phase-power.md end-to-end
+- Read and execute @./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/discuss-phase-power.md end-to-end
 - Do not continue with the steps below
 
 **Auto mode** — If `--auto` is present in ARGUMENTS:
+
 - In `check_existing`: auto-select "Skip" (if context exists) or continue without prompting (if no context/plans)
 - In `present_gray_areas`: auto-select ALL gray areas without asking the user
 - In `discuss_areas`: for each discussion question, choose the recommended option (first option, or the one marked "recommended") without using question
@@ -170,10 +182,11 @@ Exit workflow.
 - After discussion completes, auto-advance to plan-phase (existing behavior)
 
 **Chain mode** — If `--chain` is present in ARGUMENTS:
+
 - Discussion is fully interactive (questions, gray area selection — same as default mode)
 - After discussion completes, auto-advance to plan-phase → execute-phase (same as `--auto`)
 - This is the middle ground: user controls the discuss decisions, then plan+execute run autonomously
-</step>
+  </step>
 
 <step name="check_blocking_antipatterns" priority="first">
 **MANDATORY — Check for blocking anti-patterns before any other work.**
@@ -211,6 +224,7 @@ ls ${phase_dir}/*-CONTEXT.md 2>/dev/null || true
 **If `--auto`:** Auto-select "Update it" — load existing context and continue to analyze_phase. Log: `[auto] Context exists — updating with auto-selected decisions.`
 
 **Otherwise:** Use question:
+
 - header: "Context"
 - question: "Phase [X] already has context. What do you want to do?"
 - options:
@@ -235,6 +249,7 @@ If a checkpoint file exists (previous session was interrupted before CONTEXT.md 
 **If `--auto`:** Auto-select "Resume" — load checkpoint and continue from last completed area.
 
 **Otherwise:** Use question:
+
 - header: "Resume"
 - question: "Found interrupted discussion checkpoint ({N} areas completed out of {M}). Resume from where you left off?"
 - options:
@@ -249,6 +264,7 @@ Check `has_plans` and `plan_count` from init. **If `has_plans` is true:**
 **If `--auto`:** Auto-select "Continue and replan after". Log: `[auto] Plans exist — continuing with context capture, will replan after.`
 
 **Otherwise:** Use question:
+
 - header: "Plans exist"
 - question: "Phase [X] already has {plan_count} plan(s) created without user context. Your decisions here won't affect existing plans unless you replan."
 - options:
@@ -267,6 +283,7 @@ If "Cancel": Exit workflow.
 Read project-level and prior phase context to avoid re-asking decided questions and maintain consistency.
 
 **Step 1: Read project-level files**
+
 ```bash
 # Core project files
 cat .planning/PROJECT.md 2>/dev/null || true
@@ -275,17 +292,20 @@ cat .planning/STATE.md 2>/dev/null || true
 ```
 
 Extract from these:
+
 - **PROJECT.md** — Vision, principles, non-negotiables, user preferences
 - **REQUIREMENTS.md** — Acceptance criteria, constraints, must-haves vs nice-to-haves
 - **STATE.md** — Current progress, any flags or session notes
 
 **Step 2: Read all prior CONTEXT.md files**
+
 ```bash
 # Find all CONTEXT.md files from phases before current
 (find .planning/phases -name "*-CONTEXT.md" 2>/dev/null || true) | sort
 ```
 
 For each CONTEXT.md where phase number < current phase:
+
 - Read the `<decisions>` section — these are locked preferences
 - Read `<specifics>` — particular references or "I want it like X" moments
 - Note any patterns (e.g., "user consistently prefers minimal UI", "user rejected single-key shortcuts")
@@ -293,6 +313,7 @@ For each CONTEXT.md where phase number < current phase:
 **Step 3: Build internal `<prior_decisions>` context**
 
 Structure the extracted information:
+
 ```
 <prior_decisions>
 ## Project-Level
@@ -310,6 +331,7 @@ Structure the extracted information:
 ```
 
 **Usage in subsequent steps:**
+
 - `analyze_phase`: Skip gray areas already decided in prior phases
 - `present_gray_areas`: Annotate options with prior decisions ("You chose X in Phase 5")
 - `discuss_areas`: Pre-fill answers or flag conflicts ("This contradicts Phase 3 — same here or different?")
@@ -321,8 +343,9 @@ Structure the extracted information:
 Check if any pending todos are relevant to this phase's scope. Surfaces backlog items that might otherwise be missed.
 
 **Load and match todos:**
+
 ```bash
-TODO_MATCHES=$(node "/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" todo match-phase "${PHASE_NUMBER}")
+TODO_MATCHES=$(node "./desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" todo match-phase "${PHASE_NUMBER}")
 ```
 
 Parse JSON for: `todo_count`, `matches[]` (each with `file`, `title`, `area`, `score`, `reasons`).
@@ -348,10 +371,12 @@ Which of these todos should be folded into Phase {X} scope?
 ```
 
 **For selected (folded) todos:**
+
 - Store internally as `<folded_todos>` for inclusion in CONTEXT.md `<decisions>` section
 - These become additional scope items that downstream agents (researcher, planner) will see
 
 **For unselected (reviewed but not folded) todos:**
+
 - Store internally as `<reviewed_todos>` for inclusion in CONTEXT.md `<deferred>` section
 - This prevents future phases from re-surfacing the same todos as "missed"
 
@@ -362,11 +387,13 @@ Which of these todos should be folded into Phase {X} scope?
 Lightweight scan of existing code to inform gray area identification and discussion. Uses ~10% context — acceptable for an interactive session.
 
 **Step 1: Check for existing codebase maps**
+
 ```bash
 ls .planning/codebase/*.md 2>/dev/null || true
 ```
 
 **If codebase maps exist:** Read the most relevant ones (CONVENTIONS.md, STRUCTURE.md, STACK.md based on phase type). Extract:
+
 - Reusable components/hooks/utilities
 - Established patterns (state management, styling, data fetching)
 - Integration points (where new code would connect)
@@ -392,6 +419,7 @@ Read the 3-5 most relevant files to understand existing patterns.
 **Step 3: Build internal codebase_context**
 
 From the scan, identify:
+
 - **Reusable assets** — existing components, hooks, utilities that could be used in this phase
 - **Established patterns** — how the codebase does state management, styling, data fetching
 - **Integration points** — where new code would connect (routes, nav, providers)
@@ -409,12 +437,12 @@ Analyze the phase to identify gray areas worth discussing. **Use both `prior_dec
 
 1b. **Initialize canonical refs accumulator** — Start building the `<canonical_refs>` list for CONTEXT.md. This accumulates throughout the entire discussion, not just this step.
 
-   **Source 1 (now):** Copy `Canonical refs:` from ROADMAP.md for this phase. Expand each to a full relative path.
-   **Source 2 (now):** Check REQUIREMENTS.md and PROJECT.md for any specs/ADRs referenced for this phase.
-   **Source 3 (scout_codebase):** If existing code references docs (e.g., comments citing ADRs), add those.
-   **Source 4 (discuss_areas):** When the user says "read X", "check Y", or references any doc/spec/ADR during discussion — add it immediately. These are often the MOST important refs because they represent docs the user specifically wants followed.
+**Source 1 (now):** Copy `Canonical refs:` from ROADMAP.md for this phase. Expand each to a full relative path.
+**Source 2 (now):** Check REQUIREMENTS.md and PROJECT.md for any specs/ADRs referenced for this phase.
+**Source 3 (scout_codebase):** If existing code references docs (e.g., comments citing ADRs), add those.
+**Source 4 (discuss_areas):** When the user says "read X", "check Y", or references any doc/spec/ADR during discussion — add it immediately. These are often the MOST important refs because they represent docs the user specifically wants followed.
 
-   This list is MANDATORY in CONTEXT.md. Every ref must have a full relative path so downstream agents can read it directly. If no external docs exist, note that explicitly.
+This list is MANDATORY in CONTEXT.md. Every ref must have a full relative path so downstream agents can read it directly. If no external docs exist, note that explicitly.
 
 2. **Check prior decisions** — Before generating gray areas, check if any were already decided:
    - Scan `<prior_decisions>` for relevant choices (e.g., "Ctrl+C only, no single-key shortcuts")
@@ -430,9 +458,11 @@ Analyze the phase to identify gray areas worth discussing. **Use both `prior_dec
 Check if advisor mode should activate:
 
 1. Check for USER-PROFILE.md:
+
    ```bash
-   PROFILE_PATH="/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/USER-PROFILE.md"
+   PROFILE_PATH="./desafio-fcg3/src/backend/.opencode/get-shit-done/USER-PROFILE.md"
    ```
+
    ADVISOR_MODE = file exists at PROFILE_PATH → true, otherwise → false
 
 2. If ADVISOR_MODE is true, resolve vendor_philosophy calibration tier:
@@ -447,7 +477,7 @@ Check if advisor mode should activate:
 
 3. Resolve model for advisor agents:
    ```bash
-   ADVISOR_MODEL=$(node "/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" resolve-model gsd-advisor-researcher --raw)
+   ADVISOR_MODEL=$(node "./desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" resolve-model gsd-advisor-researcher --raw)
    ```
 
 If ADVISOR_MODE is false, skip all advisor-specific steps — workflow proceeds with existing conversational flow unchanged.
@@ -455,6 +485,7 @@ If ADVISOR_MODE is false, skip all advisor-specific steps — workflow proceeds 
 **Output your analysis internally, then present to user.**
 
 Example analysis for "Post Feed" phase (with code and prior context):
+
 ```
 Domain: Displaying posts from followed users
 Existing: Card component (src/components/ui/Card.tsx), useInfiniteQuery hook, Tailwind CSS
@@ -466,12 +497,14 @@ Gray areas:
 - Empty State: What shows when no posts exist — EmptyState component exists in ui/
 - Content: What metadata displays (time, author, reactions count)
 ```
+
 </step>
 
 <step name="present_gray_areas">
 Present the domain boundary, prior decisions, and gray areas to user.
 
 **First, state the boundary and any prior decisions that apply:**
+
 ```
 Phase [X]: [Name]
 Domain: [What this phase delivers — from your analysis]
@@ -488,6 +521,7 @@ We'll clarify HOW to implement this.
 **If `--auto`:** Auto-select ALL gray areas. Log: `[auto] Selected all gray areas: [list area names].` Skip the question below and continue directly to discuss_areas with all areas selected.
 
 **Otherwise, use question (multiSelect: true):**
+
 - header: "Discuss"
 - question: "Which areas do you want to discuss for [phase name]?"
 - options: Generate 3-4 phase-specific gray areas, each with:
@@ -496,18 +530,21 @@ We'll clarify HOW to implement this.
   - **Highlight the recommended choice with brief explanation why**
 
 **Prior decision annotations:** When a gray area was already decided in a prior phase, annotate it:
+
 ```
 ☐ Exit shortcuts — How should users quit?
   (You decided "Ctrl+C only, no single-key shortcuts" in Phase 5 — revisit or keep?)
 ```
 
 **Code context annotations:** When the scout found relevant existing code, annotate the gray area description:
+
 ```
 ☐ Layout style — Cards vs list vs timeline?
   (You already have a Card component with shadow/rounded variants. Reusing it keeps the app consistent.)
 ```
 
 **Combining both:** When both prior decisions and code context apply:
+
 ```
 ☐ Loading behavior — Infinite scroll or pagination?
   (You chose infinite scroll in Phase 4. useInfiniteQuery hook already set up.)
@@ -518,6 +555,7 @@ We'll clarify HOW to implement this.
 **Examples by domain (with code context):**
 
 For "Post Feed" (visual feature):
+
 ```
 ☐ Layout style — Cards vs list vs timeline? (Card component exists with variants)
 ☐ Loading behavior — Infinite scroll or pagination? (useInfiniteQuery hook available)
@@ -526,6 +564,7 @@ For "Post Feed" (visual feature):
 ```
 
 For "Database backup CLI" (command-line tool):
+
 ```
 ☐ Output format — JSON, table, or plain text? Verbosity levels?
 ☐ Flag design — Short flags, long flags, or both? Required vs optional?
@@ -534,6 +573,7 @@ For "Database backup CLI" (command-line tool):
 ```
 
 For "Organize photo library" (organization task):
+
 ```
 ☐ Grouping criteria — By date, location, faces, or events?
 ☐ Duplicate handling — Keep best, keep all, or prompt each time?
@@ -554,18 +594,18 @@ After user selects gray areas in present_gray_areas, spawn parallel research age
 2. For EACH user-selected gray area, spawn a Task() in parallel:
 
    Task(
-     prompt="First, read @/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/agents/gsd-advisor-researcher.md for your role and instructions.
+   prompt="First, read @./desafio-fcg3/src/backend/.opencode/agents/gsd-advisor-researcher.md for your role and instructions.
 
-     <gray_area>{area_name}: {area_description from gray area identification}</gray_area>
-     <phase_context>{phase_goal and description from ROADMAP.md}</phase_context>
-     <project_context>{project name and brief description from PROJECT.md}</project_context>
-     <calibration_tier>{resolved calibration tier: full_maturity | standard | minimal_decisive}</calibration_tier>
+   <gray_area>{area_name}: {area_description from gray area identification}</gray_area>
+   <phase_context>{phase_goal and description from ROADMAP.md}</phase_context>
+   <project_context>{project name and brief description from PROJECT.md}</project_context>
+   <calibration_tier>{resolved calibration tier: full_maturity | standard | minimal_decisive}</calibration_tier>
 
-     Research this gray area and return a structured comparison table with rationale.
-     ${AGENT_SKILLS_ADVISOR}",
-     subagent_type="general",
-     model="{ADVISOR_MODEL}",
-     description="Research: {area_name}"
+   Research this gray area and return a structured comparison table with rationale.
+   ${AGENT_SKILLS_ADVISOR}",
+   subagent_type="general",
+   model="{ADVISOR_MODEL}",
+   description="Research: {area_name}"
    )
 
    All Task() calls spawn simultaneously — do NOT wait for one before starting the next.
@@ -575,12 +615,12 @@ After user selects gray areas in present_gray_areas, spawn parallel research age
    a. Parse the markdown comparison table and rationale paragraph
    b. Verify all 5 columns present (Option | Pros | Cons | Complexity | Recommendation) — fill any missing columns rather than showing broken table
    c. Verify option count matches calibration tier:
-      - full_maturity: 3-5 options acceptable
-      - standard: 2-4 options acceptable
-      - minimal_decisive: 1-2 options acceptable
-      If agent returned too many, trim least viable. If too few, accept as-is.
-   d. Rewrite rationale paragraph to weave in project context and ongoing discussion context that the agent did not have access to
-   e. If agent returned only 1 option, convert from table format to direct recommendation: "Standard approach for {area}: {option}. {rationale}"
+   - full_maturity: 3-5 options acceptable
+   - standard: 2-4 options acceptable
+   - minimal_decisive: 1-2 options acceptable
+     If agent returned too many, trim least viable. If too few, accept as-is.
+     d. Rewrite rationale paragraph to weave in project context and ongoing discussion context that the agent did not have access to
+     e. If agent returned only 1 option, convert from table format to direct recommendation: "Standard approach for {area}: {option}. {rationale}"
 
 4. Store synthesized tables for use in discuss_areas.
 
@@ -633,6 +673,7 @@ Table-first discussion flow — present research-backed comparison tables, then 
 
 **Scope creep handling (advisor mode):**
 If user mentions something outside the phase domain:
+
 ```
 "[Feature] sounds like a new capability — that belongs in its own phase.
 I'll note it as a deferred idea.
@@ -649,11 +690,13 @@ Track deferred ideas internally.
 For each selected area, conduct a focused discussion loop.
 
 **Research-before-questions mode:** Check if `workflow.research_before_questions` is enabled in config (from init context or `.planning/config.json`). When enabled, before presenting questions for each area:
+
 1. Do a brief web search for best practices related to the area topic
 2. Summarize the top findings in 2-3 bullet points
 3. Present the research alongside the question so the user can make a more informed decision
 
 Example with research enabled:
+
 ```
 Let's talk about [Authentication Strategy].
 
@@ -668,6 +711,7 @@ With that context: How should users authenticate?
 When disabled (default), skip the research and present questions directly as before.
 
 **Text mode support:** Parse optional `--text` from `$ARGUMENTS`.
+
 - Accept `--text` flag OR read `workflow.text_mode` from config (from init context)
 - When active, replace ALL `question` calls with plain-text numbered lists
 - User types a number to select, or types free text for "Other"
@@ -675,15 +719,18 @@ When disabled (default), skip the research and present questions directly as bef
   don't work through the the agent App
 
 **Batch mode support:** Parse optional `--batch` from `$ARGUMENTS`.
+
 - Accept `--batch`, `--batch=N`, or `--batch N`
 
 **Analyze mode support:** Parse optional `--analyze` from `$ARGUMENTS`.
 When `--analyze` is active, before presenting each question (or question group in batch mode), provide a brief **trade-off analysis** for the decision:
+
 - 2-3 options with pros/cons based on codebase context and common patterns
 - A recommended approach with reasoning
 - Known pitfalls or constraints from prior phases
 
 Example with `--analyze`:
+
 ```
 **Trade-off analysis: Authentication strategy**
 
@@ -699,29 +746,34 @@ How should users authenticate?
 ```
 
 This gives the user context to make informed decisions without extra prompting. When `--analyze` is absent, present questions directly as before.
+
 - Accept `--batch`, `--batch=N`, or `--batch N`
 - Default to 4 questions per batch when no number is provided
 - Clamp explicit sizes to 2-5 so a batch stays answerable
 - If `--batch` is absent, keep the existing one-question-at-a-time flow
 
 **Philosophy:** stay adaptive, but let the user choose the pacing.
+
 - Default mode: 4 single-question turns, then check whether to continue
 - `--batch` mode: 1 grouped turn with 2-5 numbered questions, then check whether to continue
 
 Each answer (or answer set, in batch mode) should reveal the next question or next batch.
 
 **Auto mode (`--auto`):** For each area, the agent selects the recommended option (first option, or the one explicitly marked "recommended") for every question without using question. Log each auto-selected choice:
+
 ```
 [auto] [Area] — Q: "[question text]" → Selected: "[chosen option]" (recommended default)
 ```
+
 After all areas are auto-resolved, skip the "Explore more gray areas" prompt and proceed directly to write_context.
 
 **CRITICAL — Auto-mode pass cap:**
 In `--auto` mode, the discuss step MUST complete in a **single pass**. After writing CONTEXT.md once, you are DONE — proceed immediately to write_context and then auto_advance. Do NOT re-read your own CONTEXT.md to find "gaps", "undefined types", or "missing decisions" and run additional passes. This creates a self-feeding loop where each pass generates references that the next pass treats as gaps, consuming unbounded time and resources.
 
 Check the pass cap from config:
+
 ```bash
-MAX_PASSES=$(node "/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.max_discuss_passes 2>/dev/null || echo "3")
+MAX_PASSES=$(node "./desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.max_discuss_passes 2>/dev/null || echo "3")
 ```
 
 If you have already written and committed CONTEXT.md, the discuss step is complete. Move on.
@@ -731,6 +783,7 @@ If you have already written and committed CONTEXT.md, the discuss step is comple
 **For each area:**
 
 1. **Announce the area:**
+
    ```
    Let's talk about [Area].
    ```
@@ -783,6 +836,7 @@ If you have already written and committed CONTEXT.md, the discuss step is comple
 
 **Canonical ref accumulation during discussion:**
 When the user references a doc, spec, or ADR during any answer — e.g., "read adr-014", "check the MCP spec", "per browse-spec.md" — immediately:
+
 1. Read the referenced doc (or confirm it exists)
 2. Add it to the canonical refs accumulator with full relative path
 3. Use what you learned from the doc to inform subsequent questions
@@ -790,12 +844,14 @@ When the user references a doc, spec, or ADR during any answer — e.g., "read a
 These user-referenced docs are often MORE important than ROADMAP.md refs because they represent docs the user specifically wants downstream agents to follow. Never drop them.
 
 **Question design:**
+
 - Options should be concrete, not abstract ("Cards" not "Option A")
 - Each answer should inform the next question or next batch
 - If user picks "Other" to provide freeform input (e.g., "let me describe it", "something else", or an open-ended reply), ask your follow-up as plain text — NOT another question. Wait for them to type at the normal prompt, then reflect their input back and confirm before resuming question or the next numbered batch.
 
 **Scope creep handling:**
 If user mentions something outside the phase domain:
+
 ```
 "[Feature] sounds like a new capability — that belongs in its own phase.
 I'll note it as a deferred idea.
@@ -812,6 +868,7 @@ After each area is resolved (user says "Next area" or area auto-resolves in `--a
 **Checkpoint file:** `${phase_dir}/${padded_phase}-DISCUSS-CHECKPOINT.json`
 
 Write after each area:
+
 ```json
 {
   "phase": "{PHASE_NUM}",
@@ -821,11 +878,11 @@ Write after each area:
   "areas_remaining": ["Area 3", "Area 4"],
   "decisions": {
     "Area 1": [
-      {"question": "...", "answer": "...", "options_presented": ["..."]},
-      {"question": "...", "answer": "...", "options_presented": ["..."]}
+      { "question": "...", "answer": "...", "options_presented": ["..."] },
+      { "question": "...", "answer": "...", "options_presented": ["..."] }
     ],
     "Area 2": [
-      {"question": "...", "answer": "...", "options_presented": ["..."]}
+      { "question": "...", "answer": "...", "options_presented": ["..."] }
     ]
   },
   "deferred_ideas": ["..."],
@@ -836,6 +893,7 @@ Write after each area:
 This is a structured checkpoint, not the final CONTEXT.md — the `write_context` step still produces the canonical output. But if the session dies, the next `/gsd-discuss-phase` invocation can detect this checkpoint and offer to resume from it instead of starting from scratch.
 
 **On session resume:** In the `check_existing` step, also check for `*-DISCUSS-CHECKPOINT.json`. If found and no CONTEXT.md exists:
+
 - Display: "Found interrupted discussion checkpoint ({N} areas completed). Resume from checkpoint?"
 - Options: "Resume" / "Start fresh"
 - On "Resume": Load the checkpoint, skip completed areas, continue from where it left off
@@ -845,12 +903,13 @@ This is a structured checkpoint, not the final CONTEXT.md — the `write_context
 
 **Track discussion log data internally:**
 For each question asked, accumulate:
+
 - Area name
 - All options presented (label + description)
 - Which option the user selected (or their free-text response)
 - Any follow-up notes or clarifications the user provided
-This data is used to generate DISCUSSION-LOG.md in the `write_context` step.
-</step>
+  This data is used to generate DISCUSSION-LOG.md in the `write_context` step.
+  </step>
 
 <step name="write_context">
 Create CONTEXT.md capturing decisions made.
@@ -864,6 +923,7 @@ consumed by downstream agents (researcher, planner, executor).
 Use values from init: `phase_dir`, `phase_slug`, `padded_phase`.
 
 If `phase_dir` is null (phase exists in roadmap but no directory):
+
 ```bash
 mkdir -p ".planning/phases/${padded_phase}-${phase_slug}"
 ```
@@ -889,16 +949,20 @@ mkdir -p ".planning/phases/${padded_phase}-${phase_slug}"
 ## Implementation Decisions
 
 ### [Category 1 that was discussed]
+
 - **D-01:** [Decision or preference captured]
 - **D-02:** [Another decision if applicable]
 
 ### [Category 2 that was discussed]
+
 - **D-03:** [Decision or preference captured]
 
 ### the agent's Discretion
+
 [Areas where user said "you decide" — note that the agent has flexibility here]
 
 ### Folded Todos
+
 [If any todos were folded into scope from the cross_reference_todos step, list them here.
 Each entry should include the todo title, original problem, and how it fits this phase's scope.
 If no todos were folded: omit this subsection entirely.]
@@ -906,6 +970,7 @@ If no todos were folded: omit this subsection entirely.]
 </decisions>
 
 <canonical_refs>
+
 ## Canonical References
 
 **Downstream agents MUST read these before planning or implementing.**
@@ -916,10 +981,12 @@ discussion + any docs discovered during codebase scout. Group by topic area.
 Every entry needs a full relative path — not just a name.]
 
 ### [Topic area 1]
+
 - `path/to/adr-or-spec.md` — [What it decides/defines that's relevant]
 - `path/to/doc.md` §N — [Specific section reference]
 
 ### [Topic area 2]
+
 - `path/to/feature-doc.md` — [What this doc defines]
 
 [If no external specs: "No external specs — requirements fully captured in decisions above"]
@@ -927,15 +994,19 @@ Every entry needs a full relative path — not just a name.]
 </canonical_refs>
 
 <code_context>
+
 ## Existing Code Insights
 
 ### Reusable Assets
+
 - [Component/hook/utility]: [How it could be used in this phase]
 
 ### Established Patterns
+
 - [Pattern]: [How it constrains/enables this phase]
 
 ### Integration Points
+
 - [Where new code connects to existing system]
 
 </code_context>
@@ -955,6 +1026,7 @@ Every entry needs a full relative path — not just a name.]
 [Ideas that came up but belong in other phases. Don't lose them.]
 
 ### Reviewed Todos (not folded)
+
 [If any todos were reviewed in cross_reference_todos but not folded into scope,
 list them here so future phases know they were considered.
 Each entry: todo title + reason it was deferred (out of scope, belongs in Phase Y, etc.)
@@ -966,8 +1038,8 @@ If no reviewed-but-deferred todos: omit this subsection entirely.]
 
 ---
 
-*Phase: XX-name*
-*Context gathered: [date]*
+_Phase: XX-name_
+_Context gathered: [date]_
 ```
 
 Write file.
@@ -1011,6 +1083,7 @@ Created: .planning/phases/${PADDED_PHASE}-${SLUG}/${PADDED_PHASE}-CONTEXT.md
 
 ---
 ```
+
 </step>
 
 <step name="git_commit">
@@ -1034,11 +1107,11 @@ Created: .planning/phases/${PADDED_PHASE}-${SLUG}/${PADDED_PHASE}-CONTEXT.md
 
 ## [Area Name]
 
-| Option | Description | Selected |
-|--------|-------------|----------|
-| [Option 1] | [Description from question] | |
-| [Option 2] | [Description] | ✓ |
-| [Option 3] | [Description] | |
+| Option     | Description                 | Selected |
+| ---------- | --------------------------- | -------- |
+| [Option 1] | [Description from question] |          |
+| [Option 2] | [Description]               | ✓        |
+| [Option 3] | [Description]               |          |
 
 **User's choice:** [Selected option or free-text response]
 **Notes:** [Any clarifications, follow-up context, or rationale the user provided]
@@ -1067,7 +1140,7 @@ rm -f "${phase_dir}/${padded_phase}-DISCUSS-CHECKPOINT.json"
 Commit phase context and discussion log:
 
 ```bash
-node "/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs(${padded_phase}): capture phase context" --files "${phase_dir}/${padded_phase}-CONTEXT.md" "${phase_dir}/${padded_phase}-DISCUSSION-LOG.md"
+node "./desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs(${padded_phase}): capture phase context" --files "${phase_dir}/${padded_phase}-CONTEXT.md" "${phase_dir}/${padded_phase}-DISCUSSION-LOG.md"
 ```
 
 Confirm: "Committed: docs(${padded_phase}): capture phase context"
@@ -1077,7 +1150,7 @@ Confirm: "Committed: docs(${padded_phase}): capture phase context"
 Update STATE.md with session info:
 
 ```bash
-node "/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" state record-session \
+node "./desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" state record-session \
   --stopped-at "Phase ${PHASE} context gathered" \
   --resume-file "${phase_dir}/${padded_phase}-CONTEXT.md"
 ```
@@ -1085,8 +1158,9 @@ node "/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3
 Commit STATE.md:
 
 ```bash
-node "/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs(state): record phase ${PHASE} context session" --files .planning/STATE.md
+node "./desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs(state): record phase ${PHASE} context session" --files .planning/STATE.md
 ```
+
 </step>
 
 <step name="auto_advance">
@@ -1096,23 +1170,25 @@ Check for auto-advance trigger:
 2. **Sync chain flag with intent** — if user invoked manually (no `--auto` and no `--chain`), clear the ephemeral chain flag from any previous interrupted `--auto` chain. This does NOT touch `workflow.auto_advance` (the user's persistent settings preference):
    ```bash
    if [[ ! "$ARGUMENTS" =~ --auto ]] && [[ ! "$ARGUMENTS" =~ --chain ]]; then
-     node "/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" config-set workflow._auto_chain_active false 2>/dev/null
+     node "./desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" config-set workflow._auto_chain_active false 2>/dev/null
    fi
    ```
 3. Read both the chain flag and user preference:
    ```bash
-   AUTO_CHAIN=$(node "/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow._auto_chain_active 2>/dev/null || echo "false")
-   AUTO_CFG=$(node "/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.auto_advance 2>/dev/null || echo "false")
+   AUTO_CHAIN=$(node "./desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow._auto_chain_active 2>/dev/null || echo "false")
+   AUTO_CFG=$(node "./desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.auto_advance 2>/dev/null || echo "false")
    ```
 
 **If `--auto` or `--chain` flag present AND `AUTO_CHAIN` is not true:** Persist chain flag to config (handles direct usage without new-project):
+
 ```bash
-node "/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" config-set workflow._auto_chain_active true
+node "./desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" config-set workflow._auto_chain_active true
 ```
 
 **If `--auto` flag present OR `--chain` flag present OR `AUTO_CHAIN` is true OR `AUTO_CFG` is true:**
 
 Display banner:
+
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
  GSD ► AUTO-ADVANCING TO PLAN
@@ -1122,6 +1198,7 @@ Context captured. Launching plan-phase...
 ```
 
 Launch plan-phase using the Skill tool to avoid nested Task sessions (which cause runtime freezes due to deep agent nesting — see #686):
+
 ```
 Skill(skill="gsd-plan-phase", args="${PHASE} --auto ${GSD_WS}")
 ```
@@ -1129,7 +1206,9 @@ Skill(skill="gsd-plan-phase", args="${PHASE} --auto ${GSD_WS}")
 This keeps the auto-advance chain flat — discuss, plan, and execute all run at the same nesting level rather than spawning increasingly deep Task agents.
 
 **Handle plan-phase return:**
+
 - **PHASE COMPLETE** → Full chain succeeded. Display:
+
   ```
   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    GSD ► PHASE ${PHASE} COMPLETE
@@ -1141,6 +1220,7 @@ This keeps the auto-advance chain flat — discuss, plan, and execute all run at
 
   Next: /gsd-discuss-phase ${NEXT_PHASE} ${WAS_CHAIN ? "--chain" : "--auto"} ${GSD_WS}
   ```
+
 - **PLANNING COMPLETE** → Planning done, execution didn't complete:
   ```
   Auto-advance partial: Planning complete, execution did not finish.
@@ -1168,17 +1248,19 @@ When `--power` flag is present in ARGUMENTS, skip interactive questioning and ex
 
 The power user mode generates ALL questions upfront into machine-readable and human-friendly files, then waits for the user to answer at their own pace before processing all answers in a single pass.
 
-**Full step-by-step instructions:** @/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/discuss-phase-power.md
+**Full step-by-step instructions:** @./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/discuss-phase-power.md
 
 **Summary of flow:**
+
 1. Run the same phase analysis (gray area identification) as standard mode
 2. Write all questions to `{phase_dir}/{padded_phase}-QUESTIONS.json` and `{phase_dir}/{padded_phase}-QUESTIONS.html`
 3. Notify user with file paths and wait for a "refresh" or "finalize" command
 4. On "refresh": read the JSON, process answered questions, update stats and HTML
 5. On "finalize": read all answers from JSON, generate CONTEXT.md in the standard format
-</power_user_mode>
+   </power_user_mode>
 
 <success_criteria>
+
 - Phase validated against roadmap
 - Prior context loaded (PROJECT.md, REQUIREMENTS.md, STATE.md, prior CONTEXT.md files)
 - Already-decided questions not re-asked (carried forward from prior phases)
@@ -1198,4 +1280,4 @@ The power user mode generates ALL questions upfront into machine-readable and hu
 - Checkpoint file cleaned up after successful CONTEXT.md write
 - `--chain` triggers interactive discuss followed by auto plan+execute (no auto-answering)
 - `--chain` and `--auto` both persist chain flag and auto-advance to plan-phase
-</success_criteria>
+  </success_criteria>

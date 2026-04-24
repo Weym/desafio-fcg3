@@ -7,6 +7,7 @@ tools:
   write: true
   question: true
 ---
+
 <context>
 **Flags:**
 - `--name` (required) — Workspace name
@@ -21,10 +22,12 @@ tools:
 Create a physical workspace directory containing copies of specified git repos (as worktrees or clones) with an independent `.planning/` directory for isolated GSD sessions.
 
 **Use cases:**
+
 - Multi-repo orchestration: work on a subset of repos in parallel with isolated GSD state
 - Feature branch isolation: create a worktree of the current repo with its own `.planning/`
 
 **Creates:**
+
 - `<path>/WORKSPACE.md` — workspace manifest
 - `<path>/.planning/` — independent planning directory
 - `<path>/<repo>/` — git worktree or clone for each specified repo
@@ -33,11 +36,11 @@ Create a physical workspace directory containing copies of specified git repos (
 </objective>
 
 <execution_context>
-@/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/new-workspace.md
-@/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/references/ui-brand.md
+@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/new-workspace.md
+@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/ui-brand.md
 </execution_context>
 
 <process>
-Execute the new-workspace workflow from @/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/new-workspace.md end-to-end.
+Execute the new-workspace workflow from @./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/new-workspace.md end-to-end.
 Preserve all workflow gates (validation, approvals, commits, routing).
 </process>

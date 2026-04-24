@@ -18,20 +18,21 @@ planning via /gsd-plan-phase --reviews.
 </objective>
 
 <execution_context>
-@/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/review.md
+@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/review.md
 </execution_context>
 
 <context>
 Phase number: extracted from $ARGUMENTS (required)
 
 **Flags:**
+
 - `--gemini` — Include Gemini CLI review
 - `--claude` — Include the agent CLI review (uses separate session)
 - `--codex` — Include Codex CLI review
 - `--opencode` — Include OpenCode review (uses model from user's OpenCode config)
 - `--all` — Include all available CLIs
-</context>
+  </context>
 
 <process>
-Execute the review workflow from @/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/review.md end-to-end.
+Execute the review workflow from @./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/review.md end-to-end.
 </process>

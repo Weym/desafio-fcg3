@@ -9,6 +9,7 @@ tools:
   task: true
   question: true
 ---
+
 <objective>
 Open-ended Socratic ideation session. Guides the developer through exploring an idea via
 probing questions, optionally spawns research, then routes outputs to the appropriate GSD
@@ -18,9 +19,9 @@ Accepts an optional topic argument: `/gsd-explore authentication strategy`
 </objective>
 
 <execution_context>
-@/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/explore.md
+@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/explore.md
 </execution_context>
 
 <process>
-Execute the explore workflow from @/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/explore.md end-to-end.
+Execute the explore workflow from @./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/explore.md end-to-end.
 </process>

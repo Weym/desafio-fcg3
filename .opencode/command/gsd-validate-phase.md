@@ -11,6 +11,7 @@ tools:
   task: true
   question: true
 ---
+
 <objective>
 Audit Nyquist validation coverage for a completed phase. Three states:
 - (A) VALIDATION.md exists — audit and fill gaps
@@ -21,7 +22,7 @@ Output: updated VALIDATION.md + generated test files.
 </objective>
 
 <execution_context>
-@/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/validate-phase.md
+@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/validate-phase.md
 </execution_context>
 
 <context>
@@ -29,6 +30,6 @@ Phase: $ARGUMENTS — optional, defaults to last completed phase.
 </context>
 
 <process>
-Execute @/home/henry/Documents/programming/github/alphaEdTech/projetos/desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/validate-phase.md.
+Execute @./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/validate-phase.md.
 Preserve all workflow gates.
 </process>
