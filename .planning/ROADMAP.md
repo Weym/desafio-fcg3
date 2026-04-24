@@ -3,13 +3,13 @@
 **Milestone:** M1 — Backend + AI Service + MCP Server
 **Granularity:** Standard
 **Coverage:** 69/69 requirements mapped
-**Last Updated:** 2026-04-15
+**Last Updated:** 2026-04-24
 
 ---
 
 ## Phases
 
-- [ ] **Phase 1: Infrastructure & Schema** — Docker Compose running, all 17 tables migrated, seed data loaded
+- [x] **Phase 1: Infrastructure & Schema** — Docker Compose running, all application tables migrated, seed data loaded
 - [ ] **Phase 2: Authentication** — OTP email flow, JWT with roles, session revocation, auth middleware
 - [ ] **Phase 3: Business Feature Slices** — All FastAPI feature endpoints (students, courses, enrollment, grades, documents, appointments, staff dashboard)
 - [ ] **Phase 4: MCP Server** — 16 tools over streamable-http, student_id injection, mcp_action_logs
@@ -28,15 +28,16 @@
 
 ### Success Criteria
 1. Running `docker compose up` brings all four containers (postgres, fastapi-app, langchain-service, mcp-server) to a healthy state with passing healthchecks.
-2. Running `alembic upgrade head` creates all 17 tables (including the pgvector extension as migration #001) and the HNSW index on `knowledge_base_chunks.embedding` — verified by `\dt` in psql.
+2. Running `alembic upgrade head` creates all application tables (21 in the current documented schema, including the pgvector extension as migration #001) and the HNSW index on `knowledge_base_chunks.embedding` — verified by `\dt` in psql.
 3. All required environment variables are documented in `.env.example` so the project can be configured from scratch without reading source code.
 4. Running the seed script populates the `curriculum`, `curriculum_courses`, and `courses` tables with 8 semesters and ~40 disciplines including prerequisite relationships.
 
 ### Plans
-- [ ] Plan 1.1: Docker Compose & networking — define four services with `service_healthy` depends_on, app-network and data-network, port mappings
-- [ ] Plan 1.2: Alembic async configuration — `env.py` async setup, migration #001 (pgvector extension), full schema migrations for all 17 tables + indexes
-- [ ] Plan 1.3: Environment configuration — `.env.example` with all variables; `config.py` / `settings.py` with Pydantic BaseSettings
-- [ ] Plan 1.4: Seed script — `scripts/seed.py` loading curriculum, courses, and prerequisites for CC 8-semester program
+- [x] Plan 1.1: Docker Compose & networking — define four services with `service_healthy` depends_on, app-network and data-network, port mappings
+- [x] Plan 1.2: Alembic async configuration — `env.py` async setup, migration #001 (pgvector extension), full schema migrations for all application tables + indexes
+- [x] Plan 1.3: Environment configuration — `.env.example` with all variables; `config.py` / `settings.py` with Pydantic BaseSettings
+- [x] Plan 1.4: Seed script — `scripts/seed.py` loading curriculum, courses, and prerequisites for CC 8-semester program
+- [x] Plan 1.5: Gap closure — repair backend import path so `fastapi-app` starts healthy in Docker
 
 ---
 
@@ -162,7 +163,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Infrastructure & Schema | 0/4 | Not started | - |
+| 1. Infrastructure & Schema | 5/5 | Complete | 2026-04-24 |
 | 2. Authentication | 0/4 | Not started | - |
 | 3. Business Feature Slices | 0/7 | Not started | - |
 | 4. MCP Server | 0/4 | Planned | - |
