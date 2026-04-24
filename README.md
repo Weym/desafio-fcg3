@@ -30,6 +30,8 @@ Observacoes:
 docker compose up --build -d
 ```
 
+O comando destacado acima termina antes dos healthchecks dos servicos HTTP concluirem. Trate essa saida destacada como um estado intermediario de startup, nao como veredito final de falha.
+
 4. Confira a saude dos servicos:
 
 ```bash
