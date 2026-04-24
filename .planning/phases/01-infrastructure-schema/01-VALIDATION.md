@@ -32,6 +32,13 @@ created: 2026-04-23
 - **Before `/gsd-verify-work`:** Full suite: Docker up + migrations + seed + all verification queries
 - **Max feedback latency:** 60 seconds (includes Docker build on cache miss)
 
+### Cold-start evidence contract
+
+- `docker compose up --build -d` is only an intermediate startup state for Phase 1 smoke verification.
+- Detached compose output alone is not sufficient evidence to fail the stack.
+- A post-start `docker compose ps` re-check is mandatory before judging stack health.
+- `curl http://localhost:8000/health` is required proof for the backend path in the Phase 1 cold-start smoke flow.
+
 ---
 
 ## Per-Task Verification Map
