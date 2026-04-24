@@ -4,14 +4,14 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 01
 status: executing
-last_updated: "2026-04-24T15:02:29.411Z"
-last_activity: 2026-04-24 -- Phase 01 planning complete
+last_updated: "2026-04-24T15:12:28.706Z"
+last_activity: 2026-04-24
 progress:
   total_phases: 6
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 32
-  completed_plans: 6
-  percent: 19
+  completed_plans: 7
+  percent: 22
 ---
 
 # Project State
@@ -19,9 +19,9 @@ progress:
 ## Current Position
 
 Phase: 1 of 6 (Infrastructure & Schema)
-Plan: 6 of 7
+Plan: 7 of 7
 Status: Ready to execute
-Last activity: 2026-04-24 -- Phase 01 planning complete
+Last activity: 2026-04-24
 
 Progress: [██░░░░░░░░] 19%
 
@@ -34,6 +34,7 @@ Progress: [██░░░░░░░░] 19%
 **Status:** Ready to execute
 **Last Updated:** 2026-04-24
 | Phase 01-infrastructure-schema P06 | 8 min | 2 tasks | 4 files |
+| Phase 01-infrastructure-schema P07 | 25 min | 2 tasks | 7 files |
 
 ## Phase Status
 
@@ -62,6 +63,8 @@ Recent decisions affecting current work:
 - [Phase 01]: Preserved D-05 by clarifying the existing Docker Compose bootstrap flow instead of replacing it.
 - [Phase 01]: Preserved D-08 by limiting the fix to documentation and keeping AI/MCP as Phase 1 healthcheck stubs.
 - [Phase 01]: Gap closure plan 01-07 restores Docker runtime DB authentication without deleting the persisted volume or bypassing Alembic/seed commands.
+- [Phase 01]: PostgreSQL startup now reconciles the configured role, password, and database on every container boot instead of requiring manual volume repair.
+- [Phase 01]: FastAPI runtime, Alembic, and test helpers now derive DSNs from one POSTGRES_* credential source while preserving explicit DATABASE_URL overrides.
 
 ### Key Decisions Pending
 
