@@ -1,3 +1,9 @@
 
 # FVM Version Cache
 .fvm/
+
+# Local environment
+.env
+
+# Python cache
+__pycache__/
