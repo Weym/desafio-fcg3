@@ -22,6 +22,7 @@ from src.features.enrollment.routes import (
 from src.features.documents.routes import documents_router
 from src.features.appointments.routes import scheduling_router, appointments_router
 from src.features.grades.routes import grades_router
+from src.features.staff.routes import staff_router
 
 
 @asynccontextmanager
@@ -96,6 +97,7 @@ app.include_router(documents_router, prefix="/api/v1")
 app.include_router(scheduling_router, prefix="/api/v1")
 app.include_router(appointments_router, prefix="/api/v1")
 app.include_router(grades_router, prefix="/api/v1")
+app.include_router(staff_router, prefix="/api/v1")
 
 
 @app.get("/health")
