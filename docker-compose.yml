@@ -9,7 +9,7 @@ services:
           docker-entrypoint.sh postgres &
           postgres_pid=$$!
           trap 'kill -TERM "$$postgres_pid"; wait "$$postgres_pid"' INT TERM
-          until pg_isready -h 127.0.0.1 -U postgres -d postgres >/dev/null 2>&1; do
+          until pg_isready -h 127.0.0.1 -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-postgres} >/dev/null 2>&1; do
             sleep 1
           done
           bash /docker-entrypoint-initdb.d/reconcile_dev_credentials.sh

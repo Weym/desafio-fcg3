@@ -11,7 +11,7 @@ run_psql() {
         -v reconcile_user="$POSTGRES_USER" \
         -v reconcile_password="$POSTGRES_PASSWORD" \
         -v reconcile_db="$POSTGRES_DB" \
-        --username=postgres \
+        --username="${POSTGRES_USER:-postgres}" \
         --dbname="$1"
 }
 
