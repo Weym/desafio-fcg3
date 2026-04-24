@@ -16,13 +16,14 @@ Aluno envia mensagem no WhatsApp e recebe resposta precisa sobre sua situação 
 - ✓ Estrutura Flutter mobile (scaffolded) — existing
 - ✓ Documentação de arquitetura, API, banco e chatbot em `docs/` — existing
 - ✓ Docker Compose presente (vazio, pendente de implementação) — existing
+- ✓ Docker Compose com 4 serviços, healthchecks e hot reload local — validated in Phase 1
+- ✓ Alembic configurado com migrations para o schema da aplicação + pgvector/HNSW — validated in Phase 1
+- ✓ Variáveis de ambiente documentadas em `.env.example` — validated in Phase 1
+- ✓ Seed destrutivo de desenvolvimento com currículo, alunos, staff e fixtures acadêmicos — validated in Phase 1
 
 ### Active
 
 **Infraestrutura:**
-- [ ] Docker Compose com 4 serviços: PostgreSQL+PGVector, FastAPI, AI Service, MCP Server
-- [ ] Alembic configurado com migrations para todo o schema (17 tabelas)
-- [ ] Variáveis de ambiente documentadas em `.env.example`
 
 **Backend (FastAPI):**
 - [ ] Auth: OTP por email via Resend + JWT com campo `role` (student | staff)
@@ -81,13 +82,18 @@ Aluno envia mensagem no WhatsApp e recebe resposta precisa sobre sua situação 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
 | Python / FastAPI (não TypeScript) | README estava desatualizado; toda a documentação técnica em `docs/` especifica Python | ✓ Python/FastAPI |
-| SQLAlchemy + Alembic | ORM maduro com controle total do SQL, integra nativamente com Alembic para migrations | — Pending |
+| SQLAlchemy + Alembic | ORM maduro com controle total do SQL, integra nativamente com Alembic para migrations | ✓ Validated in Phase 1 |
 | JWT com campo `role` (student \| staff) | Um único fluxo de auth, diferenciação por payload | — Pending |
 | asyncio.create_task para background processing | Atende o limite de 5s do WhatsApp no MVP; sem overhead de task queue externo | ⚠️ Revisit (sem visibility de falhas) |
 | LLM provider agnóstico | Decisão de provider é de terceiro; embedding fixo em OpenAI `text-embedding-3-small` | — Pending |
 | Resend para envio de OTP | SDK Python, tier gratuito 3k emails/mês, API simples | — Pending |
 | `student_id` injetado pelo MCP (nunca exposto ao agente) | Prevenção de IDOR — o agente não pode forjar student_id | — Pending |
 | Agendamentos incluídos neste ciclo | Requisito confirmado pelo usuário | — Pending |
+
+## Current State
+
+- Phase 1 concluída: stack Docker de 4 serviços sobe localmente, schema da aplicação está migrado, e a base possui seed de desenvolvimento com currículo e fixtures acadêmicos.
+- Próximo foco: Phase 2 (Authentication) sobre a infraestrutura, configuração e dados base já validados.
 
 ## Evolution
 
@@ -107,4 +113,4 @@ Este documento evolui a cada transição de fase e marco de milestone.
 4. Atualizar Context com estado atual
 
 ---
-*Last updated: 2026-04-15 after initialization*
+*Last updated: 2026-04-24 after Phase 1 completion*
