@@ -1,21 +1,39 @@
-"""FastAPI dependencies for auth routes.
+"""FastAPI dependencies and middleware for auth routes.
 
 body_parser: caches request body on request.state to avoid double-read issue (P-01).
-email_key_func: slowapi key_func that extracts email from the cached body.
+email_key_func: slowapi key_func (SYNC) that extracts email from the cached body.
+BodyCacheMiddleware: pre-reads request body for /auth/ routes so key_func has access.
 """
 
 import json
+
 from fastapi import Request
+from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
+from starlette.responses import Response
+
+
+class BodyCacheMiddleware(BaseHTTPMiddleware):
+    """Pre-reads and caches request body for /auth/ routes.
+
+    slowapi key_func runs BEFORE FastAPI dependency resolution, so the
+    body_parser Depends() hasn't executed yet. This middleware ensures the
+    body is cached on request.state.parsed_body before slowapi evaluates limits.
+    """
+
+    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
+        if request.url.path.startswith("/auth/") and request.method == "POST":
+            raw = await request.body()
+            try:
+                request.state.parsed_body = json.loads(raw) if raw else {}
+            except json.JSONDecodeError:
+                request.state.parsed_body = {}
+        return await call_next(request)
 
 
 async def body_parser(request: Request) -> dict:
     """
-    Mitigation for P-01: slowapi key_func runs before FastAPI body parsing, so
-    if email_key_func calls `await request.json()` and then the route handler
-    does too, Starlette raises 'body already consumed'. This dependency runs
-    FIRST (as the route's Depends), reads request.body() once, caches it on
-    request.state.parsed_body, and returns the dict. email_key_func reads the
-    same cached value.
+    Mitigation for P-01: reads and caches request body on request.state.parsed_body.
+    If BodyCacheMiddleware already ran, returns the cached value immediately.
     """
     if hasattr(request.state, "parsed_body"):
         return request.state.parsed_body
@@ -28,16 +46,14 @@ async def body_parser(request: Request) -> dict:
     return data
 
 
-async def email_key_func(request: Request) -> str:
-    """slowapi key_func: rate limit by email extracted from cached body."""
+def email_key_func(request: Request) -> str:
+    """slowapi key_func (SYNC): rate limit by email extracted from cached body.
+
+    Must be synchronous — slowapi calls key_func in a sync context.
+    BodyCacheMiddleware has already cached the body on request.state.parsed_body.
+    """
     body = getattr(request.state, "parsed_body", None)
     if body is None:
-        # Fallback — body_parser should have run first, but in case it didn't, read now.
-        raw = await request.body()
-        try:
-            body = json.loads(raw) if raw else {}
-        except json.JSONDecodeError:
-            body = {}
-        request.state.parsed_body = body
+        body = {}
     email = (body.get("email") or "").lower().strip()
     return f"email:{email}" if email else "email:unknown"
