@@ -20,20 +20,20 @@ Aluno envia mensagem no WhatsApp e recebe resposta precisa sobre sua situação 
 - ✓ Alembic configurado com migrations para o schema da aplicação + pgvector/HNSW — validated in Phase 1
 - ✓ Variáveis de ambiente documentadas em `.env.example` — validated in Phase 1
 - ✓ Seed destrutivo de desenvolvimento com currículo, alunos, staff e fixtures acadêmicos — validated in Phase 1
+- ✓ Auth: OTP por email via Resend + JWT com campo `role` (student | staff) — validated in Phase 2
+- ✓ Middleware: JWT, Service Token (MCP), rate limiting no endpoint de auth — validated in Phase 2
 
 ### Active
 
 **Infraestrutura:**
 
 **Backend (FastAPI):**
-- [ ] Auth: OTP por email via Resend + JWT com campo `role` (student | staff)
 - [ ] Matrículas: consultar, solicitar, confirmar, cancelar (com validação de período e pré-requisitos)
 - [ ] Notas e histórico: consulta de notas por disciplina/período, IRA calculado
 - [ ] Documentos: listagem e URL assinada para download
 - [ ] Agendamentos: consultar, solicitar e cancelar horários com professores/coordenadores
 - [ ] Webhook WhatsApp: validação HMAC-SHA256, save de mensagem, despacho assíncrono
-- [ ] Middleware: JWT, Service Token (MCP), rate limiting no endpoint de auth
-- [ ] Testes: cobertura dos fluxos críticos (auth, matrícula, webhook, middleware IDOR)
+- [ ] Testes: cobertura dos fluxos críticos (matrícula, webhook, middleware IDOR)
 
 **AI Service (LangChain):**
 - [ ] ReAct agent com ConversationBufferWindowMemory (k=20)
@@ -83,17 +83,18 @@ Aluno envia mensagem no WhatsApp e recebe resposta precisa sobre sua situação 
 |----------|-----------|---------|
 | Python / FastAPI (não TypeScript) | README estava desatualizado; toda a documentação técnica em `docs/` especifica Python | ✓ Python/FastAPI |
 | SQLAlchemy + Alembic | ORM maduro com controle total do SQL, integra nativamente com Alembic para migrations | ✓ Validated in Phase 1 |
-| JWT com campo `role` (student \| staff) | Um único fluxo de auth, diferenciação por payload | — Pending |
+| JWT com campo `role` (student \| staff) | Um único fluxo de auth, diferenciação por payload | ✓ Validated in Phase 2 |
 | asyncio.create_task para background processing | Atende o limite de 5s do WhatsApp no MVP; sem overhead de task queue externo | ⚠️ Revisit (sem visibility de falhas) |
 | LLM provider agnóstico | Decisão de provider é de terceiro; embedding fixo em OpenAI `text-embedding-3-small` | — Pending |
-| Resend para envio de OTP | SDK Python, tier gratuito 3k emails/mês, API simples | — Pending |
+| Resend para envio de OTP | SDK Python, tier gratuito 3k emails/mês, API simples | ✓ Validated in Phase 2 |
 | `student_id` injetado pelo MCP (nunca exposto ao agente) | Prevenção de IDOR — o agente não pode forjar student_id | — Pending |
 | Agendamentos incluídos neste ciclo | Requisito confirmado pelo usuário | — Pending |
 
 ## Current State
 
 - Phase 1 concluída: stack Docker de 4 serviços sobe localmente, schema da aplicação está migrado, e a base possui seed de desenvolvimento com currículo e fixtures acadêmicos.
-- Próximo foco: Phase 2 (Authentication) sobre a infraestrutura, configuração e dados base já validados.
+- Phase 2 concluída: autenticação completa via OTP/email (Resend), JWT com roles (student/staff), refresh-token rotation com SELECT FOR UPDATE, middleware de auth (get_current_user, require_role, require_service_token), rate limiting via SlowAPI, 47 testes passando. Gap conhecido: D-08 enumeration timing (documentado em HUMAN-UAT).
+- Próximo foco: Phase 3 (Business Feature Slices) — matrículas, notas, documentos, agendamentos.
 
 ## Evolution
 
@@ -113,4 +114,4 @@ Este documento evolui a cada transição de fase e marco de milestone.
 4. Atualizar Context com estado atual
 
 ---
-*Last updated: 2026-04-24 after Phase 1 completion*
+*Last updated: 2026-04-24 after Phase 2 completion*
