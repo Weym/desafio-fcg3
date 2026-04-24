@@ -213,8 +213,10 @@ class StudentService(BaseService[Student]):
             )
             total_courses = total_result.scalar_one()
 
-        # 4. GPA/CRA — placeholder (Plan 03-05 will implement full calculation)
-        gpa = 0.0
+        # 4. GPA/CRA — calculated via GradeService (D-07, D-08)
+        from src.features.grades.services import grade_service
+
+        gpa = await grade_service.get_cra_for_student(db, student_id)
 
         # 5. Pending documents (status NOT IN ('ready', 'delivered'))
         pending_result = await db.execute(
