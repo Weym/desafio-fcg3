@@ -8,6 +8,7 @@ Security invariants:
 """
 
 import hashlib
+import hmac
 import logging
 import secrets
 from dataclasses import dataclass
@@ -94,5 +95,6 @@ async def generate_and_send_code(session: AsyncSession, email: str) -> Generated
 
 
 def verify_code_hash(submitted: str, stored_hash: str, stored_salt: str) -> bool:
-    """Compare submitted code against stored hash using the same salt."""
-    return _hash_code(submitted, stored_salt) == stored_hash
+    """Compare submitted code against stored hash using the same salt (constant-time)."""
+    computed = _hash_code(submitted, stored_salt)
+    return hmac.compare_digest(computed, stored_hash)
