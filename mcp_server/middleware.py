@@ -9,6 +9,11 @@ from fastmcp.server.dependencies import get_http_headers
 from fastmcp.server.middleware import Middleware, MiddlewareContext
 
 from mcp_server.api_client import RETRY_STATE_KEY
+from mcp_server.dependencies import (
+    get_db_pool,
+    validate_active_chat_session,
+    validate_chat_session_id,
+)
 
 
 def _to_json_payload(value: Any) -> str | None:
@@ -27,15 +32,29 @@ def _serialize_result(result: Any) -> Any:
     return str(result)
 
 
+def _sanitize_input_params(input_params: dict[str, Any]) -> dict[str, Any]:
+    return {
+        key: value for key, value in input_params.items() if key != "student_id"
+    }
+
+
 class ToolLoggingMiddleware(Middleware):
     def __init__(self) -> None:
         super().__init__()
 
     async def on_call_tool(self, context: MiddlewareContext, call_next):
         tool_name = context.message.name
-        input_params = context.message.arguments or {}
+        input_params = _sanitize_input_params(context.message.arguments or {})
         headers = get_http_headers(include={"x-chat-session-id"})
         raw_chat_session_id = headers.get("x-chat-session-id")
+        fastmcp_context = context.fastmcp_context
+        if fastmcp_context is None:
+            raise RuntimeError("FastMCP context unavailable for audit logging.")
+
+        chat_session_id = validate_chat_session_id(raw_chat_session_id)
+        db_pool = get_db_pool(fastmcp_context.lifespan_context)
+        await validate_active_chat_session(db_pool, chat_session_id)
+
         start = time.monotonic()
         result: Any = None
         status = "success"
@@ -51,7 +70,8 @@ class ToolLoggingMiddleware(Middleware):
                 context=context,
                 tool_name=tool_name,
                 input_params=input_params,
-                raw_chat_session_id=raw_chat_session_id,
+                db_pool=db_pool,
+                chat_session_id=chat_session_id,
                 result=result,
                 latency_ms=latency_ms,
                 status=status,
@@ -65,52 +85,38 @@ class ToolLoggingMiddleware(Middleware):
         context: MiddlewareContext,
         tool_name: str,
         input_params: dict[str, Any],
-        raw_chat_session_id: str | None,
+        db_pool: object,
+        chat_session_id: UUID,
         result: Any,
         latency_ms: int,
         status: str,
     ) -> None:
         fastmcp_context = context.fastmcp_context
-        if fastmcp_context is None or not raw_chat_session_id:
-            return
-
-        try:
-            chat_session_id = UUID(raw_chat_session_id)
-        except ValueError:
-            return
-
-        db_pool = fastmcp_context.lifespan_context.get("db_pool")
-        if db_pool is None:
-            return
-
         retry = bool(await fastmcp_context.get_state(RETRY_STATE_KEY))
         effective_status = status
         if status == "success" and retry:
             effective_status = "retry_success"
 
-        try:
-            await db_pool.execute(
-                """
-                INSERT INTO mcp_action_logs (
-                    chat_session_id,
-                    tool_name,
-                    input_params,
-                    output_result,
-                    reasoning,
-                    latency_ms,
-                    retry,
-                    status
-                )
-                VALUES ($1, $2, $3::jsonb, $4::jsonb, $5, $6, $7, $8)
-                """,
+        await db_pool.execute(
+            """
+            INSERT INTO mcp_action_logs (
                 chat_session_id,
                 tool_name,
-                _to_json_payload(input_params) or "{}",
-                _to_json_payload(_serialize_result(result)),
-                None,
+                input_params,
+                output_result,
+                reasoning,
                 latency_ms,
                 retry,
-                effective_status,
+                status
             )
-        except Exception:
-            return
+            VALUES ($1, $2, $3::jsonb, $4::jsonb, $5, $6, $7, $8)
+            """,
+            chat_session_id,
+            tool_name,
+            _to_json_payload(input_params) or "{}",
+            _to_json_payload(_serialize_result(result)),
+            None,
+            latency_ms,
+            retry,
+            effective_status,
+        )
