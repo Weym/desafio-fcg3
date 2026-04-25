@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -9,13 +10,21 @@ import uvicorn
 from fastapi import FastAPI, HTTPException, Request, status
 from pydantic import BaseModel
 
+from ai_service.agent import invoke_agent
 from ai_service.config import settings
-from ai_service.database import check_db_health, create_pool
+from ai_service.database import check_db_health, create_pool, save_chat_message
+
+logger = logging.getLogger(__name__)
 
 
 class ChatRequest(BaseModel):
     session_id: str
     message: str
+
+
+class ChatResponse(BaseModel):
+    response: str
+    session_id: str
 
 
 def _resolve_prompt_path() -> Path:
@@ -52,12 +61,54 @@ async def health_check(request: Request) -> dict[str, str]:
     return {"status": "healthy"}
 
 
-@app.post("/chat", status_code=status.HTTP_501_NOT_IMPLEMENTED)
-async def chat(_: ChatRequest) -> dict[str, str]:
-    raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail="Not implemented yet",
-    )
+@app.post("/chat", response_model=ChatResponse)
+async def chat(request: ChatRequest) -> ChatResponse:
+    """Process a student message through the AI agent."""
+
+    try:
+        response_text = await invoke_agent(
+            settings=settings,
+            db_pool=app.state.db_pool,
+            system_prompt=app.state.system_prompt,
+            session_id=request.session_id,
+            user_message=request.message,
+        )
+
+        save_chat_message(
+            pool=app.state.db_pool,
+            session_id=request.session_id,
+            role="assistant",
+            content=response_text,
+        )
+
+        return ChatResponse(
+            response=response_text,
+            session_id=request.session_id,
+        )
+    except Exception:
+        logger.exception("Chat error for session %s", request.session_id)
+        fallback = (
+            "Desculpe, estou com dificuldades tecnicas. "
+            "Tente novamente em alguns minutos."
+        )
+
+        try:
+            save_chat_message(
+                pool=app.state.db_pool,
+                session_id=request.session_id,
+                role="assistant",
+                content=fallback,
+            )
+        except Exception:
+            logger.exception(
+                "Failed to persist fallback response for session %s",
+                request.session_id,
+            )
+
+        return ChatResponse(
+            response=fallback,
+            session_id=request.session_id,
+        )
 
 
 if __name__ == "__main__":
