@@ -69,42 +69,77 @@ status: issues_found
 
 ## Summary
 
-Re-review covered the Phase 03 business feature slices, shared backend infrastructure, relevant migrations/scripts, and the public API contract in `docs/api.md`. The major remaining problems are API contract mismatches and a couple of server-side validation gaps that can still produce incorrect behavior or uncaught database/integrity failures.
+Re-review covered the phase 03 backend feature slices, shared infrastructure, migrations, targeted regression tests, and the public API documentation. The codebase is closer to the intended contract, but there are still a few correctness issues in appointment creation, document status transitions, enrollment-period activation, and slot generation edge-case handling.
 
 ## Warnings
 
-### WR-01: Service-token auth trusts any `X-Student-Id` without verifying the student exists
+### WR-01: Appointment creation builds the response from an unloaded relationship
 
-**File:** `backend/src/shared/dependencies.py:81-116`
-**Issue:** The service-token branch accepts any syntactically valid UUID and returns `UserContext(role="service")` without checking whether that student exists or is active. Endpoints such as document creation, enrollment creation, and appointment booking then use `user.id` directly. A bad internal caller (or a leaked service token) can therefore target a nonexistent student and trigger downstream foreign-key errors/500s instead of a controlled 401/404.
-**Fix:** Validate `x_student_id` against the students table before returning `UserContext`, and reject missing/inactive/nonexistent students with a canonical auth or not-found error.
+**File:** `backend/src/features/appointments/services.py:302-305`
+**Issue:** After `Appointment` is flushed and refreshed, `book_appointment()` returns `_build_appointment_response(appointment)`, but that helper dereferences `appointment.slot` and `appointment.slot.resource`. The new `appointment` instance never reloads its `slot` relationship, so this path can trigger async lazy-loading at response-building time and fail with `MissingGreenlet`/500 instead of returning the booked appointment.
+**Fix:** Re-query the appointment with `joinedload(Appointment.slot).joinedload(SchedulingSlot.resource)` before building the response, or assign the already-loaded `slot` object to the appointment relationship before serializing.
 
 ```python
-from src.features.auth.models import Student
-from sqlalchemy import select
-
-student = await db.execute(select(Student.id).where(Student.id == student_id, Student.status == "active"))
-if student.scalar_one_or_none() is None:
-    raise _unauthorized("IDENTIFICACAO_INVALIDA", "Aluno da chamada de servico nao existe")
+result = await db.execute(
+    select(Appointment)
+    .options(joinedload(Appointment.slot).joinedload(SchedulingSlot.resource))
+    .where(Appointment.id == appointment.id)
+)
+appointment = result.scalar_one()
+return _build_appointment_response(appointment)
 ```
 
-### WR-02: Student update path can raise raw integrity errors for duplicate unique fields
+### WR-02: Document status validation allows skipping required lifecycle steps
 
-**File:** `backend/src/features/students/services.py:152-161`
-**Issue:** `update_student()` applies incoming fields directly and relies on `BaseService.update()`. Unlike `create_student()`, it does not pre-check uniqueness for fields such as `email` (and `phone`, if present), even though the model enforces unique constraints. Updating a student to a duplicate value can therefore bubble up as an uncaught database `IntegrityError` instead of a controlled 409 business response.
-**Fix:** Before calling `self.update(...)`, query for conflicting `email`/`phone` values owned by another student and raise `ConflictException` with the same business-level behavior used on create.
+**File:** `backend/src/features/documents/services.py:119-149`
+**Issue:** `update_document_status()` only rejects backwards or same-state transitions (`new_idx <= current_idx`). That means invalid jumps like `requested -> ready`, `requested -> delivered`, or `processing -> delivered` are currently accepted, even though the service and docs define the lifecycle as `requested -> processing -> ready -> delivered`.
+**Fix:** Only allow the next immediate state in the sequence.
 
-### WR-03: `GET /scheduling/slots` response shape does not match the documented API contract
+```python
+if new_idx != current_idx + 1:
+    raise ConflictException(
+        code="TRANSICAO_STATUS_INVALIDA",
+        message=(
+            f"Transicao de status invalida: '{document.status}' -> '{data.status}'. "
+            f"Status deve seguir a ordem: {' -> '.join(_STATUS_ORDER)}"
+        ),
+    )
+```
 
-**File:** `backend/src/features/appointments/controllers.py:55-73`
-**Issue:** The endpoint returns a raw JSON array (`response_model=list[SlotResponse]`), but `docs/api.md:566-581` documents this route as returning `{ "data": [...] }`. This is a contract regression for clients generated or implemented from the published API docs.
-**Fix:** Either wrap the returned list in the documented envelope or update `docs/api.md` so implementation and published contract match exactly.
+### WR-03: Enrollment-period activation can leave multiple active periods and break current-period lookup
 
-### WR-04: `GET /enrollment-periods/current` response shape does not match the documented API contract
+**File:** `backend/src/features/enrollment/services.py:57-77,115-136`
+**Issue:** `get_current_period()` uses `scalar_one_or_none()` and assumes there is at most one active period, but `update_period()` allows setting `is_active=True` without first deactivating other active periods. Once two overlapping active periods exist, `GET /enrollment-periods/current` can fail with `MultipleResultsFound` and return 500.
+**Fix:** Enforce a single active enrollment period inside `create_period()`/`update_period()` by clearing existing active rows (or rejecting the change) before saving the new active period.
 
-**File:** `backend/src/features/enrollment/controllers.py:64-79`
-**Issue:** The controller returns `{ "data": period }` or `{ "data": null }`, while `docs/api.md:396-407` documents the successful response as the raw period object. This mismatch can break MCP or frontend consumers that are coded against the documented shape.
-**Fix:** Return the raw `EnrollmentPeriodResponse` object when a period exists (and document the null case clearly), or update the docs and all consumers to the wrapped `{data: ...}` format.
+```python
+if update_data.get("is_active") is True:
+    active_periods = await db.execute(
+        select(EnrollmentPeriod).where(
+            EnrollmentPeriod.is_active.is_(True),
+            EnrollmentPeriod.id != period.id,
+        )
+    )
+    for other in active_periods.scalars():
+        other.is_active = False
+```
+
+### WR-04: Slot creation accepts invalid ranges that generate zero slots
+
+**File:** `backend/src/features/appointments/services.py:199-238`
+**Issue:** `create_slots()` validates `start < end`, but if the interval is shorter than `slot_duration_minutes` (for example `08:00-08:20` with `30` minutes), the loop never executes and the endpoint still returns `201` with an empty list. That silently accepts a request that created nothing.
+**Fix:** Reject ranges that cannot generate at least one slot before entering the loop.
+
+```python
+duration = timedelta(minutes=data.slot_duration_minutes)
+if datetime.combine(data.date, start) + duration > datetime.combine(data.date, end):
+    raise ValidationException(
+        message="Intervalo informado nao comporta nenhum slot",
+        details=[
+            {"field": "slot_duration_minutes", "message": "A duracao precisa caber no intervalo informado"}
+        ],
+    )
+```
 
 ---
 
