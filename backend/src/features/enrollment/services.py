@@ -574,7 +574,11 @@ class EnrollmentService(BaseService[Enrollment]):
         """
         result = await db.execute(
             select(Enrollment)
-            .options(selectinload(Enrollment.enrollment_courses))
+            .options(
+                selectinload(Enrollment.enrollment_courses).selectinload(
+                    EnrollmentCourse.grades,
+                ),
+            )
             .where(Enrollment.id == enrollment_id)
         )
         enrollment = result.scalar_one_or_none()
@@ -600,6 +604,8 @@ class EnrollmentService(BaseService[Enrollment]):
         for ec in enrollment.enrollment_courses:
             if ec.status != "dropped":
                 ec.status = "locked"
+                for grade in ec.grades:
+                    grade.status = "locked"
 
         await db.flush()
         await db.refresh(enrollment)
