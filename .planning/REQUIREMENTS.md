@@ -35,7 +35,7 @@
 - [ ] **STU-04**: Staff pode desativar aluno (soft delete — status: inactive)
 - [ ] **STU-05**: Aluno ou staff pode consultar detalhe de um aluno
 - [ ] **STU-06**: Sistema retorna resumo acadêmico do aluno (semestre, disciplinas concluídas, CRA, status, documentos pendentes, próximo agendamento) — endpoint usado pelo MCP `get_student_info`
-- [ ] **STU-07**: Sistema retorna disciplinas disponíveis para matrícula do aluno respeitando pré-requisitos — endpoint usado pelo MCP `get_available_courses`
+- [x] **STU-07**: Sistema retorna disciplinas disponíveis para matrícula do aluno respeitando pré-requisitos — endpoint usado pelo MCP `get_available_courses`
 
 ---
 
@@ -185,7 +185,7 @@
 | STU-04 | Phase 3: Business Feature Slices | Pending |
 | STU-05 | Phase 3: Business Feature Slices | Pending |
 | STU-06 | Phase 3: Business Feature Slices | Pending |
-| STU-07 | Phase 3: Business Feature Slices | Pending |
+| STU-07 | Phase 3: Business Feature Slices | Complete |
 | COURSE-01 | Phase 3: Business Feature Slices | Pending |
 | COURSE-02 | Phase 3: Business Feature Slices | Pending |
 | COURSE-03 | Phase 3: Business Feature Slices | Pending |
