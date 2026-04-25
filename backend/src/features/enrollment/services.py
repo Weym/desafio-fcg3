@@ -600,6 +600,7 @@ class EnrollmentService(BaseService[Enrollment]):
                 ),
             )
             .where(Enrollment.id == enrollment_id)
+            .with_for_update()
         )
         enrollment = result.scalar_one_or_none()
 
