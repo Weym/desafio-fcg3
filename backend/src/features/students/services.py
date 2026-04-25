@@ -158,6 +158,33 @@ class StudentService(BaseService[Student]):
         """Update student fields (partial). Only non-None values are applied."""
         student = await self.get_or_404(db, student_id, "student")
         update_data = data.model_dump(exclude_unset=True)
+
+        if "email" in update_data and update_data["email"] is not None:
+            existing_email = await db.execute(
+                select(Student.id).where(
+                    Student.email == update_data["email"],
+                    Student.id != student_id,
+                )
+            )
+            if existing_email.scalar_one_or_none() is not None:
+                raise ConflictException(
+                    code="EMAIL_JA_CADASTRADO",
+                    message="Ja existe um aluno cadastrado com este email",
+                )
+
+        if "phone" in update_data and update_data["phone"] is not None:
+            existing_phone = await db.execute(
+                select(Student.id).where(
+                    Student.phone == update_data["phone"],
+                    Student.id != student_id,
+                )
+            )
+            if existing_phone.scalar_one_or_none() is not None:
+                raise ConflictException(
+                    code="TELEFONE_JA_CADASTRADO",
+                    message="Ja existe um aluno cadastrado com este telefone",
+                )
+
         return await self.update(db, student, update_data)
 
     # ------------------------------------------------------------------
