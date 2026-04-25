@@ -159,6 +159,8 @@ Phase 03 now achieves the roadmap contract.
 
 Additional note on evidence: the earlier 03-12/03-13 environment/runtime-support fixes remain verified, and 03-14 adds the last missing correctness proof needed to move the phase from `gaps_found` to `passed`.
 
+Deferred follow-ups: Phase 03 still has two non-blocking review warnings tracked in `03-REVIEW.md` for later work: the student-only auth contract on `PUT /enrollments/{id}` and the duplicate-active enrollment race in `create_enrollment()`.
+
 ---
 
 _Verified: 2026-04-25T17:37:52Z_
