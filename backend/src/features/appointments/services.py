@@ -155,9 +155,10 @@ class SlotService:
         Example: start=08:00, end=12:00, duration=30min → 8 slots
         (08:00-08:30, 08:30-09:00, ..., 11:30-12:00).
         """
-        # Verify resource exists
+        # Lock the resource row so concurrent slot creation requests for the
+        # same resource cannot both pass the overlap check before insert.
         resource_result = await db.execute(
-            select(Resource).where(Resource.id == data.resource_id)
+            select(Resource).where(Resource.id == data.resource_id).with_for_update()
         )
         resource = resource_result.scalar_one_or_none()
         if resource is None:
