@@ -177,6 +177,6 @@ Plans:
 | 1. Infrastructure & Schema | 7/7 | Complete | 2026-04-24 |
 | 2. Authentication | 4/4 | Complete | 2026-04-24 |
 | 3. Business Feature Slices | 14/14 | Complete | 2026-04-25 |
-| 4. MCP Server | 0/4 | Planned | - |
+| 4. MCP Server | 6/6 | Complete | 2026-04-25 |
 | 5. AI Service | 0/5 | Planned | - |
 | 6. WhatsApp Webhook & Integration | 0/4 | Planned | - |

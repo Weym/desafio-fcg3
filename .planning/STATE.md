@@ -17,12 +17,12 @@ progress:
 
 ## Current Position
 
-Phase: 04 (mcp-server) — EXECUTING
-Plan: 3 of 4
-Status: Ready to execute
-Last activity: 2026-04-25
+Phase: 04 (mcp-server) - COMPLETE
+Plan: 6 of 6
+Status: Phase 04 complete
+Last activity: 2026-04-25 -- Completed Phase 04 gap closures
 
-Progress: [███████░░░] 66%
+Progress: [████████░░] 78%
 
 ## Performance Metrics
 
@@ -50,15 +50,15 @@ Progress: [███████░░░] 66%
 | 1 | Infrastructure & Schema | complete |
 | 2 | Authentication | complete |
 | 3 | Business Feature Slices | complete |
-| 4 | MCP Server | not_started |
+| 4 | MCP Server | complete |
 | 5 | AI Service | not_started |
 | 6 | WhatsApp Webhook & Integration | not_started |
 
 ## Current Focus
 
-**Phase 3 is complete after closing the final COURSE-03 verification blocker**
-Phase 3 now includes the original 8 delivery plans plus 6 gap-closure plans covering the available-courses contract, enrollment lock migration/runtime sync, academic summary appointment semantics, Docker pytest verification workflow, and the recursive prerequisite-tree cycle-safety fix. The final blocker was closed by seeding the prerequisite-tree visited set with the root course and proving the behavior with focused in-container pytest coverage.
-Next action: Start Phase 4 (MCP Server) with `/gsd-plan-phase 04` or `/gsd-execute-phase 04`.
+**Phase 4 is complete after closing the MCP runtime and audit gap plans 04-05 and 04-06**
+Phase 4 now includes the original MCP scaffold/tool/test delivery plus the final gap closures for package-based startup, import-safe FastMCP boot, mandatory chat-session audit guards, and failure-path audit regressions.
+Next action: Start Phase 5 (AI Service) with `/gsd-plan-phase 05` or `/gsd-execute-phase 05`.
 Resume file: None
 
 ## Accumulated Context
