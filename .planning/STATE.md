@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-last_updated: "2026-04-25T16:13:10.569Z"
+status: verifying
+last_updated: "2026-04-25T17:19:20.785Z"
 last_activity: 2026-04-25
 progress:
   total_phases: 6
   completed_phases: 3
-  total_plans: 37
-  completed_plans: 24
-  percent: 65
+  total_plans: 38
+  completed_plans: 25
+  percent: 66
 ---
 
 # Project State
@@ -18,11 +18,11 @@ progress:
 ## Current Position
 
 Phase: 03 (business-feature-slices) — COMPLETE
-Plan: 13 of 13
+Plan: 14 of 14
 Status: Ready for Phase 4
 Last activity: 2026-04-25
 
-Progress: [███████░░░] 65%
+Progress: [███████░░░] 66%
 
 ## Performance Metrics
 
@@ -39,6 +39,7 @@ Progress: [███████░░░] 65%
 | Phase 03 P11 | 4 min | 2 tasks | 2 files |
 | Phase 03 P12 | 74 min | 2 tasks | 3 files |
 | Phase 03 P13 | 20 min | 2 tasks | 3 files |
+| Phase 03-business-feature-slices P14 | 8 min | 2 tasks | 2 files |
 
 ## Phase Status
 
@@ -53,9 +54,9 @@ Progress: [███████░░░] 65%
 
 ## Current Focus
 
-**Phase 3 complete after 13/13 plans, including gap-closure follow-ups**
-Phase 3 now includes the original 8 delivery plans plus 5 gap-closure plans covering the available-courses contract, enrollment lock migration/runtime sync, academic summary appointment semantics, and Docker pytest verification workflow. The final remaining environment/docs gap for focused pytest regressions is closed in `fastapi-app`, though fresh runtime proof is still pending on a healthy local Docker Desktop session because this workstation could not start Docker during Plan 03-13 verification.
-Next action: Start Phase 4 (MCP Server) with `/gsd-plan-phase 04` or `/gsd-execute-phase 04`, and optionally rerun the documented Docker pytest commands once Docker Desktop is healthy to refresh UAT evidence.
+**Phase 3 is complete after closing the final COURSE-03 verification blocker**
+Phase 3 now includes the original 8 delivery plans plus 6 gap-closure plans covering the available-courses contract, enrollment lock migration/runtime sync, academic summary appointment semantics, Docker pytest verification workflow, and the recursive prerequisite-tree cycle-safety fix. The final blocker was closed by seeding the prerequisite-tree visited set with the root course and proving the behavior with focused in-container pytest coverage.
+Next action: Start Phase 4 (MCP Server) with `/gsd-plan-phase 04` or `/gsd-execute-phase 04`.
 Resume file: None
 
 ## Accumulated Context
@@ -93,6 +94,10 @@ Recent decisions affecting current work:
 - [Phase 03]: Made the verifier fail on stale Alembic head/current state before any confirm_enrollment or lock_enrollment write path runs
 - [Phase 03]: Installed requirements-dev.txt on top of requirements.txt in fastapi-app so the existing backend container can serve both runtime and focused regression needs
 - [Phase 03]: Kept the gap closure scoped to the current fastapi-app service and aligned docs to its Docker exec workflow instead of adding a second backend test container
+- [Phase 03]: Follow-up runtime proof for 03-12 succeeded in Docker after `alembic upgrade head` advanced the live stack from `008a` to `009a` and the enrollment lock verifier passed end-to-end
+- [Phase 03]: Follow-up runtime proof for 03-13 required adding `aiosqlite` to `backend/requirements-dev.txt` because `backend/tests/conftest.py` uses a `sqlite+aiosqlite` async test engine
+- [Phase 03-business-feature-slices]: Kept the COURSE-03 repair inside CourseService._build_prerequisite_tree so the endpoint contract and recursive CTE stay unchanged
+- [Phase 03-business-feature-slices]: Used synthetic flat rows in a pure unit regression to prove both the root-cycle bug and the preserved acyclic nesting behavior
 
 ### Key Decisions Pending
 

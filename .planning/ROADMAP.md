@@ -69,6 +69,7 @@
 **Goal:** All FastAPI business endpoints are operational, role-gated, and IDOR-safe — providing the complete API surface that the MCP server will proxy in Phase 4.
 **Depends on:** Phase 2
 **Requirements:** STU-01, STU-02, STU-03, STU-04, STU-05, STU-06, STU-07, COURSE-01, COURSE-02, COURSE-03, CURR-01, CURR-02, ENROLL-01, ENROLL-02, ENROLL-03, ENROLL-04, ENROLL-05, ENROLL-06, ENROLL-07, ENROLL-08, ENROLL-STAFF-01, ENROLL-STAFF-02, ENROLL-STAFF-03, GRADES-01, GRADES-02, GRADES-03, GRADES-04, DOCS-01, DOCS-02, DOCS-03, DOCS-04, APPT-01, APPT-02, APPT-03, APPT-04, APPT-STAFF-01, STAFF-01
+**Verification:** `complete` — gap-closure plans `03-12` through `03-14` now cover Docker/runtime proof plus the final COURSE-03 cycle-safety regression.
 
 ### Success Criteria
 1. Staff can list, create, update, and soft-delete students; both student and staff can view student detail and academic summary including CRA, with ownership verified on every mutating operation.
@@ -77,7 +78,7 @@
 4. Student can view grades per discipline and full academic history; CRA is calculated correctly (credit-weighted, excluding in-progress and locked statuses, safe against division by zero); staff can post and update grades.
 5. Student can request documents and list their statuses; staff can update document status and attach a file URL; student can book, view, and cancel appointments; staff can create scheduling slots.
 
-**Plans:** 13 plans
+**Plans:** 14 plans
 
 Plans:
 - [x] 03-01-PLAN.md — Shared infrastructure: pagination, error handling, dual-auth, IDOR protection, base CRUD service
@@ -93,6 +94,7 @@ Plans:
 - [x] 03-11-PLAN.md — Gap closure: academic summary next_appointment slot semantics regression
 - [x] 03-12-PLAN.md — Gap closure: bind-mount Alembic assets and preflight enrollment runtime verification
 - [x] 03-13-PLAN.md — Gap closure: enable in-container pytest verification in `fastapi-app` and align Phase 03 validation docs
+- [x] 03-14-PLAN.md — Gap closure: recursive prerequisite tree cycle-safety fix + focused regression coverage
 
 ---
 
@@ -172,7 +174,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Infrastructure & Schema | 7/7 | Complete | 2026-04-24 |
 | 2. Authentication | 4/4 | Complete | 2026-04-24 |
-| 3. Business Feature Slices | 13/13 | Complete | 2026-04-25 |
+| 3. Business Feature Slices | 14/14 | Complete | 2026-04-25 |
 | 4. MCP Server | 0/4 | Planned | - |
 | 5. AI Service | 0/5 | Planned | - |
 | 6. WhatsApp Webhook & Integration | 0/4 | Planned | - |

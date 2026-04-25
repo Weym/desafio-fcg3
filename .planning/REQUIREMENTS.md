@@ -43,7 +43,7 @@
 
 - [ ] **COURSE-01**: Usuário autenticado pode listar disciplinas com filtro por nome e período
 - [ ] **COURSE-02**: Usuário autenticado pode consultar detalhes de uma disciplina incluindo créditos, carga horária e pré-requisitos diretos
-- [ ] **COURSE-03**: Sistema retorna árvore completa de pré-requisitos de uma disciplina (recursivo via CTE) — endpoint usado pelo MCP `get_course_prerequisites`
+- [x] **COURSE-03**: Sistema retorna árvore completa de pré-requisitos de uma disciplina (recursivo via CTE) — endpoint usado pelo MCP `get_course_prerequisites`
 - [ ] **CURR-01**: Sistema retorna currículo ativo com disciplinas organizadas por período — endpoint usado pelo MCP `get_curriculum`
 - [ ] **CURR-02**: Usuário autenticado pode consultar um currículo específico por ID
 
@@ -188,7 +188,7 @@
 | STU-07 | Phase 3: Business Feature Slices | Complete |
 | COURSE-01 | Phase 3: Business Feature Slices | Pending |
 | COURSE-02 | Phase 3: Business Feature Slices | Pending |
-| COURSE-03 | Phase 3: Business Feature Slices | Pending |
+| COURSE-03 | Phase 3: Business Feature Slices | Complete |
 | CURR-01 | Phase 3: Business Feature Slices | Pending |
 | CURR-02 | Phase 3: Business Feature Slices | Pending |
 | ENROLL-01 | Phase 3: Business Feature Slices | Pending |
