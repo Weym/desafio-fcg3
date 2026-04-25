@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import asyncio
-
 from fastmcp import FastMCP
 
 from mcp_server.healthcheck import register_healthcheck
@@ -19,7 +17,7 @@ from mcp_server.tools import (
 
 mcp = FastMCP("academic-mcp", lifespan=app_lifespan)
 mcp.add_middleware(ToolLoggingMiddleware())
-asyncio.run(register_healthcheck(mcp))
+register_healthcheck(mcp)
 
 # Read-only tools (Plan 02)
 register_student_tools(mcp)
@@ -32,5 +30,9 @@ register_document_tools(mcp)
 register_scheduling_tools(mcp)
 
 
-if __name__ == "__main__":
+def main() -> None:
     mcp.run(transport="http", host="0.0.0.0", port=8002)
+
+
+if __name__ == "__main__":
+    main()

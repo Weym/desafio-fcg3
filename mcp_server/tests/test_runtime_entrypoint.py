@@ -59,6 +59,7 @@ def test_dockerfile_uses_package_entrypoint():
 
 def test_compose_uses_package_entrypoint():
     compose = Path("docker-compose.yml").read_text(encoding="utf-8")
+    mcp_server_section = compose.split("mcp-server:", maxsplit=1)[1]
 
-    assert "python -m mcp_server.main" in compose
-    assert "uvicorn main:app" not in compose
+    assert "python -m mcp_server.main" in mcp_server_section
+    assert "uvicorn main:app" not in mcp_server_section

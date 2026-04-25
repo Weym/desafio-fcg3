@@ -150,7 +150,7 @@ services:
       FCM_CREDENTIALS_PATH: ${FCM_CREDENTIALS_PATH}
       FASTAPI_URL: ${FASTAPI_URL}
     volumes:
-      - ./mcp_server:/app
+      - ./mcp_server:/app/mcp_server
     depends_on:
       postgres:
         condition: service_healthy
@@ -163,7 +163,7 @@ services:
       timeout: 5s
       retries: 3
       start_period: 30s
-    command: uvicorn main:app --host 0.0.0.0 --port 8002 --reload
+    command: python -m mcp_server.main
 
 networks:
   app-network:

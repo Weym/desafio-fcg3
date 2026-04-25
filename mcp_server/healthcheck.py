@@ -12,7 +12,7 @@ def _get_lifespan_resources(request: Request) -> dict[str, Any]:
     return getattr(fastmcp_server, "_lifespan_result", {}) or {}
 
 
-async def register_healthcheck(mcp: FastMCP) -> None:
+def register_healthcheck(mcp: FastMCP) -> None:
     @mcp.custom_route("/health", methods=["GET"])
     async def healthcheck(request: Request) -> JSONResponse:
         resources = _get_lifespan_resources(request)
