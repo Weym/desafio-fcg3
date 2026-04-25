@@ -202,6 +202,17 @@ class SlotService:
         current_dt = datetime.combine(data.date, start)
         end_dt = datetime.combine(data.date, end)
 
+        if current_dt + duration > end_dt:
+            raise ValidationException(
+                message="Intervalo informado nao comporta nenhum slot",
+                details=[
+                    {
+                        "field": "slot_duration_minutes",
+                        "message": "A duracao precisa caber no intervalo informado",
+                    }
+                ],
+            )
+
         while current_dt + duration <= end_dt:
             slot_start = current_dt.time()
             slot_end = (current_dt + duration).time()
