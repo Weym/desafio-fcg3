@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from datetime import date
 
-from sqlalchemy import func, select
+from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.features.auth.models import Student
@@ -103,7 +103,15 @@ class DashboardService:
         days_remaining is calculated as (end_date - today).days.
         """
         result = await db.execute(
-            select(EnrollmentPeriod).where(EnrollmentPeriod.is_active.is_(True)).limit(1),
+            select(EnrollmentPeriod)
+            .where(
+                and_(
+                    EnrollmentPeriod.is_active.is_(True),
+                    EnrollmentPeriod.start_date <= today,
+                    EnrollmentPeriod.end_date >= today,
+                ),
+            )
+            .limit(1),
         )
         period = result.scalar_one_or_none()
 
