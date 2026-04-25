@@ -83,6 +83,7 @@ None - plan executed exactly as written.
 ## Issues Encountered
 - `docker compose up -d --build --force-recreate fastapi-app` hit existing local Docker container-state issues (`fcg3-api` could not stop cleanly and later `exec` calls failed with runtime `setns` errors), so final runtime proof on a fresh container could not be completed inside this workstation session.
 - Running Alembic locally against the live database from Windows Python hit a `UnicodeDecodeError` inside psycopg2 while loading the DSN, so database-head confirmation remained limited to the existing container/Postgres queries rather than a successful local migration run.
+- Follow-up Docker proof was captured successfully afterward: `alembic heads` showed `009a`, `alembic upgrade head` advanced the live database from `008a` to `009a`, and `python -m scripts.verify_enrollment_lock_gap` passed inside `fastapi-app`.
 
 ## User Setup Required
 
@@ -90,7 +91,7 @@ None - no external service configuration required.
 
 ## Next Phase Readiness
 - The code changes for the 009a runtime-sync gap are in place and committed.
-- Re-running the Docker verification on a healthy local Docker daemon should now validate the intended mount-based sync path and verifier preflight behavior without changing application code.
+- The intended mount-based sync path and verifier preflight behavior are now confirmed in the live Docker stack.
 - Plan `03-13` can continue independently on the remaining Phase 03 verification-container gap.
 
 ## Self-Check: PASSED
