@@ -61,6 +61,8 @@ services:
     volumes:
       - ./backend/src:/app/src
       - ./backend/scripts:/app/scripts
+      - ./backend/tests:/app/tests
+      - ./backend/pyproject.toml:/app/pyproject.toml
       # Close the 03-UAT 009a drift: keep runtime Alembic assets synced from the
       # repo so D-11 enrollment locking is verified against the right schema.
       - ./backend/alembic:/app/alembic
