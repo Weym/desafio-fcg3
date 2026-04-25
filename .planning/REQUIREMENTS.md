@@ -115,10 +115,10 @@
 ### MCP Server
 
 - [x] **MCP-01**: MCP Server implementa as 16 ferramentas documentadas em `docs/mcp.md` via Streamable HTTP transport
-- [ ] **MCP-02**: MCP Server injeta `student_id` do contexto da sessão ativa em todas as tools que operam sobre dados do aluno — `student_id` nunca aparece nos schemas das tools
+- [x] **MCP-02**: MCP Server injeta `student_id` do contexto da sessão ativa em todas as tools que operam sobre dados do aluno — `student_id` nunca aparece nos schemas das tools
 - [x] **MCP-03**: Cada chamada de tool gera registro em `mcp_action_logs` com tool_name, input_params (sem student_id), output_result, reasoning, latency_ms, retry e status
-- [ ] **MCP-04**: Chamadas internas à API são autenticadas via `X-Service-Token`; comparação usa `hmac.compare_digest` (constant-time)
-- [ ] **MCP-05**: Em caso de falha 5xx ou timeout, MCP realiza uma única retentativa imediata; erros 4xx não geram retry
+- [x] **MCP-04**: Chamadas internas à API são autenticadas via `X-Service-Token`; comparação usa `hmac.compare_digest` (constant-time)
+- [x] **MCP-05**: Em caso de falha 5xx ou timeout, MCP realiza uma única retentativa imediata; erros 4xx não geram retry
 
 ---
 
@@ -217,10 +217,10 @@
 | APPT-STAFF-01 | Phase 3: Business Feature Slices | Pending |
 | STAFF-01 | Phase 3: Business Feature Slices | Pending |
 | MCP-01 | Phase 4: MCP Server | Complete |
-| MCP-02 | Phase 4: MCP Server | Pending |
+| MCP-02 | Phase 4: MCP Server | Complete |
 | MCP-03 | Phase 4: MCP Server | Complete |
-| MCP-04 | Phase 4: MCP Server | Pending |
-| MCP-05 | Phase 4: MCP Server | Pending |
+| MCP-04 | Phase 4: MCP Server | Complete |
+| MCP-05 | Phase 4: MCP Server | Complete |
 | AI-01 | Phase 5: AI Service | Pending |
 | AI-02 | Phase 5: AI Service | Pending |
 | AI-03 | Phase 5: AI Service | Pending |

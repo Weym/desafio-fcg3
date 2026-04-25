@@ -12,7 +12,7 @@
 - [x] **Phase 1: Infrastructure & Schema** — Docker Compose running, all application tables migrated, seed data loaded
 - [x] **Phase 2: Authentication** — OTP email flow, JWT with roles, session revocation, auth middleware
 - [x] **Phase 3: Business Feature Slices** — All FastAPI feature endpoints (students, courses, enrollment, grades, documents, appointments, staff dashboard)
-- [ ] **Phase 4: MCP Server** — 16 tools over streamable-http, student_id injection, mcp_action_logs
+- [x] **Phase 4: MCP Server** — 16 tools over streamable-http, student_id injection, mcp_action_logs
 - [ ] **Phase 5: AI Service** — LangChain ReAct agent, RAG pipeline, provider-agnostic LLM, knowledge base ingest
 - [ ] **Phase 6: WhatsApp Webhook & Integration** — End-to-end chatbot flow, webhook hardening, chat visibility, test suite
 
@@ -103,6 +103,7 @@ Plans:
 **Goal:** The MCP server exposes all 16 tools over streamable-http transport, injects student_id from session context (never from the agent), and logs every tool call to mcp_action_logs.
 **Depends on:** Phase 3
 **Requirements:** MCP-01, MCP-02, MCP-03, MCP-04, MCP-05
+**Verification:** `complete` — plans `04-01` through `04-06` are complete and `04-VALIDATION.md` closed the 2026-04-25 Nyquist validation audit.
 
 ### Success Criteria
 1. MCP server starts and is reachable at port 8002; all 16 tools listed in `docs/mcp.md` are registered and callable over streamable-http transport.

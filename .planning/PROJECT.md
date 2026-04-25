@@ -47,10 +47,10 @@ Aluno envia mensagem no WhatsApp e recebe resposta precisa sobre sua situação 
 - [ ] Tratamento de mensagens de mídia (resposta padrão sem processar pelo agente)
 
 **MCP Server:**
-- [ ] 16 ferramentas documentadas em `docs/mcp.md` implementadas
-- [ ] Injeção de `student_id` a partir do contexto de sessão (prevenção de IDOR)
-- [ ] Log de cada chamada de tool em `mcp_action_logs` (params, resultado, latência, retry)
-- [ ] Validação de `X-Service-Token` em todas as chamadas internas
+- [x] 16 ferramentas documentadas em `docs/mcp.md` implementadas — validated in Phase 4
+- [x] Injeção de `student_id` a partir do contexto de sessão (prevenção de IDOR) — validated in Phase 4
+- [x] Log de cada chamada de tool em `mcp_action_logs` (params, resultado, latência, retry) — validated in Phase 4
+- [x] Validação de `X-Service-Token` em todas as chamadas internas — validated in Phase 4
 
 ### Out of Scope
 
@@ -64,7 +64,7 @@ Aluno envia mensagem no WhatsApp e recebe resposta precisa sobre sua situação 
 
 ## Context
 
-- Monorepo: `backend/` (FastAPI), `mobile/` (Flutter), `ai_service/` e `mcp_server/` ainda não criados
+- Monorepo: `backend/` (FastAPI), `mobile/` (Flutter) e `mcp_server/` implementado; `ai_service/` permanece como próximo serviço a criar na Phase 5
 - Banco: PostgreSQL 16 + PGVector. Schema completo documentado em `docs/database.md` (17 tabelas, HNSW index)
 - Embedding model: `text-embedding-3-small` (OpenAI, 1536 dimensões) — fixo no schema
 - LLM provider: a definir por terceiro — arquitetura deve suportar troca por variável de ambiente
@@ -90,15 +90,16 @@ Aluno envia mensagem no WhatsApp e recebe resposta precisa sobre sua situação 
 | asyncio.create_task para background processing | Atende o limite de 5s do WhatsApp no MVP; sem overhead de task queue externo | ⚠️ Revisit (sem visibility de falhas) |
 | LLM provider agnóstico | Decisão de provider é de terceiro; embedding fixo em OpenAI `text-embedding-3-small` | — Pending |
 | Resend para envio de OTP | SDK Python, tier gratuito 3k emails/mês, API simples | ✓ Validated in Phase 2 |
-| `student_id` injetado pelo MCP (nunca exposto ao agente) | Prevenção de IDOR — o agente não pode forjar student_id | — Pending |
-| Agendamentos incluídos neste ciclo | Requisito confirmado pelo usuário | — Pending |
+| `student_id` injetado pelo MCP (nunca exposto ao agente) | Prevenção de IDOR — o agente não pode forjar student_id | ✓ Validated in Phase 4 |
+| Agendamentos incluídos neste ciclo | Requisito confirmado pelo usuário | ✓ Validated in Phase 3 |
 
 ## Current State
 
 - Phase 1 concluída: stack Docker de 4 serviços sobe localmente, schema da aplicação está migrado, e a base possui seed de desenvolvimento com currículo e fixtures acadêmicos.
 - Phase 2 concluída: autenticação completa via OTP/email (Resend), JWT com roles (student/staff), refresh-token rotation com SELECT FOR UPDATE, middleware de auth (get_current_user, require_role, require_service_token), rate limiting via SlowAPI, 47 testes passando.
 - Phase 3 concluída: 7 feature slices (Students, Courses, Enrollment, Grades, Documents, Appointments, Staff Dashboard) com 35 endpoints REST, IDOR protection, dual-auth (JWT + X-Service-Token), state machine enforcement, SELECT FOR UPDATE para booking e enrollment confirmation, CRA calculation, recursive CTE para prerequisite tree. Bug de SELECT FOR UPDATE com outer join corrigido em UAT.
-- Próximo foco: Phase 4 (MCP Server) — implementação das 16 tools documentadas em docs/mcp.md, injeção de student_id, logging de ações.
+- Phase 4 concluída: MCP Server com as 16 tools documentadas em `docs/mcp.md`, injeção de `student_id` por contexto de sessão, `mcp_action_logs`, gap closures 04-05/04-06 e audit Nyquist concluído em 2026-04-25.
+- Próximo foco: Phase 5 (AI Service) — agente LangChain ReAct, pipeline RAG, provider agnóstico e ingest da base de conhecimento.
 
 ## Evolution
 
@@ -118,4 +119,4 @@ Este documento evolui a cada transição de fase e marco de milestone.
 4. Atualizar Context com estado atual
 
 ---
-*Last updated: 2026-04-25 after Phase 3 completion*
+*Last updated: 2026-04-25 after Phase 4 Nyquist audit completion*
