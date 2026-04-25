@@ -9,3 +9,6 @@
 
 # Python cache
 __pycache__/
+
+# AI service ingest audit output
+ai_service/knowledge/.last_ingest.json
