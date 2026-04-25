@@ -5,11 +5,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl \
 
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY ai_service/requirements.txt ./ai_service/requirements.txt
+RUN pip install --no-cache-dir -r ai_service/requirements.txt
 
-COPY main.py .
+COPY ai_service ./ai_service
 
 EXPOSE 8001
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001", "--reload"]
+CMD ["uvicorn", "ai_service.main:app", "--host", "0.0.0.0", "--port", "8001", "--reload"]
