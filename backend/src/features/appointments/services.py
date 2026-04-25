@@ -264,10 +264,13 @@ class AppointmentService:
 
         T-03-27: Race condition prevention via pessimistic locking.
         """
-        # SELECT FOR UPDATE on the slot — pessimistic lock
+        # SELECT FOR UPDATE on the slot — pessimistic lock.
+        # NOTE: We intentionally do NOT use joinedload here because
+        # PostgreSQL forbids FOR UPDATE on the nullable side of an
+        # OUTER JOIN.  Load the resource relationship separately after
+        # the lock is acquired.
         result = await db.execute(
             select(SchedulingSlot)
-            .options(joinedload(SchedulingSlot.resource))
             .where(SchedulingSlot.id == data.slot_id)
             .with_for_update()
         )
@@ -281,6 +284,9 @@ class AppointmentService:
                 code="SLOT_JA_RESERVADO",
                 message="Este horario ja foi reservado por outro aluno.",
             )
+
+        # Eagerly load the resource relationship now (outside the FOR UPDATE)
+        await db.refresh(slot, attribute_names=["resource"])
 
         # Mark slot as unavailable
         slot.is_available = False
