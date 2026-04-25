@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-last_updated: "2026-04-25T03:59:42.355Z"
+status: executing
+last_updated: "2026-04-25T16:08:39.466Z"
 last_activity: 2026-04-25
 progress:
   total_phases: 6
-  completed_phases: 3
-  total_plans: 35
-  completed_plans: 22
-  percent: 63
+  completed_phases: 2
+  total_plans: 37
+  completed_plans: 23
+  percent: 62
 ---
 
 # Project State
@@ -18,8 +18,8 @@ progress:
 ## Current Position
 
 Phase: 03 (business-feature-slices) — EXECUTING
-Plan: 2 of 2
-Status: Phase complete — ready for verification
+Plan: 2 of 13
+Status: Ready to execute
 Last activity: 2026-04-25
 
 Progress: [██████░░░░] 62%
@@ -37,6 +37,7 @@ Progress: [██████░░░░] 62%
 | Phase 03 P10 | 4 min | 2 tasks | 2 files |
 | Phase 03 P09 | 8 min | 2 tasks | 3 files |
 | Phase 03 P11 | 4 min | 2 tasks | 2 files |
+| Phase 03 P12 | 74 min | 2 tasks | 3 files |
 
 ## Phase Status
 
@@ -87,6 +88,8 @@ Recent decisions affecting current work:
 - [Phase 03]: Kept the STU-06 repair in StudentService only so the controller and response schema contract remain unchanged
 - [Phase 03]: Used timezone-aware UTC datetimes when combining slot date and start_time for AcademicSummaryResponse.next_appointment
 - [Phase 03]: Code-review follow-up was stopped after a capped 3-iteration auto-fix loop; latest fixes are recorded in `03-REVIEW-FIX.md`, but a final clean re-review still has not been captured.
+- [Phase 03]: Closed the 009a drift in the dev runtime by mounting Alembic assets into fastapi-app instead of changing enrollment business logic
+- [Phase 03]: Made the verifier fail on stale Alembic head/current state before any confirm_enrollment or lock_enrollment write path runs
 
 ### Key Decisions Pending
 
