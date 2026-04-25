@@ -17,6 +17,20 @@ async def test_resolve_chat_session_id_returns_header_value(mock_request):
     assert session_id == "11111111-1111-1111-1111-111111111111"
 
 
+async def test_resolve_chat_session_id_rejects_missing_header(request_factory):
+    request = request_factory({})
+
+    with pytest.raises(ToolError, match=dependencies.INVALID_SESSION_MESSAGE):
+        await dependencies.resolve_chat_session_id(request)
+
+
+async def test_resolve_chat_session_id_rejects_malformed_uuid(request_factory):
+    request = request_factory({"x-chat-session-id": "not-a-uuid"})
+
+    with pytest.raises(ToolError, match=dependencies.INVALID_SESSION_MESSAGE):
+        await dependencies.resolve_chat_session_id(request)
+
+
 async def test_resolve_student_id_returns_student_id_for_active_session(
     mock_request,
     mock_context,
@@ -30,6 +44,21 @@ async def test_resolve_student_id_returns_student_id_for_active_session(
     student_id = await dependencies.resolve_student_id(mock_request)
 
     assert student_id == "22222222-2222-2222-2222-222222222222"
+
+
+async def test_resolve_student_id_rejects_missing_db_pool(
+    mock_request,
+    mock_context,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    mock_context.lifespan_context.pop("db_pool")
+    monkeypatch.setattr(dependencies, "get_context", lambda: mock_context)
+
+    with pytest.raises(
+        ToolError,
+        match=dependencies.AUDIT_LOG_UNAVAILABLE_MESSAGE,
+    ):
+        await dependencies.resolve_student_id(mock_request)
 
 
 async def test_resolve_student_id_rejects_missing_header(request_factory):
