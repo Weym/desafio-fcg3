@@ -114,10 +114,10 @@ Plans:
 **Plans:** 4 plans
 
 Plans:
-- [ ] 04-01-PLAN.md — MCP scaffold: FastMCP app, settings, asyncpg pool, httpx client, healthcheck, session resolver, tool call middleware (logging + retry)
-- [ ] 04-02-PLAN.md — Read-only tools (Group A): get_student_info, get_available_courses, get_grades, get_transcript, get_curriculum, get_course_prerequisites, get_enrollment_period
-- [ ] 04-03-PLAN.md — Write/action tools (Group B): create_enrollment, confirm_enrollment, drop_course, lock_enrollment, request_document, get_document_status, get_available_slots, book_appointment, cancel_appointment
-- [ ] 04-04-PLAN.md — Integration tests: session resolution, middleware retry/logging, tool schema validation, student_id absence, X-Service-Token verification
+- [x] 04-01-PLAN.md — MCP scaffold: FastMCP app, settings, asyncpg pool, httpx client, healthcheck, session resolver, tool call middleware (logging + retry)
+- [x] 04-02-PLAN.md — Read-only tools (Group A): get_student_info, get_available_courses, get_grades, get_transcript, get_curriculum, get_course_prerequisites, get_enrollment_period
+- [x] 04-03-PLAN.md — Write/action tools (Group B): create_enrollment, confirm_enrollment, drop_course, lock_enrollment, request_document, get_document_status, get_available_slots, book_appointment, cancel_appointment
+- [x] 04-04-PLAN.md — Integration tests: session resolution, middleware retry/logging, tool schema validation, student_id absence, X-Service-Token verification
 
 ---
 
