@@ -13,7 +13,10 @@ import uuid
 from datetime import date, timedelta
 from pathlib import Path
 
+from alembic.config import Config
+from alembic.script import ScriptDirectory
 from sqlalchemy import select
+from sqlalchemy import text
 from sqlalchemy.orm import selectinload
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -36,6 +39,42 @@ from src.shared.exceptions import ConflictException
 def assert_true(condition: bool, message: str) -> None:
     if not condition:
         raise AssertionError(message)
+
+
+def get_runtime_alembic_state() -> tuple[set[str], list[str]]:
+    config = Config(str(PROJECT_ROOT / "alembic.ini"))
+    script = ScriptDirectory.from_config(config)
+    runtime_revisions = {revision.revision for revision in script.walk_revisions()}
+    head_revisions = list(script.get_heads())
+    return runtime_revisions, head_revisions
+
+
+async def verify_runtime_sync() -> None:
+    runtime_revisions, head_revisions = get_runtime_alembic_state()
+
+    if "009a" not in runtime_revisions:
+        raise RuntimeError(
+            "Runtime Alembic tree is stale: revision 009a is not available in /app/alembic. "
+            "Please rebuild/recreate fastapi-app so the container picks up the repo migration tree, "
+            "then run 'alembic upgrade head' before rerunning this verifier."
+        )
+
+    if "009a" not in head_revisions:
+        raise RuntimeError(
+            "Runtime Alembic head is stale: expected head 009a in the container script tree. "
+            "Please rebuild/recreate fastapi-app so the container picks up the repo migration tree, "
+            "then run 'alembic upgrade head' before rerunning this verifier."
+        )
+
+    async with async_session() as session:
+        current_revision = await session.scalar(text("SELECT version_num FROM alembic_version LIMIT 1"))
+
+    if current_revision != "009a":
+        raise RuntimeError(
+            "Database revision is stale: alembic_version reports "
+            f"{current_revision or 'none'} while runtime head is 009a. Please rebuild/recreate "
+            "fastapi-app if needed and run 'alembic upgrade head' before rerunning this verifier."
+        )
 
 
 async def seed_runtime_entities() -> tuple[uuid.UUID, uuid.UUID, uuid.UUID]:
@@ -140,6 +179,7 @@ async def verify_drop_rejected(enrollment_id: uuid.UUID, course_id: uuid.UUID, s
 
 
 async def main() -> None:
+    await verify_runtime_sync()
     enrollment_id, student_id, course_id = await seed_runtime_entities()
     await verify_confirm_and_lock(enrollment_id, student_id)
     await verify_persisted_state(enrollment_id, course_id)
