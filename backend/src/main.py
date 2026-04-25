@@ -1,3 +1,4 @@
+import os
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
@@ -7,7 +8,6 @@ from fastapi.exceptions import HTTPException, RequestValidationError
 from fastapi.responses import JSONResponse
 from slowapi.errors import RateLimitExceeded
 
-from src.infrastructure.config import get_settings
 from src.shared.rate_limit import limiter, rate_limit_exceeded_handler
 from src.shared.exceptions import register_exception_handlers
 from src.features.auth.deps import BodyCacheMiddleware
@@ -28,8 +28,10 @@ from src.features.staff.routes import staff_router
 @asynccontextmanager
 async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
     """Application lifespan: configure third-party services at startup."""
-    # WR-03: set Resend API key once at startup rather than on every OTP call
-    resend.api_key = get_settings().resend_api_key
+    # Allow the API to start with placeholder env values during infrastructure setup.
+    resend_api_key = os.getenv("RESEND_API_KEY", "")
+    if resend_api_key.startswith("re_"):
+        resend.api_key = resend_api_key
     yield
 
 

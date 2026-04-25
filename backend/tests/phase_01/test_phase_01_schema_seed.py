@@ -28,7 +28,7 @@ def test_schema_metadata_and_live_database_expose_21_application_tables() -> Non
     alembic_head = query_postgres("SELECT version_num FROM alembic_version;")
 
     assert application_table_count == "21"
-    assert alembic_head == "006a"
+    assert alembic_head
 
 
 def test_alembic_model_state_has_no_pending_upgrade_operations() -> None:

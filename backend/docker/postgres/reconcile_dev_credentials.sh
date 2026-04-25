@@ -1,5 +1,8 @@
-#!/bin/bash
-set -euo pipefail
+#!/bin/sh
+set -eu
+
+# `pipefail` is not available in every shell used during container startup.
+(set -o pipefail) 2>/dev/null && set -o pipefail
 
 : "${POSTGRES_USER:?POSTGRES_USER is required}"
 : "${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}"

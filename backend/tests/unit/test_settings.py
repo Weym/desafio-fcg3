@@ -15,7 +15,7 @@ def test_settings_all_auth_vars_declared(monkeypatch):
 
     from src.infrastructure.config import Settings
 
-    s = Settings()
+    s = Settings(_env_file=None)
     assert s.jwt_algorithm == "HS256"
     assert s.jwt_access_expiry_seconds == 3600
     assert s.jwt_refresh_expiry_seconds == 2592000
@@ -38,4 +38,4 @@ def test_settings_requires_jwt_secret(monkeypatch):
     from src.infrastructure.config import Settings
 
     with pytest.raises(Exception):
-        Settings()
+        Settings(_env_file=None)
