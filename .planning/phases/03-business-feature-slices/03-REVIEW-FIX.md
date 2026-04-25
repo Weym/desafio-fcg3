@@ -1,6 +1,6 @@
 ---
 phase: 03-business-feature-slices
-fixed_at: 2026-04-25T02:30:17.9617647-03:00
+fixed_at: 2026-04-25T05:43:22.609814+00:00
 review_path: .planning/phases/03-business-feature-slices/03-REVIEW.md
 iteration: 1
 fix_scope: critical_warning
@@ -8,12 +8,12 @@ findings_in_scope: 4
 fixed: 4
 skipped: 0
 status: all_fixed
-summary: Fixed all warning findings by enforcing locked-enrollment conflicts, propagating enrollment locks to grades, blocking locked grade edits, and limiting staff dashboard periods to the current active date window.
+summary: Fixed both backend validation gaps and aligned the published API docs with the implemented Phase 03 response shapes.
 ---
 
 # Phase 03: Code Review Fix Report
 
-**Fixed at:** 2026-04-25T02:30:17.9617647-03:00
+**Fixed at:** 2026-04-25T05:43:22.609814+00:00
 **Source review:** `.planning/phases/03-business-feature-slices/03-REVIEW.md`
 **Iteration:** 1
 
@@ -25,36 +25,36 @@ summary: Fixed all warning findings by enforcing locked-enrollment conflicts, pr
 
 ## Fixed Issues
 
-### WR-01: Locked enrollments can be recreated for the same period
-
-**Status:** fixed
-**Files modified:** `backend/src/features/enrollment/services.py`
-**Commit:** `9aa694d`
-**Applied fix:** Expanded the duplicate-enrollment guard to treat `locked` enrollments as conflicting for the same student and enrollment period.
-
-### WR-02: Locking an enrollment does not lock its grade records
-
-**Status:** fixed
-**Files modified:** `backend/src/features/enrollment/services.py`
-**Commit:** `0ca7705`
-**Applied fix:** Loaded enrollment-course grades during lock processing and updated related non-dropped grade rows to `status="locked"` in the same transaction.
-
-### WR-03: Locked grades can still be edited and silently unlocked
+### WR-01: Service-token auth trusts any `X-Student-Id` without verifying the student exists
 
 **Status:** fixed: requires human verification
-**Files modified:** `backend/src/features/grades/services.py`
-**Commit:** `eaa68ca`
-**Applied fix:** Added a conflict guard that rejects grade updates when the grade is already locked, preventing recalculation and status rewrites.
+**Files modified:** `backend/src/shared/dependencies.py`
+**Commit:** `46b2901`
+**Applied fix:** Added an active-student lookup before accepting `X-Student-Id`, so invalid or inactive service calls fail with a controlled 401 instead of reaching downstream foreign-key failures.
 
-### WR-04: Staff dashboard can report an expired or future enrollment period as active
+### WR-02: Student update path can raise raw integrity errors for duplicate unique fields
 
 **Status:** fixed: requires human verification
-**Files modified:** `backend/src/features/staff/services.py`
-**Commit:** `8412a78`
-**Applied fix:** Constrained the dashboard enrollment-period query to records that are active and whose date window includes today.
+**Files modified:** `backend/src/features/students/services.py`
+**Commit:** `8d33c30`
+**Applied fix:** Added pre-update conflict checks for duplicate `email` and `phone` values owned by other students, preserving business-level 409 responses.
+
+### WR-03: `GET /scheduling/slots` response shape does not match the documented API contract
+
+**Status:** fixed
+**Files modified:** `docs/api.md`
+**Commit:** `ca9297d`
+**Applied fix:** Updated the published API example to show the implemented raw array response returned by `GET /scheduling/slots`.
+
+### WR-04: `GET /enrollment-periods/current` response shape does not match the documented API contract
+
+**Status:** fixed
+**Files modified:** `docs/api.md`
+**Commit:** `af13a26`
+**Applied fix:** Updated the API contract to document the existing `{ "data": ... }` envelope and the `{ "data": null }` no-active-period case.
 
 ---
 
-_Fixed: 2026-04-25T02:30:17.9617647-03:00_
+_Fixed: 2026-04-25T05:43:22.609814+00:00_
 _Fixer: the agent (gsd-code-fixer)_
 _Iteration: 1_
