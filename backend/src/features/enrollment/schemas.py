@@ -23,6 +23,7 @@ class EnrollmentPeriodCreate(BaseModel):
     start_date: date
     end_date: date
     semester_year: str = Field(..., min_length=1, max_length=10)
+    is_active: bool = False
 
 
 class EnrollmentPeriodUpdate(BaseModel):
