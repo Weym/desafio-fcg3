@@ -15,8 +15,10 @@ from uuid import UUID
 
 from fastapi import Depends, Header, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.features.auth.models import Student
 from src.infrastructure.config import get_settings
 from src.infrastructure.database import get_db_session
 from src.shared.exceptions import ForbiddenException
@@ -106,6 +108,18 @@ async def get_current_user_or_service(
             raise _unauthorized(
                 "IDENTIFICACAO_INVALIDA",
                 "X-Student-Id deve ser um UUID valido",
+            )
+
+        student_result = await db.execute(
+            select(Student.id).where(
+                Student.id == student_id,
+                Student.status == "active",
+            )
+        )
+        if student_result.scalar_one_or_none() is None:
+            raise _unauthorized(
+                "IDENTIFICACAO_INVALIDA",
+                "Aluno da chamada de servico nao existe ou esta inativo",
             )
 
         return UserContext(
