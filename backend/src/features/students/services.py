@@ -16,7 +16,7 @@ from datetime import date, datetime, timezone
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import and_, func, select
+from sqlalchemy import and_, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.features.auth.models import Student
@@ -256,8 +256,10 @@ class StudentService(BaseService[Student]):
         )
         pending_documents = pending_result.scalar_one()
 
-        # 6. Next appointment (status='scheduled', date >= today)
-        today = date.today()
+        # 6. Next appointment (status='scheduled', start >= now)
+        now = datetime.now(timezone.utc)
+        today = now.date()
+        current_time = now.time().replace(tzinfo=None)
         next_appt_result = await db.execute(
             select(SchedulingSlot.date, SchedulingSlot.start_time)
             .join(Appointment, Appointment.slot_id == SchedulingSlot.id)
@@ -265,7 +267,13 @@ class StudentService(BaseService[Student]):
                 and_(
                     Appointment.student_id == student_id,
                     Appointment.status == "scheduled",
-                    SchedulingSlot.date >= today,
+                    or_(
+                        SchedulingSlot.date > today,
+                        and_(
+                            SchedulingSlot.date == today,
+                            SchedulingSlot.start_time >= current_time,
+                        ),
+                    ),
                 )
             )
             .order_by(SchedulingSlot.date.asc(), SchedulingSlot.start_time.asc())
