@@ -55,8 +55,8 @@ files_reviewed_list:
 findings:
   critical: 0
   warning: 4
-  info: 2
-  total: 6
+  info: 0
+  total: 4
 status: issues_found
 ---
 
@@ -69,75 +69,42 @@ status: issues_found
 
 ## Summary
 
-Reviewed the Phase 03 backend feature-slice additions plus the API contract doc. The implementation is generally cohesive, but there are a few correctness gaps around enrollment locking, grade mutation after locking, and period selection logic that can produce inconsistent academic state or misleading staff data.
+Re-review covered the Phase 03 business feature slices, shared backend infrastructure, relevant migrations/scripts, and the public API contract in `docs/api.md`. The major remaining problems are API contract mismatches and a couple of server-side validation gaps that can still produce incorrect behavior or uncaught database/integrity failures.
 
 ## Warnings
 
-### WR-01: Locked enrollments can be recreated for the same period
+### WR-01: Service-token auth trusts any `X-Student-Id` without verifying the student exists
 
-**File:** `backend/src/features/enrollment/services.py:291-299`
-**Issue:** `create_enrollment()` blocks only `draft` and `confirmed` enrollments for the same student+period. After a student locks an enrollment, they can create a brand-new draft in the same active period, effectively bypassing the “irreversible” lock/trancamento rule.
-**Fix:** Include `locked` in the conflict check, or explicitly allow only `cancelled` enrollments to be replaced.
-
-```python
-Enrollment.status.in_(["draft", "confirmed", "locked"])
-```
-
-### WR-02: Locking an enrollment does not lock its grade records
-
-**File:** `backend/src/features/enrollment/services.py:596-603`
-**Issue:** `lock_enrollment()` updates `Enrollment` and `EnrollmentCourse` statuses but leaves related `Grade` rows unchanged. Downstream grade logic already treats `Grade.status == "locked"` as special, so the current behavior leaves the academic state inconsistent after trancamento.
-**Fix:** In the same transaction, update all grades linked to the enrollment’s non-dropped `EnrollmentCourse` rows to `status="locked"`.
+**File:** `backend/src/shared/dependencies.py:81-116`
+**Issue:** The service-token branch accepts any syntactically valid UUID and returns `UserContext(role="service")` without checking whether that student exists or is active. Endpoints such as document creation, enrollment creation, and appointment booking then use `user.id` directly. A bad internal caller (or a leaked service token) can therefore target a nonexistent student and trigger downstream foreign-key errors/500s instead of a controlled 401/404.
+**Fix:** Validate `x_student_id` against the students table before returning `UserContext`, and reject missing/inactive/nonexistent students with a canonical auth or not-found error.
 
 ```python
-for ec in enrollment.enrollment_courses:
-    if ec.status != "dropped":
-        ec.status = "locked"
-        for grade in ec.grades:
-            grade.status = "locked"
+from src.features.auth.models import Student
+from sqlalchemy import select
+
+student = await db.execute(select(Student.id).where(Student.id == student_id, Student.status == "active"))
+if student.scalar_one_or_none() is None:
+    raise _unauthorized("IDENTIFICACAO_INVALIDA", "Aluno da chamada de servico nao existe")
 ```
 
-### WR-03: Locked grades can still be edited and silently unlocked
+### WR-02: Student update path can raise raw integrity errors for duplicate unique fields
 
-**File:** `backend/src/features/grades/services.py:239-249`
-**Issue:** `update_grade()` always recalculates `grade_final` and overwrites `status`, with no guard for `grade.status == "locked"`. Even if grades are later locked correctly, this endpoint can mutate them and change the status back to `approved`/`failed`.
-**Fix:** Reject updates for locked grades before applying any mutation.
+**File:** `backend/src/features/students/services.py:152-161`
+**Issue:** `update_student()` applies incoming fields directly and relies on `BaseService.update()`. Unlike `create_student()`, it does not pre-check uniqueness for fields such as `email` (and `phone`, if present), even though the model enforces unique constraints. Updating a student to a duplicate value can therefore bubble up as an uncaught database `IntegrityError` instead of a controlled 409 business response.
+**Fix:** Before calling `self.update(...)`, query for conflicting `email`/`phone` values owned by another student and raise `ConflictException` with the same business-level behavior used on create.
 
-```python
-if grade.status == "locked":
-    raise ConflictException(
-        code="OPERACAO_NAO_PERMITIDA",
-        message="Notas de disciplinas trancadas nao podem ser alteradas",
-    )
-```
-
-### WR-04: Staff dashboard can report an expired or future enrollment period as active
-
-**File:** `backend/src/features/staff/services.py:105-118`
-**Issue:** `_get_enrollment_period_summary()` filters only by `is_active=True`. If staff forgets to flip the flag off, the dashboard may show an already-ended period with negative `days_remaining`, or a future period that has not started yet, as the active one.
-**Fix:** Reuse the same date-window rule used elsewhere: `is_active=True`, `start_date <= today`, and `end_date >= today`.
-
-```python
-select(EnrollmentPeriod).where(
-    EnrollmentPeriod.is_active.is_(True),
-    EnrollmentPeriod.start_date <= today,
-    EnrollmentPeriod.end_date >= today,
-)
-```
-
-## Info
-
-### IN-01: Scheduling slots response does not match the documented envelope
+### WR-03: `GET /scheduling/slots` response shape does not match the documented API contract
 
 **File:** `backend/src/features/appointments/controllers.py:55-73`
-**Issue:** `GET /scheduling/slots` returns a raw JSON list, while `docs/api.md:566-581` documents `{ "data": [...] }`. This kind of contract drift tends to break generated clients and MCP integrations.
-**Fix:** Either wrap the response in `{"data": ...}` or update `docs/api.md` to document the raw-list shape.
+**Issue:** The endpoint returns a raw JSON array (`response_model=list[SlotResponse]`), but `docs/api.md:566-581` documents this route as returning `{ "data": [...] }`. This is a contract regression for clients generated or implemented from the published API docs.
+**Fix:** Either wrap the returned list in the documented envelope or update `docs/api.md` so implementation and published contract match exactly.
 
-### IN-02: Enrollment current-period response shape also drifts from the API doc
+### WR-04: `GET /enrollment-periods/current` response shape does not match the documented API contract
 
 **File:** `backend/src/features/enrollment/controllers.py:64-79`
-**Issue:** `GET /enrollment-periods/current` returns `{"data": ...}` / `{"data": null}`, while `docs/api.md:396-407` documents a raw period object. This creates another avoidable contract mismatch.
-**Fix:** Align the controller and doc to the same response shape, preferably with an explicit response model.
+**Issue:** The controller returns `{ "data": period }` or `{ "data": null }`, while `docs/api.md:396-407` documents the successful response as the raw period object. This mismatch can break MCP or frontend consumers that are coded against the documented shape.
+**Fix:** Return the raw `EnrollmentPeriodResponse` object when a period exists (and document the null case clearly), or update the docs and all consumers to the wrapped `{data: ...}` format.
 
 ---
 
