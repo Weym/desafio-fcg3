@@ -1,9 +1,9 @@
 ---
-status: diagnosed
+status: resolved
 phase: 03-business-feature-slices
 source: [03-01-SUMMARY.md, 03-02-SUMMARY.md, 03-03-SUMMARY.md, 03-04-SUMMARY.md, 03-05-SUMMARY.md, 03-06-SUMMARY.md, 03-07-SUMMARY.md, 03-08-SUMMARY.md]
 started: 2026-04-25T02:08:47.8036531Z
-updated: 2026-04-25T03:06:28.5021709Z
+updated: 2026-04-25T03:37:18.7540932Z
 ---
 
 ## Current Test
@@ -83,7 +83,7 @@ blocked: 0
 ## Gaps
 
 - truth: "Fetching available courses for a student returns a successful list response containing only courses whose prerequisites are already satisfied by that student."
-  status: failed
+  status: resolved
   reason: "Live verification: GET /api/v1/students/{id}/available-courses returned HTTP 500 Internal Server Error. FastAPI raised ResponseValidationError because the route declares response_model=list[AvailableCourseItem] but returned an object with a top-level data key instead of a raw list."
   severity: blocker
   test: 3
@@ -100,7 +100,7 @@ blocked: 0
     - "Add or update an integration test that verifies GET /students/{id}/available-courses returns HTTP 200 with the intended response shape."
   debug_session: ".planning/debug/available-courses-500-validation.md"
 - truth: "Locking an enrollment succeeds after confirmation, marks the enrollment as locked, and preserves the rule that draft-only actions such as dropping a course are no longer allowed afterward."
-  status: failed
+  status: resolved
   reason: "Live verification: POST /enrollments/{id}/confirm returned 200 and created an in_progress grade record, but POST /enrollments/{id}/lock returned HTTP 500. FastAPI logs show PostgreSQL CheckViolationError on constraint ck_enrollments_status when updating enrollment.status to 'locked'."
   severity: blocker
   test: 6
