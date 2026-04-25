@@ -51,9 +51,9 @@ Progress: [██████░░░░] 62%
 
 ## Current Focus
 
-**Phase 3 complete; Phase 4 next**
-Phase 3 is complete: all 8 plans executed across 5 waves, 35 REST endpoints implemented (7 feature slices + shared infrastructure), 4/4 human UAT tests passed in Docker, SELECT FOR UPDATE bug found and fixed during UAT. Code review identified 3 critical + 10 warning items (advisory, not blocking). Milestone M1 remains in progress because Phases 4-6 are still not implemented.
-Next action: Begin Phase 4 (MCP Server) with `/gsd-plan-phase 04` or `/gsd-execute-phase 04`.
+**Phase 3 complete; stop point documented before Phase 4**
+Phase 3 is complete: all 8 plans executed across 5 waves, 35 REST endpoints implemented (7 feature slices + shared infrastructure), and 4/4 human UAT tests passed in Docker. Follow-up code review and auto-fix work ran through 3 capped iterations on Phase 03 artifacts; the final iteration applied fixes for the last in-scope findings, but the workflow stopped before a final confirming re-review. Milestone M1 remains in progress because Phases 4-6 are still not implemented.
+Next action: Either rerun `/gsd-code-review 3` to confirm a clean post-fix state, or begin Phase 4 (MCP Server) with `/gsd-plan-phase 04` or `/gsd-execute-phase 04`.
 Resume file: None
 
 ## Accumulated Context
@@ -86,6 +86,7 @@ Recent decisions affecting current work:
 - [Phase 03]: Used an authenticated integration regression with a monkeypatched service result to isolate the route contract bug while preserving auth and ownership checks.
 - [Phase 03]: Kept the STU-06 repair in StudentService only so the controller and response schema contract remain unchanged
 - [Phase 03]: Used timezone-aware UTC datetimes when combining slot date and start_time for AcademicSummaryResponse.next_appointment
+- [Phase 03]: Code-review follow-up was stopped after a capped 3-iteration auto-fix loop; latest fixes are recorded in `03-REVIEW-FIX.md`, but a final clean re-review still has not been captured.
 
 ### Key Decisions Pending
 

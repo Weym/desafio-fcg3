@@ -8,7 +8,7 @@ findings_in_scope: 4
 fixed: 4
 skipped: 0
 status: all_fixed
-summary: Applied all in-scope warning fixes across enrollment, students, and shared service helpers.
+summary: Applied all in-scope warning fixes across enrollment, students, and shared service helpers; auto mode stopped at the iteration cap before a final confirming re-review.
 ---
 
 # Phase 03: Code Review Fix Report
@@ -22,6 +22,7 @@ summary: Applied all in-scope warning fixes across enrollment, students, and sha
 - Findings in scope: 4
 - Fixed: 4
 - Skipped: 0
+- Auto mode reached its 3-iteration cap before a final confirming re-review of these last fixes.
 
 ## Fixed Issues
 

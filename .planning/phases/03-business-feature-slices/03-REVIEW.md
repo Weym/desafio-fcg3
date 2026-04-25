@@ -69,76 +69,71 @@ status: issues_found
 
 ## Summary
 
-Re-review covered the phase 03 backend feature slices, shared infrastructure, migrations, targeted regression tests, and the public API documentation. The codebase is closer to the intended contract, but there are still a few correctness issues in appointment creation, document status transitions, enrollment-period activation, and slot generation edge-case handling.
+Re-reviewed the original Phase 03 scope across the business feature slices, shared helpers, migrations, targeted tests, and API documentation. Most of the slice structure is consistent, but the enrollment lifecycle still has correctness gaps around locking, and the shared/student update paths still contain request-handling bugs that can surface as incorrect state transitions or unexpected 500s.
+
+This report is the last pre-fix re-review captured by the `--auto` loop. The fixes described in `03-REVIEW-FIX.md` iteration 3 were applied after this review, but the workflow hit its iteration cap before a final post-fix re-review could confirm a clean state.
 
 ## Warnings
 
-### WR-01: Appointment creation builds the response from an unloaded relationship
+### WR-01: Cancelled enrollments can still be locked
 
-**File:** `backend/src/features/appointments/services.py:302-305`
-**Issue:** After `Appointment` is flushed and refreshed, `book_appointment()` returns `_build_appointment_response(appointment)`, but that helper dereferences `appointment.slot` and `appointment.slot.resource`. The new `appointment` instance never reloads its `slot` relationship, so this path can trigger async lazy-loading at response-building time and fail with `MissingGreenlet`/500 instead of returning the booked appointment.
-**Fix:** Re-query the appointment with `joinedload(Appointment.slot).joinedload(SchedulingSlot.resource)` before building the response, or assign the already-loaded `slot` object to the appointment relationship before serializing.
+**File:** `backend/src/features/enrollment/services.py:613-621`
+**Issue:** `lock_enrollment()` only rejects the already-locked state. That means an enrollment in `cancelled` status can still be moved to `locked`, even though the method contract says locking is only valid from `draft` or `confirmed`. This breaks the enrollment state machine and can mutate records that should be terminal.
+**Fix:** Add an explicit allowed-status guard before mutating the record.
+
+```python
+if enrollment.status not in {"draft", "confirmed"}:
+    raise ConflictException(
+        code="OPERACAO_NAO_PERMITIDA",
+        message="Somente matriculas em rascunho ou confirmadas podem ser trancadas",
+    )
+```
+
+### WR-02: Lock flow is not protected against concurrent confirm requests
+
+**File:** `backend/src/features/enrollment/services.py:386-392,595-603,623-628`
+**Issue:** `confirm_enrollment()` uses `SELECT ... FOR UPDATE`, but `lock_enrollment()` reads the same enrollment without a row lock. Concurrent confirm/lock requests can therefore interleave: one request can create grade rows while the other marks the enrollment and courses as locked, leaving grade state out of sync with the final enrollment state.
+**Fix:** Load the enrollment with `with_for_update()` inside `lock_enrollment()` too, then apply the status transition only after the lock is acquired.
 
 ```python
 result = await db.execute(
-    select(Appointment)
-    .options(joinedload(Appointment.slot).joinedload(SchedulingSlot.resource))
-    .where(Appointment.id == appointment.id)
+    select(Enrollment)
+    .options(
+        selectinload(Enrollment.enrollment_courses).selectinload(EnrollmentCourse.grades)
+    )
+    .where(Enrollment.id == enrollment_id)
+    .with_for_update()
 )
-appointment = result.scalar_one()
-return _build_appointment_response(appointment)
 ```
 
-### WR-02: Document status validation allows skipping required lifecycle steps
+### WR-03: Student creation still misses duplicate phone validation
 
-**File:** `backend/src/features/documents/services.py:119-149`
-**Issue:** `update_document_status()` only rejects backwards or same-state transitions (`new_idx <= current_idx`). That means invalid jumps like `requested -> ready`, `requested -> delivered`, or `processing -> delivered` are currently accepted, even though the service and docs define the lifecycle as `requested -> processing -> ready -> delivered`.
-**Fix:** Only allow the next immediate state in the sequence.
+**File:** `backend/src/features/students/services.py:120-146`
+**Issue:** `create_student()` validates duplicate `email` and `registration_number`, but not duplicate `phone`. The `students.phone` column is unique (`backend/src/features/auth/models.py:30-32`), so a repeated phone number will fall through to the database and likely return an unhandled integrity error instead of a controlled 409 response.
+**Fix:** Mirror the update-path phone uniqueness check before calling `create()`.
 
 ```python
-if new_idx != current_idx + 1:
-    raise ConflictException(
-        code="TRANSICAO_STATUS_INVALIDA",
-        message=(
-            f"Transicao de status invalida: '{document.status}' -> '{data.status}'. "
-            f"Status deve seguir a ordem: {' -> '.join(_STATUS_ORDER)}"
-        ),
+if data.phone is not None:
+    existing_phone = await db.execute(
+        select(Student.id).where(Student.phone == data.phone)
     )
-```
-
-### WR-03: Enrollment-period activation can leave multiple active periods and break current-period lookup
-
-**File:** `backend/src/features/enrollment/services.py:57-77,115-136`
-**Issue:** `get_current_period()` uses `scalar_one_or_none()` and assumes there is at most one active period, but `update_period()` allows setting `is_active=True` without first deactivating other active periods. Once two overlapping active periods exist, `GET /enrollment-periods/current` can fail with `MultipleResultsFound` and return 500.
-**Fix:** Enforce a single active enrollment period inside `create_period()`/`update_period()` by clearing existing active rows (or rejecting the change) before saving the new active period.
-
-```python
-if update_data.get("is_active") is True:
-    active_periods = await db.execute(
-        select(EnrollmentPeriod).where(
-            EnrollmentPeriod.is_active.is_(True),
-            EnrollmentPeriod.id != period.id,
+    if existing_phone.scalar_one_or_none() is not None:
+        raise ConflictException(
+            code="TELEFONE_JA_CADASTRADO",
+            message="Ja existe um aluno cadastrado com este telefone",
         )
-    )
-    for other in active_periods.scalars():
-        other.is_active = False
 ```
 
-### WR-04: Slot creation accepts invalid ranges that generate zero slots
+### WR-04: Shared update helper cannot clear nullable fields
 
-**File:** `backend/src/features/appointments/services.py:199-238`
-**Issue:** `create_slots()` validates `start < end`, but if the interval is shorter than `slot_duration_minutes` (for example `08:00-08:20` with `30` minutes), the loop never executes and the endpoint still returns `201` with an empty list. That silently accepts a request that created nothing.
-**Fix:** Reject ranges that cannot generate at least one slot before entering the loop.
+**File:** `backend/src/shared/base_service.py:156-163`
+**Issue:** `BaseService.update()` ignores every field whose new value is `None`. That makes it impossible for feature slices to intentionally clear nullable columns such as `students.phone` or similar optional attributes during partial updates, even when the API explicitly sends `null`.
+**Fix:** Apply all provided keys and let callers control which fields are included via `exclude_unset=True`.
 
 ```python
-duration = timedelta(minutes=data.slot_duration_minutes)
-if datetime.combine(data.date, start) + duration > datetime.combine(data.date, end):
-    raise ValidationException(
-        message="Intervalo informado nao comporta nenhum slot",
-        details=[
-            {"field": "slot_duration_minutes", "message": "A duracao precisa caber no intervalo informado"}
-        ],
-    )
+for key, value in data.items():
+    if hasattr(instance, key):
+        setattr(instance, key, value)
 ```
 
 ---
