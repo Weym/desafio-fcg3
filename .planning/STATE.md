@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-last_updated: "2026-04-25T03:20:52.596Z"
+status: verifying
+last_updated: "2026-04-25T03:59:42.355Z"
 last_activity: 2026-04-25
 progress:
   total_phases: 6
   completed_phases: 3
-  total_plans: 34
-  completed_plans: 21
-  percent: 62
+  total_plans: 35
+  completed_plans: 22
+  percent: 63
 ---
 
 # Project State
@@ -19,7 +19,7 @@ progress:
 
 Phase: 03 (business-feature-slices) — EXECUTING
 Plan: 2 of 2
-Status: Ready for verification
+Status: Phase complete — ready for verification
 Last activity: 2026-04-25
 
 Progress: [██████░░░░] 62%
@@ -36,6 +36,7 @@ Progress: [██████░░░░] 62%
 | Phase 02-authentication P04 | 5 min | 6 tasks | 5 files |
 | Phase 03 P10 | 4 min | 2 tasks | 2 files |
 | Phase 03 P09 | 8 min | 2 tasks | 3 files |
+| Phase 03 P11 | 4 min | 2 tasks | 2 files |
 
 ## Phase Status
 
@@ -83,6 +84,8 @@ Recent decisions affecting current work:
 - [Phase 03]: Verify the enrollment lock gap with real confirm_enrollment and lock_enrollment calls plus a direct post-commit PostgreSQL re-query
 - [Phase 03]: Kept the available-courses fix in the controller/docs layer because the student service already returned list[AvailableCourseItem].
 - [Phase 03]: Used an authenticated integration regression with a monkeypatched service result to isolate the route contract bug while preserving auth and ownership checks.
+- [Phase 03]: Kept the STU-06 repair in StudentService only so the controller and response schema contract remain unchanged
+- [Phase 03]: Used timezone-aware UTC datetimes when combining slot date and start_time for AcademicSummaryResponse.next_appointment
 
 ### Key Decisions Pending
 
