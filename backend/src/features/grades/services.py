@@ -28,7 +28,7 @@ from src.features.grades.schemas import (
     TranscriptEntry,
     TranscriptResponse,
 )
-from src.shared.exceptions import NotFoundException
+from src.shared.exceptions import ConflictException, NotFoundException
 
 
 # Passing threshold (configurable)
@@ -235,6 +235,12 @@ class GradeService:
         grade = result.scalar_one_or_none()
         if grade is None:
             raise NotFoundException("grade", grade_id)
+
+        if grade.status == "locked":
+            raise ConflictException(
+                code="OPERACAO_NAO_PERMITIDA",
+                message="Notas de disciplinas trancadas nao podem ser alteradas",
+            )
 
         # Update grade_1 and/or grade_2
         if data.grade_1 is not None:
