@@ -80,14 +80,14 @@
 **Plans:** 8 plans
 
 Plans:
-- [ ] 03-01-PLAN.md — Shared infrastructure: pagination, error handling, dual-auth, IDOR protection, base CRUD service
-- [ ] 03-02-PLAN.md — Students slice: CRUD, academic summary (STU-06), available courses with prereq filter (STU-07)
-- [ ] 03-03-PLAN.md — Courses & curriculum slice: listing, detail, recursive CTE prerequisite tree (COURSE-03), curriculum endpoints
-- [ ] 03-04-PLAN.md — Enrollment slice: period management, draft-confirm flow, course drop/lock, prereq+period validation, IDOR checks
-- [ ] 03-05-PLAN.md — Grades slice: grades by discipline/period, transcript, CRA calculation (D-07/D-08), staff grade entry
-- [ ] 03-06-PLAN.md — Documents slice: student request/listing, staff status update + file URL
-- [ ] 03-07-PLAN.md — Appointments slice: slot creation, availability query, SELECT FOR UPDATE booking, cancellation
-- [ ] 03-08-PLAN.md — Staff dashboard: KPI aggregation (total students, active enrollments, pending docs, appointments, chat sessions)
+- [x] 03-01-PLAN.md — Shared infrastructure: pagination, error handling, dual-auth, IDOR protection, base CRUD service
+- [x] 03-02-PLAN.md — Students slice: CRUD, academic summary (STU-06), available courses with prereq filter (STU-07)
+- [x] 03-03-PLAN.md — Courses & curriculum slice: listing, detail, recursive CTE prerequisite tree (COURSE-03), curriculum endpoints
+- [x] 03-04-PLAN.md — Enrollment slice: period management, draft-confirm flow, course drop/lock, prereq+period validation, IDOR checks
+- [x] 03-05-PLAN.md — Grades slice: grades by discipline/period, transcript, CRA calculation (D-07/D-08), staff grade entry
+- [x] 03-06-PLAN.md — Documents slice: student request/listing, staff status update + file URL
+- [x] 03-07-PLAN.md — Appointments slice: slot creation, availability query, SELECT FOR UPDATE booking, cancellation
+- [x] 03-08-PLAN.md — Staff dashboard: KPI aggregation (total students, active enrollments, pending docs, appointments, chat sessions)
 
 ---
 
