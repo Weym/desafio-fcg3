@@ -1,0 +1,7 @@
+Placeholder de desenvolvimento para o regulamento academico.
+
+Este arquivo possui extensao .pdf apenas para testes do pipeline de ingestao.
+O conteudo real em PDF sera fornecido posteriormente pela equipe academica.
+
+Caso o parser de PDF nao consiga ler este arquivo, o script de ingestao deve
+registrar um aviso e usar o conteudo textual como fallback quando possivel.
