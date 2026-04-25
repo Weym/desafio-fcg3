@@ -1,21 +1,21 @@
 ---
 phase: 03-business-feature-slices
-fixed_at: 2026-04-25T05:43:22.609814+00:00
-review_path: .planning/phases/03-business-feature-slices/03-REVIEW.md
-iteration: 1
+iteration: 3
 fix_scope: critical_warning
+fixed_at: 2026-04-25T03:09:28.3214283-03:00
+review_path: .planning/phases/03-business-feature-slices/03-REVIEW.md
 findings_in_scope: 4
 fixed: 4
 skipped: 0
 status: all_fixed
-summary: Fixed both backend validation gaps and aligned the published API docs with the implemented Phase 03 response shapes.
+summary: Applied all in-scope warning fixes across enrollment, students, and shared service helpers.
 ---
 
 # Phase 03: Code Review Fix Report
 
-**Fixed at:** 2026-04-25T05:43:22.609814+00:00
+**Fixed at:** 2026-04-25T03:09:28.3214283-03:00
 **Source review:** `.planning/phases/03-business-feature-slices/03-REVIEW.md`
-**Iteration:** 1
+**Iteration:** 3
 
 **Summary:**
 
@@ -25,36 +25,36 @@ summary: Fixed both backend validation gaps and aligned the published API docs w
 
 ## Fixed Issues
 
-### WR-01: Service-token auth trusts any `X-Student-Id` without verifying the student exists
+### WR-01: Cancelled enrollments can still be locked
 
 **Status:** fixed: requires human verification
-**Files modified:** `backend/src/shared/dependencies.py`
-**Commit:** `46b2901`
-**Applied fix:** Added an active-student lookup before accepting `X-Student-Id`, so invalid or inactive service calls fail with a controlled 401 instead of reaching downstream foreign-key failures.
+**Files modified:** `backend/src/features/enrollment/services.py`
+**Commit:** `53902e8`
+**Applied fix:** Added an allowed-status guard so only `draft` and `confirmed` enrollments can transition to `locked`.
 
-### WR-02: Student update path can raise raw integrity errors for duplicate unique fields
+### WR-02: Lock flow is not protected against concurrent confirm requests
+
+**Status:** fixed: requires human verification
+**Files modified:** `backend/src/features/enrollment/services.py`
+**Commit:** `0f2e7b1`
+**Applied fix:** Added `with_for_update()` to the lock flow query so lock and confirm operations serialize on the same enrollment row.
+
+### WR-03: Student creation still misses duplicate phone validation
 
 **Status:** fixed: requires human verification
 **Files modified:** `backend/src/features/students/services.py`
-**Commit:** `8d33c30`
-**Applied fix:** Added pre-update conflict checks for duplicate `email` and `phone` values owned by other students, preserving business-level 409 responses.
+**Commit:** `400a29d`
+**Applied fix:** Added the same duplicate-phone conflict check used in updates before creating a student.
 
-### WR-03: `GET /scheduling/slots` response shape does not match the documented API contract
+### WR-04: Shared update helper cannot clear nullable fields
 
-**Status:** fixed
-**Files modified:** `docs/api.md`
-**Commit:** `ca9297d`
-**Applied fix:** Updated the published API example to show the implemented raw array response returned by `GET /scheduling/slots`.
-
-### WR-04: `GET /enrollment-periods/current` response shape does not match the documented API contract
-
-**Status:** fixed
-**Files modified:** `docs/api.md`
-**Commit:** `af13a26`
-**Applied fix:** Updated the API contract to document the existing `{ "data": ... }` envelope and the `{ "data": null }` no-active-period case.
+**Status:** fixed: requires human verification
+**Files modified:** `backend/src/shared/base_service.py`
+**Commit:** `4f0e351`
+**Applied fix:** Updated the shared `update()` helper to apply all provided keys, including explicit `None` values, and aligned the docstring with that behavior.
 
 ---
 
-_Fixed: 2026-04-25T05:43:22.609814+00:00_
+_Fixed: 2026-04-25T03:09:28.3214283-03:00_
 _Fixer: the agent (gsd-code-fixer)_
-_Iteration: 1_
+_Iteration: 3_
