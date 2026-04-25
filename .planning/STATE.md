@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-04-25T18:10:10.884Z"
-last_activity: 2026-04-25 -- Phase 04 execution started
+last_updated: "2026-04-25T19:54:57.835Z"
+last_activity: 2026-04-25
 progress:
   total_phases: 6
   completed_phases: 3
-  total_plans: 38
-  completed_plans: 25
-  percent: 66
+  total_plans: 40
+  completed_plans: 30
+  percent: 75
 ---
 
 # Project State
@@ -18,9 +18,9 @@ progress:
 ## Current Position
 
 Phase: 04 (mcp-server) — EXECUTING
-Plan: 1 of 4
-Status: Executing Phase 04
-Last activity: 2026-04-25 -- Phase 04 execution started
+Plan: 2 of 4
+Status: Ready to execute
+Last activity: 2026-04-25
 
 Progress: [███████░░░] 66%
 
@@ -40,6 +40,7 @@ Progress: [███████░░░] 66%
 | Phase 03 P12 | 74 min | 2 tasks | 3 files |
 | Phase 03 P13 | 20 min | 2 tasks | 3 files |
 | Phase 03-business-feature-slices P14 | 8 min | 2 tasks | 2 files |
+| Phase 04 P05 | 19 min | 2 tasks | 5 files |
 
 ## Phase Status
 
@@ -98,6 +99,8 @@ Recent decisions affecting current work:
 - [Phase 03]: Follow-up runtime proof for 03-13 required adding `aiosqlite` to `backend/requirements-dev.txt` because `backend/tests/conftest.py` uses a `sqlite+aiosqlite` async test engine
 - [Phase 03-business-feature-slices]: Kept the COURSE-03 repair inside CourseService._build_prerequisite_tree so the endpoint contract and recursive CTE stay unchanged
 - [Phase 03-business-feature-slices]: Used synthetic flat rows in a pure unit regression to prove both the root-cycle bug and the preserved acyclic nesting behavior
+- [Phase 04]: Kept FastMCP as the exported server and moved startup side effects behind main() so imports remain safe inside active event loops.
+- [Phase 04]: Matched both Docker image and bind-mounted compose development to the same package layout by running python -m mcp_server.main and mounting ./mcp_server at /app/mcp_server.
 
 ### Key Decisions Pending
 

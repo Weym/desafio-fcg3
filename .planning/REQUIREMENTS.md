@@ -114,7 +114,7 @@
 
 ### MCP Server
 
-- [ ] **MCP-01**: MCP Server implementa as 16 ferramentas documentadas em `docs/mcp.md` via Streamable HTTP transport
+- [x] **MCP-01**: MCP Server implementa as 16 ferramentas documentadas em `docs/mcp.md` via Streamable HTTP transport
 - [ ] **MCP-02**: MCP Server injeta `student_id` do contexto da sessão ativa em todas as tools que operam sobre dados do aluno — `student_id` nunca aparece nos schemas das tools
 - [ ] **MCP-03**: Cada chamada de tool gera registro em `mcp_action_logs` com tool_name, input_params (sem student_id), output_result, reasoning, latency_ms, retry e status
 - [ ] **MCP-04**: Chamadas internas à API são autenticadas via `X-Service-Token`; comparação usa `hmac.compare_digest` (constant-time)
@@ -216,7 +216,7 @@
 | APPT-04 | Phase 3: Business Feature Slices | Pending |
 | APPT-STAFF-01 | Phase 3: Business Feature Slices | Pending |
 | STAFF-01 | Phase 3: Business Feature Slices | Pending |
-| MCP-01 | Phase 4: MCP Server | Pending |
+| MCP-01 | Phase 4: MCP Server | Complete |
 | MCP-02 | Phase 4: MCP Server | Pending |
 | MCP-03 | Phase 4: MCP Server | Pending |
 | MCP-04 | Phase 4: MCP Server | Pending |

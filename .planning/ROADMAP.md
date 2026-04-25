@@ -118,7 +118,7 @@ Plans:
 - [x] 04-02-PLAN.md — Read-only tools (Group A): get_student_info, get_available_courses, get_grades, get_transcript, get_curriculum, get_course_prerequisites, get_enrollment_period
 - [x] 04-03-PLAN.md — Write/action tools (Group B): create_enrollment, confirm_enrollment, drop_course, lock_enrollment, request_document, get_document_status, get_available_slots, book_appointment, cancel_appointment
 - [x] 04-04-PLAN.md — Integration tests: session resolution, middleware retry/logging, tool schema validation, student_id absence, X-Service-Token verification
-- [ ] 04-05-PLAN.md — Gap closure: repair MCP package startup, Docker/compose entrypoint alignment, and import-safe runtime regressions
+- [x] 04-05-PLAN.md — Gap closure: repair MCP package startup, Docker/compose entrypoint alignment, and import-safe runtime regressions
 - [ ] 04-06-PLAN.md — Gap closure: enforce mandatory audit logging/session guards and add failure-path regressions
 
 ---
