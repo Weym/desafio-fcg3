@@ -302,6 +302,15 @@ class AppointmentService:
         await db.flush()
         await db.refresh(appointment)
 
+        appointment_result = await db.execute(
+            select(Appointment)
+            .options(
+                joinedload(Appointment.slot).joinedload(SchedulingSlot.resource),
+            )
+            .where(Appointment.id == appointment.id)
+        )
+        appointment = appointment_result.scalar_one()
+
         return _build_appointment_response(appointment)
 
     # ------------------------------------------------------------------
