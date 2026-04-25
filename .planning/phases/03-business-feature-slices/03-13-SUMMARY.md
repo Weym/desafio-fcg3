@@ -16,7 +16,7 @@ affects: [03-uat, 03-validation, 04-mcp-server]
 
 # Tech tracking
 tech-stack:
-  added: []
+  added: [aiosqlite]
   patterns:
     - "Use the existing fastapi-app service as the Docker verification container instead of introducing a parallel backend test service"
     - "Document Docker-first pytest commands explicitly and label host-side pytest as optional local-only"
@@ -26,6 +26,7 @@ key-files:
     - ".planning/phases/03-business-feature-slices/03-13-SUMMARY.md"
   modified:
     - "backend/Dockerfile"
+    - "backend/requirements-dev.txt"
     - "docker-compose.yml"
     - ".planning/phases/03-business-feature-slices/03-VALIDATION.md"
 
@@ -60,6 +61,7 @@ completed: 2026-04-25
 - Installed dev/test dependencies into the backend Docker image without changing the existing runtime command or service shape.
 - Mounted `backend/tests` and `backend/pyproject.toml` into `fastapi-app` so the documented focused regressions have the live files they need.
 - Updated Phase 03 validation guidance to make `docker compose exec -T fastapi-app ... python -m pytest ...` the explicit supported Docker path and mark host-side pytest as optional local-only.
+- Added the missing test-only dependency `aiosqlite` so the SQLite async harness in `backend/tests/conftest.py` can load inside `fastapi-app` during real in-container pytest runs.
 
 ## Task Commits
 
@@ -72,6 +74,7 @@ Each task was committed atomically:
 
 ## Files Created/Modified
 - `backend/Dockerfile` - Installs `requirements-dev.txt` in addition to runtime dependencies and includes pytest config/test assets in clean image builds.
+- `backend/requirements-dev.txt` - Adds `aiosqlite` so the async SQLite-backed pytest harness can import in the container.
 - `docker-compose.yml` - Mounts `/app/tests` and `/app/pyproject.toml` into `fastapi-app` alongside the existing live source mounts.
 - `.planning/phases/03-business-feature-slices/03-VALIDATION.md` - Documents the supported Docker pytest workflow and labels host-side pytest as optional local-only.
 
@@ -86,6 +89,8 @@ None - plan executed exactly as written.
 ## Issues Encountered
 - `docker compose up -d --build fastapi-app` could not be completed on this workstation because Docker Desktop was unavailable (`Docker Desktop is unable to start`).
 - Because the Docker daemon was unavailable, full in-container pytest runtime proof could not be re-executed here after the configuration changes; verification was limited to `docker compose config` plus file-content assertions.
+- Follow-up runtime proof exposed one missing dependency: `backend/tests/conftest.py` uses `sqlite+aiosqlite`, so focused in-container pytest failed until `aiosqlite` was added to `backend/requirements-dev.txt`.
+- After that minimal dependency fix, the documented Docker regressions passed in `fastapi-app`: `2 passed`, `1 passed`, and `13 passed` for the STU-06, STU-07, and GRADES-03 checks.
 
 ## User Setup Required
 
@@ -93,7 +98,7 @@ None - no external service configuration required.
 
 ## Next Phase Readiness
 - The remaining Phase 03 verification-container gap is closed in code/config/docs.
-- Once Docker Desktop is healthy again, rerun the documented `docker compose exec -T fastapi-app ... python -m pytest ...` commands to capture fresh runtime proof for UAT/verification artifacts.
+- Fresh runtime proof is now captured for the documented `docker compose exec -T fastapi-app ... python -m pytest ...` path.
 - Phase 4 planning can now assume the backend dev container is intended to support the focused Phase 03 regressions.
 
 ## Self-Check: PASSED
