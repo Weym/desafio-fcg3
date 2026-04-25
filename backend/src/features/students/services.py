@@ -232,8 +232,8 @@ class StudentService(BaseService[Student]):
         # 6. Next appointment (status='scheduled', date >= today)
         today = date.today()
         next_appt_result = await db.execute(
-            select(Appointment)
-            .join(SchedulingSlot, Appointment.slot_id == SchedulingSlot.id)
+            select(SchedulingSlot.date, SchedulingSlot.start_time)
+            .join(Appointment, Appointment.slot_id == SchedulingSlot.id)
             .where(
                 and_(
                     Appointment.student_id == student_id,
@@ -244,9 +244,15 @@ class StudentService(BaseService[Student]):
             .order_by(SchedulingSlot.date.asc(), SchedulingSlot.start_time.asc())
             .limit(1)
         )
-        next_appointment_row = next_appt_result.scalar_one_or_none()
+        next_appointment_row = next_appt_result.one_or_none()
         next_appointment = (
-            next_appointment_row.created_at if next_appointment_row else None
+            datetime.combine(
+                next_appointment_row.date,
+                next_appointment_row.start_time,
+                tzinfo=timezone.utc,
+            )
+            if next_appointment_row
+            else None
         )
 
         return AcademicSummaryResponse(
