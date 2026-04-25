@@ -287,18 +287,16 @@ Disciplinas disponiveis para matricula (respeita pre-requisitos). **Requer auten
 **Response (200):**
 
 ```json
-{
-  "data": [
-    {
-      "id": "uuid",
-      "code": "CC201",
-      "name": "Estrutura de Dados",
-      "credits": 4,
-      "prerequisites_met": true,
-      "semester": 2
-    }
-  ]
-}
+[
+  {
+    "id": "uuid",
+    "code": "CC201",
+    "name": "Estrutura de Dados",
+    "credits": 4,
+    "prerequisites_met": true,
+    "semester": 2
+  }
+]
 ```
 
 ---

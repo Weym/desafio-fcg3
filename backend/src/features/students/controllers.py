@@ -173,14 +173,14 @@ async def get_available_courses(
     student_id: UUID,
     user: UserContext = Depends(get_current_user_or_service),
     db: AsyncSession = Depends(get_db_session),
-) -> dict:
+) -> list[AvailableCourseItem]:
     """Available courses with prerequisite filtering. Accepts X-Service-Token (MCP)."""
     # IDOR protection — even service token goes through check (D-05)
     if user.role != "staff":
         check_ownership(student_id, user)
 
     courses = await student_service.get_available_courses(db, student_id)
-    return {"data": [c.model_dump() for c in courses]}
+    return courses
 
 
 # ------------------------------------------------------------------
