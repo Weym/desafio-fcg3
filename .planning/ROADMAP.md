@@ -140,11 +140,11 @@ Plans:
 **Plans:** 5 plans
 
 Plans:
-- [ ] 05-01-PLAN.md — AI service scaffold: FastAPI app, psycopg3 DB layer, LLM factory, system prompt, config
-- [ ] 05-02-PLAN.md — Knowledge base ingest: document chunking, text-embedding-3-small embeddings, PGVector storage
-- [ ] 05-03-PLAN.md — RAG pipeline: search_knowledge_base tool with pgvector cosine similarity, 0.75 threshold
-- [ ] 05-04-PLAN.md — ReAct agent: create_agent with MCP tool binding (langchain-mcp-adapters), conversation memory, provider-agnostic LLM
-- [ ] 05-05-PLAN.md — AI service /chat endpoint: receives message + session_id, invokes agent, saves response to chat_messages
+- [x] 05-01-PLAN.md — AI service scaffold: FastAPI app, psycopg3 DB layer, LLM factory, system prompt, config
+- [x] 05-02-PLAN.md — Knowledge base ingest: document chunking, text-embedding-3-small embeddings, PGVector storage
+- [x] 05-03-PLAN.md — RAG pipeline: search_knowledge_base tool with pgvector cosine similarity, 0.75 threshold
+- [x] 05-04-PLAN.md — ReAct agent: create_agent with MCP tool binding (langchain-mcp-adapters), conversation memory, provider-agnostic LLM
+- [x] 05-05-PLAN.md — AI service /chat endpoint: receives message + session_id, invokes agent, saves response to chat_messages
 
 ---
 
@@ -179,5 +179,5 @@ Plans:
 | 2. Authentication | 4/4 | Complete | 2026-04-24 |
 | 3. Business Feature Slices | 14/14 | Complete | 2026-04-25 |
 | 4. MCP Server | 6/6 | Complete | 2026-04-25 |
-| 5. AI Service | 0/5 | Planned | - |
+| 5. AI Service | 5/5 | In Progress (verification gaps) | - |
 | 6. WhatsApp Webhook & Integration | 0/4 | Planned | - |
