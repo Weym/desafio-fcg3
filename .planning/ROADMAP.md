@@ -103,7 +103,7 @@ Plans:
 **Goal:** The MCP server exposes all 16 tools over streamable-http transport, injects student_id from session context (never from the agent), and logs every tool call to mcp_action_logs.
 **Depends on:** Phase 3
 **Requirements:** MCP-01, MCP-02, MCP-03, MCP-04, MCP-05
-**Verification:** `complete` — plans `04-01` through `04-06` are complete and `04-VALIDATION.md` closed the 2026-04-25 Nyquist validation audit.
+**Verification:** `complete` — plans `04-01` through `04-06` are complete, `04-VALIDATION.md` closed the 2026-04-25 Nyquist validation audit, `04-SECURITY.md` closed the threat audit, and `04-UAT.md` completed user-facing verification after the follow-up cold-start/runtime fixes.
 
 ### Success Criteria
 1. MCP server starts and is reachable at port 8002; all 16 tools listed in `docs/mcp.md` are registered and callable over streamable-http transport.

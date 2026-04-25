@@ -1,9 +1,9 @@
 ---
 status: complete
 phase: 04-mcp-server
-source: [04-VALIDATION.md]
-started: 2026-04-25T04:20:24.1214462Z
-updated: 2026-04-25T04:20:24.1214462Z
+source: [04-01-SUMMARY.md, 04-02-SUMMARY.md, 04-03-SUMMARY.md, 04-04-SUMMARY.md, 04-05-SUMMARY.md, 04-06-SUMMARY.md]
+started: 2026-04-25T18:42:41.0481269-03:00
+updated: 2026-04-25T19:21:30.0000000-03:00
 ---
 
 ## Current Test
@@ -12,64 +12,39 @@ updated: 2026-04-25T04:20:24.1214462Z
 
 ## Tests
 
-### 1. MCP Health Endpoint
-expected: The MCP service should answer its health endpoint successfully when the stack is up.
+### 1. Cold Start Smoke Test
+expected: Stop the Phase 04 stack if it is already running, then start it again from scratch. The MCP service should boot cleanly with the packaged runtime, and `http://localhost:8002/health` should return a healthy response backed by the real MCP server instead of the old stub behavior.
 result: pass
-reported: "`curl -sf http://localhost:8002/health` returned `{\"status\":\"ok\",\"service\":\"mcp-server\",\"phase\":\"stub\"}`."
 
-### 2. MCP Bootstrap Files
-expected: The Phase 4 MCP server should include the planned bootstrap modules (`main.py`, `settings.py`, `lifespan.py`) and all of them should parse successfully.
-result: issue
-reported: "`python -c \"import ast; ast.parse(open('mcp_server/main.py').read()); ast.parse(open('mcp_server/settings.py').read()); ast.parse(open('mcp_server/lifespan.py').read())\"` failed with `FileNotFoundError: 'mcp_server/settings.py'`."
-severity: blocker
+### 2. MCP Health Endpoint
+expected: With the stack running, calling `http://localhost:8002/health` should return HTTP 200 and confirm that the MCP server can reach both PostgreSQL and FastAPI.
+result: pass
 
-### 3. MCP Automated Suite
-expected: The Phase 4 automated suite should exist and pass via `python -m pytest mcp_server/tests -q`.
-result: issue
-reported: "`python -m pytest mcp_server/tests -q` failed immediately with `ERROR: file or directory not found: mcp_server/tests`."
-severity: blocker
+### 3. MCP Tool Surface
+expected: The exported MCP runtime should expose the full 16-tool surface plus the `/health` route, and importing `mcp_server.main` inside an active event loop should not crash.
+result: pass
 
-### 4. MCP Feature Surface
-expected: Session resolver, middleware logging, service-token validation, and the 16 tool modules should exist instead of a health-only stub.
-result: issue
-reported: "Repository scan found only `mcp_server/main.py`, `mcp_server/Dockerfile`, and `mcp_server/requirements.txt`. No tool modules, resolver, middleware, or test files are present."
-severity: blocker
+### 4. Student Context Boundaries
+expected: Student-scoped tools should keep `student_id` out of their input schemas, while the public curriculum tools should remain available without requiring student context.
+result: pass
+
+### 5. Service Token and Retry Contract
+expected: MCP outbound calls should always include `X-Service-Token`; invalid tokens should be rejected by the backend, 5xx and timeout failures should retry once, and 4xx errors should not retry.
+result: pass
+
+### 6. Audit Logging Fail-Closed
+expected: Tool calls without a valid chat session should be rejected before execution, and valid calls should either write auditable `mcp_action_logs` rows or fail loudly if logging cannot be persisted.
+result: pass
 
 ## Summary
 
-total: 4
-passed: 1
-issues: 3
+total: 6
+passed: 6
+issues: 0
 pending: 0
 skipped: 0
 blocked: 0
 
 ## Gaps
 
-- truth: "The MCP server includes the planned bootstrap modules and starts as a real Phase 4 service instead of a stub."
-  status: failed
-  reason: "Automated verification failed because `mcp_server/settings.py` was missing during the Phase 4 bootstrap check."
-  severity: blocker
-  test: 2
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
-- truth: "The MCP server automated test suite exists and passes."
-  status: failed
-  reason: "Automated verification failed because `python -m pytest mcp_server/tests -q` reported that `mcp_server/tests` does not exist."
-  severity: blocker
-  test: 3
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
-- truth: "The MCP server exposes the planned Phase 4 feature surface: tools, resolver, middleware logging, and service-token enforcement."
-  status: failed
-  reason: "Repository contents show only a health-only stub, not the planned Phase 4 implementation."
-  severity: blocker
-  test: 4
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+[]

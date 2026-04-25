@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-04-25T20:10:00.000Z"
+last_updated: "2026-04-25T22:21:30.000Z"
 last_activity: 2026-04-25
 progress:
   total_phases: 6
@@ -20,7 +20,7 @@ progress:
 Phase: 04 (mcp-server) - COMPLETE
 Plan: 6 of 6
 Status: Phase 04 complete
-Last activity: 2026-04-25 -- Completed Phase 04 Nyquist validation audit
+Last activity: 2026-04-25 -- Completed Phase 04 security review, UAT, and follow-up MCP runtime cold-start fix
 
 Progress: [████████░░] 78%
 
@@ -56,8 +56,8 @@ Progress: [████████░░] 78%
 
 ## Current Focus
 
-**Phase 4 is complete and Nyquist-audited**
-Phase 4 now includes the original MCP scaffold/tool/test delivery, the final gap closures for package-based startup, import-safe FastMCP boot, mandatory chat-session audit guards, failure-path audit regressions, and a closed Nyquist validation audit recorded in `04-VALIDATION.md`.
+**Phase 4 is complete, secured, and UAT-verified**
+Phase 4 now includes the original MCP scaffold/tool/test delivery, the final gap closures for package-based startup, import-safe FastMCP boot, mandatory chat-session audit guards, a closed Nyquist validation audit in `04-VALIDATION.md`, a closed security audit in `04-SECURITY.md`, and a completed user-facing verification run in `04-UAT.md` after the follow-up cold-start/runtime fixes.
 Next action: Start Phase 5 (AI Service) with `/gsd-plan-phase 05` or `/gsd-execute-phase 05`.
 Resume file: None
 
@@ -104,6 +104,8 @@ Recent decisions affecting current work:
 - [Phase 04]: Matched both Docker image and bind-mounted compose development to the same package layout by running python -m mcp_server.main and mounting ./mcp_server at /app/mcp_server.
 - [Phase 04]: Centralized chat-session UUID parsing, active-session lookup, and DB-pool validation in dependencies.py so resolver and middleware fail with the same guard logic.
 - [Phase 04]: Made audit logging a hard precondition and a hard postcondition: tools only run with valid audit context, and log insert failures now fail the call instead of being swallowed.
+- [Phase 04]: Normalized the MCP runtime database DSN before passing it to `asyncpg.create_pool(...)` so the container boot path accepts the shared `postgresql+asyncpg://` configuration used elsewhere in the stack.
+- [Phase 04]: Split the MCP backend health probe from the versioned API base URL so the MCP `/health` check hits FastAPI's real root `/health` endpoint during cold starts.
 
 ### Key Decisions Pending
 
