@@ -617,6 +617,12 @@ class EnrollmentService(BaseService[Enrollment]):
                 message="Esta matricula ja esta trancada",
             )
 
+        if enrollment.status not in {"draft", "confirmed"}:
+            raise ConflictException(
+                code="OPERACAO_NAO_PERMITIDA",
+                message="Somente matriculas em rascunho ou confirmadas podem ser trancadas",
+            )
+
         # Lock enrollment
         enrollment.status = "locked"
 
