@@ -120,12 +120,12 @@ class DocumentService(BaseService[Document]):
         current_idx = _STATUS_ORDER.index(document.status)
         new_idx = _STATUS_ORDER.index(data.status)
 
-        if new_idx <= current_idx:
+        if new_idx != current_idx + 1:
             raise ConflictException(
                 code="TRANSICAO_STATUS_INVALIDA",
                 message=(
                     f"Transicao de status invalida: '{document.status}' -> '{data.status}'. "
-                    f"Status so pode avancar na ordem: {' -> '.join(_STATUS_ORDER)}"
+                    f"Status deve seguir a ordem: {' -> '.join(_STATUS_ORDER)}"
                 ),
             )
 
