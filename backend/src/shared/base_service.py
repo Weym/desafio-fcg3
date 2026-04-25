@@ -153,11 +153,12 @@ class BaseService(Generic[T]):
     ) -> T:
         """Update entity fields from data dict.
 
-        Only sets non-None values. Calls db.flush() + db.refresh() to
-        persist changes and reload DB-generated values (updated_at).
+        Sets all provided values, including None. Calls db.flush() +
+        db.refresh() to persist changes and reload DB-generated values
+        (updated_at).
         """
         for key, value in data.items():
-            if value is not None and hasattr(instance, key):
+            if hasattr(instance, key):
                 setattr(instance, key, value)
         await db.flush()
         await db.refresh(instance)
