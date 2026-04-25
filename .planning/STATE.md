@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-04-25T00:29:56.450Z"
+last_updated: "2026-04-25T03:16:06.172Z"
 last_activity: 2026-04-25
 progress:
   total_phases: 6
-  completed_phases: 3
-  total_plans: 32
-  completed_plans: 19
+  completed_phases: 2
+  total_plans: 34
+  completed_plans: 20
   percent: 59
 ---
 
@@ -17,10 +17,10 @@ progress:
 
 ## Current Position
 
-Phase: 04 (mcp-server) — NOT STARTED
-Plan: Not started
-Status: Phase 03 complete, Phase 04 next
-Last activity: 2026-04-25 -- Phase 03 execution complete, all 8 plans verified
+Phase: 03 (business-feature-slices) — EXECUTING
+Plan: 2 of 2
+Status: Ready to execute
+Last activity: 2026-04-25
 
 Progress: [██████░░░░] 59%
 
@@ -34,6 +34,7 @@ Progress: [██████░░░░] 59%
 | Phase 02-authentication P02 | 18 min | 6 tasks | 12 files |
 | Phase 02-authentication P03 | 3 min | 3 tasks | 5 files |
 | Phase 02-authentication P04 | 5 min | 6 tasks | 5 files |
+| Phase 03 P10 | 4 min | 2 tasks | 2 files |
 
 ## Phase Status
 
@@ -77,6 +78,8 @@ Recent decisions affecting current work:
 - [Phase 03]: Alembic migration 008a added for missing `notes` column on documents table.
 - [Phase 03]: SELECT FOR UPDATE bug in appointments fixed — joinedload with FOR UPDATE causes outer join error in PostgreSQL; separated lock query from relationship loading.
 - [Phase 03]: WR-09 from code review: `require_staff` blocks `service` role — MCP cannot access staff endpoints. Must decide in Phase 4 if MCP needs staff-level access.
+- [Phase 03]: Fix UAT Test 6 in the database layer by recreating ck_enrollments_status with locked instead of changing already-correct enrollment service logic
+- [Phase 03]: Verify the enrollment lock gap with real confirm_enrollment and lock_enrollment calls plus a direct post-commit PostgreSQL re-query
 
 ### Key Decisions Pending
 

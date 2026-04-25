@@ -56,7 +56,7 @@
 - [ ] **ENROLL-03**: Aluno pode confirmar matrícula (draft → confirmed) durante período ativo
 - [ ] **ENROLL-04**: Aluno pode modificar disciplinas de uma matrícula enquanto em draft
 - [ ] **ENROLL-05**: Aluno pode remover disciplina individual de uma matrícula — endpoint usado pelo MCP `drop_course`
-- [ ] **ENROLL-06**: Aluno pode trancar a matrícula inteira do período — endpoint usado pelo MCP `lock_enrollment`
+- [x] **ENROLL-06**: Aluno pode trancar a matrícula inteira do período — endpoint usado pelo MCP `lock_enrollment`
 - [ ] **ENROLL-07**: Aluno pode listar suas matrículas com filtro por semestre e status
 - [ ] **ENROLL-08**: Sistema bloqueia criação de matrícula fora do período ativo, com disciplinas cujos pré-requisitos não foram cumpridos, ou com disciplinas duplicadas
 - [ ] **ENROLL-STAFF-01**: Staff pode criar período de matrícula (nome, tipo, datas de início/fim, semestre letivo)
@@ -196,7 +196,7 @@
 | ENROLL-03 | Phase 3: Business Feature Slices | Pending |
 | ENROLL-04 | Phase 3: Business Feature Slices | Pending |
 | ENROLL-05 | Phase 3: Business Feature Slices | Pending |
-| ENROLL-06 | Phase 3: Business Feature Slices | Pending |
+| ENROLL-06 | Phase 3: Business Feature Slices | Complete |
 | ENROLL-07 | Phase 3: Business Feature Slices | Pending |
 | ENROLL-08 | Phase 3: Business Feature Slices | Pending |
 | ENROLL-STAFF-01 | Phase 3: Business Feature Slices | Pending |
