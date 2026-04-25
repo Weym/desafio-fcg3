@@ -50,6 +50,20 @@ class EnrollmentPeriodService(BaseService[EnrollmentPeriod]):
     def __init__(self) -> None:
         super().__init__(EnrollmentPeriod)
 
+    async def _deactivate_other_active_periods(
+        self,
+        db: AsyncSession,
+        exclude_id: UUID | None = None,
+    ) -> None:
+        """Ensure only one enrollment period stays active at a time."""
+        query = select(EnrollmentPeriod).where(EnrollmentPeriod.is_active.is_(True))
+        if exclude_id is not None:
+            query = query.where(EnrollmentPeriod.id != exclude_id)
+
+        result = await db.execute(query)
+        for active_period in result.scalars().all():
+            active_period.is_active = False
+
     # ------------------------------------------------------------------
     # ENROLL-01: Get current (active) enrollment period
     # ------------------------------------------------------------------
@@ -106,6 +120,9 @@ class EnrollmentPeriodService(BaseService[EnrollmentPeriod]):
                 ],
             )
 
+        if data.is_active:
+            await self._deactivate_other_active_periods(db)
+
         return await self.create(db, data.model_dump())
 
     # ------------------------------------------------------------------
@@ -132,6 +149,9 @@ class EnrollmentPeriodService(BaseService[EnrollmentPeriod]):
                     {"field": "start_date", "message": "start_date deve ser menor que end_date"}
                 ],
             )
+
+        if update_data.get("is_active") is True:
+            await self._deactivate_other_active_periods(db, exclude_id=period.id)
 
         return await self.update(db, period, update_data)
 
