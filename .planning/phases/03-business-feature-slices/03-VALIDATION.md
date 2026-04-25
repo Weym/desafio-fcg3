@@ -19,18 +19,28 @@ created: 2026-04-23
 |----------|-------|
 | **Framework** | pytest 8.x + pytest-asyncio + httpx AsyncClient (from Phase 2 Wave 0) |
 | **Config file** | `backend/pyproject.toml` (`[tool.pytest.ini_options]`) — created by Phase 2 |
-| **Quick run command** | `cd backend && pytest tests/unit -x -q` |
-| **Full suite command** | `cd backend && pytest -x -q` |
+| **Quick run command** | `docker compose exec -T fastapi-app sh -lc "cd /app && python -m pytest tests/unit -x -q"` |
+| **Full suite command** | `docker compose exec -T fastapi-app sh -lc "cd /app && python -m pytest -x -q"` |
 | **Estimated runtime** | unit ~10s · integration ~45s · full suite ~55s |
+
+**Supported Docker workflow:** run Phase 03 regressions inside `fastapi-app` with `docker compose exec -T fastapi-app sh -lc "cd /app && python -m pytest ..."`.
+
+**Optional local-only workflow:** if you are not using Docker for verification, you may still run `cd backend && pytest ...` from the host environment.
 
 ---
 
 ## Sampling Rate
 
 - **After every task commit:** Run the task-scoped `<automated>` verify command from the plan
-- **After every plan wave:** Run `cd backend && pytest -x -q`
+- **After every plan wave:** Run `docker compose exec -T fastapi-app sh -lc "cd /app && python -m pytest -x -q"`
 - **Before `/gsd-verify-work`:** Full suite must be green
 - **Max feedback latency:** 55 seconds
+
+### Focused Docker regressions used by Phase 03 gap-closure/UAT
+
+- **STU-06 regression:** `docker compose exec -T fastapi-app sh -lc "cd /app && python -m pytest tests/unit/test_students_academic_summary.py -q"`
+- **STU-07 raw-list contract:** `docker compose exec -T fastapi-app sh -lc "cd /app && python -m pytest tests/integration/test_students_available_courses.py -q"`
+- **GRADES-03 CRA behavior:** `docker compose exec -T fastapi-app sh -lc "cd /app && python -m pytest tests/unit/test_grades_cra.py -q"`
 
 ---
 
@@ -38,7 +48,7 @@ created: 2026-04-23
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 3-01-01 | 01 | 1 | STU-01,ENROLL-07,DOCS-01,APPT-04 | T-03-04 | Exception handlers return standard error envelope; error codes in PT-BR SCREAMING_SNAKE_CASE | module check | `cd backend && python -c "from src.shared.pagination import PaginationParams, paginated_response; from src.shared.exceptions import AppException, NotFoundException, ConflictException, ForbiddenException, register_exception_handlers; from src.shared.responses import ErrorResponse, PaginationMeta; print('PASS')"` | ✅ | ⬜ pending |
+| 3-01-01 | 01 | 1 | STU-01,ENROLL-07,DOCS-01,APPT-04 | T-03-04 | Exception handlers return standard error envelope; error codes in PT-BR SCREAMING_SNAKE_CASE | module check | `docker compose exec -T fastapi-app sh -lc "cd /app && python -c \"from src.shared.pagination import PaginationParams, paginated_response; from src.shared.exceptions import AppException, NotFoundException, ConflictException, ForbiddenException, register_exception_handlers; from src.shared.responses import ErrorResponse, PaginationMeta; print('PASS')\""` | ✅ | ⬜ pending |
 | 3-01-02 | 01 | 1 | — | T-03-01 / T-03-02 | Dual-auth tries JWT then X-Service-Token; hmac.compare_digest for constant-time comparison; ownership check enforced for student AND service roles (D-05 defense in depth) | module check | `cd backend && python -c "from src.shared.dependencies import get_current_user_or_service, check_ownership, require_staff, UserContext; print('PASS')"` | ✅ | ⬜ pending |
 | 3-01-03 | 01 | 1 | — | T-03-03 | BaseService validates sort_by against model columns to prevent SQL injection via ORDER BY | module check | `cd backend && python -c "from src.shared.base_service import BaseService; print('PASS')"` | ✅ | ⬜ pending |
 | 3-02-01 | 02 | 2 | STU-01..STU-07 | T-03-02 / T-03-05 | All mutating operations verify ownership (IDOR-safe); staff can list/create/update/soft-delete students; academic summary includes CRA | module check | `cd backend && python -c "from src.features.students.schemas import StudentCreate, StudentUpdate, AcademicSummaryResponse, AvailableCourseItem; from src.features.students.services import StudentService; print('PASS')"` | ✅ | ⬜ pending |
