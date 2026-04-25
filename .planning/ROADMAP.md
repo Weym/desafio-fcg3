@@ -77,7 +77,7 @@
 4. Student can view grades per discipline and full academic history; CRA is calculated correctly (credit-weighted, excluding in-progress and locked statuses, safe against division by zero); staff can post and update grades.
 5. Student can request documents and list their statuses; staff can update document status and attach a file URL; student can book, view, and cancel appointments; staff can create scheduling slots.
 
-**Plans:** 8 plans
+**Plans:** 13 plans
 
 Plans:
 - [x] 03-01-PLAN.md — Shared infrastructure: pagination, error handling, dual-auth, IDOR protection, base CRUD service
@@ -88,6 +88,11 @@ Plans:
 - [x] 03-06-PLAN.md — Documents slice: student request/listing, staff status update + file URL
 - [x] 03-07-PLAN.md — Appointments slice: slot creation, availability query, SELECT FOR UPDATE booking, cancellation
 - [x] 03-08-PLAN.md — Staff dashboard: KPI aggregation (total students, active enrollments, pending docs, appointments, chat sessions)
+- [x] 03-09-PLAN.md — Gap closure: available-courses raw-list contract regression + docs alignment
+- [x] 03-10-PLAN.md — Gap closure: enrollment `locked` constraint migration + PostgreSQL verifier
+- [x] 03-11-PLAN.md — Gap closure: academic summary next_appointment slot semantics regression
+- [x] 03-12-PLAN.md — Gap closure: bind-mount Alembic assets and preflight enrollment runtime verification
+- [x] 03-13-PLAN.md — Gap closure: enable in-container pytest verification in `fastapi-app` and align Phase 03 validation docs
 
 ---
 
@@ -167,7 +172,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Infrastructure & Schema | 7/7 | Complete | 2026-04-24 |
 | 2. Authentication | 4/4 | Complete | 2026-04-24 |
-| 3. Business Feature Slices | 8/8 | Complete | 2026-04-25 |
+| 3. Business Feature Slices | 13/13 | Complete | 2026-04-25 |
 | 4. MCP Server | 0/4 | Planned | - |
 | 5. AI Service | 0/5 | Planned | - |
 | 6. WhatsApp Webhook & Integration | 0/4 | Planned | - |

@@ -69,7 +69,7 @@
 
 - [ ] **GRADES-01**: Aluno pode consultar suas notas por disciplina e período letivo
 - [ ] **GRADES-02**: Aluno pode consultar histórico escolar completo com todas as disciplinas e notas
-- [ ] **GRADES-03**: Sistema calcula e retorna CRA ponderado por créditos (exclui disciplinas em andamento e trancadas; protegido contra divisão por zero)
+- [x] **GRADES-03**: Sistema calcula e retorna CRA ponderado por créditos (exclui disciplinas em andamento e trancadas; protegido contra divisão por zero)
 - [ ] **GRADES-04**: Staff pode lançar ou atualizar notas (N1, N2) de um aluno em uma disciplina; nota final é calculada automaticamente
 
 ---
@@ -204,7 +204,7 @@
 | ENROLL-STAFF-03 | Phase 3: Business Feature Slices | Pending |
 | GRADES-01 | Phase 3: Business Feature Slices | Pending |
 | GRADES-02 | Phase 3: Business Feature Slices | Pending |
-| GRADES-03 | Phase 3: Business Feature Slices | Pending |
+| GRADES-03 | Phase 3: Business Feature Slices | Complete |
 | GRADES-04 | Phase 3: Business Feature Slices | Pending |
 | DOCS-01 | Phase 3: Business Feature Slices | Pending |
 | DOCS-02 | Phase 3: Business Feature Slices | Pending |
