@@ -1,13 +1,16 @@
-from fastapi import FastAPI
+from __future__ import annotations
+
+from fastmcp import FastMCP
+
+from mcp_server.lifespan import app_lifespan
 
 
-app = FastAPI(title="MCP Server - Stub", version="0.1.0")
+mcp = FastMCP("academic-mcp", lifespan=app_lifespan)
+
+# TODO: add ToolLoggingMiddleware in Task 2.
+# TODO: register /health custom route in Task 2.
+# TODO: register tool modules in Plans 02/03.
 
 
-@app.get("/health")
-async def health_check() -> dict[str, str]:
-    return {
-        "status": "ok",
-        "service": "mcp-server",
-        "phase": "stub",
-    }
+if __name__ == "__main__":
+    mcp.run(transport="http", host="0.0.0.0", port=8002)
