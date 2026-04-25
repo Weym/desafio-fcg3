@@ -10,6 +10,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY alembic.ini ./
 COPY alembic/ ./alembic/
+# Keep Alembic assets in the image for clean builds; docker-compose bind mounts
+# them in dev/UAT so the running fastapi-app cannot drift behind revision 009a.
 COPY src/ ./src/
 COPY scripts/ ./scripts/
 

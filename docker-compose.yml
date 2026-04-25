@@ -61,6 +61,10 @@ services:
     volumes:
       - ./backend/src:/app/src
       - ./backend/scripts:/app/scripts
+      # Close the 03-UAT 009a drift: keep runtime Alembic assets synced from the
+      # repo so D-11 enrollment locking is verified against the right schema.
+      - ./backend/alembic:/app/alembic
+      - ./backend/alembic.ini:/app/alembic.ini
     depends_on:
       postgres:
         condition: service_healthy
