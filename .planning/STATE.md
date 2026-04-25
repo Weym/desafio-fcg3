@@ -17,12 +17,12 @@ progress:
 
 ## Current Position
 
-Phase: 04
+Phase: 04 (mcp-server) — NOT STARTED
 Plan: Not started
-Status: Executing Phase 03
-Last activity: 2026-04-25
+Status: Phase 03 complete, Phase 04 next
+Last activity: 2026-04-25 -- Phase 03 execution complete, all 8 plans verified
 
-Progress: [███░░░░░░░] 34%
+Progress: [██████░░░░] 59%
 
 ## Performance Metrics
 
@@ -41,16 +41,16 @@ Progress: [███░░░░░░░] 34%
 |-------|------|--------|
 | 1 | Infrastructure & Schema | complete |
 | 2 | Authentication | complete |
-| 3 | Business Feature Slices | not_started |
+| 3 | Business Feature Slices | complete |
 | 4 | MCP Server | not_started |
 | 5 | AI Service | not_started |
 | 6 | WhatsApp Webhook & Integration | not_started |
 
 ## Current Focus
 
-**Phase 2 complete; Phase 3 next**
-Phase 2 is complete: all 4 plans executed, 47 tests green, security audit passed (24/24 threats closed, ASVS L1), code review fixes applied, UAT verified. Milestone M1 remains in progress because Phases 3-6 are still not implemented.
-Next action: Begin Phase 3 planning/execution with `/gsd-execute-phase 03`.
+**Phase 3 complete; Phase 4 next**
+Phase 3 is complete: all 8 plans executed across 5 waves, 35 REST endpoints implemented (7 feature slices + shared infrastructure), 4/4 human UAT tests passed in Docker, SELECT FOR UPDATE bug found and fixed during UAT. Code review identified 3 critical + 10 warning items (advisory, not blocking). Milestone M1 remains in progress because Phases 4-6 are still not implemented.
+Next action: Begin Phase 4 (MCP Server) with `/gsd-plan-phase 04` or `/gsd-execute-phase 04`.
 Resume file: None
 
 ## Accumulated Context
@@ -71,6 +71,12 @@ Recent decisions affecting current work:
 - [Phase 02]: BodyCacheMiddleware added for slowapi sync key_func compatibility (P-01).
 - [Phase 02]: SQLite+aiosqlite test engine with ForUpdateArg compiler hook for PostgreSQL-free testing.
 - [Phase 02]: Security audit passed — 24/24 threats closed at ASVS Level 1.
+- [Phase 03]: Shared infrastructure layer: PaginationParams, AppException, dual-auth (JWT + X-Service-Token), check_ownership, BaseService[T].
+- [Phase 03]: 7 vertical feature slices implemented: Students, Courses, Enrollment, Grades, Documents, Appointments, Staff Dashboard.
+- [Phase 03]: Enrollment model check constraint updated to include 'locked' status (deviation from original schema).
+- [Phase 03]: Alembic migration 008a added for missing `notes` column on documents table.
+- [Phase 03]: SELECT FOR UPDATE bug in appointments fixed — joinedload with FOR UPDATE causes outer join error in PostgreSQL; separated lock query from relationship loading.
+- [Phase 03]: WR-09 from code review: `require_staff` blocks `service` role — MCP cannot access staff endpoints. Must decide in Phase 4 if MCP needs staff-level access.
 
 ### Key Decisions Pending
 

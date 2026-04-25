@@ -3,7 +3,7 @@
 **Milestone:** M1 — Backend + AI Service + MCP Server
 **Granularity:** Standard
 **Coverage:** 69/69 requirements mapped
-**Last Updated:** 2026-04-24
+**Last Updated:** 2026-04-25
 
 ---
 
@@ -11,7 +11,7 @@
 
 - [x] **Phase 1: Infrastructure & Schema** — Docker Compose running, all application tables migrated, seed data loaded
 - [x] **Phase 2: Authentication** — OTP email flow, JWT with roles, session revocation, auth middleware
-- [ ] **Phase 3: Business Feature Slices** — All FastAPI feature endpoints (students, courses, enrollment, grades, documents, appointments, staff dashboard)
+- [x] **Phase 3: Business Feature Slices** — All FastAPI feature endpoints (students, courses, enrollment, grades, documents, appointments, staff dashboard)
 - [ ] **Phase 4: MCP Server** — 16 tools over streamable-http, student_id injection, mcp_action_logs
 - [ ] **Phase 5: AI Service** — LangChain ReAct agent, RAG pipeline, provider-agnostic LLM, knowledge base ingest
 - [ ] **Phase 6: WhatsApp Webhook & Integration** — End-to-end chatbot flow, webhook hardening, chat visibility, test suite
@@ -167,7 +167,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Infrastructure & Schema | 7/7 | Complete | 2026-04-24 |
 | 2. Authentication | 4/4 | Complete | 2026-04-24 |
-| 3. Business Feature Slices | 0/8 | Not started | - |
+| 3. Business Feature Slices | 8/8 | Complete | 2026-04-25 |
 | 4. MCP Server | 0/4 | Planned | - |
 | 5. AI Service | 0/5 | Planned | - |
 | 6. WhatsApp Webhook & Integration | 0/4 | Planned | - |
