@@ -288,13 +288,13 @@ class EnrollmentService(BaseService[Enrollment]):
                 message="Nao ha periodo de matricula ativo ou o periodo informado nao esta ativo",
             )
 
-        # 2. Check no existing draft/confirmed enrollment for this student+period
+        # 2. Check no existing active/locked enrollment for this student+period
         existing_result = await db.execute(
             select(Enrollment).where(
                 and_(
                     Enrollment.student_id == student_id,
                     Enrollment.enrollment_period_id == data.enrollment_period_id,
-                    Enrollment.status.in_(["draft", "confirmed"]),
+                    Enrollment.status.in_(["draft", "confirmed", "locked"]),
                 )
             )
         )
