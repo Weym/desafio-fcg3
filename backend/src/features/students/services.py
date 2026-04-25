@@ -139,6 +139,16 @@ class StudentService(BaseService[Student]):
                 message="Ja existe um aluno cadastrado com este numero de matricula",
             )
 
+        if data.phone is not None:
+            existing_phone = await db.execute(
+                select(Student.id).where(Student.phone == data.phone)
+            )
+            if existing_phone.scalar_one_or_none() is not None:
+                raise ConflictException(
+                    code="TELEFONE_JA_CADASTRADO",
+                    message="Ja existe um aluno cadastrado com este telefone",
+                )
+
         # Build dict — auto-set enrollment_year (SM-04)
         student_data: dict[str, Any] = data.model_dump()
         student_data["enrollment_year"] = datetime.now(timezone.utc).year
