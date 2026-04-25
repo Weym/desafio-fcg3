@@ -397,15 +397,19 @@ Retorna o periodo de matricula ativo (se houver). **Aceita X-Service-Token (MCP)
 
 ```json
 {
-  "id": "uuid",
-  "name": "2025.1 - Matricula",
-  "type": "enrollment",
-  "start_date": "2025-01-15",
-  "end_date": "2025-02-15",
-  "semester_year": "2025.1",
-  "is_active": true
+  "data": {
+    "id": "uuid",
+    "name": "2025.1 - Matricula",
+    "type": "enrollment",
+    "start_date": "2025-01-15",
+    "end_date": "2025-02-15",
+    "semester_year": "2025.1",
+    "is_active": true
+  }
 }
 ```
+
+Quando nao houver periodo ativo, a API retorna `{"data": null}`.
 
 ---
 
