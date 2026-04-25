@@ -15,7 +15,7 @@ async def app_lifespan(_server: FastMCP) -> AsyncIterator[dict[str, object]]:
     settings.validate_runtime()
 
     pool = await asyncpg.create_pool(
-        dsn=settings.database_url,
+        dsn=settings.asyncpg_dsn,
         min_size=2,
         max_size=10,
     )

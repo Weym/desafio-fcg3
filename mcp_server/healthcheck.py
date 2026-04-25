@@ -6,6 +6,8 @@ from fastmcp import FastMCP
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
+from mcp_server.settings import settings
+
 
 def _get_lifespan_resources(request: Request) -> dict[str, Any]:
     fastmcp_server = request.app.state.fastmcp_server
@@ -26,7 +28,7 @@ def register_healthcheck(mcp: FastMCP) -> None:
             details["database"] = str(exc)
 
         try:
-            response = await client.get("/health")
+            response = await client.get(settings.fastapi_health_url)
             response.raise_for_status()
         except Exception as exc:
             details["api"] = str(exc)

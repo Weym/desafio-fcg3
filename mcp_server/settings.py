@@ -4,11 +4,27 @@ import os
 from dataclasses import dataclass
 
 
+def _normalize_asyncpg_dsn(database_url: str) -> str:
+    return database_url.replace("postgresql+asyncpg://", "postgresql://", 1).replace(
+        "postgresql+psycopg://",
+        "postgresql://",
+        1,
+    )
+
+
 @dataclass(frozen=True)
 class Settings:
     database_url: str
     fastapi_base_url: str
     mcp_service_token: str
+
+    @property
+    def asyncpg_dsn(self) -> str:
+        return _normalize_asyncpg_dsn(self.database_url)
+
+    @property
+    def fastapi_health_url(self) -> str:
+        return self.fastapi_base_url.removesuffix("/api/v1").rstrip("/") + "/health"
 
     def validate_runtime(self) -> None:
         missing = []

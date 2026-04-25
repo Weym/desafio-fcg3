@@ -9,6 +9,7 @@ from fastmcp import FastMCP
 from starlette.requests import Request
 
 from mcp_server.healthcheck import register_healthcheck
+from mcp_server.settings import settings
 
 
 pytestmark = pytest.mark.asyncio
@@ -51,7 +52,7 @@ async def test_healthcheck_returns_healthy_when_db_and_api_checks_pass():
     assert response.status_code == 200
     assert json.loads(response.body) == {"status": "healthy"}
     pool.fetchval.assert_awaited_once_with("SELECT 1")
-    client.get.assert_awaited_once_with("/health")
+    client.get.assert_awaited_once_with(settings.fastapi_health_url)
     api_response.raise_for_status.assert_called_once_with()
 
 
