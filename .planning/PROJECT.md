@@ -22,16 +22,19 @@ Aluno envia mensagem no WhatsApp e recebe resposta precisa sobre sua situação 
 - ✓ Seed destrutivo de desenvolvimento com currículo, alunos, staff e fixtures acadêmicos — validated in Phase 1
 - ✓ Auth: OTP por email via Resend + JWT com campo `role` (student | staff) — validated in Phase 2
 - ✓ Middleware: JWT, Service Token (MCP), rate limiting no endpoint de auth — validated in Phase 2
+- ✓ Matrículas: consultar, solicitar, confirmar, cancelar (com validação de período e pré-requisitos) — validated in Phase 3
+- ✓ Notas e histórico: consulta de notas por disciplina/período, CRA calculado — validated in Phase 3
+- ✓ Documentos: listagem, solicitação, detalhe e atualização de status — validated in Phase 3
+- ✓ Agendamentos: consultar, solicitar e cancelar horários com SELECT FOR UPDATE — validated in Phase 3
+- ✓ Cursos & Currículo: listagem, detalhe, árvore recursiva de pré-requisitos — validated in Phase 3
+- ✓ Alunos: CRUD, resumo acadêmico com CRA, cursos disponíveis com filtro de pré-requisitos — validated in Phase 3
+- ✓ Staff Dashboard: KPIs agregados de todos os domínios — validated in Phase 3
 
 ### Active
 
 **Infraestrutura:**
 
 **Backend (FastAPI):**
-- [ ] Matrículas: consultar, solicitar, confirmar, cancelar (com validação de período e pré-requisitos)
-- [ ] Notas e histórico: consulta de notas por disciplina/período, IRA calculado
-- [ ] Documentos: listagem e URL assinada para download
-- [ ] Agendamentos: consultar, solicitar e cancelar horários com professores/coordenadores
 - [ ] Webhook WhatsApp: validação HMAC-SHA256, save de mensagem, despacho assíncrono
 - [ ] Testes: cobertura dos fluxos críticos (matrícula, webhook, middleware IDOR)
 
@@ -93,8 +96,9 @@ Aluno envia mensagem no WhatsApp e recebe resposta precisa sobre sua situação 
 ## Current State
 
 - Phase 1 concluída: stack Docker de 4 serviços sobe localmente, schema da aplicação está migrado, e a base possui seed de desenvolvimento com currículo e fixtures acadêmicos.
-- Phase 2 concluída: autenticação completa via OTP/email (Resend), JWT com roles (student/staff), refresh-token rotation com SELECT FOR UPDATE, middleware de auth (get_current_user, require_role, require_service_token), rate limiting via SlowAPI, 47 testes passando. Gap conhecido: D-08 enumeration timing (documentado em HUMAN-UAT).
-- Próximo foco: Phase 3 (Business Feature Slices) — matrículas, notas, documentos, agendamentos.
+- Phase 2 concluída: autenticação completa via OTP/email (Resend), JWT com roles (student/staff), refresh-token rotation com SELECT FOR UPDATE, middleware de auth (get_current_user, require_role, require_service_token), rate limiting via SlowAPI, 47 testes passando.
+- Phase 3 concluída: 7 feature slices (Students, Courses, Enrollment, Grades, Documents, Appointments, Staff Dashboard) com 35 endpoints REST, IDOR protection, dual-auth (JWT + X-Service-Token), state machine enforcement, SELECT FOR UPDATE para booking e enrollment confirmation, CRA calculation, recursive CTE para prerequisite tree. Bug de SELECT FOR UPDATE com outer join corrigido em UAT.
+- Próximo foco: Phase 4 (MCP Server) — implementação das 16 tools documentadas em docs/mcp.md, injeção de student_id, logging de ações.
 
 ## Evolution
 
@@ -114,4 +118,4 @@ Este documento evolui a cada transição de fase e marco de milestone.
 4. Atualizar Context com estado atual
 
 ---
-*Last updated: 2026-04-24 after Phase 2 completion*
+*Last updated: 2026-04-25 after Phase 3 completion*
