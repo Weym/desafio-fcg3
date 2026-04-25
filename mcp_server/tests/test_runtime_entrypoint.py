@@ -31,6 +31,11 @@ def _reload_main_module():
     return importlib.import_module("mcp_server.main")
 
 
+def _read_mcp_server_compose_section() -> str:
+    compose = Path("docker-compose.yml").read_text(encoding="utf-8")
+    return compose.split("mcp-server:", maxsplit=1)[1]
+
+
 def test_import_is_safe_inside_active_event_loop():
     async def import_module():
         return _reload_main_module()
@@ -57,9 +62,22 @@ def test_dockerfile_uses_package_entrypoint():
     assert "uvicorn" not in dockerfile
 
 
+def test_package_runner_keeps_http_transport_configuration():
+    module = _reload_main_module()
+
+    assert hasattr(module, "main")
+    source = Path("mcp_server/main.py").read_text(encoding="utf-8")
+    assert 'mcp.run(transport="http", host="0.0.0.0", port=8002)' in source
+
+
 def test_compose_uses_package_entrypoint():
-    compose = Path("docker-compose.yml").read_text(encoding="utf-8")
-    mcp_server_section = compose.split("mcp-server:", maxsplit=1)[1]
+    mcp_server_section = _read_mcp_server_compose_section()
 
     assert "python -m mcp_server.main" in mcp_server_section
     assert "uvicorn main:app" not in mcp_server_section
+
+
+def test_compose_bind_mount_matches_package_layout():
+    mcp_server_section = _read_mcp_server_compose_section()
+
+    assert "./mcp_server:/app/mcp_server" in mcp_server_section
