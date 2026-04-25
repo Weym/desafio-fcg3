@@ -217,7 +217,9 @@ class CourseService(BaseService[Course]):
         """Build nested tree from flat CTE rows.
 
         Each row has: id, code, name, parent_id, depth.
-        Groups children by parent_id, then recursively builds the tree.
+        Groups children by parent_id, then recursively builds the tree while
+        seeding the visited set with the root so cyclic graphs cannot reinsert
+        the root course below itself.
         """
         # Group rows by parent_id
         children_map: dict[UUID, list[dict[str, Any]]] = defaultdict(list)
@@ -248,7 +250,7 @@ class CourseService(BaseService[Course]):
                 )
             return result
 
-        return _build_children(root_id, set())
+        return _build_children(root_id, {root_id})
 
     # ------------------------------------------------------------------
     # CURR-01: Active curriculum grouped by semester
