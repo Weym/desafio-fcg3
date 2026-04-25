@@ -566,18 +566,16 @@ Slots disponiveis. **Requer autenticacao. Aceita X-Service-Token (MCP).**
 **Response (200):**
 
 ```json
-{
-  "data": [
-    {
-      "id": "uuid",
-      "staff": { "id": "uuid", "name": "Maria Coordenadora" },
-      "date": "2025-01-20",
-      "start_time": "10:00",
-      "end_time": "10:30",
-      "is_available": true
-    }
-  ]
-}
+[
+  {
+    "id": "uuid",
+    "staff": { "id": "uuid", "name": "Maria Coordenadora" },
+    "date": "2025-01-20",
+    "start_time": "10:00",
+    "end_time": "10:30",
+    "is_available": true
+  }
+]
 ```
 
 ---
