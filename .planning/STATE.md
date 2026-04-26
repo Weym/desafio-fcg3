@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-last_updated: "2026-04-25T23:50:00.000Z"
-last_activity: 2026-04-25 -- Phase 05 execution finished with verification gaps
+status: verifying
+last_updated: "2026-04-26T01:01:32.145Z"
+last_activity: 2026-04-26
 progress:
   total_phases: 6
-  completed_phases: 4
-  total_plans: 40
-  completed_plans: 36
+  completed_phases: 5
+  total_plans: 42
+  completed_plans: 38
   percent: 90
 ---
 
@@ -19,8 +19,8 @@ progress:
 
 Phase: 05 (ai-service) — GAPS FOUND
 Plan: 5 of 5
-Status: Execution complete; verification gaps found
-Last activity: 2026-04-25 -- Phase 05 execution finished with gaps in AI-01 and AI-02
+Status: Phase complete — ready for verification
+Last activity: 2026-04-26
 
 Progress: [█████████░] 90%
 
@@ -42,6 +42,7 @@ Progress: [█████████░] 90%
 | Phase 03-business-feature-slices P14 | 8 min | 2 tasks | 2 files |
 | Phase 04 P05 | 19 min | 2 tasks | 5 files |
 | Phase 04 P06 | 5 min | 2 tasks | 4 files |
+| Phase 05 P07 | 25 | 2 tasks | 6 files |
 
 ## Phase Status
 
@@ -106,6 +107,8 @@ Recent decisions affecting current work:
 - [Phase 04]: Made audit logging a hard precondition and a hard postcondition: tools only run with valid audit context, and log insert failures now fail the call instead of being swallowed.
 - [Phase 04]: Normalized the MCP runtime database DSN before passing it to `asyncpg.create_pool(...)` so the container boot path accepts the shared `postgresql+asyncpg://` configuration used elsewhere in the stack.
 - [Phase 04]: Split the MCP backend health probe from the versioned API base URL so the MCP `/health` check hits FastAPI's real root `/health` endpoint during cold starts.
+- [Phase 05]: Used python -m ai_service.main as the shared AI runtime entrypoint so Docker and compose stay aligned with the package layout.
+- [Phase 05]: Normalized SQLAlchemy-style PostgreSQL URLs before psycopg usage so the AI service can share the repository DATABASE_URL contract.
 
 ### Key Decisions Pending
 

@@ -124,11 +124,11 @@
 
 ### AI Service (LangChain)
 
-- [ ] **AI-01**: Agente ReAct processa mensagens de texto, decide quais MCP tools chamar e gera resposta em português
-- [ ] **AI-02**: Memória de conversa é reconstruída do banco a cada invocação (últimas 20 mensagens da sessão) — não depende de estado em memória
-- [ ] **AI-03**: RAG busca chunks relevantes no PGVector com threshold de distância coseno calibrado (baseline: ≤ 0.25 de distância = ≥ 0.75 de similaridade)
-- [ ] **AI-04**: LLM provider é configurável via variável de ambiente `LLM_PROVIDER` (valores: `openai`, `gemini`) — troca de provider não requer alteração de código
-- [ ] **AI-05**: Script `scripts/ingest.py` ingere documentos da knowledge base (`matricula.md`, `regulamento.pdf`, `faq.md`, `calendario.md`, `curriculo.md`) gerando embeddings e armazenando chunks no PGVector
+- [x] **AI-01**: Agente ReAct processa mensagens de texto, decide quais MCP tools chamar e gera resposta em português
+- [x] **AI-02**: Memória de conversa é reconstruída do banco a cada invocação (últimas 20 mensagens da sessão) — não depende de estado em memória
+- [x] **AI-03**: RAG busca chunks relevantes no PGVector com threshold de distância coseno calibrado (baseline: ≤ 0.25 de distância = ≥ 0.75 de similaridade)
+- [x] **AI-04**: LLM provider é configurável via variável de ambiente `LLM_PROVIDER` (valores: `openai`, `gemini`) — troca de provider não requer alteração de código
+- [x] **AI-05**: Script `scripts/ingest.py` ingere documentos da knowledge base (`matricula.md`, `regulamento.pdf`, `faq.md`, `calendario.md`, `curriculo.md`) gerando embeddings e armazenando chunks no PGVector
 
 ---
 
@@ -221,11 +221,11 @@
 | MCP-03 | Phase 4: MCP Server | Complete |
 | MCP-04 | Phase 4: MCP Server | Complete |
 | MCP-05 | Phase 4: MCP Server | Complete |
-| AI-01 | Phase 5: AI Service | Pending |
-| AI-02 | Phase 5: AI Service | Pending |
-| AI-03 | Phase 5: AI Service | Pending |
-| AI-04 | Phase 5: AI Service | Pending |
-| AI-05 | Phase 5: AI Service | Pending |
+| AI-01 | Phase 5: AI Service | Complete |
+| AI-02 | Phase 5: AI Service | Complete |
+| AI-03 | Phase 5: AI Service | Complete |
+| AI-04 | Phase 5: AI Service | Complete |
+| AI-05 | Phase 5: AI Service | Complete |
 | WH-01 | Phase 6: WhatsApp Webhook & Integration | Pending |
 | WH-02 | Phase 6: WhatsApp Webhook & Integration | Pending |
 | WH-03 | Phase 6: WhatsApp Webhook & Integration | Pending |
