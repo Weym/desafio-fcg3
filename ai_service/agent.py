@@ -7,7 +7,7 @@ import logging
 from typing import Any
 
 from langchain.agents import create_agent
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import AIMessage, HumanMessage
 
 from ai_service.database import load_chat_history
 from ai_service.llm_factory import get_model_string
@@ -32,15 +32,8 @@ def create_chat_agent(settings: Any, tools: list[Any], system_prompt: str) -> An
     )
 
 
-def _extract_response_text(result: dict[str, Any]) -> str:
-    """Return the last assistant message content as plain text."""
-
-    response_messages = result.get("messages", [])
-    if not response_messages:
-        return FALLBACK_MESSAGE
-
-    last_message = response_messages[-1]
-    content = getattr(last_message, "content", "")
+def _normalize_message_content(content: Any) -> str:
+    """Normalize LangChain message content into plain text."""
 
     if isinstance(content, str):
         return content.strip() or FALLBACK_MESSAGE
@@ -58,6 +51,20 @@ def _extract_response_text(result: dict[str, Any]) -> str:
         return combined_text or FALLBACK_MESSAGE
 
     return str(content).strip() or FALLBACK_MESSAGE
+
+
+def _extract_response_text(result: dict[str, Any]) -> str:
+    """Return the last assistant-authored message as plain text."""
+
+    response_messages = result.get("messages", [])
+    if not response_messages:
+        return FALLBACK_MESSAGE
+
+    for message in reversed(response_messages):
+        if isinstance(message, AIMessage):
+            return _normalize_message_content(getattr(message, "content", ""))
+
+    return FALLBACK_MESSAGE
 
 
 async def invoke_agent(
