@@ -108,7 +108,7 @@ services:
       FCM_CREDENTIALS_PATH: ${FCM_CREDENTIALS_PATH}
       FASTAPI_URL: ${FASTAPI_URL}
     volumes:
-      - ./ai_service:/app
+      - ./ai_service:/app/ai_service
     depends_on:
       postgres:
         condition: service_healthy
@@ -121,7 +121,7 @@ services:
       timeout: 5s
       retries: 3
       start_period: 30s
-    command: uvicorn main:app --host 0.0.0.0 --port 8001 --reload
+    command: python -m ai_service.main
 
   mcp-server:
     build: ./mcp_server

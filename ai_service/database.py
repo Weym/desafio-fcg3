@@ -5,12 +5,22 @@ from __future__ import annotations
 from typing import Any
 
 
+def normalize_psycopg_dsn(dsn: str) -> str:
+    """Convert SQLAlchemy-style PostgreSQL URLs into psycopg conninfo URLs."""
+
+    return dsn.replace("postgresql+asyncpg://", "postgresql://", 1).replace(
+        "postgresql+psycopg://",
+        "postgresql://",
+        1,
+    )
+
+
 def create_pool(dsn: str) -> Any:
     """Create a psycopg3 synchronous connection pool."""
 
     from psycopg_pool import ConnectionPool
 
-    return ConnectionPool(conninfo=dsn, min_size=2, max_size=10)
+    return ConnectionPool(conninfo=normalize_psycopg_dsn(dsn), min_size=2, max_size=10)
 
 
 def load_chat_history(pool: Any, session_id: str, k: int = 20) -> list[Any]:

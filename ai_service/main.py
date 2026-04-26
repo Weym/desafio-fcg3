@@ -50,6 +50,17 @@ app = FastAPI(
 )
 
 
+def main() -> None:
+    """Run the packaged AI service application."""
+
+    uvicorn.run(
+        "ai_service.main:app",
+        host="0.0.0.0",
+        port=8001,
+        reload=True,
+    )
+
+
 @app.get("/health")
 async def health_check(request: Request) -> dict[str, str]:
     if not check_db_health(request.app.state.db_pool):
@@ -66,6 +77,13 @@ async def chat(request: ChatRequest) -> ChatResponse:
     """Process a student message through the AI agent."""
 
     try:
+        save_chat_message(
+            pool=app.state.db_pool,
+            session_id=request.session_id,
+            role="user",
+            content=request.message,
+        )
+
         response_text = await invoke_agent(
             settings=settings,
             db_pool=app.state.db_pool,
@@ -112,4 +130,4 @@ async def chat(request: ChatRequest) -> ChatResponse:
 
 
 if __name__ == "__main__":
-    uvicorn.run("ai_service.main:app", host="0.0.0.0", port=8001, reload=True)
+    main()

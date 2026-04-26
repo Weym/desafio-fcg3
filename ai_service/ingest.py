@@ -12,6 +12,8 @@ from typing import Iterable
 
 import psycopg
 
+from ai_service.database import normalize_psycopg_dsn
+
 LOGGER = logging.getLogger("ai_service.ingest")
 KNOWLEDGE_DIR = Path(__file__).parent / "knowledge"
 AUDIT_PATH = KNOWLEDGE_DIR / ".last_ingest.json"
@@ -50,7 +52,10 @@ class IngestSettings:
                 f"Missing required environment variables: {missing_str}"
             )
 
-        return cls(database_url=database_url, openai_api_key=openai_api_key)
+        return cls(
+            database_url=normalize_psycopg_dsn(database_url),
+            openai_api_key=openai_api_key,
+        )
 
 
 @dataclass(frozen=True)
