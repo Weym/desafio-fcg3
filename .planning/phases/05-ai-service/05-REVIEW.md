@@ -1,108 +1,91 @@
 ---
 phase: 05-ai-service
-reviewed: 2026-04-25T23:38:12Z
+reviewed: 2026-04-26T02:53:37Z
 depth: standard
 files_reviewed: 22
 files_reviewed_list:
-  - AGENTS.md
-  - .planning/phases/05-ai-service/05-01-PLAN.md
-  - .planning/phases/05-ai-service/05-02-PLAN.md
-  - .planning/phases/05-ai-service/05-03-PLAN.md
-  - .planning/phases/05-ai-service/05-04-PLAN.md
-  - .planning/phases/05-ai-service/05-05-PLAN.md
-  - .planning/phases/05-ai-service/05-01-SUMMARY.md
-  - .planning/phases/05-ai-service/05-02-SUMMARY.md
-  - .planning/phases/05-ai-service/05-03-SUMMARY.md
-  - .planning/phases/05-ai-service/05-04-SUMMARY.md
-  - .planning/phases/05-ai-service/05-05-SUMMARY.md
+  - .gitignore
+  - ai_service/__init__.py
+  - ai_service/agent.py
   - ai_service/config.py
   - ai_service/database.py
-  - ai_service/llm_factory.py
-  - ai_service/ingest.py
-  - ai_service/rag.py
-  - ai_service/mcp_tools.py
-  - ai_service/agent.py
-  - ai_service/main.py
   - ai_service/Dockerfile
-  - ai_service/requirements.txt
+  - ai_service/ingest.py
+  - ai_service/knowledge/calendario.md
+  - ai_service/knowledge/curriculo.md
+  - ai_service/knowledge/faq.md
+  - ai_service/knowledge/matricula.md
+  - ai_service/knowledge/regulamento.pdf
+  - ai_service/llm_factory.py
+  - ai_service/main.py
+  - ai_service/mcp_tools.py
   - ai_service/prompts/system_prompt.txt
+  - ai_service/rag.py
+  - ai_service/requirements.txt
+  - ai_service/tests/__init__.py
+  - ai_service/tests/test_chat_gap_closure.py
+  - ai_service/tests/test_runtime_entrypoint.py
+  - docker-compose.yml
 findings:
   critical: 1
-  warning: 3
+  warning: 2
   info: 0
-  total: 4
+  total: 3
 status: issues_found
 ---
 
 # Phase 05: Code Review Report
 
-**Reviewed:** 2026-04-25T23:38:12Z
+**Reviewed:** 2026-04-26T02:53:37Z
 **Depth:** standard
 **Files Reviewed:** 22
 **Status:** issues_found
 
 ## Summary
 
-Reviewed the Phase 05 AI service scaffold, RAG flow, MCP tool wiring, and `/chat` endpoint against the phase plans and summaries. The implementation is close to plan, but it currently has one meaningful authorization gap, one conversation-history persistence bug, one response-extraction bug, and no test coverage for the new AI-service behavior.
+Reviewed the current Phase 05 AI-service scope after plans `05-06` and `05-07`. The earlier chat-history and response-extraction gaps are now fixed and covered by tests, but the current phase still ships with one direct session-spoofing exposure and two deployment/configuration problems.
 
 ## Critical Issues
 
-### CR-01: `/chat` trusts arbitrary `session_id` without authenticating the caller
+### CR-01: `/chat` accepts arbitrary session IDs and is published outside the backend boundary
 
-**File:** `ai_service/main.py:64-75`, `ai_service/mcp_tools.py:19-30`
-**Issue:** The AI service accepts any `session_id` from the request body and forwards it as `X-Chat-Session-ID` to the MCP server, but the endpoint itself performs no caller authentication or service-token validation. If this service is ever reachable outside the intended private network boundary, a caller can impersonate another chat session and access that student's academic context through MCP tools.
-**Fix:** Require an internal authentication mechanism on `/chat` before accepting a session id, e.g. validate a shared service header and reject unauthorized callers.
+**File:** `ai_service/main.py:20-23`, `ai_service/main.py:75-105`, `ai_service/mcp_tools.py:19-26`, `docker-compose.yml:84-89`, `docker-compose.yml:126-130`
 
-```python
-from fastapi import Header, HTTPException, status
+**Issue:** The AI service accepts a caller-supplied `session_id` in the request body and forwards it directly to MCP as `X-Chat-Session-ID`, but `/chat` performs no service-to-service authentication. At the same time, `docker-compose.yml` publishes both `langchain-service` (`8001`) and `mcp-server` (`8002`) to the host. Any caller that can reach those ports can bypass the FastAPI backend boundary and attempt to act under another chat session.
 
-async def require_internal_token(x_service_token: str = Header(...)) -> None:
-    if x_service_token != settings.MCP_SERVICE_TOKEN:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+**Why it matters:** This undermines the intended trust boundary for student context injection. A guessed or stolen session identifier becomes sufficient to query or mutate academic data through the AI/MCP path.
 
-
-@app.post("/chat", response_model=ChatResponse, dependencies=[Depends(require_internal_token)])
-async def chat(request: ChatRequest) -> ChatResponse:
-    ...
-```
+**Fix:** Keep these services private by default and require an internal auth header before accepting `/chat` requests. If host port exposure is only for local development, gate it behind an override file rather than the default compose manifest.
 
 ## Warnings
 
-### WR-01: User messages are never persisted, so chat history becomes incomplete
+### WR-01: Gemini deployments are wired with the wrong environment variable name
 
-**File:** `ai_service/main.py:68-82`
-**Issue:** The endpoint saves only the assistant reply. Because `invoke_agent()` reloads history from `chat_messages` on every request, a direct `/chat` conversation loses prior user turns unless another service persisted them beforehand. That breaks the phase goal of observable end-to-end chat behavior from this service alone and weakens future-turn context.
-**Fix:** Persist the incoming user message before invoking the agent, or explicitly enforce and document an upstream contract that guarantees user-message persistence before `/chat` is called.
+**File:** `ai_service/config.py:20-21`, `ai_service/llm_factory.py:35-41`, `docker-compose.yml:104-107`
 
-```python
-save_chat_message(app.state.db_pool, request.session_id, "user", request.message)
-response_text = await invoke_agent(...)
-save_chat_message(app.state.db_pool, request.session_id, "assistant", response_text)
-```
+**Issue:** The AI service reads Gemini credentials from `GOOGLE_API_KEY`, but the compose service injects only `GEMINI_API_KEY`. A compose-based Gemini deployment therefore starts without the credential the code actually consumes.
 
-### WR-02: Agent response extraction can return the wrong message type
+**Why it matters:** The phase advertises provider-agnostic OpenAI/Gemini support, but the Gemini path is broken in the default runtime wiring.
 
-**File:** `ai_service/agent.py:35-60`
-**Issue:** `_extract_response_text()` always reads `result["messages"][-1]`. In LangChain agent flows the final item is not guaranteed to be the assistant reply; it can be a tool/result message or other structured message. In that case the API can return raw tool output or a stringified structure instead of the final student-facing answer.
-**Fix:** Walk backward through the message list and return the last assistant/AI message only.
+**Fix:** Standardize on one variable name across config, compose, and tests. Either rename the service setting to `GEMINI_API_KEY` or export `GOOGLE_API_KEY` into `langchain-service`.
 
-```python
-from langchain_core.messages import AIMessage
+### WR-02: The AI service receives many unrelated secrets it does not use
 
-for message in reversed(response_messages):
-    if isinstance(message, AIMessage):
-        return _coerce_content_to_text(message.content)
-return FALLBACK_MESSAGE
-```
+**File:** `ai_service/config.py:14-34`, `docker-compose.yml:89-109`
 
-### WR-03: Phase 05 ships without tests for the new AI-service behavior
+**Issue:** `langchain-service` receives unrelated secrets such as `JWT_SECRET`, `WHATSAPP_*`, and `RESEND_API_KEY`, even though Phase 05 code only reads database, LLM, and MCP settings.
 
-**File:** `ai_service/agent.py:35-111`, `ai_service/main.py:64-111`, `ai_service/rag.py:16-68`
-**Issue:** The repository has tests for backend and MCP server modules, but there is no `ai_service` test coverage for the newly added endpoint, history persistence, RAG threshold behavior, MCP header propagation, or response extraction edge cases. That leaves the highest-risk Phase 05 paths unguarded against regressions.
-**Fix:** Add targeted unit/integration tests for at least: `/chat` success/fallback paths, user+assistant persistence ordering, `_extract_response_text()` with non-string and non-final assistant messages, and `create_rag_tool()` no-result / top-3 threshold behavior.
+**Why it matters:** This widens the blast radius if the service is exposed or compromised, and it makes local/runtime configuration harder to reason about.
+
+**Fix:** Limit the AI-service environment to the variables it actually consumes. Keep backend- and messaging-specific secrets on the services that need them.
+
+## Notes
+
+- `ai_service/tests` currently passes (`16 passed`), and the Phase 05 regressions for assistant-only response extraction and ordered chat persistence are covered.
+- The stale pre-`05-06` findings previously present in this file no longer apply to the current source state.
 
 ---
 
-_Reviewed: 2026-04-25T23:38:12Z_
-_Reviewer: the agent (gsd-code-reviewer)_
+_Reviewed: 2026-04-26T02:53:37Z_
+_Reviewer: OpenCode manual review after gsd-code-reviewer artifact refresh failed_
 _Depth: standard_
