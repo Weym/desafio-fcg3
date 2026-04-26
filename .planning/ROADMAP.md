@@ -137,7 +137,7 @@ Plans:
 4. Setting `LLM_PROVIDER=gemini` in the environment switches the agent to Gemini without any code changes; setting `LLM_PROVIDER=openai` uses OpenAI — both produce valid responses.
 5. Running `python scripts/ingest.py` processes all five knowledge base documents (`matricula.md`, `regulamento.pdf`, `faq.md`, `calendario.md`, `curriculo.md`), generates embeddings, and stores chunks in `knowledge_base_chunks`.
 
-**Plans:** 5 plans
+**Plans:** 6 plans
 
 Plans:
 - [x] 05-01-PLAN.md — AI service scaffold: FastAPI app, psycopg3 DB layer, LLM factory, system prompt, config
@@ -145,6 +145,7 @@ Plans:
 - [x] 05-03-PLAN.md — RAG pipeline: search_knowledge_base tool with pgvector cosine similarity, 0.75 threshold
 - [x] 05-04-PLAN.md — ReAct agent: create_agent with MCP tool binding (langchain-mcp-adapters), conversation memory, provider-agnostic LLM
 - [x] 05-05-PLAN.md — AI service /chat endpoint: receives message + session_id, invokes agent, saves response to chat_messages
+- [ ] 05-06-PLAN.md — Gap closure: assistant-only response extraction and direct `/chat` user-turn persistence regressions
 
 ---
 
