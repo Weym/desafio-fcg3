@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-last_updated: "2026-04-26T01:01:32.145Z"
+status: ready
+last_updated: "2026-04-26T01:10:00.000Z"
 last_activity: 2026-04-26
 progress:
   total_phases: 6
@@ -17,9 +17,9 @@ progress:
 
 ## Current Position
 
-Phase: 05 (ai-service) — GAPS FOUND
-Plan: 5 of 5
-Status: Phase complete — ready for verification
+Phase: 06 (whatsapp-webhook-integration) — NEXT FOCUS
+Plan: 0 of 4
+Status: Phase 05 complete — Phase 06 pending start
 Last activity: 2026-04-26
 
 Progress: [█████████░] 90%
@@ -52,14 +52,14 @@ Progress: [█████████░] 90%
 | 2 | Authentication | complete |
 | 3 | Business Feature Slices | complete |
 | 4 | MCP Server | complete |
-| 5 | AI Service | in_progress |
+| 5 | AI Service | complete |
 | 6 | WhatsApp Webhook & Integration | not_started |
 
 ## Current Focus
 
-**Phase 5 execution is complete, but verification found gap-closure work**
-Phase 5 now has all five execution plans implemented and summarized, plus a new advisory review in `05-REVIEW.md`. Verification in `05-VERIFICATION.md` found two phase-goal gaps: `/chat` can return the wrong final message type (`AI-01`) and direct AI-service usage drops user turns from persisted history (`AI-02`).
-Next action: Run `/gsd-plan-phase 05 --gaps` and then `/gsd-execute-phase 05 --gaps-only`.
+**Phase 05 is complete and verification is closed**
+Phase 05 now has all seven plans complete, including gap-closure plans `05-06` and `05-07`. `05-UAT.md` is `complete` with `4/4` tests passing, `05-VERIFICATION.md` is `complete` with no open gaps, and the live `langchain-service` health check returns `{"status":"healthy"}`.
+Next action: Start Phase 06 planning and execution for WhatsApp webhook and end-to-end integration.
 Resume file: None
 
 ## Accumulated Context
@@ -109,6 +109,8 @@ Recent decisions affecting current work:
 - [Phase 04]: Split the MCP backend health probe from the versioned API base URL so the MCP `/health` check hits FastAPI's real root `/health` endpoint during cold starts.
 - [Phase 05]: Used python -m ai_service.main as the shared AI runtime entrypoint so Docker and compose stay aligned with the package layout.
 - [Phase 05]: Normalized SQLAlchemy-style PostgreSQL URLs before psycopg usage so the AI service can share the repository DATABASE_URL contract.
+- [Phase 05]: Closed AI-01 and AI-02 by returning the last assistant-authored LangChain message and persisting the inbound user turn before agent execution.
+- [Phase 05]: Plan `05-07` restored package/runtime alignment; `fcg3-ai` is healthy and `/health` returns `{"status":"healthy"}` in the live stack.
 
 ### Key Decisions Pending
 
@@ -117,8 +119,7 @@ Recent decisions affecting current work:
 
 ### Known Risks
 
-- Phase 4 open question: how `langchain-mcp-adapters` (or equivalent) injects per-request `student_id` into MCP tool calls from the LangChain side — resolve before beginning Phase 4 planning
-- Phase 5: confirm correct ConversationBufferWindowMemory / RunnableWithMessageHistory pattern for LangChain 0.3+ ReAct agents before Phase 5 planning
+- Phase 6 must preserve the <5s WhatsApp webhook response budget by keeping AI work in background tasks with explicit `done_callback` error logging.
 
 ### Architecture Constraints (non-negotiable)
 

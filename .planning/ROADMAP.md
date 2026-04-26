@@ -3,7 +3,7 @@
 **Milestone:** M1 — Backend + AI Service + MCP Server
 **Granularity:** Standard
 **Coverage:** 69/69 requirements mapped
-**Last Updated:** 2026-04-25
+**Last Updated:** 2026-04-26
 
 ---
 
@@ -13,7 +13,7 @@
 - [x] **Phase 2: Authentication** — OTP email flow, JWT with roles, session revocation, auth middleware
 - [x] **Phase 3: Business Feature Slices** — All FastAPI feature endpoints (students, courses, enrollment, grades, documents, appointments, staff dashboard)
 - [x] **Phase 4: MCP Server** — 16 tools over streamable-http, student_id injection, mcp_action_logs
-- [ ] **Phase 5: AI Service** — LangChain ReAct agent, RAG pipeline, provider-agnostic LLM, knowledge base ingest
+- [x] **Phase 5: AI Service** — LangChain ReAct agent, RAG pipeline, provider-agnostic LLM, knowledge base ingest
 - [ ] **Phase 6: WhatsApp Webhook & Integration** — End-to-end chatbot flow, webhook hardening, chat visibility, test suite
 
 ---
@@ -39,7 +39,7 @@
 - [x] Plan 1.4: Seed script — `scripts/seed.py` loading curriculum, courses, and prerequisites for CC 8-semester program
 - [x] Plan 1.5: Gap closure — repair backend import path so `fastapi-app` starts healthy in Docker
 - [x] Plan 1.6: Gap closure — clarify Phase 1 cold-start verification evidence in UAT/validation/bootstrap docs
-- [ ] Plan 1.7: Gap closure — restore Docker runtime PostgreSQL credentials so `alembic upgrade head` and `python -m scripts.seed` work again from `fastapi-app`
+- [x] Plan 1.7: Gap closure — restore Docker runtime PostgreSQL credentials so `alembic upgrade head` and `python -m scripts.seed` work again from `fastapi-app`
 
 ---
 
@@ -129,6 +129,7 @@ Plans:
 **Goal:** The LangChain ReAct agent answers student academic questions in Portuguese, using MCP tools for live data and PGVector RAG for regulation and policy, with any LLM provider configurable by environment variable.
 **Depends on:** Phase 4
 **Requirements:** AI-01, AI-02, AI-03, AI-04, AI-05
+**Verification:** `complete` — plans `05-01` through `05-07` are complete, `05-UAT.md` closed at `4/4` passing, `05-VERIFICATION.md` closed with no open gaps, and the live `langchain-service` is healthy with `/health` returning `{"status":"healthy"}`.
 
 ### Success Criteria
 1. Agent receives a student message, selects appropriate MCP tools, calls them, and generates a coherent Portuguese-language response — observable end-to-end without WhatsApp by directly invoking the service HTTP endpoint.
@@ -181,5 +182,5 @@ Plans:
 | 2. Authentication | 4/4 | Complete | 2026-04-24 |
 | 3. Business Feature Slices | 14/14 | Complete | 2026-04-25 |
 | 4. MCP Server | 6/6 | Complete | 2026-04-25 |
-| 5. AI Service | 5/5 | In Progress (verification gaps) | - |
+| 5. AI Service | 7/7 | Complete | 2026-04-26 |
 | 6. WhatsApp Webhook & Integration | 0/4 | Planned | - |
