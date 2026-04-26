@@ -5,9 +5,11 @@ from __future__ import annotations
 from types import SimpleNamespace
 
 import pytest
+from fastapi import HTTPException, status
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 
 from ai_service.agent import _extract_response_text
+from ai_service import main
 from ai_service.main import ChatRequest, app, chat
 
 
@@ -23,6 +25,25 @@ def test_extract_response_text_uses_last_ai_message() -> None:
     }
 
     assert _extract_response_text(result) == "Voce pode cursar ALG001."
+
+
+@pytest.mark.asyncio
+async def test_chat_requires_internal_service_token(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(main, "settings", SimpleNamespace(MCP_SERVICE_TOKEN="shared-token"))
+
+    with pytest.raises(HTTPException) as exc_info:
+        await main.require_service_token("wrong-token")
+
+    assert exc_info.value.status_code == status.HTTP_401_UNAUTHORIZED
+
+    with pytest.raises(HTTPException) as missing_exc:
+        await main.require_service_token(None)
+
+    assert missing_exc.value.status_code == status.HTTP_401_UNAUTHORIZED
+
+    await main.require_service_token("shared-token")
 
 
 @pytest.mark.asyncio

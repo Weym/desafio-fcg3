@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
+import hmac
 import logging
 from contextlib import asynccontextmanager
 from pathlib import Path
 
 import uvicorn
-from fastapi import FastAPI, HTTPException, Request, status
+from fastapi import Depends, FastAPI, Header, HTTPException, Request, status
 from pydantic import BaseModel
 
 from ai_service.agent import invoke_agent
@@ -15,6 +16,35 @@ from ai_service.config import settings
 from ai_service.database import check_db_health, create_pool, save_chat_message
 
 logger = logging.getLogger(__name__)
+
+
+async def require_service_token(
+    x_service_token: str | None = Header(default=None, alias="X-Service-Token"),
+) -> None:
+    """Require the shared internal service token before accepting chat requests."""
+
+    if x_service_token is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="X-Service-Token header required",
+        )
+
+    expected_token = settings.MCP_SERVICE_TOKEN
+    if not expected_token:
+        logger.error("AI service chat auth is not configured")
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Chat authentication is not configured",
+        )
+
+    if not hmac.compare_digest(
+        x_service_token.encode("utf-8"),
+        expected_token.encode("utf-8"),
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Service token invalid",
+        )
 
 
 class ChatRequest(BaseModel):
@@ -73,7 +103,10 @@ async def health_check(request: Request) -> dict[str, str]:
 
 
 @app.post("/chat", response_model=ChatResponse)
-async def chat(request: ChatRequest) -> ChatResponse:
+async def chat(
+    request: ChatRequest,
+    _: None = Depends(require_service_token),
+) -> ChatResponse:
     """Process a student message through the AI agent."""
 
     try:

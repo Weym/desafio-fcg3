@@ -84,8 +84,6 @@ services:
   langchain-service:
     build: ./ai_service
     container_name: fcg3-ai
-    ports:
-      - "8001:8001"
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -126,8 +124,6 @@ services:
   mcp-server:
     build: ./mcp_server
     container_name: fcg3-mcp
-    ports:
-      - "8002:8002"
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
