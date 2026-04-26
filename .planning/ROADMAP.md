@@ -13,7 +13,7 @@
 - [x] **Phase 2: Authentication** — OTP email flow, JWT with roles, session revocation, auth middleware
 - [x] **Phase 3: Business Feature Slices** — All FastAPI feature endpoints (students, courses, enrollment, grades, documents, appointments, staff dashboard)
 - [x] **Phase 4: MCP Server** — 16 tools over streamable-http, student_id injection, mcp_action_logs
-- [x] **Phase 5: AI Service** — LangChain ReAct agent, RAG pipeline, provider-agnostic LLM, knowledge base ingest
+- [ ] **Phase 5: AI Service** — LangChain ReAct agent, RAG pipeline, provider-agnostic LLM, knowledge base ingest (reopened after partial UAT)
 - [ ] **Phase 6: WhatsApp Webhook & Integration** — End-to-end chatbot flow, webhook hardening, chat visibility, test suite
 
 ---
@@ -129,7 +129,7 @@ Plans:
 **Goal:** The LangChain ReAct agent answers student academic questions in Portuguese, using MCP tools for live data and PGVector RAG for regulation and policy, with any LLM provider configurable by environment variable.
 **Depends on:** Phase 4
 **Requirements:** AI-01, AI-02, AI-03, AI-04, AI-05
-**Verification:** `complete` — plans `05-01` through `05-07` are complete, `05-VALIDATION.md` closed the 2026-04-26 Nyquist audit, `05-UAT.md` closed at `4/4` passing, `05-VERIFICATION.md` closed with no open gaps, the AI-service suite is green at `16 passed`, and the live `langchain-service` is healthy with `/health` returning `{"status":"healthy"}`.
+**Verification:** `reopened` — plans `05-01` through `05-07` remain complete, but resumed UAT on 2026-04-26 reopened the phase with three blockers in `05-UAT.md`: host-level `localhost:8001/health` is no longer reachable under the secured compose topology, `python -m ai_service.ingest` fails with an invalid OpenAI API key, and authorized `/chat` requests return fallback because inserts into `chat_messages` violate the live `id` NOT NULL constraint. Phase 06 is blocked until these gaps are closed.
 
 ### Success Criteria
 1. Agent receives a student message, selects appropriate MCP tools, calls them, and generates a coherent Portuguese-language response — observable end-to-end without WhatsApp by directly invoking the service HTTP endpoint.
@@ -182,5 +182,5 @@ Plans:
 | 2. Authentication | 4/4 | Complete | 2026-04-24 |
 | 3. Business Feature Slices | 14/14 | Complete | 2026-04-25 |
 | 4. MCP Server | 6/6 | Complete | 2026-04-25 |
-| 5. AI Service | 7/7 | Complete | 2026-04-26 |
-| 6. WhatsApp Webhook & Integration | 0/4 | Planned | - |
+| 5. AI Service | 7/7 | Reopened | - |
+| 6. WhatsApp Webhook & Integration | 0/4 | Blocked by Phase 5 | - |

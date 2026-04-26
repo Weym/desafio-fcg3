@@ -2,12 +2,12 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: ready
-last_updated: "2026-04-26T01:20:00.000Z"
+status: blocked
+last_updated: "2026-04-26T03:35:07.507Z"
 last_activity: 2026-04-26
 progress:
   total_phases: 6
-  completed_phases: 5
+  completed_phases: 4
   total_plans: 42
   completed_plans: 38
   percent: 90
@@ -17,9 +17,9 @@ progress:
 
 ## Current Position
 
-Phase: 06 (whatsapp-webhook-integration) — NEXT FOCUS
-Plan: 0 of 4
-Status: Phase 05 complete — Phase 06 pending start
+Phase: 05 (ai-service) — REOPENED
+Plan: gap closure pending from partial UAT
+Status: Phase 05 reopened by UAT blockers — Phase 06 blocked
 Last activity: 2026-04-26
 
 Progress: [█████████░] 90%
@@ -52,15 +52,15 @@ Progress: [█████████░] 90%
 | 2 | Authentication | complete |
 | 3 | Business Feature Slices | complete |
 | 4 | MCP Server | complete |
-| 5 | AI Service | complete |
-| 6 | WhatsApp Webhook & Integration | not_started |
+| 5 | AI Service | gaps_found |
+| 6 | WhatsApp Webhook & Integration | blocked |
 
 ## Current Focus
 
-**Phase 05 is complete and audit artifacts are synchronized**
-Phase 05 now has all seven plans complete, including gap-closure plans `05-06` and `05-07`. `05-VALIDATION.md` records the 2026-04-26 Nyquist audit closure, `05-UAT.md` is `complete` with `4/4` checks passing, `05-VERIFICATION.md` is `complete` with no open gaps, and `python -m pytest ai_service/tests -q` is green at `16 passed` while the live `langchain-service` health check returns `{"status":"healthy"}`.
-Next action: Start Phase 06 planning and execution for WhatsApp webhook and end-to-end integration.
-Resume file: None
+**Phase 05 has been reopened by resumed UAT**
+Phase 05 still has all seven implementation plans complete, but resumed UAT on 2026-04-26 found three blockers and the phase is no longer ready to hand off to Phase 06. `05-UAT.md` is now `partial` with 3 recorded issues and 3 remaining tests. The current blockers are: the AI container is healthy but no longer host-reachable at `localhost:8001`, `python -m ai_service.ingest` fails with an invalid OpenAI API key, and authorized `/chat` requests fall back because inserts into `chat_messages` violate the live `id` NOT NULL constraint.
+Next action: Diagnose and close the Phase 05 gaps before resuming Phase 06.
+Resume file: `.planning/phases/05-ai-service/05-UAT.md`
 
 ## Accumulated Context
 
@@ -111,7 +111,9 @@ Recent decisions affecting current work:
 - [Phase 05]: Normalized SQLAlchemy-style PostgreSQL URLs before psycopg usage so the AI service can share the repository DATABASE_URL contract.
 - [Phase 05]: Closed AI-01 and AI-02 by returning the last assistant-authored LangChain message and persisting the inbound user turn before agent execution.
 - [Phase 05]: Plan `05-07` restored package/runtime alignment; `fcg3-ai` is healthy and `/health` returns `{"status":"healthy"}` in the live stack.
-- [Phase 05]: Post-audit documentation is now synchronized across validation, verification, roadmap, and state artifacts; the AI-service regression suite is green at `16 passed`.
+- [Phase 05]: Resumed UAT on 2026-04-26 reopened the phase with three blockers recorded in `05-UAT.md`.
+- [Phase 05]: The secured compose topology no longer publishes AI-service port `8001` to the host, so host-level `localhost:8001/health` checks fail even though the container healthcheck passes internally.
+- [Phase 05]: The current runtime environment has an invalid OpenAI embeddings key for ingest, and the live `chat_messages` insert path fails because it does not satisfy the table's required `id` column.
 
 ### Key Decisions Pending
 
@@ -120,6 +122,7 @@ Recent decisions affecting current work:
 
 ### Known Risks
 
+- Phase 05 is not currently goal-complete: ingest cannot run with the configured OpenAI key, and live `/chat` calls fall back before agent execution completes because chat persistence fails at the database layer.
 - Phase 6 must preserve the <5s WhatsApp webhook response budget by keeping AI work in background tasks with explicit `done_callback` error logging.
 
 ### Architecture Constraints (non-negotiable)
