@@ -53,7 +53,7 @@ def test_create_llm_builds_gemini_client(monkeypatch: pytest.MonkeyPatch) -> Non
     settings = SimpleNamespace(
         LLM_PROVIDER="gemini",
         LLM_MODEL="gemini-2.5-flash",
-        GOOGLE_API_KEY="gemini-key",
+        GEMINI_API_KEY="gemini-key",
     )
 
     llm = create_llm(settings)

@@ -37,7 +37,7 @@ def create_llm(settings: Any) -> "BaseChatModel":
 
         return ChatGoogleGenerativeAI(
             model=settings.LLM_MODEL,
-            google_api_key=settings.GOOGLE_API_KEY,
+            google_api_key=settings.GEMINI_API_KEY,
         )
 
     raise ValueError(

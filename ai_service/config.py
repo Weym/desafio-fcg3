@@ -19,7 +19,7 @@ class Settings:
     LLM_MODEL: str = os.environ.get("LLM_MODEL", "gpt-4o")
     MCP_SERVICE_TOKEN: str | None = os.environ.get("MCP_SERVICE_TOKEN")
     OPENAI_API_KEY: str | None = os.environ.get("OPENAI_API_KEY")
-    GOOGLE_API_KEY: str | None = os.environ.get("GOOGLE_API_KEY")
+    GEMINI_API_KEY: str | None = os.environ.get("GEMINI_API_KEY")
     MCP_SERVER_URL: str = os.environ.get(
         "MCP_SERVER_URL",
         "http://mcp-server:8002/mcp",
