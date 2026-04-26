@@ -1,6 +1,6 @@
 ---
 phase: 05-ai-service
-verified: 2026-04-26T00:35:00Z
+verified: 2026-04-26T01:20:00Z
 status: complete
 score: 5/5 must-haves verified
 overrides_applied: 0
@@ -21,13 +21,13 @@ gaps: []
 # Phase 5: AI Service Verification Report
 
 **Phase Goal:** The AI service can ingest academic knowledge, rebuild chat memory, call MCP tools through a provider-agnostic LangChain agent, and answer `/chat` requests with a student-facing Portuguese response.
-**Verified:** 2026-04-26T00:35:00Z
+**Verified:** 2026-04-26T01:20:00Z
 **Status:** complete
 **Re-verification:** Yes - after gap closure
 
 ## Verdict
 
-Phase 05 is complete. The previously closed code gaps remain closed, `AI-RUNTIME-01` was corrected by plan `05-07`, `docker compose ps` now shows `fcg3-ai` as `healthy`, `curl -sf http://localhost:8001/health` returns `{"status":"healthy"}`, `python -m pytest ai_service/tests -q` returns `7 passed`, and `/gsd-verify-work 05` concluded the phase as `complete` with `05-UAT.md` updated to `4/4` tests passing.
+Phase 05 is complete. The previously closed code gaps remain closed, `AI-RUNTIME-01` was corrected by plan `05-07`, `05-VALIDATION.md` now records the Nyquist audit closure, `docker compose ps` now shows `fcg3-ai` as `healthy`, `curl -sf http://localhost:8001/health` returns `{"status":"healthy"}`, `python -m pytest ai_service/tests -q` returns `16 passed`, and `/gsd-verify-work 05` concluded the phase as `complete` with `05-UAT.md` updated to `4/4` tests passing.
 
 ## Requirement Status
 
@@ -43,7 +43,7 @@ Phase 05 is complete. The previously closed code gaps remain closed, `AI-RUNTIME
 
 | Check | Result |
 | --- | --- |
-| `python -m pytest ai_service/tests -q` | PASS - `7 passed` |
+| `python -m pytest ai_service/tests -q` | PASS - `16 passed in 5.37s` |
 | `python -c "import ast; ast.parse(open('ai_service/agent.py').read()); ast.parse(open('ai_service/main.py').read())"` | PASS |
 | `python -c "import ast; ast.parse(open('ai_service/rag.py').read())"` + pattern assertions | PASS |
 | `python -c "import ast; ast.parse(open('ai_service/config.py').read()); ast.parse(open('ai_service/llm_factory.py').read())"` + provider pattern assertions | PASS |
@@ -66,4 +66,4 @@ Phase 05 is complete. The previously closed code gaps remain closed, `AI-RUNTIME
 
 ## Final Outcome
 
-`/gsd-verify-work 05` concluded the phase as `complete`, with all must-have requirements verified, live runtime checks passing, and UAT recorded as `4/4` passing.
+`/gsd-verify-work 05` concluded the phase as `complete`, with all must-have requirements verified, the Nyquist validation artifact synchronized, live runtime checks passing, and UAT recorded as `4/4` passing.

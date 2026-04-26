@@ -129,14 +129,14 @@ Plans:
 **Goal:** The LangChain ReAct agent answers student academic questions in Portuguese, using MCP tools for live data and PGVector RAG for regulation and policy, with any LLM provider configurable by environment variable.
 **Depends on:** Phase 4
 **Requirements:** AI-01, AI-02, AI-03, AI-04, AI-05
-**Verification:** `complete` — plans `05-01` through `05-07` are complete, `05-UAT.md` closed at `4/4` passing, `05-VERIFICATION.md` closed with no open gaps, and the live `langchain-service` is healthy with `/health` returning `{"status":"healthy"}`.
+**Verification:** `complete` — plans `05-01` through `05-07` are complete, `05-VALIDATION.md` closed the 2026-04-26 Nyquist audit, `05-UAT.md` closed at `4/4` passing, `05-VERIFICATION.md` closed with no open gaps, the AI-service suite is green at `16 passed`, and the live `langchain-service` is healthy with `/health` returning `{"status":"healthy"}`.
 
 ### Success Criteria
 1. Agent receives a student message, selects appropriate MCP tools, calls them, and generates a coherent Portuguese-language response — observable end-to-end without WhatsApp by directly invoking the service HTTP endpoint.
 2. Conversation context is rebuilt from the last 20 messages stored in `chat_messages` on every invocation; restarting the langchain-service container does not lose conversation history.
 3. RAG retriever finds relevant policy chunks from the knowledge base with cosine similarity threshold calibrated at ≥ 0.75 (distance ≤ 0.25); irrelevant queries return no RAG context rather than noisy chunks.
 4. Setting `LLM_PROVIDER=gemini` in the environment switches the agent to Gemini without any code changes; setting `LLM_PROVIDER=openai` uses OpenAI — both produce valid responses.
-5. Running `python scripts/ingest.py` processes all five knowledge base documents (`matricula.md`, `regulamento.pdf`, `faq.md`, `calendario.md`, `curriculo.md`), generates embeddings, and stores chunks in `knowledge_base_chunks`.
+5. Running `python -m ai_service.ingest` processes all five knowledge base documents (`matricula.md`, `regulamento.pdf`, `faq.md`, `calendario.md`, `curriculo.md`), generates embeddings, and stores chunks in `knowledge_base_chunks`.
 
 **Plans:** 7 plans
 

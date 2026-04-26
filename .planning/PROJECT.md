@@ -29,6 +29,9 @@ Aluno envia mensagem no WhatsApp e recebe resposta precisa sobre sua situação 
 - ✓ Cursos & Currículo: listagem, detalhe, árvore recursiva de pré-requisitos — validated in Phase 3
 - ✓ Alunos: CRUD, resumo acadêmico com CRA, cursos disponíveis com filtro de pré-requisitos — validated in Phase 3
 - ✓ Staff Dashboard: KPIs agregados de todos os domínios — validated in Phase 3
+- ✓ AI Service: agente ReAct em LangChain com MCP tools, resposta em português e regressões de chat/runtime — validated in Phase 5
+- ✓ AI Service: pipeline RAG com threshold 0.75 e ingest da knowledge base em `ai_service/ingest.py` — validated in Phase 5
+- ✓ AI Service: provider agnóstico via `LLM_PROVIDER` (`openai`/`gemini`) — validated in Phase 5
 
 ### Active
 
@@ -37,14 +40,6 @@ Aluno envia mensagem no WhatsApp e recebe resposta precisa sobre sua situação 
 **Backend (FastAPI):**
 - [ ] Webhook WhatsApp: validação HMAC-SHA256, save de mensagem, despacho assíncrono
 - [ ] Testes: cobertura dos fluxos críticos (matrícula, webhook, middleware IDOR)
-
-**AI Service (LangChain):**
-- [ ] ReAct agent com ConversationBufferWindowMemory (k=20)
-- [ ] RAG pipeline: PGVector retriever com threshold 0.75 cosine similarity
-- [ ] LLM provider agnóstico — configurado via variável de ambiente (suporte a OpenAI e Gemini)
-- [ ] Script de ingestão de knowledge base (`scripts/ingest.py`)
-- [ ] Knowledge base inicial: `matricula.md`, `regulamento.pdf`, `faq.md`, `calendario.md`, `curriculo.md`
-- [ ] Tratamento de mensagens de mídia (resposta padrão sem processar pelo agente)
 
 **MCP Server:**
 - [x] 16 ferramentas documentadas em `docs/mcp.md` implementadas — validated in Phase 4
@@ -64,7 +59,7 @@ Aluno envia mensagem no WhatsApp e recebe resposta precisa sobre sua situação 
 
 ## Context
 
-- Monorepo: `backend/` (FastAPI), `mobile/` (Flutter) e `mcp_server/` implementado; `ai_service/` permanece como próximo serviço a criar na Phase 5
+- Monorepo: `backend/` (FastAPI), `mobile/` (Flutter), `mcp_server/` e `ai_service/` implementados no workspace atual
 - Banco: PostgreSQL 16 + PGVector. Schema completo documentado em `docs/database.md` (17 tabelas, HNSW index)
 - Embedding model: `text-embedding-3-small` (OpenAI, 1536 dimensões) — fixo no schema
 - LLM provider: a definir por terceiro — arquitetura deve suportar troca por variável de ambiente
@@ -99,7 +94,8 @@ Aluno envia mensagem no WhatsApp e recebe resposta precisa sobre sua situação 
 - Phase 2 concluída: autenticação completa via OTP/email (Resend), JWT com roles (student/staff), refresh-token rotation com SELECT FOR UPDATE, middleware de auth (get_current_user, require_role, require_service_token), rate limiting via SlowAPI, 47 testes passando.
 - Phase 3 concluída: 7 feature slices (Students, Courses, Enrollment, Grades, Documents, Appointments, Staff Dashboard) com 35 endpoints REST, IDOR protection, dual-auth (JWT + X-Service-Token), state machine enforcement, SELECT FOR UPDATE para booking e enrollment confirmation, CRA calculation, recursive CTE para prerequisite tree. Bug de SELECT FOR UPDATE com outer join corrigido em UAT.
 - Phase 4 concluída: MCP Server com as 16 tools documentadas em `docs/mcp.md`, injeção de `student_id` por contexto de sessão, `mcp_action_logs`, gap closures 04-05/04-06 e audit Nyquist concluído em 2026-04-25.
-- Próximo foco: Phase 5 (AI Service) — agente LangChain ReAct, pipeline RAG, provider agnóstico e ingest da base de conhecimento.
+- Phase 5 concluída: AI Service com agente LangChain ReAct, pipeline RAG, provider agnóstico, ingest da base de conhecimento, auditoria Nyquist fechada em `05-VALIDATION.md` e suíte `ai_service/tests` verde com `16 passed`.
+- Próximo foco: Phase 6 (WhatsApp Webhook & Integration) — fluxo fim a fim do chatbot, hardening do webhook, visibilidade de chat e suite de integração.
 
 ## Evolution
 
@@ -119,4 +115,4 @@ Este documento evolui a cada transição de fase e marco de milestone.
 4. Atualizar Context com estado atual
 
 ---
-*Last updated: 2026-04-25 after Phase 4 Nyquist audit completion*
+*Last updated: 2026-04-26 after Phase 5 Nyquist audit closure*

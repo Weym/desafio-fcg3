@@ -128,7 +128,7 @@
 - [x] **AI-02**: Memória de conversa é reconstruída do banco a cada invocação (últimas 20 mensagens da sessão) — não depende de estado em memória
 - [x] **AI-03**: RAG busca chunks relevantes no PGVector com threshold de distância coseno calibrado (baseline: ≤ 0.25 de distância = ≥ 0.75 de similaridade)
 - [x] **AI-04**: LLM provider é configurável via variável de ambiente `LLM_PROVIDER` (valores: `openai`, `gemini`) — troca de provider não requer alteração de código
-- [x] **AI-05**: Script `scripts/ingest.py` ingere documentos da knowledge base (`matricula.md`, `regulamento.pdf`, `faq.md`, `calendario.md`, `curriculo.md`) gerando embeddings e armazenando chunks no PGVector
+- [x] **AI-05**: Script `ai_service/ingest.py` (executável via `python -m ai_service.ingest`) ingere documentos da knowledge base (`matricula.md`, `regulamento.pdf`, `faq.md`, `calendario.md`, `curriculo.md`) gerando embeddings e armazenando chunks no PGVector
 
 ---
 

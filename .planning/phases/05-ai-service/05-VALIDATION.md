@@ -1,9 +1,9 @@
 ---
 phase: 5
 slug: ai-service
-status: draft
+status: complete
 nyquist_compliant: true
-wave_0_complete: false
+wave_0_complete: true
 created: 2026-04-23
 ---
 
@@ -18,9 +18,9 @@ created: 2026-04-23
 | Property | Value |
 |----------|-------|
 | **Framework** | AST parse checks (Waves 1-2) + pytest 8.x with mocked LLM/embeddings (Wave 3) |
-| **Config file** | `ai_service/pyproject.toml` or inline — created by Wave 0 if absent |
-| **Quick run command** | `python -c "import ast; ast.parse(open('ai_service/main.py').read()); print('OK')"` |
-| **Full suite command** | `python -m pytest ai_service/tests/ -v --tb=short` |
+| **Config file** | Inline pytest defaults; no ai_service-specific config file |
+| **Quick run command** | `python -m pytest ai_service/tests/test_agent_flow.py -q` |
+| **Full suite command** | `python -m pytest ai_service/tests -q` |
 | **Estimated runtime** | AST checks ~2s · unit ~10s · integration (mocked LLM) ~20s |
 
 ---
@@ -28,7 +28,7 @@ created: 2026-04-23
 ## Sampling Rate
 
 - **After every task commit:** Run the task-scoped `<automated>` verify command from the plan
-- **After every plan wave:** Run `python -m pytest ai_service/tests/ -v --tb=short` (when tests exist)
+- **After every plan wave:** Run `python -m pytest ai_service/tests -q` (when tests exist)
 - **Before `/gsd-verify-work`:** Full suite must be green + Docker healthcheck `curl -sf http://localhost:8001/health`
 - **Max feedback latency:** 20 seconds
 
@@ -38,14 +38,14 @@ created: 2026-04-23
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 5-01-01 | 01 | 1 | AI-01,AI-04 | — | Config with LLM_PROVIDER/LLM_MODEL env vars; system prompt in Portuguese; requirements.txt with pinned versions; no hardcoded API keys | AST parse + file check | `python -c "import ast; ast.parse(open('ai_service/config.py').read()); print('config OK')" && python -c "f=open('ai_service/prompts/system_prompt.txt'); c=f.read(); assert len(c) > 100, 'prompt too short'; print('prompt OK')" && python -c "f=open('ai_service/requirements.txt'); lines=[l.strip() for l in f if l.strip()]; assert len(lines) >= 10, f'only {len(lines)} deps'; print('requirements OK')"` | ✅ | ⬜ pending |
-| 5-01-02 | 01 | 1 | AI-01,AI-04 | — | Database layer with psycopg3 pool; LLM factory using create_agent model string format (openai:model, google_genai:model); FastAPI app with /health and placeholder /chat | AST parse | `python -c "import ast; ast.parse(open('ai_service/database.py').read()); ast.parse(open('ai_service/llm_factory.py').read()); ast.parse(open('ai_service/main.py').read()); print('All files parse OK')"` | ✅ | ⬜ pending |
-| 5-02-01 | 02 | 1 | AI-05 | — | 5 knowledge base documents present (matricula.md, faq.md, calendario.md, curriculo.md, regulamento.pdf) | file check | `python -c "import os; files = os.listdir('ai_service/knowledge'); expected = {'matricula.md', 'faq.md', 'calendario.md', 'curriculo.md', 'regulamento.pdf'}; missing = expected - set(files); assert not missing, f'Missing: {missing}'; print(f'All {len(expected)} files present')"` | ✅ | ⬜ pending |
-| 5-02-02 | 02 | 1 | AI-05 | — | Ingest script: delete-then-insert per source; text-embedding-3-small model; CATEGORY_MAP for 6 categories; RecursiveCharacterTextSplitter token-based (500 tokens, overlap 50) | AST parse + pattern check | `python -c "import ast; ast.parse(open('ai_service/ingest.py').read()); print('ingest.py parses OK')" && python -c "import re; code=open('ai_service/ingest.py').read(); assert 'DELETE FROM knowledge_base_chunks' in code, 'missing delete'; assert 'text-embedding-3-small' in code, 'missing embedding model'; assert 'CATEGORY_MAP' in code, 'missing category map'; assert 'RecursiveCharacterTextSplitter' in code, 'missing splitter'; print('All patterns present')"` | ✅ | ⬜ pending |
-| 5-03-01 | 03 | 2 | AI-03 | — | RAG tool with @tool decorator; pgvector cosine similarity; threshold 0.75; LIMIT 3 chunks; embed_query for query embedding | AST parse + pattern check | `python -c "import ast; ast.parse(open('ai_service/rag.py').read()); print('rag.py parses OK')" && python -c "code=open('ai_service/rag.py').read(); assert 'search_knowledge_base' in code; assert '0.75' in code; assert 'embed_query' in code; assert 'LIMIT 3' in code; assert '@tool' in code; print('All RAG patterns present')"` | ✅ | ⬜ pending |
-| 5-04-01 | 04 | 2 | AI-01,AI-02,AI-04 | — | MCP tool loading via MultiServerMCPClient with X-Chat-Session-ID header per request; get_tools for schema discovery | AST parse + pattern check | `python -c "import ast; ast.parse(open('ai_service/mcp_tools.py').read()); print('mcp_tools.py parses OK')" && python -c "code=open('ai_service/mcp_tools.py').read(); assert 'MultiServerMCPClient' in code; assert 'X-Chat-Session-ID' in code; assert 'get_tools' in code; print('MCP patterns present')"` | ✅ | ⬜ pending |
-| 5-04-02 | 04 | 2 | AI-01,AI-02,AI-04 | — | ReAct agent factory with create_agent; MCP tools + RAG tool bound; conversation history loaded from chat_messages (last 20); provider-agnostic model string; fallback message on error | AST parse + pattern check | `python -c "import ast; ast.parse(open('ai_service/agent.py').read()); print('agent.py parses OK')" && python -c "code=open('ai_service/agent.py').read(); assert 'create_agent' in code; assert 'load_mcp_tools' in code; assert 'create_rag_tool' in code; assert 'load_chat_history' in code; assert 'FALLBACK_MESSAGE' in code; assert 'ainvoke' in code; print('All agent patterns present')"` | ✅ | ⬜ pending |
-| 5-05-01 | 05 | 3 | AI-01,AI-02 | — | /chat endpoint: receives message + session_id; invokes agent; saves user message and assistant response to chat_messages; no 501 placeholder | AST parse + pattern check | `python -c "import ast; ast.parse(open('ai_service/main.py').read()); print('main.py parses OK')" && python -c "code=open('ai_service/main.py').read(); assert 'invoke_agent' in code; assert 'save_chat_message' in code; assert 'ChatRequest' in code; assert 'ChatResponse' in code; assert '501' not in code or 'Not implemented' not in code; print('Endpoint patterns present, placeholder removed')"` | ✅ | ⬜ pending |
+| 5-01-01 | 01 | 1 | AI-01,AI-04 | — | Config with LLM_PROVIDER/LLM_MODEL env vars; system prompt in Portuguese; requirements.txt with pinned versions; no hardcoded API keys | AST parse + file check | `python -c "import ast; ast.parse(open('ai_service/config.py').read()); print('config OK')" && python -c "f=open('ai_service/prompts/system_prompt.txt'); c=f.read(); assert len(c) > 100, 'prompt too short'; print('prompt OK')" && python -c "f=open('ai_service/requirements.txt'); lines=[l.strip() for l in f if l.strip()]; assert len(lines) >= 10, f'only {len(lines)} deps'; print('requirements OK')"` | ✅ | ✅ green |
+| 5-01-02 | 01 | 1 | AI-01,AI-04 | — | Database layer with psycopg3 pool; LLM factory using create_agent model string format (openai:model, google_genai:model); FastAPI app with /health and placeholder /chat | AST parse + unit | `python -c "import ast; ast.parse(open('ai_service/database.py').read()); ast.parse(open('ai_service/llm_factory.py').read()); ast.parse(open('ai_service/main.py').read()); print('All files parse OK')" && python -m pytest ai_service/tests/test_llm_factory.py -q` | ✅ | ✅ green |
+| 5-02-01 | 02 | 1 | AI-05 | — | 5 knowledge base documents present (matricula.md, faq.md, calendario.md, curriculo.md, regulamento.pdf) | file check | `python -c "import os; files = os.listdir('ai_service/knowledge'); expected = {'matricula.md', 'faq.md', 'calendario.md', 'curriculo.md', 'regulamento.pdf'}; missing = expected - set(files); assert not missing, f'Missing: {missing}'; print(f'All {len(expected)} files present')"` | ✅ | ✅ green |
+| 5-02-02 | 02 | 1 | AI-05 | — | Ingest script: delete-then-insert per source; text-embedding-3-small model; CATEGORY_MAP for 6 categories; RecursiveCharacterTextSplitter token-based (500 tokens, overlap 50) | AST parse + pattern check + integration | `python -c "import ast; ast.parse(open('ai_service/ingest.py').read()); print('ingest.py parses OK')" && python -c "code=open('ai_service/ingest.py').read(); assert 'DELETE FROM knowledge_base_chunks' in code; assert 'text-embedding-3-small' in code; assert 'CATEGORY_MAP' in code; assert 'RecursiveCharacterTextSplitter' in code; print('All patterns present')" && python -m pytest ai_service/tests/test_ingest.py -q` | ✅ | ✅ green |
+| 5-03-01 | 03 | 2 | AI-03 | — | RAG tool with @tool decorator; pgvector cosine similarity; threshold 0.75; LIMIT 3 chunks; embed_query for query embedding | AST parse + pattern check + unit | `python -c "import ast; ast.parse(open('ai_service/rag.py').read()); print('rag.py parses OK')" && python -c "code=open('ai_service/rag.py').read(); assert 'search_knowledge_base' in code; assert '0.75' in code; assert 'embed_query' in code; assert 'LIMIT 3' in code; assert '@tool' in code; print('All RAG patterns present')" && python -m pytest ai_service/tests/test_rag_retrieval.py -q` | ✅ | ✅ green |
+| 5-04-01 | 04 | 2 | AI-01,AI-02,AI-04 | — | MCP tool loading via MultiServerMCPClient with X-Chat-Session-ID header per request; get_tools for schema discovery | AST parse + pattern check | `python -c "import ast; ast.parse(open('ai_service/mcp_tools.py').read()); print('mcp_tools.py parses OK')" && python -c "code=open('ai_service/mcp_tools.py').read(); assert 'MultiServerMCPClient' in code; assert 'X-Chat-Session-ID' in code; assert 'get_tools' in code; print('MCP patterns present')"` | ✅ | ✅ green |
+| 5-04-02 | 04 | 2 | AI-01,AI-02,AI-04 | — | ReAct agent factory with create_agent; MCP tools + RAG tool bound; conversation history loaded from chat_messages (last 20); provider-agnostic model string; fallback message on error | AST parse + pattern check + integration | `python -c "import ast; ast.parse(open('ai_service/agent.py').read()); print('agent.py parses OK')" && python -c "code=open('ai_service/agent.py').read(); assert 'create_agent' in code; assert 'load_mcp_tools' in code; assert 'create_rag_tool' in code; assert 'load_chat_history' in code; assert 'FALLBACK_MESSAGE' in code; assert 'ainvoke' in code; print('All agent patterns present')" && python -m pytest ai_service/tests/test_agent_flow.py -q && python -m pytest ai_service/tests/test_conversation_memory.py -q && python -m pytest ai_service/tests/test_llm_factory.py -q` | ✅ | ✅ green |
+| 5-05-01 | 05 | 3 | AI-01,AI-02 | — | /chat endpoint: receives message + session_id; invokes agent; saves user message and assistant response to chat_messages; no 501 placeholder | AST parse + pattern check + integration | `python -c "import ast; ast.parse(open('ai_service/main.py').read()); print('main.py parses OK')" && python -c "code=open('ai_service/main.py').read(); assert 'invoke_agent' in code; assert 'save_chat_message' in code; assert 'ChatRequest' in code; assert 'ChatResponse' in code; assert '501' not in code or 'Not implemented' not in code; print('Endpoint patterns present, placeholder removed')" && python -m pytest ai_service/tests/test_chat_gap_closure.py -q && python -m pytest ai_service/tests/test_agent_flow.py -q` | ✅ | ✅ green |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -55,11 +55,11 @@ created: 2026-04-23
 
 | Test ID | Scope | Requirements | Test Type | Automated Command | File Exists | Status |
 |---------|-------|-------------|-----------|-------------------|-------------|--------|
-| V-05-01 | Agent processes message, selects MCP tools, generates Portuguese response (mocked LLM + mocked MCP) | AI-01 | integration | `python -m pytest ai_service/tests/test_agent_flow.py -x` | ❌ W0 | ⬜ pending |
-| V-05-02 | Conversation history rebuilt from last 20 messages in chat_messages; restart does not lose context | AI-02 | integration | `python -m pytest ai_service/tests/test_conversation_memory.py -x` | ❌ W0 | ⬜ pending |
-| V-05-03 | RAG retriever returns only chunks with cosine similarity >= 0.75; irrelevant queries return empty | AI-03 | unit | `python -m pytest ai_service/tests/test_rag_retrieval.py -x` | ❌ W0 | ⬜ pending |
-| V-05-04 | LLM_PROVIDER=openai uses openai:model; LLM_PROVIDER=gemini uses google_genai:model; no code changes needed | AI-04 | unit | `python -m pytest ai_service/tests/test_llm_factory.py -x` | ❌ W0 | ⬜ pending |
-| V-05-05 | Ingest script processes all 5 knowledge base documents, generates embeddings, stores chunks with correct categories | AI-05 | integration | `python -m pytest ai_service/tests/test_ingest.py -x` | ❌ W0 | ⬜ pending |
+| V-05-01 | Agent processes message, selects MCP tools, generates Portuguese response (mocked LLM + mocked MCP) | AI-01 | integration | `python -m pytest ai_service/tests/test_agent_flow.py -q` | ✅ | ✅ green |
+| V-05-02 | Conversation history rebuilt from last 20 messages in chat_messages; restart does not lose context | AI-02 | integration | `python -m pytest ai_service/tests/test_conversation_memory.py -q` | ✅ | ✅ green |
+| V-05-03 | RAG retriever returns only chunks with cosine similarity >= 0.75; irrelevant queries return empty | AI-03 | unit | `python -m pytest ai_service/tests/test_rag_retrieval.py -q` | ✅ | ✅ green |
+| V-05-04 | LLM_PROVIDER=openai uses openai:model; LLM_PROVIDER=gemini uses google_genai:model; no code changes needed | AI-04 | unit | `python -m pytest ai_service/tests/test_llm_factory.py -q` | ✅ | ✅ green |
+| V-05-05 | Ingest script processes all 5 knowledge base documents, generates embeddings, stores chunks with correct categories | AI-05 | integration | `python -m pytest ai_service/tests/test_ingest.py -q` | ✅ | ✅ green |
 
 ### Coverage Matrix (Success Criteria -> Validations)
 
@@ -75,18 +75,19 @@ created: 2026-04-23
 
 ## Wave 0 Requirements
 
-Test stubs and infrastructure to be created alongside or after plan execution:
+Wave 0 coverage is satisfied by self-contained pytest modules; no shared `conftest.py` or `requirements-dev.txt` was required in the current repo state.
 
-- [ ] `ai_service/tests/__init__.py` — package marker
-- [ ] `ai_service/tests/conftest.py` — shared fixtures: mock psycopg3 connection, mock OpenAIEmbeddings, mock LLM (FakeListChatModel or similar), mock MCP tools, seed chat_messages rows
-- [ ] `ai_service/tests/test_agent_flow.py` — stubs for V-05-01 (mocked LLM + mocked MCP tools)
-- [ ] `ai_service/tests/test_conversation_memory.py` — stubs for V-05-02 (load_chat_history with DB fixture)
-- [ ] `ai_service/tests/test_rag_retrieval.py` — stubs for V-05-03 (cosine similarity threshold)
-- [ ] `ai_service/tests/test_llm_factory.py` — stubs for V-05-04 (model string generation per provider)
-- [ ] `ai_service/tests/test_ingest.py` — stubs for V-05-05 (mocked embeddings + DB)
-- [ ] `ai_service/requirements-dev.txt` — `pytest>=8`, `pytest-asyncio>=0.23`, `pytest-mock>=3.12`
+- [x] `ai_service/tests/__init__.py` — package marker
+- [x] `ai_service/tests/test_chat_gap_closure.py` — persistence and assistant-only response extraction regressions retained from Plan 05-06
+- [x] `ai_service/tests/test_runtime_entrypoint.py` — runtime bootstrap regressions retained from Plan 05-07
+- [x] `ai_service/tests/test_agent_flow.py` — behavioral integration for mocked MCP/RAG wiring and Portuguese response path
+- [x] `ai_service/tests/test_conversation_memory.py` — behavioral integration for last-20 chat history rebuild during invocation
+- [x] `ai_service/tests/test_rag_retrieval.py` — unit coverage for the 0.75 threshold contract and empty fallback
+- [x] `ai_service/tests/test_llm_factory.py` — unit coverage for provider switching and model-string generation
+- [x] `ai_service/tests/test_ingest.py` — integration coverage for known-doc processing, category mapping, DB writes, and audit summary
+- [x] Shared fixtures and extra dev-requirements files were not needed; each test module uses local fakes/`monkeypatch`, and `python -m pytest ai_service/tests -q` passes in the current repo environment.
 
-*Note: Waves 1-2 rely on AST parse checks and pattern assertions since the AI service has external dependencies (LLM APIs, MCP server) that cannot be tested without mocks. Wave 0 test stubs provide the mocking infrastructure.*
+*Note: Waves 1-2 still rely on AST parse checks and pattern assertions for structure-level guarantees, while the completed Wave 0 suite now covers the requirement-level behaviors with mocks and local fakes.*
 
 ---
 
@@ -104,9 +105,17 @@ Test stubs and infrastructure to be created alongside or after plan execution:
 
 - [x] All tasks have `<automated>` verify or Wave 0 dependencies
 - [x] Sampling continuity: no 3 consecutive tasks without automated verify
-- [x] Wave 0 covers all MISSING references (7 test files + conftest + requirements-dev)
+- [x] Wave 0 closes all requirement-level gaps with 7 green test modules and 16 passing tests in `ai_service/tests/`
 - [x] No watch-mode flags
 - [x] Feedback latency < 20s
 - [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** approved 2026-04-23 (by planner; awaits execution confirmation)
+**Approval:** approved 2026-04-26 after Nyquist audit closure; execution confirmed by green phase-specific tests and a green full AI-service suite (`16 passed`).
+
+## Validation Audit 2026-04-26
+
+| Metric | Count |
+|--------|-------|
+| Gaps found | 5 |
+| Resolved | 5 |
+| Escalated | 0 |
