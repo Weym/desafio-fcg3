@@ -56,14 +56,22 @@ def test_compose_limits_ai_service_env_to_runtime_dependencies() -> None:
         "\n  mcp-server:\n", 1
     )[0]
 
-    assert "DATABASE_URL: ${DATABASE_URL}" in service_section
+    # Plan 08 replaced explicit DATABASE_URL with POSTGRES_* component vars
+    # to prevent credential drift (ai_service config.py builds URL at runtime)
+    assert "POSTGRES_DB: ${POSTGRES_DB}" in service_section
+    assert "POSTGRES_USER: ${POSTGRES_USER}" in service_section
+    assert "POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}" in service_section
+    assert "POSTGRES_HOST: postgres" in service_section
+    assert "POSTGRES_PORT: 5432" in service_section
     assert "MCP_SERVICE_TOKEN: ${MCP_SERVICE_TOKEN}" in service_section
     assert "LLM_PROVIDER: ${LLM_PROVIDER}" in service_section
     assert "LLM_MODEL: ${LLM_MODEL}" in service_section
     assert "OPENAI_API_KEY: ${OPENAI_API_KEY}" in service_section
     assert "GEMINI_API_KEY: ${GEMINI_API_KEY}" in service_section
+    assert "OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}" in service_section
     assert "MCP_SERVER_URL: http://mcp-server:8002/mcp" in service_section
     assert "JWT_SECRET:" not in service_section
     assert "WHATSAPP_TOKEN:" not in service_section
     assert "RESEND_API_KEY:" not in service_section
     assert "FASTAPI_URL:" not in service_section
+    assert "DATABASE_URL:" not in service_section  # Replaced by POSTGRES_* component vars
