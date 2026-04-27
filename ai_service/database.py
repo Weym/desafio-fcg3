@@ -55,8 +55,8 @@ def save_chat_message(pool: Any, session_id: str, role: str, content: str) -> No
     """Persist a chat message for a session."""
 
     query = (
-        "INSERT INTO chat_messages (chat_session_id, role, content) "
-        "VALUES (%s, %s, %s)"
+        "INSERT INTO chat_messages (id, chat_session_id, role, content) "
+        "VALUES (gen_random_uuid(), %s, %s, %s)"
     )
 
     with pool.connection() as connection:
