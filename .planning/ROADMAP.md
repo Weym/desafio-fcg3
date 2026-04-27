@@ -149,7 +149,7 @@ Plans:
 - [x] 05-06-PLAN.md — Gap closure: assistant-only response extraction and direct `/chat` user-turn persistence regressions
 - [x] 05-07-PLAN.md — Gap closure: package-based AI service runtime alignment and startup regressions
 - [x] 05-08-PLAN.md — Gap closure: align DATABASE_URL credentials with POSTGRES_PASSWORD and fix chat_messages UUID generation
-- [ ] 05-09-PLAN.md — Gap closure: propagate POSTGRES_* component var pattern to ingest.py and fix stale regression test
+- [x] 05-09-PLAN.md — Gap closure: propagate POSTGRES_* component var pattern to ingest.py and fix stale regression test
 
 ---
 
