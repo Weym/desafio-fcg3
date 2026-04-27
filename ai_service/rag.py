@@ -5,21 +5,14 @@ from __future__ import annotations
 from typing import Any
 
 from langchain_core.tools import tool
-from langchain_openai import OpenAIEmbeddings
 
 
 SIMILARITY_THRESHOLD = 0.75
 MAX_RESULTS = 3
-EMBEDDING_MODEL = "text-embedding-3-small"
 
 
-def create_rag_tool(db_pool: Any, openai_api_key: str):
+def create_rag_tool(db_pool: Any, embeddings: Any):
     """Create the LangChain knowledge-base search tool bound to a DB pool."""
-
-    embeddings = OpenAIEmbeddings(
-        model=EMBEDDING_MODEL,
-        api_key=openai_api_key,
-    )
 
     @tool
     def search_knowledge_base(search_query: str) -> str:

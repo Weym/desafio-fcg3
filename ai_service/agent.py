@@ -10,6 +10,7 @@ from langchain.agents import create_agent
 from langchain_core.messages import AIMessage, HumanMessage
 
 from ai_service.database import load_chat_history
+from ai_service.embedding_factory import create_embeddings
 from ai_service.llm_factory import get_model_string
 from ai_service.mcp_tools import load_mcp_tools
 from ai_service.rag import create_rag_tool
@@ -83,7 +84,8 @@ async def invoke_agent(
     """
 
     mcp_tools = await load_mcp_tools(settings.MCP_SERVER_URL, session_id)
-    rag_tool = create_rag_tool(db_pool, settings.OPENAI_API_KEY)
+    embeddings = create_embeddings(settings)
+    rag_tool = create_rag_tool(db_pool, embeddings)
     agent = create_chat_agent(settings, [*mcp_tools, rag_tool], system_prompt)
 
     history_messages = load_chat_history(

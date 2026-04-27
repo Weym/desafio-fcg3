@@ -3,7 +3,6 @@ from __future__ import annotations
 import argparse
 import json
 import logging
-import os
 import time
 from collections import Counter
 from dataclasses import dataclass
@@ -17,7 +16,6 @@ from ai_service.database import normalize_psycopg_dsn
 LOGGER = logging.getLogger("ai_service.ingest")
 KNOWLEDGE_DIR = Path(__file__).parent / "knowledge"
 AUDIT_PATH = KNOWLEDGE_DIR / ".last_ingest.json"
-EMBEDDING_MODEL = "text-embedding-3-small"
 
 CATEGORY_MAP = {
     "matricula.md": "regras_matricula",
@@ -31,23 +29,23 @@ CATEGORY_MAP = {
 @dataclass(frozen=True)
 class IngestSettings:
     database_url: str
-    openai_api_key: str
+    embedding_api_key: str
+    embedding_provider: str
+    embedding_model: str
 
     @classmethod
     def from_env(cls) -> "IngestSettings":
         from ai_service.config import settings as app_settings
+        from ai_service.embedding_factory import get_embedding_api_key
 
         database_url = app_settings.DATABASE_URL
-        openai_api_key = os.environ.get("OPENAI_API_KEY")
-
-        if not openai_api_key:
-            raise RuntimeError(
-                "Missing required environment variable: OPENAI_API_KEY"
-            )
+        embedding_api_key = get_embedding_api_key(app_settings)
 
         return cls(
             database_url=normalize_psycopg_dsn(database_url),
-            openai_api_key=openai_api_key,
+            embedding_api_key=embedding_api_key,
+            embedding_provider=app_settings.EMBEDDING_PROVIDER,
+            embedding_model=app_settings.EMBEDDING_MODEL,
         )
 
 
@@ -113,13 +111,7 @@ def build_chunks(text: str, chunk_size: int, overlap: int) -> list[str]:
     return [chunk.strip() for chunk in splitter.split_text(text) if chunk.strip()]
 
 
-def embed_chunks(chunks: list[str], api_key: str) -> list[list[float]]:
-    from langchain_openai import OpenAIEmbeddings
-
-    embeddings = OpenAIEmbeddings(
-        model=EMBEDDING_MODEL,
-        api_key=api_key,
-    )
+def embed_chunks(chunks: list[str], embeddings: object) -> list[list[float]]:
     return embeddings.embed_documents(chunks)
 
 
@@ -191,6 +183,11 @@ def main(source: str, chunk_size: int, overlap: int) -> dict[str, object]:
     if not source_dir.exists():
         raise FileNotFoundError(f"Knowledge directory not found: {source_dir}")
 
+    from ai_service.embedding_factory import create_embeddings
+    from ai_service.config import settings as app_settings
+
+    embeddings = create_embeddings(app_settings)
+
     start_time = time.perf_counter()
     documents_processed = 0
     total_chunks = 0
@@ -214,7 +211,7 @@ def main(source: str, chunk_size: int, overlap: int) -> dict[str, object]:
                 )
                 for index, chunk_text in enumerate(chunk_texts)
             ]
-            vectors = embed_chunks(chunk_texts, settings.openai_api_key)
+            vectors = embed_chunks(chunk_texts, embeddings)
             inserted_count = replace_source_chunks(conn, chunk_records, vectors)
             conn.commit()
 
@@ -236,7 +233,7 @@ def main(source: str, chunk_size: int, overlap: int) -> dict[str, object]:
         "source_directory": str(source_dir),
         "chunk_size": chunk_size,
         "chunk_overlap": overlap,
-        "embedding_model": EMBEDDING_MODEL,
+        "embedding_model": settings.embedding_model,
         "audit_file": str(AUDIT_PATH),
     }
     write_audit_summary(summary)
