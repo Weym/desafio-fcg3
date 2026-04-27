@@ -1,9 +1,9 @@
 ---
-status: partial
+status: diagnosed
 phase: 05-ai-service
 source: [05-01-SUMMARY.md, 05-02-SUMMARY.md, 05-03-SUMMARY.md, 05-04-SUMMARY.md, 05-05-SUMMARY.md, 05-06-SUMMARY.md, 05-07-SUMMARY.md, 05-REVIEW-FIX.md]
 started: 2026-04-27T16:00:00Z
-updated: 2026-04-27T16:08:00Z
+updated: 2026-04-27T16:12:00Z
 ---
 
 ## Current Test
@@ -64,25 +64,43 @@ blocked: 3
   reason: "User reported: All containers started successfully, but `docker compose exec langchain-service curl -sf http://localhost:8001/health` returned empty output with a non-zero exit code — the health endpoint is not returning a successful response."
   severity: blocker
   test: 1
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "DATABASE_URL in .env has password 'backend' but POSTGRES_PASSWORD is 'change_me_in_production'. The reconcile_dev_credentials.sh script enforces POSTGRES_PASSWORD on every startup, so the pool in ai_service/database.py fails all connections and /health returns 503. curl -sf suppresses 503 body, showing empty output."
+  artifacts:
+    - path: ".env"
+      issue: "DATABASE_URL password ('backend') does not match POSTGRES_PASSWORD ('change_me_in_production')"
+    - path: "ai_service/database.py"
+      issue: "Pool creation with mismatched credentials causes all health checks to return 503"
+    - path: "ai_service/main.py"
+      issue: "/health returns 503 when DB pool has no working connections"
+  missing:
+    - "Synchronize all DATABASE_URL passwords with POSTGRES_PASSWORD in .env"
+    - "Consider constructing DATABASE_URL from component env vars in docker-compose.yml to prevent drift"
   debug_session: ""
 - truth: "The ingest script should connect to PostgreSQL and complete without crashing."
   status: failed
   reason: "User reported: Running `python -m ai_service.ingest` inside langchain-service crashed with `psycopg.OperationalError: password authentication failed for user \"fcg3\"` — the DATABASE_URL credentials don't match the PostgreSQL instance."
   severity: blocker
   test: 2
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "Same root cause as Test 1 — .env DATABASE_URL embeds password 'backend' but PostgreSQL only accepts 'change_me_in_production'. ai_service/ingest.py line 206 calls psycopg.connect(settings.database_url) with the wrong password. Additionally, all URL variants in .env (DATABASE_URL, ALEMBIC_DATABASE_URL, DATABASE_URL_AI, DATABASE_URL_MCP) have different passwords and none match POSTGRES_PASSWORD."
+  artifacts:
+    - path: ".env"
+      issue: "Five different passwords across DATABASE_URL variants, none matching POSTGRES_PASSWORD"
+    - path: "ai_service/ingest.py"
+      issue: "Line 206 connects with credentials from DATABASE_URL which has wrong password"
+  missing:
+    - "Fix all DATABASE_URL passwords in .env to match POSTGRES_PASSWORD"
   debug_session: ""
 - truth: "POST /chat with valid X-Service-Token should return a student-facing Portuguese answer grounded in knowledge base content."
   status: failed
   reason: "User reported: POST /chat with valid X-Service-Token returned empty output and non-zero exit code — endpoint not responding. Likely cascading from the health check failure in Test 1."
   severity: blocker
   test: 3
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "Cascading from Test 1 — the AI service DB pool has no working connections due to the credential mismatch. /chat depends on DB connectivity for chat history persistence and agent execution, so it also fails."
+  artifacts:
+    - path: ".env"
+      issue: "DATABASE_URL password mismatch (same root cause as Tests 1 and 2)"
+    - path: "ai_service/main.py"
+      issue: "/chat endpoint fails when DB pool is unhealthy"
+  missing:
+    - "Fix DATABASE_URL password in .env (same fix as Tests 1 and 2)"
   debug_session: ""
