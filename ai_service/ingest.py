@@ -35,21 +35,14 @@ class IngestSettings:
 
     @classmethod
     def from_env(cls) -> "IngestSettings":
-        database_url = os.environ.get("DATABASE_URL")
+        from ai_service.config import settings as app_settings
+
+        database_url = app_settings.DATABASE_URL
         openai_api_key = os.environ.get("OPENAI_API_KEY")
 
-        missing = [
-            name
-            for name, value in {
-                "DATABASE_URL": database_url,
-                "OPENAI_API_KEY": openai_api_key,
-            }.items()
-            if not value
-        ]
-        if missing:
-            missing_str = ", ".join(missing)
+        if not openai_api_key:
             raise RuntimeError(
-                f"Missing required environment variables: {missing_str}"
+                "Missing required environment variable: OPENAI_API_KEY"
             )
 
         return cls(
