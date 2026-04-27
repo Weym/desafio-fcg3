@@ -56,6 +56,7 @@ services:
       LLM_MODEL: ${LLM_MODEL}
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       GEMINI_API_KEY: ${GEMINI_API_KEY}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
       FCM_CREDENTIALS_PATH: ${FCM_CREDENTIALS_PATH}
       FASTAPI_URL: ${FASTAPI_URL}
     volumes:
@@ -85,12 +86,17 @@ services:
     build: ./ai_service
     container_name: fcg3-ai
     environment:
-      DATABASE_URL: ${DATABASE_URL}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
       MCP_SERVICE_TOKEN: ${MCP_SERVICE_TOKEN}
       LLM_PROVIDER: ${LLM_PROVIDER}
       LLM_MODEL: ${LLM_MODEL}
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       GEMINI_API_KEY: ${GEMINI_API_KEY}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
       MCP_SERVER_URL: http://mcp-server:8002/mcp
     volumes:
       - ./ai_service:/app/ai_service
@@ -130,6 +136,7 @@ services:
       LLM_MODEL: ${LLM_MODEL}
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       GEMINI_API_KEY: ${GEMINI_API_KEY}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
       FCM_CREDENTIALS_PATH: ${FCM_CREDENTIALS_PATH}
       FASTAPI_URL: ${FASTAPI_URL}
     volumes:
