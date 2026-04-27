@@ -118,6 +118,7 @@ def test_environment_template_documents_required_keys_with_placeholder_secrets()
         "JWT_SECRET=replace_with_a_unique_32_plus_char_secret",
         "WHATSAPP_TOKEN=replace_with_whatsapp_business_api_token",
         "RESEND_API_KEY=replace_with_resend_api_key",
+        "OPENROUTER_API_KEY=replace_with_openrouter_api_key",
         "LLM_PROVIDER=openai",
         "FASTAPI_URL=http://fastapi-app:8000",
     ]:

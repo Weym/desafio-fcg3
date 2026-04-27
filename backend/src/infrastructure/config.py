@@ -159,7 +159,7 @@ class Settings(BaseSettings):
         description="slowapi rate limit string per IP (D-14).",
     )
 
-    llm_provider: Literal["openai", "gemini"] = Field(
+    llm_provider: Literal["openai", "gemini", "openrouter"] = Field(
         default="openai",
         description="Configured LLM provider.",
     )
@@ -170,6 +170,10 @@ class Settings(BaseSettings):
     gemini_api_key: str | None = Field(
         default=None,
         description="Google Gemini API key.",
+    )
+    openrouter_api_key: str | None = Field(
+        default=None,
+        description="OpenRouter API key.",
     )
 
     fcm_credentials_path: str | None = Field(

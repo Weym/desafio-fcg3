@@ -18,9 +18,11 @@ def get_model_string(settings: Any) -> str:
         return f"openai:{model}"
     if provider == "gemini":
         return f"google_genai:{model}"
+    if provider == "openrouter":
+        return f"openai:{model}"
 
     raise ValueError(
-        f"Unsupported LLM provider: {provider}. Use 'openai' or 'gemini'."
+        f"Unsupported LLM provider: {provider}. Use 'openai', 'gemini', or 'openrouter'."
     )
 
 
@@ -40,7 +42,16 @@ def create_llm(settings: Any) -> "BaseChatModel":
             google_api_key=settings.GEMINI_API_KEY,
         )
 
+    if settings.LLM_PROVIDER == "openrouter":
+        from langchain_openai import ChatOpenAI
+
+        return ChatOpenAI(
+            model=settings.LLM_MODEL,
+            api_key=settings.OPENROUTER_API_KEY,
+            base_url="https://openrouter.ai/api/v1",
+        )
+
     raise ValueError(
         f"Unsupported LLM provider: {settings.LLM_PROVIDER}. "
-        "Use 'openai' or 'gemini'."
+        "Use 'openai', 'gemini', or 'openrouter'."
     )
