@@ -2,78 +2,84 @@
 status: partial
 phase: 05-ai-service
 source: [05-01-SUMMARY.md, 05-02-SUMMARY.md, 05-03-SUMMARY.md, 05-04-SUMMARY.md, 05-05-SUMMARY.md, 05-06-SUMMARY.md, 05-07-SUMMARY.md, 05-REVIEW-FIX.md]
-started: 2026-04-26T03:24:00.286Z
-updated: 2026-04-26T03:35:07.507Z
+started: 2026-04-27T16:00:00Z
+updated: 2026-04-27T16:08:00Z
 ---
 
 ## Current Test
 
-[testing paused — 3 items outstanding]
+[testing complete]
 
 ## Tests
 
 ### 1. Cold Start Smoke Test
-expected: Stop any running Phase 05 services, then start the AI stack from scratch. The packaged AI service should boot cleanly without import or DATABASE_URL compatibility errors, and `http://localhost:8001/health` should return a healthy response once startup finishes.
+expected: Kill any running Phase 05 containers (`docker compose down`), then rebuild and start the stack from scratch (`docker compose up -d --build`). The `langchain-service` container should become healthy within ~30s. Since port 8001 is intentionally not published to the host (CR-01 security fix), verify health via `docker compose exec langchain-service curl -sf http://localhost:8001/health` — it should return a healthy JSON response with no import or startup errors in the container logs.
 result: issue
-reported: "The stack rebuilt and the AI container became healthy, but `http://localhost:8001/health` on the host failed with connection refused because the current compose config does not publish port 8001."
+reported: "All containers started successfully, but `docker compose exec langchain-service curl -sf http://localhost:8001/health` returned empty output with a non-zero exit code — the health endpoint is not returning a successful response."
 severity: blocker
 
 ### 2. Knowledge Base Ingest
-expected: Running the ingest flow with the Phase 05 environment configured should complete without crashing, refresh the academic source documents, and write or update `ai_service/knowledge/.last_ingest.json` with a chunking summary.
+expected: Run `docker compose exec langchain-service python -m ai_service.ingest` with a valid `OPENAI_API_KEY` configured in the environment. The script should complete without crashing, log chunk counts per source category (matricula, faq, calendario, curriculo, regulamento), and write `ai_service/knowledge/.last_ingest.json` inside the container with a summary of what was ingested.
 result: issue
-reported: "Running `python -m ai_service.ingest` inside `langchain-service` failed with `401 Unauthorized` from the OpenAI embeddings API because the configured API key is invalid, and `ai_service/knowledge/.last_ingest.json` was not created."
+reported: "Running `python -m ai_service.ingest` inside langchain-service crashed with `psycopg.OperationalError: password authentication failed for user \"fcg3\"` — the DATABASE_URL credentials don't match the PostgreSQL instance."
 severity: blocker
 
 ### 3. Academic Policy Answer
-expected: Sending an authorized `/chat` request with a question about matricula, calendario, curriculo, or FAQ content should return a student-facing Portuguese answer grounded in the academic knowledge base instead of a placeholder or empty response.
+expected: Send an authorized POST to `/chat` (via internal network or `docker compose exec`) with a valid `X-Service-Token` and a Portuguese academic question like "Quais sao as regras de matricula?". The response should contain a student-facing Portuguese answer grounded in knowledge base content — not a generic fallback or empty response.
 result: issue
-reported: "An authorized `/chat` request returned only the generic fallback response instead of an academic answer. AI-service logs show `psycopg.errors.NotNullViolation` because inserts into `chat_messages` fail with `null value in column \"id\"` when persisting both the user and fallback assistant turns."
+reported: "POST /chat with valid X-Service-Token returned empty output and non-zero exit code — endpoint not responding. Likely cascading from the health check failure in Test 1."
 severity: blocker
 
 ### 4. Conversation Continuity
-expected: Sending a follow-up `/chat` request with the same `session_id` should preserve context from the earlier exchange, so the second answer clearly reflects the prior question without needing the full context repeated.
-result: [pending]
+expected: Send a follow-up `/chat` request using the same `session_id` from Test 3. The response should clearly reflect context from the earlier exchange (e.g., referencing the prior topic) without needing the full question repeated.
+result: blocked
+blocked_by: prior-phase
+reason: "/chat endpoint not responding (Test 1/3 blocker)"
 
 ### 5. Ordered Chat Persistence
-expected: After a `/chat` exchange, the same session should behave as if the user turn was saved before the assistant turn, so follow-up requests continue from the right order instead of losing or scrambling the conversation.
-result: [pending]
+expected: After Tests 3-4, query `chat_messages` for the session. Both user and assistant turns should be present in chronological order — user turn stored before the assistant turn for each exchange, with no null `id` violations or missing rows.
+result: blocked
+blocked_by: prior-phase
+reason: "/chat endpoint not responding (Test 1/3 blocker)"
 
-### 6. Protected Chat Boundary
-expected: Calling `/chat` without the internal service token should be rejected, while the same request with the valid internal token should be accepted. The default compose stack should not rely on host-published AI or MCP ports to make chat work.
-result: [pending]
+### 6. Service Token Enforcement
+expected: Call `/chat` without the `X-Service-Token` header — the request should be rejected (401 or 403). Call `/chat` with a valid `X-Service-Token` — validation should pass and the request should proceed to agent execution. The AI and MCP service ports should not be reachable from the host (no published ports in compose).
+result: blocked
+blocked_by: prior-phase
+reason: "/chat endpoint not responding (Test 1/3 blocker)"
 
 ## Summary
 
 total: 6
 passed: 0
 issues: 3
-pending: 3
+pending: 0
 skipped: 0
-blocked: 0
+blocked: 3
 
 ## Gaps
 
-- truth: "Stop any running Phase 05 services, then start the AI stack from scratch. The packaged AI service should boot cleanly without import or DATABASE_URL compatibility errors, and `http://localhost:8001/health` should return a healthy response once startup finishes."
+- truth: "The langchain-service health endpoint should return a successful JSON response when curled from inside the container after a cold start."
   status: failed
-  reason: "User reported: The stack rebuilt and the AI container became healthy, but `http://localhost:8001/health` on the host failed with connection refused because the current compose config does not publish port 8001."
+  reason: "User reported: All containers started successfully, but `docker compose exec langchain-service curl -sf http://localhost:8001/health` returned empty output with a non-zero exit code — the health endpoint is not returning a successful response."
   severity: blocker
   test: 1
   root_cause: ""
   artifacts: []
   missing: []
   debug_session: ""
-- truth: "Running the ingest flow with the Phase 05 environment configured should complete without crashing, refresh the academic source documents, and write or update `ai_service/knowledge/.last_ingest.json` with a chunking summary."
+- truth: "The ingest script should connect to PostgreSQL and complete without crashing."
   status: failed
-  reason: "User reported: Running `python -m ai_service.ingest` inside `langchain-service` failed with `401 Unauthorized` from the OpenAI embeddings API because the configured API key is invalid, and `ai_service/knowledge/.last_ingest.json` was not created."
+  reason: "User reported: Running `python -m ai_service.ingest` inside langchain-service crashed with `psycopg.OperationalError: password authentication failed for user \"fcg3\"` — the DATABASE_URL credentials don't match the PostgreSQL instance."
   severity: blocker
   test: 2
   root_cause: ""
   artifacts: []
   missing: []
   debug_session: ""
-- truth: "Sending an authorized `/chat` request with a question about matricula, calendario, curriculo, or FAQ content should return a student-facing Portuguese answer grounded in the academic knowledge base instead of a placeholder or empty response."
+- truth: "POST /chat with valid X-Service-Token should return a student-facing Portuguese answer grounded in knowledge base content."
   status: failed
-  reason: "User reported: An authorized `/chat` request returned only the generic fallback response instead of an academic answer. AI-service logs show `psycopg.errors.NotNullViolation` because inserts into `chat_messages` fail with `null value in column \"id\"` when persisting both the user and fallback assistant turns."
+  reason: "User reported: POST /chat with valid X-Service-Token returned empty output and non-zero exit code — endpoint not responding. Likely cascading from the health check failure in Test 1."
   severity: blocker
   test: 3
   root_cause: ""
