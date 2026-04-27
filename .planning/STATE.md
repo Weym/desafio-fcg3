@@ -2,25 +2,25 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: blocked
-last_updated: "2026-04-26T03:35:07.507Z"
-last_activity: 2026-04-26
+status: executing
+last_updated: "2026-04-27T14:59:26.409Z"
+last_activity: 2026-04-27 - Completed quick task 260427-h6x
 progress:
   total_phases: 6
   completed_phases: 4
-  total_plans: 42
-  completed_plans: 38
-  percent: 90
+  total_plans: 44
+  completed_plans: 39
+  percent: 89
 ---
 
 # Project State
 
 ## Current Position
 
-Phase: 05 (ai-service) — REOPENED
-Plan: gap closure pending from partial UAT
-Status: Phase 05 reopened by UAT blockers — Phase 06 blocked
-Last activity: 2026-04-26
+Phase: 05 (ai-service) — EXECUTING
+Plan: 1 of 9
+Status: Executing Phase 05
+Last activity: 2026-04-27 - Completed quick task 260427-h6x: adicionar opcao de escolher provedor e modelo do embedding via env
 
 Progress: [█████████░] 90%
 
@@ -133,6 +133,12 @@ Recent decisions affecting current work:
 - Two separate PostgreSQL drivers: `asyncpg` for FastAPI + MCP; `psycopg3` for LangChain service
 - HMAC validation: use `await request.body()` BEFORE any JSON parsing in webhook handler
 - Alembic migration #001 MUST be `CREATE EXTENSION IF NOT EXISTS vector` before any table with `vector` column
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260427-h6x | adicionar opcao de escolher provedor e modelo do embedding via env | 2026-04-27 | 0aceac2 | [260427-h6x-adicionar-opcao-de-escolher-provedor-e-m](./quick/260427-h6x-adicionar-opcao-de-escolher-provedor-e-m/) |
 
 ## Session Continuity
 
