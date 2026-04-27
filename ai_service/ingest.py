@@ -137,13 +137,14 @@ def replace_source_chunks(
             cur.execute(
                 """
                 INSERT INTO knowledge_base_chunks (
+                    id,
                     content,
                     embedding,
                     source,
                     category,
                     chunk_index
                 )
-                VALUES (%s, %s::vector, %s, %s, %s)
+                VALUES (gen_random_uuid(), %s, %s::vector, %s, %s, %s)
                 """,
                 [
                     chunk_record.content,

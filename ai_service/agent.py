@@ -11,7 +11,7 @@ from langchain_core.messages import AIMessage, HumanMessage
 
 from ai_service.database import load_chat_history
 from ai_service.embedding_factory import create_embeddings
-from ai_service.llm_factory import get_model_string
+from ai_service.llm_factory import create_llm
 from ai_service.mcp_tools import load_mcp_tools
 from ai_service.rag import create_rag_tool
 
@@ -26,8 +26,9 @@ FALLBACK_MESSAGE = (
 def create_chat_agent(settings: Any, tools: list[Any], system_prompt: str) -> Any:
     """Create a provider-agnostic LangChain ReAct agent."""
 
+    llm = create_llm(settings)
     return create_agent(
-        model=get_model_string(settings),
+        model=llm,
         tools=tools,
         system_prompt=system_prompt,
     )
