@@ -20,8 +20,12 @@ async def test_student_gets_portuguese_response_with_mcp_and_rag_tools_wired(
         calls["mcp"] = (mcp_server_url, session_id)
         return [SimpleNamespace(name="consultar_notas")]
 
-    def fake_create_rag_tool(db_pool, openai_api_key: str):
-        calls["rag"] = (db_pool, openai_api_key)
+    def fake_create_embeddings(settings):
+        calls["embeddings"] = settings.EMBEDDING_PROVIDER
+        return SimpleNamespace(name="fake_embeddings")
+
+    def fake_create_rag_tool(db_pool, embeddings):
+        calls["rag"] = (db_pool, embeddings)
         return SimpleNamespace(name="search_knowledge_base")
 
     def fake_create_chat_agent(settings, tools, system_prompt: str):
@@ -45,6 +49,7 @@ async def test_student_gets_portuguese_response_with_mcp_and_rag_tools_wired(
         return FakeAgent()
 
     monkeypatch.setattr("ai_service.agent.load_mcp_tools", fake_load_mcp_tools)
+    monkeypatch.setattr("ai_service.agent.create_embeddings", fake_create_embeddings)
     monkeypatch.setattr("ai_service.agent.create_rag_tool", fake_create_rag_tool)
     monkeypatch.setattr("ai_service.agent.create_chat_agent", fake_create_chat_agent)
     monkeypatch.setattr(
@@ -55,6 +60,8 @@ async def test_student_gets_portuguese_response_with_mcp_and_rag_tools_wired(
     settings = SimpleNamespace(
         MCP_SERVER_URL="http://mcp-server:8002/mcp",
         OPENAI_API_KEY="test-key",
+        EMBEDDING_PROVIDER="openai",
+        EMBEDDING_MODEL="text-embedding-3-small",
         CHAT_HISTORY_K=20,
         MAX_AGENT_ITERATIONS=10,
         MAX_AGENT_EXECUTION_TIME=45.0,
@@ -71,7 +78,8 @@ async def test_student_gets_portuguese_response_with_mcp_and_rag_tools_wired(
 
     assert response == "Olá! Consultei seus dados e sua matrícula está ativa."
     assert calls["mcp"] == ("http://mcp-server:8002/mcp", "session-pt")
-    assert calls["rag"][1] == "test-key"
+    assert calls["embeddings"] == "openai"
+    assert calls["rag"][1].name == "fake_embeddings"
     assert calls["agent"] == {
         "model": "openai",
         "tool_names": ["consultar_notas", "search_knowledge_base"],

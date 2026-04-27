@@ -97,6 +97,8 @@ services:
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       GEMINI_API_KEY: ${GEMINI_API_KEY}
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+      EMBEDDING_PROVIDER: ${EMBEDDING_PROVIDER:-openai}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-text-embedding-3-small}
       MCP_SERVER_URL: http://mcp-server:8002/mcp
     volumes:
       - ./ai_service:/app/ai_service

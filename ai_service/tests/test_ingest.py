@@ -64,7 +64,9 @@ def test_ingest_processes_known_documents_and_writes_audit_summary(
         classmethod(
             lambda cls: SimpleNamespace(
                 database_url="postgresql://db",
-                openai_api_key="openai-key",
+                embedding_api_key="embed-key",
+                embedding_provider="openai",
+                embedding_model="text-embedding-3-small",
             )
         ),
     )
@@ -80,9 +82,18 @@ def test_ingest_processes_known_documents_and_writes_audit_summary(
         "ai_service.ingest.build_chunks",
         lambda text, chunk_size, overlap: [f"{text}-parte-1", f"{text}-parte-2"],
     )
+
+    class _FakeEmbeddings:
+        def embed_documents(self, chunks):
+            return [[0.1, 0.2]] * len(chunks)
+
+    monkeypatch.setattr(
+        "ai_service.embedding_factory.create_embeddings",
+        lambda _settings: _FakeEmbeddings(),
+    )
     monkeypatch.setattr(
         "ai_service.ingest.embed_chunks",
-        lambda chunks, api_key: [[0.1, 0.2], [0.3, 0.4]],
+        lambda chunks, embeddings: embeddings.embed_documents(chunks),
     )
 
     summary = ingest.main(str(source_dir), chunk_size=500, overlap=50)

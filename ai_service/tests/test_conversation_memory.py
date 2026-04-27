@@ -72,6 +72,9 @@ async def test_agent_rebuilds_last_twenty_messages_in_chronological_order(
     async def fake_load_mcp_tools(*_args, **_kwargs):
         return []
 
+    def fake_create_embeddings(*_args, **_kwargs):
+        return SimpleNamespace(name="fake_embeddings")
+
     def fake_create_rag_tool(*_args, **_kwargs):
         return SimpleNamespace(name="search_knowledge_base")
 
@@ -84,12 +87,15 @@ async def test_agent_rebuilds_last_twenty_messages_in_chronological_order(
         return FakeAgent()
 
     monkeypatch.setattr("ai_service.agent.load_mcp_tools", fake_load_mcp_tools)
+    monkeypatch.setattr("ai_service.agent.create_embeddings", fake_create_embeddings)
     monkeypatch.setattr("ai_service.agent.create_rag_tool", fake_create_rag_tool)
     monkeypatch.setattr("ai_service.agent.create_chat_agent", fake_create_chat_agent)
 
     settings = SimpleNamespace(
         MCP_SERVER_URL="http://mcp-server:8002/mcp",
         OPENAI_API_KEY="test-key",
+        EMBEDDING_PROVIDER="openai",
+        EMBEDDING_MODEL="text-embedding-3-small",
         CHAT_HISTORY_K=20,
         MAX_AGENT_ITERATIONS=10,
         MAX_AGENT_EXECUTION_TIME=45.0,

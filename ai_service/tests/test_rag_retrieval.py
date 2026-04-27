@@ -49,7 +49,7 @@ class _FakePool:
 
 def test_retrieval_uses_threshold_and_formats_top_chunks(monkeypatch: pytest.MonkeyPatch) -> None:
     class FakeEmbeddings:
-        def __init__(self, *args, **kwargs):
+        def __init__(self):
             self.query = None
 
         def embed_query(self, query: str):
@@ -61,9 +61,9 @@ def test_retrieval_uses_threshold_and_formats_top_chunks(monkeypatch: pytest.Mon
         ("Trancamento vai até 30/04.", "calendario.md", "agendamento", 0.80),
     ]
     cursor = _FakeCursor(rows)
-    monkeypatch.setattr("ai_service.rag.OpenAIEmbeddings", FakeEmbeddings)
+    fake_embeddings = FakeEmbeddings()
 
-    tool = create_rag_tool(_FakePool(cursor), "api-key")
+    tool = create_rag_tool(_FakePool(cursor), fake_embeddings)
     result = tool.func("prazo de matrícula")
 
     assert "Prazo de matrícula até sexta." in result
@@ -76,15 +76,11 @@ def test_retrieval_returns_empty_string_when_no_chunk_meets_threshold(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     class FakeEmbeddings:
-        def __init__(self, *args, **kwargs):
-            pass
-
         def embed_query(self, query: str):
             return [0.3, 0.4]
 
     cursor = _FakeCursor([])
-    monkeypatch.setattr("ai_service.rag.OpenAIEmbeddings", FakeEmbeddings)
 
-    tool = create_rag_tool(_FakePool(cursor), "api-key")
+    tool = create_rag_tool(_FakePool(cursor), FakeEmbeddings())
 
     assert tool.func("assunto sem resultado") == ""
