@@ -129,7 +129,7 @@ Plans:
 **Goal:** The LangChain ReAct agent answers student academic questions in Portuguese, using MCP tools for live data and PGVector RAG for regulation and policy, with any LLM provider configurable by environment variable.
 **Depends on:** Phase 4
 **Requirements:** AI-01, AI-02, AI-03, AI-04, AI-05
-**Verification:** `reopened` — plans `05-01` through `05-07` remain complete, but resumed UAT on 2026-04-26 reopened the phase with three blockers in `05-UAT.md`: host-level `localhost:8001/health` is no longer reachable under the secured compose topology, `python -m ai_service.ingest` fails with an invalid OpenAI API key, and authorized `/chat` requests return fallback because inserts into `chat_messages` violate the live `id` NOT NULL constraint. Phase 06 is blocked until these gaps are closed.
+**Verification:** `gaps_found` — plans `05-01` through `05-08` complete. Plan 08 closed credential alignment and UUID gaps. `05-VERIFICATION.md` re-verification (4/5 truths) found 2 remaining gaps: `ingest.py` reads `DATABASE_URL` from `os.environ` (fails in Docker after Plan 08 removal) and a stale regression test. Plan 09 addresses both.
 
 ### Success Criteria
 1. Agent receives a student message, selects appropriate MCP tools, calls them, and generates a coherent Portuguese-language response — observable end-to-end without WhatsApp by directly invoking the service HTTP endpoint.
@@ -138,7 +138,7 @@ Plans:
 4. Setting `LLM_PROVIDER=gemini` in the environment switches the agent to Gemini without any code changes; setting `LLM_PROVIDER=openai` uses OpenAI — both produce valid responses.
 5. Running `python -m ai_service.ingest` processes all five knowledge base documents (`matricula.md`, `regulamento.pdf`, `faq.md`, `calendario.md`, `curriculo.md`), generates embeddings, and stores chunks in `knowledge_base_chunks`.
 
-**Plans:** 8 plans
+**Plans:** 9 plans
 
 Plans:
 - [x] 05-01-PLAN.md — AI service scaffold: FastAPI app, psycopg3 DB layer, LLM factory, system prompt, config
@@ -148,7 +148,8 @@ Plans:
 - [x] 05-05-PLAN.md — AI service /chat endpoint: receives message + session_id, invokes agent, saves response to chat_messages
 - [x] 05-06-PLAN.md — Gap closure: assistant-only response extraction and direct `/chat` user-turn persistence regressions
 - [x] 05-07-PLAN.md — Gap closure: package-based AI service runtime alignment and startup regressions
-- [ ] 05-08-PLAN.md — Gap closure: align DATABASE_URL credentials with POSTGRES_PASSWORD and fix chat_messages UUID generation
+- [x] 05-08-PLAN.md — Gap closure: align DATABASE_URL credentials with POSTGRES_PASSWORD and fix chat_messages UUID generation
+- [ ] 05-09-PLAN.md — Gap closure: propagate POSTGRES_* component var pattern to ingest.py and fix stale regression test
 
 ---
 
@@ -183,5 +184,5 @@ Plans:
 | 2. Authentication | 4/4 | Complete | 2026-04-24 |
 | 3. Business Feature Slices | 14/14 | Complete | 2026-04-25 |
 | 4. MCP Server | 6/6 | Complete | 2026-04-25 |
-| 5. AI Service | 7/7 | Reopened | - |
+| 5. AI Service | 8/9 | Gaps Found | - |
 | 6. WhatsApp Webhook & Integration | 0/4 | Blocked by Phase 5 | - |
