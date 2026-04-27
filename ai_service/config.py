@@ -19,6 +19,8 @@ class Settings:
     OPENAI_API_KEY: str | None = os.environ.get("OPENAI_API_KEY")
     GEMINI_API_KEY: str | None = os.environ.get("GEMINI_API_KEY")
     OPENROUTER_API_KEY: str | None = os.environ.get("OPENROUTER_API_KEY")
+    EMBEDDING_PROVIDER: str = os.environ.get("EMBEDDING_PROVIDER", "openai")
+    EMBEDDING_MODEL: str = os.environ.get("EMBEDDING_MODEL", "text-embedding-3-small")
     MCP_SERVER_URL: str = os.environ.get(
         "MCP_SERVER_URL",
         "http://mcp-server:8002/mcp",
