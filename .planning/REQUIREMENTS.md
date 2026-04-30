@@ -108,7 +108,7 @@
 - [x] **WH-05**: Sistema responde ao challenge de verificação do webhook WhatsApp (`GET /webhook/whatsapp` com `hub.challenge`)
 - [x] **CHAT-01**: Staff pode listar sessões de chat com filtro por aluno e status
 - [x] **CHAT-02**: Usuário autenticado pode listar mensagens de uma sessão de chat
-- [ ] **CHAT-03**: Staff pode consultar logs MCP de uma sessão de chat (tool_name, params, resultado, reasoning, latência)
+- [x] **CHAT-03**: Staff pode consultar logs MCP de uma sessão de chat (tool_name, params, resultado, reasoning, latência)
 
 ---
 
@@ -233,7 +233,7 @@
 | WH-05 | Phase 6: WhatsApp Webhook & Integration | Complete |
 | CHAT-01 | Phase 6: WhatsApp Webhook & Integration | Complete |
 | CHAT-02 | Phase 6: WhatsApp Webhook & Integration | Complete |
-| CHAT-03 | Phase 6: WhatsApp Webhook & Integration | Pending |
+| CHAT-03 | Phase 6: WhatsApp Webhook & Integration | Complete |
 | TEST-01 | Phase 6: WhatsApp Webhook & Integration | Pending |
 | TEST-02 | Phase 6: WhatsApp Webhook & Integration | Pending |
 | TEST-03 | Phase 6: WhatsApp Webhook & Integration | Pending |
