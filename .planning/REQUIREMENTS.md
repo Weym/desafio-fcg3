@@ -101,10 +101,10 @@
 
 ### Webhook & Chat (WhatsApp)
 
-- [ ] **WH-01**: Sistema recebe mensagens do WhatsApp e valida assinatura HMAC-SHA256 (`X-Hub-Signature-256`) antes de qualquer processamento
-- [ ] **WH-02**: Sistema responde 200 OK em < 5 segundos e despacha processamento da mensagem em background com `asyncio.create_task` + `add_done_callback` para visibilidade de falhas
-- [ ] **WH-03**: Sistema trata mensagens de mídia (áudio, imagem, vídeo, documento, sticker, localização) com resposta padrão sem passar pelo agente; tipo de mídia é registrado em `chat_messages`
-- [ ] **WH-04**: Sistema deduplica mensagens por `whatsapp_message_id` — mensagem com ID já existente é ignorada
+- [x] **WH-01**: Sistema recebe mensagens do WhatsApp e valida assinatura HMAC-SHA256 (`X-Hub-Signature-256`) antes de qualquer processamento
+- [x] **WH-02**: Sistema responde 200 OK em < 5 segundos e despacha processamento da mensagem em background com `asyncio.create_task` + `add_done_callback` para visibilidade de falhas
+- [x] **WH-03**: Sistema trata mensagens de mídia (áudio, imagem, vídeo, documento, sticker, localização) com resposta padrão sem passar pelo agente; tipo de mídia é registrado em `chat_messages`
+- [x] **WH-04**: Sistema deduplica mensagens por `whatsapp_message_id` — mensagem com ID já existente é ignorada
 - [ ] **WH-05**: Sistema responde ao challenge de verificação do webhook WhatsApp (`GET /webhook/whatsapp` com `hub.challenge`)
 - [ ] **CHAT-01**: Staff pode listar sessões de chat com filtro por aluno e status
 - [ ] **CHAT-02**: Usuário autenticado pode listar mensagens de uma sessão de chat
@@ -226,10 +226,10 @@
 | AI-03 | Phase 5: AI Service | Complete |
 | AI-04 | Phase 5: AI Service | Complete |
 | AI-05 | Phase 5: AI Service | Complete |
-| WH-01 | Phase 6: WhatsApp Webhook & Integration | Pending |
-| WH-02 | Phase 6: WhatsApp Webhook & Integration | Pending |
-| WH-03 | Phase 6: WhatsApp Webhook & Integration | Pending |
-| WH-04 | Phase 6: WhatsApp Webhook & Integration | Pending |
+| WH-01 | Phase 6: WhatsApp Webhook & Integration | Complete |
+| WH-02 | Phase 6: WhatsApp Webhook & Integration | Complete |
+| WH-03 | Phase 6: WhatsApp Webhook & Integration | Complete |
+| WH-04 | Phase 6: WhatsApp Webhook & Integration | Complete |
 | WH-05 | Phase 6: WhatsApp Webhook & Integration | Pending |
 | CHAT-01 | Phase 6: WhatsApp Webhook & Integration | Pending |
 | CHAT-02 | Phase 6: WhatsApp Webhook & Integration | Pending |

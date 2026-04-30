@@ -3,24 +3,24 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-04-27T15:48:24.391Z"
-last_activity: 2026-04-27
+last_updated: "2026-04-30T16:41:30.173Z"
+last_activity: 2026-04-30
 progress:
   total_phases: 6
   completed_phases: 5
   total_plans: 44
-  completed_plans: 40
-  percent: 91
+  completed_plans: 41
+  percent: 93
 ---
 
 # Project State
 
 ## Current Position
 
-Phase: 06
-Plan: Not started
-Status: Executing Phase 05
-Last activity: 2026-04-27
+Phase: 06 (WhatsApp Webhook & Integration) — EXECUTING
+Plan: 2 of 4
+Status: Ready to execute
+Last activity: 2026-04-30
 
 Progress: [█████████░] 90%
 
@@ -43,6 +43,7 @@ Progress: [█████████░] 90%
 | Phase 04 P05 | 19 min | 2 tasks | 5 files |
 | Phase 04 P06 | 5 min | 2 tasks | 4 files |
 | Phase 05 P07 | 25 | 2 tasks | 6 files |
+| Phase 06 P01 | 6 min | 2 tasks | 11 files |
 
 ## Phase Status
 
@@ -60,7 +61,7 @@ Progress: [█████████░] 90%
 **Phase 05 has been reopened by resumed UAT**
 Phase 05 still has all seven implementation plans complete, but resumed UAT on 2026-04-26 found three blockers and the phase is no longer ready to hand off to Phase 06. `05-UAT.md` is now `partial` with 3 recorded issues and 3 remaining tests. The current blockers are: the AI container is healthy but no longer host-reachable at `localhost:8001`, `python -m ai_service.ingest` fails with an invalid OpenAI API key, and authorized `/chat` requests fall back because inserts into `chat_messages` violate the live `id` NOT NULL constraint.
 Next action: Diagnose and close the Phase 05 gaps before resuming Phase 06.
-Resume file: `.planning/phases/05-ai-service/05-UAT.md`
+Resume file: None
 
 ## Accumulated Context
 
@@ -114,6 +115,9 @@ Recent decisions affecting current work:
 - [Phase 05]: Resumed UAT on 2026-04-26 reopened the phase with three blockers recorded in `05-UAT.md`.
 - [Phase 05]: The secured compose topology no longer publishes AI-service port `8001` to the host, so host-level `localhost:8001/health` checks fail even though the container healthcheck passes internally.
 - [Phase 05]: The current runtime environment has an invalid OpenAI embeddings key for ingest, and the live `chat_messages` insert path fails because it does not satisfy the table's required `id` column.
+- [Phase 06]: Settings use config.py (not settings.py) matching Phase 2 convention
+- [Phase 06]: Partial unique index on whatsapp_message_id WHERE NOT NULL for message dedup
+- [Phase 06]: Verification flow reuses OTP service directly instead of HTTP calls to auth endpoints
 
 ### Key Decisions Pending
 
