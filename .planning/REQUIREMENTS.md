@@ -137,8 +137,8 @@
 - [ ] **TEST-01**: Testes de integração cobrem fluxo de auth completo (OTP → JWT → logout → token revogado; esgotamento de tentativas → novo código enviado)
 - [ ] **TEST-02**: Testes de integração cobrem matrícula (draft-confirm, pré-requisito não cumprido, período fechado, ownership check / prevenção de IDOR)
 - [ ] **TEST-03**: Testes unitários cobrem cálculo de CRA (ponderação por créditos, exclusão de em andamento, divisão por zero)
-- [ ] **TEST-04**: Testes de integração cobrem webhook (HMAC válido, HMAC inválido → 403, deduplicação por wamid, rota de mídia)
-- [ ] **TEST-05**: Testes de integração cobrem middleware X-Service-Token (token ausente → 401, token inválido → 401) e prevenção de IDOR nos endpoints MCP
+- [x] **TEST-04**: Testes de integração cobrem webhook (HMAC válido, HMAC inválido → 403, deduplicação por wamid, rota de mídia)
+- [x] **TEST-05**: Testes de integração cobrem middleware X-Service-Token (token ausente → 401, token inválido → 401) e prevenção de IDOR nos endpoints MCP
 
 ---
 
@@ -237,5 +237,5 @@
 | TEST-01 | Phase 6: WhatsApp Webhook & Integration | Pending |
 | TEST-02 | Phase 6: WhatsApp Webhook & Integration | Pending |
 | TEST-03 | Phase 6: WhatsApp Webhook & Integration | Pending |
-| TEST-04 | Phase 6: WhatsApp Webhook & Integration | Pending |
-| TEST-05 | Phase 6: WhatsApp Webhook & Integration | Pending |
+| TEST-04 | Phase 6: WhatsApp Webhook & Integration | Complete |
+| TEST-05 | Phase 6: WhatsApp Webhook & Integration | Complete |

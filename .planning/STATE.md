@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-last_updated: "2026-04-30T16:52:21.784Z"
+status: verifying
+last_updated: "2026-04-30T17:08:37.409Z"
 last_activity: 2026-04-30
 progress:
   total_phases: 6
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 44
-  completed_plans: 43
-  percent: 98
+  completed_plans: 44
+  percent: 100
 ---
 
 # Project State
@@ -19,7 +19,7 @@ progress:
 
 Phase: 06 (WhatsApp Webhook & Integration) — EXECUTING
 Plan: 4 of 4
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-04-30
 
 Progress: [█████████░] 90%
@@ -46,6 +46,7 @@ Progress: [█████████░] 90%
 | Phase 06 P01 | 6 min | 2 tasks | 11 files |
 | Phase 06 P02 | 3 min | 2 tasks | 5 files |
 | Phase 06 P03 | 2 min | 2 tasks | 4 files |
+| Phase 06 P04 | 13 min | 2 tasks | 17 files |
 
 ## Phase Status
 
@@ -122,6 +123,7 @@ Recent decisions affecting current work:
 - [Phase 06]: Verification flow reuses OTP service directly instead of HTTP calls to auth endpoints
 - [Phase 06]: Background task opens own async_session (CRITICAL-4) — never request-scoped; AI service retry: 1 retry then fallback; per-session asyncio.Lock keyed by session_id; pg_cron auto-close every hour for 24h inactive sessions
 - [Phase 06]: Used require_role('staff') for chat visibility endpoints — simpler than dual-auth for pure staff-only access
+- [Phase 06]: Included chat_sessions/chat_messages in SQLite test tables; patch_webhook_db fixture for async_session redirect; MagicMock for httpx Response (sync .json() method)
 
 ### Key Decisions Pending
 

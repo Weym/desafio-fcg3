@@ -172,7 +172,7 @@ Plans:
 - [x] 06-01-PLAN.md — Webhook core: WhatsApp client, HMAC validation, GET/POST endpoints, verification state migration, message routing
 - [x] 06-02-PLAN.md — Background processing: AI service integration, retry/fallback, per-session lock, session lifecycle, pg_cron auto-close
 - [x] 06-03-PLAN.md — Chat visibility: staff endpoints for sessions, messages, and MCP action logs
-- [ ] 06-04-PLAN.md — Test suite: TEST-04 (HMAC + dedup + media), TEST-05 (service token), verification state, background tasks, chat visibility
+- [x] 06-04-PLAN.md — Test suite: TEST-04 (HMAC + dedup + media), TEST-05 (service token), verification state, background tasks, chat visibility
 
 ---
 
