@@ -24,6 +24,7 @@ from src.features.appointments.routes import scheduling_router, appointments_rou
 from src.features.grades.routes import grades_router
 from src.features.staff.routes import staff_router
 from src.features.webhook.router import router as webhook_router
+from src.features.chat.router import router as chat_router
 
 
 @asynccontextmanager
@@ -102,6 +103,7 @@ app.include_router(appointments_router, prefix="/api/v1")
 app.include_router(grades_router, prefix="/api/v1")
 app.include_router(staff_router, prefix="/api/v1")
 app.include_router(webhook_router, prefix="/api/v1")
+app.include_router(chat_router, prefix="/api/v1")
 
 
 @app.get("/health")
