@@ -110,11 +110,13 @@ async def whatsapp_webhook(request: Request) -> Response:
                         media_response = webhook_service.get_media_response(
                             message.type
                         )
+                        # Only persist media_type for types the DB constraint allows
+                        _known_media = {"audio", "image", "document", "video", "sticker"}
                         await webhook_service.save_message(
                             session.id,
                             "user",
                             f"[{message.type}]",
-                            message.type,
+                            message.type if message.type in _known_media else None,
                             wamid,
                             db,
                         )
