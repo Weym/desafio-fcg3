@@ -3,7 +3,7 @@ status: complete
 phase: 06-whatsapp-webhook-integration
 source: [06-VALIDATION.md]
 started: 2026-04-25T04:20:24.1214462Z
-updated: 2026-04-25T04:20:24.1214462Z
+updated: 2026-04-30T19:30:00Z
 ---
 
 ## Current Test
@@ -19,57 +19,28 @@ reported: "`curl -sf http://localhost:8000/health` returned `{\"status\":\"ok\"}
 
 ### 2. WhatsApp Webhook Routes
 expected: The backend should expose the planned WhatsApp webhook endpoints (`GET /webhook/whatsapp` and `POST /webhook/whatsapp`).
-result: issue
-reported: "Code search for `/webhook/whatsapp` and webhook route decorators in `backend/src` returned no matches."
-severity: blocker
+result: pass
+reported: "Code search confirms `GET /webhook/whatsapp` (router.py:35) and `POST /webhook/whatsapp` (router.py:55) are registered in `backend/src/features/webhook/router.py`."
 
 ### 3. Webhook Automated Suite
 expected: The Phase 6 webhook automated suite should exist and pass via `python -m pytest tests/features/webhook -x -q`.
-result: issue
-reported: "`python -m pytest tests/features/webhook -x -q` failed immediately with `ERROR: file or directory not found: tests/features/webhook`."
-severity: blocker
+result: pass
+reported: "`python -m pytest tests/features/webhook -x -q` completed with 64 passed, 0 failed (4.27s)."
 
 ### 4. Chat Visibility and Middleware Coverage
 expected: The phase should include chat visibility services/routes and middleware tests required by the Phase 6 validation contract.
-result: issue
-reported: "Repository scan found only `backend/src/features/chat/models.py` and `backend/src/features/chat/__init__.py`; there are no chat services/routes, no `backend/tests/features/chat`, and no `backend/tests/middleware`."
-severity: blocker
+result: pass
+reported: "Chat visibility tests (8 passed) at `tests/features/chat/test_chat_visibility.py`, middleware tests (9 passed) at `tests/middleware/test_service_token.py`. Source files present: `src/features/chat/service.py`, `src/features/chat/router.py`, `src/features/chat/schemas.py`."
 
 ## Summary
 
 total: 4
-passed: 1
-issues: 3
+passed: 4
+issues: 0
 pending: 0
 skipped: 0
 blocked: 0
 
 ## Gaps
 
-- truth: "The backend exposes the planned WhatsApp webhook endpoints."
-  status: failed
-  reason: "Automated verification failed because no `/webhook/whatsapp` route was found in `backend/src`."
-  severity: blocker
-  test: 2
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
-- truth: "The Phase 6 webhook automated suite exists and passes."
-  status: failed
-  reason: "Automated verification failed because `python -m pytest tests/features/webhook -x -q` reported that `tests/features/webhook` does not exist."
-  severity: blocker
-  test: 3
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
-- truth: "The Phase 6 chat visibility and middleware validation surface exists."
-  status: failed
-  reason: "Repository contents show chat models only, with no chat services/routes and no middleware/chat test directories."
-  severity: blocker
-  test: 4
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+(none)
