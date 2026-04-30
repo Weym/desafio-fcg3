@@ -28,6 +28,7 @@ class ChatSession(Base):
     student_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("students.id"), nullable=False)
     whatsapp_phone: Mapped[str] = mapped_column(String(20), nullable=False)
     status: Mapped[str] = mapped_column(String(20), nullable=False, server_default=text("'active'"))
+    verification_state: Mapped[str] = mapped_column(String(20), nullable=False, server_default=text("'unverified'"))
     started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
     ended_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 

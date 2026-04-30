@@ -131,6 +131,15 @@ class Settings(BaseSettings):
         default="",
         description="WhatsApp app secret for webhook signature validation.",
     )
+    whatsapp_api_version: str = Field(
+        default="v18.0",
+        description="WhatsApp Graph API version (MINOR-2: configurable, not hardcoded).",
+    )
+
+    ai_service_url: str = Field(
+        default="http://langchain-service:8001",
+        description="Internal AI service URL for background task processing.",
+    )
 
     resend_api_key: str = Field(
         pattern=r"^re_",
