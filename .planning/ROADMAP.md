@@ -3,7 +3,7 @@
 **Milestone:** M1 — Backend + AI Service + MCP Server
 **Granularity:** Standard
 **Coverage:** 69/69 requirements mapped
-**Last Updated:** 2026-04-26
+**Last Updated:** 2026-04-30
 
 ---
 
@@ -14,7 +14,7 @@
 - [x] **Phase 3: Business Feature Slices** — All FastAPI feature endpoints (students, courses, enrollment, grades, documents, appointments, staff dashboard)
 - [x] **Phase 4: MCP Server** — 16 tools over streamable-http, student_id injection, mcp_action_logs
 - [ ] **Phase 5: AI Service** — LangChain ReAct agent, RAG pipeline, provider-agnostic LLM, knowledge base ingest (reopened after partial UAT)
-- [ ] **Phase 6: WhatsApp Webhook & Integration** — End-to-end chatbot flow, webhook hardening, chat visibility, test suite
+- [x] **Phase 6: WhatsApp Webhook & Integration** — End-to-end chatbot flow, webhook hardening, chat visibility, test suite
 
 ---
 
@@ -158,6 +158,7 @@ Plans:
 **Goal:** A student can send a WhatsApp message and receive an AI-powered response about their academic situation — the end-to-end chatbot flow is operational and hardened against the five-second timeout, signature spoofing, and background task failures.
 **Depends on:** Phase 5
 **Requirements:** WH-01, WH-02, WH-03, WH-04, WH-05, CHAT-01, CHAT-02, CHAT-03, TEST-01, TEST-02, TEST-03, TEST-04, TEST-05
+**Verification:** `complete` — all 4 plans executed, code review (7 findings fixed), UAT 4/4 passed, HUMAN-UAT 3/3 passed. End-to-end WhatsApp flow verified. pg_cron infrastructure gap resolved with custom Docker image.
 
 ### Success Criteria
 1. WhatsApp webhook challenge (`GET /webhook/whatsapp?hub.challenge=...`) is answered correctly, enabling webhook registration with Meta.
@@ -184,5 +185,5 @@ Plans:
 | 2. Authentication | 4/4 | Complete | 2026-04-24 |
 | 3. Business Feature Slices | 14/14 | Complete | 2026-04-25 |
 | 4. MCP Server | 6/6 | Complete | 2026-04-25 |
-| 5. AI Service | 8/9 | Gaps Found | - |
-| 6. WhatsApp Webhook & Integration | 0/4 | Blocked by Phase 5 | - |
+| 5. AI Service | 9/9 | Gaps Found | - |
+| 6. WhatsApp Webhook & Integration | 4/4 | Complete | 2026-04-30 |
