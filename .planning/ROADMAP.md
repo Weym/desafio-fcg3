@@ -129,7 +129,7 @@ Plans:
 **Goal:** The LangChain ReAct agent answers student academic questions in Portuguese, using MCP tools for live data and PGVector RAG for regulation and policy, with any LLM provider configurable by environment variable.
 **Depends on:** Phase 4
 **Requirements:** AI-01, AI-02, AI-03, AI-04, AI-05
-**Verification:** `gaps_found` — plans `05-01` through `05-08` complete. Plan 08 closed credential alignment and UUID gaps. `05-VERIFICATION.md` re-verification (4/5 truths) found 2 remaining gaps: `ingest.py` reads `DATABASE_URL` from `os.environ` (fails in Docker after Plan 08 removal) and a stale regression test. Plan 09 addresses both.
+**Verification:** `gaps_found` — plans `05-01` through `05-09` complete. UAT re-run (2026-04-30) passed 4/6 tests. 1 blocker: RAG threshold too high for OpenRouter embeddings (scores 0.49-0.67 vs threshold 0.75). Non-blocking: MCP action_logs UUID missing. Plan 10 addresses both.
 
 ### Success Criteria
 1. Agent receives a student message, selects appropriate MCP tools, calls them, and generates a coherent Portuguese-language response — observable end-to-end without WhatsApp by directly invoking the service HTTP endpoint.
@@ -138,7 +138,7 @@ Plans:
 4. Setting `LLM_PROVIDER=gemini` in the environment switches the agent to Gemini without any code changes; setting `LLM_PROVIDER=openai` uses OpenAI — both produce valid responses.
 5. Running `python -m ai_service.ingest` processes all five knowledge base documents (`matricula.md`, `regulamento.pdf`, `faq.md`, `calendario.md`, `curriculo.md`), generates embeddings, and stores chunks in `knowledge_base_chunks`.
 
-**Plans:** 9 plans
+**Plans:** 10 plans
 
 Plans:
 - [x] 05-01-PLAN.md — AI service scaffold: FastAPI app, psycopg3 DB layer, LLM factory, system prompt, config
@@ -150,6 +150,7 @@ Plans:
 - [x] 05-07-PLAN.md — Gap closure: package-based AI service runtime alignment and startup regressions
 - [x] 05-08-PLAN.md — Gap closure: align DATABASE_URL credentials with POSTGRES_PASSWORD and fix chat_messages UUID generation
 - [x] 05-09-PLAN.md — Gap closure: propagate POSTGRES_* component var pattern to ingest.py and fix stale regression test
+- [ ] 05-10-PLAN.md — Gap closure: configurable RAG similarity threshold + MCP action logs UUID fix
 
 ---
 
@@ -185,5 +186,5 @@ Plans:
 | 2. Authentication | 4/4 | Complete | 2026-04-24 |
 | 3. Business Feature Slices | 14/14 | Complete | 2026-04-25 |
 | 4. MCP Server | 6/6 | Complete | 2026-04-25 |
-| 5. AI Service | 9/9 | Gaps Found | - |
+| 5. AI Service | 9/10 | Gaps Found | - |
 | 6. WhatsApp Webhook & Integration | 4/4 | Complete | 2026-04-30 |
