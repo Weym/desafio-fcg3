@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-last_updated: "2026-04-30T18:10:15.047Z"
+last_updated: "2026-04-30T19:15:00.000Z"
 last_activity: 2026-04-30
 progress:
   total_phases: 6
@@ -61,10 +61,10 @@ Progress: [█████████░] 90%
 
 ## Current Focus
 
-**Phase 05 has been reopened by resumed UAT**
-Phase 05 still has all seven implementation plans complete, but resumed UAT on 2026-04-26 found three blockers and the phase is no longer ready to hand off to Phase 06. `05-UAT.md` is now `partial` with 3 recorded issues and 3 remaining tests. The current blockers are: the AI container is healthy but no longer host-reachable at `localhost:8001`, `python -m ai_service.ingest` fails with an invalid OpenAI API key, and authorized `/chat` requests fall back because inserts into `chat_messages` violate the live `id` NOT NULL constraint.
-Next action: Diagnose and close the Phase 05 gaps before resuming Phase 06.
-Resume file: None
+**Phase 05 UAT re-run complete (2026-04-30) — 1 blocker remains**
+Plans 08-09 fixed the credential alignment and UUID generation issues. Fresh UAT passed 4/6 tests. One blocker: RAG similarity scores via OpenRouter embeddings are systematically low (max ~0.67 vs threshold 0.75), so the knowledge base tool always returns empty. MCP action logging also has a UUID issue (non-blocking for Phase 05 scope but affects Phase 06 integration).
+Next action: `/gsd-plan-phase 05 --gaps` to plan the RAG threshold fix, then execute.
+Resume file: `.planning/phases/05-ai-service/05-UAT.md`
 
 ## Accumulated Context
 
@@ -132,7 +132,9 @@ Recent decisions affecting current work:
 
 ### Known Risks
 
-- Phase 05 is not currently goal-complete: ingest cannot run with the configured OpenAI key, and live `/chat` calls fall back before agent execution completes because chat persistence fails at the database layer.
+- Phase 05 RAG retrieval is non-functional: OpenRouter embedding proxy produces cosine similarity scores 0.49-0.67 for highly relevant content, always below the 0.75 threshold in `ai_service/rag.py`. Fix: make threshold configurable or lower it.
+- MCP action logging (`mcp_action_logs.id`) does not generate UUIDs — MCP tool calls crash during action logging. Affects Phase 06 integration when agent invokes MCP tools.
+- Windows portability: `reconcile_dev_credentials.sh` needs `.gitattributes` enforcement of LF line endings.
 - Phase 6 must preserve the <5s WhatsApp webhook response budget by keeping AI work in background tasks with explicit `done_callback` error logging.
 
 ### Architecture Constraints (non-negotiable)
