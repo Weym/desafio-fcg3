@@ -158,6 +158,7 @@ async def whatsapp_webhook(request: Request) -> Response:
                         await webhook_service.handle_verification_flow(
                             session, text_content, phone, db, wa_client
                         )
+                        await db.commit()
                         continue
 
                     # Verified: dispatch to background task (Plan 02)
