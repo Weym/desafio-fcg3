@@ -128,8 +128,8 @@ class Settings(BaseSettings):
         description="WhatsApp webhook verification token.",
     )
     whatsapp_app_secret: str = Field(
-        default="",
-        description="WhatsApp app secret for webhook signature validation.",
+        min_length=1,
+        description="WhatsApp app secret for webhook signature validation (REQUIRED).",
     )
     whatsapp_api_version: str = Field(
         default="v18.0",
