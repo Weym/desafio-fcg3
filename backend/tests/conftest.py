@@ -12,6 +12,7 @@ os.environ.setdefault("MCP_SERVICE_TOKEN", "y" * 64)
 os.environ.setdefault("WHATSAPP_TOKEN", "placeholder-whatsapp-token")
 os.environ.setdefault("WHATSAPP_PHONE_NUMBER_ID", "123456")
 os.environ.setdefault("WHATSAPP_WEBHOOK_VERIFY_TOKEN", "verify-token")
+os.environ.setdefault("WHATSAPP_APP_SECRET", "test-app-secret-for-hmac")
 # ---------------------------------------------------------
 
 import sys

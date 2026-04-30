@@ -208,7 +208,7 @@ class TestProcessVerifiedMessage:
         wa_client = AsyncMock()
         wa_client.send_text_message = AsyncMock(return_value=True)
 
-        mock_response = AsyncMock()
+        mock_response = MagicMock()
         mock_response.status_code = 200
         mock_response.json.return_value = {"response": "Test"}
 
@@ -231,6 +231,6 @@ class TestProcessVerifiedMessage:
 
             await process_verified_message(session_id, "Test", "5521999999999", wa_client)
 
-        # After execution, a lock should be stored for this session
-        assert str(session_id) in _session_locks
-        assert isinstance(_session_locks[str(session_id)], asyncio.Lock)
+        # After execution, lock should be cleaned up (HI-01 fix: prevent memory leak)
+        # The lock was used during processing but removed after completion
+        assert str(session_id) not in _session_locks
