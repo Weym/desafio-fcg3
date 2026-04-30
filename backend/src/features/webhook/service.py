@@ -13,7 +13,7 @@ import uuid
 from datetime import datetime, timezone
 from typing import Optional
 
-from sqlalchemy import select, and_
+from sqlalchemy import select, update, and_
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -65,8 +65,9 @@ class WebhookService:
     ) -> ChatSession:
         """Reuse active session or create new one per D-10.
 
-        When creating from a closed session's phone, new session starts
-        'unverified' per D-13.
+        D-10: Reuse active session per phone number.
+        D-13: Closed session → new session, verification_state starts unverified.
+        Updates updated_at on reuse for pg_cron auto-close tracking.
         """
         result = await db.execute(
             select(ChatSession).where(
@@ -78,9 +79,12 @@ class WebhookService:
         )
         session = result.scalar_one_or_none()
         if session is not None:
+            # Touch updated_at for auto-close tracking (D-12)
+            session.updated_at = datetime.now(timezone.utc)
+            await db.flush()
             return session
 
-        # Create new session — starts unverified
+        # Create new session — starts unverified (D-13)
         session = ChatSession(
             student_id=student_id,
             whatsapp_phone=phone,
@@ -104,6 +108,7 @@ class WebhookService:
 
         On IntegrityError (duplicate wamid per MODERATE-1), returns None
         to signal dedup — caller should skip processing.
+        Also touches session.updated_at for pg_cron auto-close tracking.
         """
         msg = ChatMessage(
             chat_session_id=session_id,
@@ -115,6 +120,12 @@ class WebhookService:
         db.add(msg)
         try:
             await db.flush()
+            # Touch session updated_at for auto-close tracking (D-12)
+            await db.execute(
+                update(ChatSession)
+                .where(ChatSession.id == session_id)
+                .values(updated_at=datetime.now(timezone.utc))
+            )
             return msg
         except IntegrityError:
             await db.rollback()

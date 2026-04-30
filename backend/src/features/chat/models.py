@@ -31,6 +31,7 @@ class ChatSession(Base):
     verification_state: Mapped[str] = mapped_column(String(20), nullable=False, server_default=text("'unverified'"))
     started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
     ended_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
     student: Mapped["Student"] = relationship(back_populates="chat_sessions")
     chat_messages: Mapped[list["ChatMessage"]] = relationship(back_populates="chat_session")
