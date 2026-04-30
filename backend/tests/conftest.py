@@ -49,10 +49,12 @@ import src.features.scheduling.models  # noqa: F401,E402
 import src.features.chat.models  # noqa: F401,E402
 import src.features.knowledge_base.models  # noqa: F401,E402
 
-# Tables that SQLite can handle (excludes those using JSONB/Vector: chat_*, mcp_action_logs, knowledge_base_chunks)
+# Tables that SQLite can handle (excludes those using JSONB/Vector: mcp_action_logs, knowledge_base_chunks)
+# chat_sessions and chat_messages use only standard column types (VARCHAR, Text, DateTime, UUID)
+# and are safe for SQLite testing. mcp_action_logs has JSONB columns; knowledge_base_chunks has Vector.
 _SQLITE_SAFE_TABLES = [
     t for t in Base.metadata.sorted_tables
-    if t.name not in ("chat_sessions", "chat_messages", "mcp_action_logs", "knowledge_base_chunks")
+    if t.name not in ("mcp_action_logs", "knowledge_base_chunks")
 ]
 
 # ---- Test engine: use SQLite (aiosqlite) for isolation without PostgreSQL ----
