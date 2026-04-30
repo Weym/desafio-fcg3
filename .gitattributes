@@ -1,0 +1,3 @@
+# Force LF line endings for shell scripts so they execute correctly
+# inside Linux containers regardless of the host OS checkout setting.
+*.sh text eol=lf
