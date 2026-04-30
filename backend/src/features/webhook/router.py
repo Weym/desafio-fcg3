@@ -11,6 +11,7 @@ CRITICAL-4: Background tasks open their OWN DB session (not request-scoped).
 from __future__ import annotations
 
 import asyncio
+import hmac
 import logging
 
 from fastapi import APIRouter, HTTPException, Query, Request
@@ -45,7 +46,7 @@ async def webhook_challenge(
     settings = get_settings()
     if (
         hub_mode == "subscribe"
-        and hub_verify_token == settings.whatsapp_webhook_verify_token
+        and hmac.compare_digest(hub_verify_token or "", settings.whatsapp_webhook_verify_token)
     ):
         return PlainTextResponse(content=hub_challenge)
     raise HTTPException(status_code=403, detail="Verification failed")
