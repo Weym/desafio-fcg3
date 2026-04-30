@@ -119,16 +119,16 @@ class WebhookService:
         )
         db.add(msg)
         try:
-            await db.flush()
-            # Touch session updated_at for auto-close tracking (D-12)
-            await db.execute(
-                update(ChatSession)
-                .where(ChatSession.id == session_id)
-                .values(updated_at=datetime.now(timezone.utc))
-            )
+            async with db.begin_nested():  # SAVEPOINT — rollback scoped, not full txn
+                await db.flush()
+                # Touch session updated_at for auto-close tracking (D-12)
+                await db.execute(
+                    update(ChatSession)
+                    .where(ChatSession.id == session_id)
+                    .values(updated_at=datetime.now(timezone.utc))
+                )
             return msg
         except IntegrityError:
-            await db.rollback()
             logger.info("Duplicate wamid detected, skipping: %s", wamid)
             return None
 
