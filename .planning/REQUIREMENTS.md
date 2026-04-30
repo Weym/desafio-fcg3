@@ -105,9 +105,9 @@
 - [x] **WH-02**: Sistema responde 200 OK em < 5 segundos e despacha processamento da mensagem em background com `asyncio.create_task` + `add_done_callback` para visibilidade de falhas
 - [x] **WH-03**: Sistema trata mensagens de mídia (áudio, imagem, vídeo, documento, sticker, localização) com resposta padrão sem passar pelo agente; tipo de mídia é registrado em `chat_messages`
 - [x] **WH-04**: Sistema deduplica mensagens por `whatsapp_message_id` — mensagem com ID já existente é ignorada
-- [ ] **WH-05**: Sistema responde ao challenge de verificação do webhook WhatsApp (`GET /webhook/whatsapp` com `hub.challenge`)
-- [ ] **CHAT-01**: Staff pode listar sessões de chat com filtro por aluno e status
-- [ ] **CHAT-02**: Usuário autenticado pode listar mensagens de uma sessão de chat
+- [x] **WH-05**: Sistema responde ao challenge de verificação do webhook WhatsApp (`GET /webhook/whatsapp` com `hub.challenge`)
+- [x] **CHAT-01**: Staff pode listar sessões de chat com filtro por aluno e status
+- [x] **CHAT-02**: Usuário autenticado pode listar mensagens de uma sessão de chat
 - [ ] **CHAT-03**: Staff pode consultar logs MCP de uma sessão de chat (tool_name, params, resultado, reasoning, latência)
 
 ---
@@ -230,9 +230,9 @@
 | WH-02 | Phase 6: WhatsApp Webhook & Integration | Complete |
 | WH-03 | Phase 6: WhatsApp Webhook & Integration | Complete |
 | WH-04 | Phase 6: WhatsApp Webhook & Integration | Complete |
-| WH-05 | Phase 6: WhatsApp Webhook & Integration | Pending |
-| CHAT-01 | Phase 6: WhatsApp Webhook & Integration | Pending |
-| CHAT-02 | Phase 6: WhatsApp Webhook & Integration | Pending |
+| WH-05 | Phase 6: WhatsApp Webhook & Integration | Complete |
+| CHAT-01 | Phase 6: WhatsApp Webhook & Integration | Complete |
+| CHAT-02 | Phase 6: WhatsApp Webhook & Integration | Complete |
 | CHAT-03 | Phase 6: WhatsApp Webhook & Integration | Pending |
 | TEST-01 | Phase 6: WhatsApp Webhook & Integration | Pending |
 | TEST-02 | Phase 6: WhatsApp Webhook & Integration | Pending |
