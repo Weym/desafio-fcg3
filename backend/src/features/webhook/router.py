@@ -16,6 +16,10 @@ import logging
 from fastapi import APIRouter, HTTPException, Query, Request
 from fastapi.responses import PlainTextResponse, Response
 
+from src.features.webhook.background import (
+    _handle_task_result,
+    process_verified_message,
+)
 from src.features.webhook.dependencies import get_whatsapp_client, get_webhook_service
 from src.features.webhook.schemas import WhatsAppWebhookPayload
 from src.infrastructure.config import get_settings
@@ -25,36 +29,6 @@ from src.infrastructure.whatsapp_client import validate_signature
 logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["webhook"])
-
-
-def _handle_task_result(task: asyncio.Task) -> None:
-    """CRITICAL-3: Log exceptions from background tasks to prevent silent failures."""
-    try:
-        exc = task.exception()
-        if exc is not None:
-            logger.error(
-                "Background task failed: %s: %s",
-                type(exc).__name__,
-                exc,
-                exc_info=exc,
-            )
-    except asyncio.CancelledError:
-        logger.warning("Background task was cancelled")
-
-
-async def process_verified_message(
-    session_id, message_text: str, phone: str
-) -> None:
-    """Placeholder for verified message processing (Plan 02).
-
-    Will be fully implemented in Plan 02 with retry logic and AI service
-    integration. For now, logs that processing is pending.
-    """
-    logger.info(
-        "Message processing not yet implemented - session=%s phone=%s",
-        session_id,
-        phone,
-    )
 
 
 @router.get("/webhook/whatsapp")
@@ -190,7 +164,7 @@ async def whatsapp_webhook(request: Request) -> Response:
                     await db.commit()
                     task = asyncio.create_task(
                         process_verified_message(
-                            session.id, text_content, phone
+                            session.id, text_content, phone, wa_client
                         )
                     )
                     task.add_done_callback(_handle_task_result)  # CRITICAL-3
