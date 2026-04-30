@@ -8,7 +8,7 @@ from __future__ import annotations
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 
 # ---------------------------------------------------------------------------
@@ -28,6 +28,14 @@ class StudentCreate(BaseModel):
     registration_number: str = Field(..., min_length=1, max_length=20)
     curriculum_id: UUID | None = None
 
+    @field_validator("phone", mode="before")
+    @classmethod
+    def normalize_phone(cls, v: str | None) -> str | None:
+        """Strip + prefix so phone is always stored without it (D-04)."""
+        if v is not None:
+            return v.lstrip("+")
+        return v
+
 
 class StudentUpdate(BaseModel):
     """PUT /students/{id} — partial update by staff."""
@@ -37,6 +45,14 @@ class StudentUpdate(BaseModel):
     phone: str | None = Field(default=None, max_length=20)
     semester: int | None = Field(default=None, ge=1)
     status: str | None = Field(default=None, pattern=r"^(active|inactive|graduated|locked)$")
+
+    @field_validator("phone", mode="before")
+    @classmethod
+    def normalize_phone(cls, v: str | None) -> str | None:
+        """Strip + prefix so phone is always stored without it (D-04)."""
+        if v is not None:
+            return v.lstrip("+")
+        return v
 
 
 # ---------------------------------------------------------------------------

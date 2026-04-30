@@ -192,7 +192,7 @@ async def seed_users(db_session):
         id=uuid.uuid4(),
         name="Test Student",
         email="student@test.edu",
-        phone="+5511999990001",
+        phone="5511999990001",
         registration_number="STU001",
         semester=3,
         status="active",
@@ -202,7 +202,7 @@ async def seed_users(db_session):
         id=uuid.uuid4(),
         name="Test Staff",
         email="staff@test.edu",
-        phone="+5511999990002",
+        phone="5511999990002",
         role="staff",
     )
     db_session.add(student)

@@ -160,7 +160,7 @@ STUDENTS_DATA = (
     StudentSeed(
         name="Ana Silva",
         email="ana.silva@usp.br",
-        phone="+5511987654321",
+        phone="5511987654321",
         registration_number="20250001",
         semester=2,
         enrollment_year=2025,
@@ -176,7 +176,7 @@ STUDENTS_DATA = (
     StudentSeed(
         name="Bruno Santos",
         email="bruno.santos@usp.br",
-        phone="+5511987654322",
+        phone="5511987654322",
         registration_number="20240002",
         semester=4,
         enrollment_year=2024,
@@ -201,7 +201,7 @@ STUDENTS_DATA = (
     StudentSeed(
         name="Carla Oliveira",
         email="carla.oliveira@usp.br",
-        phone="+5511987654323",
+        phone="5511987654323",
         registration_number="20230003",
         semester=6,
         enrollment_year=2023,
@@ -226,7 +226,7 @@ STUDENTS_DATA = (
     StudentSeed(
         name="Daniel Costa",
         email="daniel.costa@usp.br",
-        phone="+5511987654324",
+        phone="5511987654324",
         registration_number="20220004",
         semester=8,
         enrollment_year=2022,
@@ -251,7 +251,7 @@ STUDENTS_DATA = (
     StudentSeed(
         name="Eva Martins",
         email="eva.martins@usp.br",
-        phone="+5511987654325",
+        phone="5511987654325",
         registration_number="20250005",
         semester=2,
         enrollment_year=2025,
