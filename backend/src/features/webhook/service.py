@@ -221,7 +221,6 @@ class WebhookService:
         await otp_service.generate_and_send_code(db, email)
         session.verification_state = "awaiting_code"
         await db.flush()
-        await db.commit()
 
         await wa_client.send_text_message(
             phone,
@@ -280,7 +279,6 @@ class WebhookService:
             )
             session.verification_state = "awaiting_email"
             await db.flush()
-            await db.commit()
             return
 
         # Check expiry
@@ -295,7 +293,6 @@ class WebhookService:
             )
             session.verification_state = "awaiting_email"
             await db.flush()
-            await db.commit()
             return
 
         # Verify code hash
@@ -308,14 +305,12 @@ class WebhookService:
                 code_row.used = True
                 await db.flush()
                 await otp_service.generate_and_send_code(db, student.email)
-                await db.commit()
                 await wa_client.send_text_message(
                     phone,
                     "Codigo invalido. Limite atingido. Enviei um novo codigo para seu email.",
                 )
             else:
                 await db.flush()
-                await db.commit()
                 await wa_client.send_text_message(
                     phone,
                     f"Codigo invalido. Tente novamente. ({remaining} tentativa(s) restante(s))",
@@ -326,7 +321,6 @@ class WebhookService:
         code_row.used = True
         session.verification_state = "verified"
         await db.flush()
-        await db.commit()
 
         await wa_client.send_text_message(
             phone,
