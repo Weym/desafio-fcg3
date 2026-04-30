@@ -93,10 +93,17 @@ async def process_verified_message(
                             response.status_code,
                             attempt + 1,
                         )
-            except (httpx.HTTPError, Exception) as e:
+            except httpx.HTTPError as e:
                 logger.warning(
                     "AI service call attempt %d failed: %s", attempt + 1, e
                 )
+            except Exception as e:
+                logger.error(
+                    "Unexpected error calling AI service attempt %d: %s",
+                    attempt + 1,
+                    e,
+                )
+                break  # Don't retry on unexpected errors
 
         # If both attempts failed, use fallback (D-06)
         if agent_response is None:
