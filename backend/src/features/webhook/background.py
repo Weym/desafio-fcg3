@@ -64,7 +64,8 @@ async def process_verified_message(
     CRITICAL-4: Opens its OWN DB session — never uses the request-scoped one.
     """
     settings = get_settings()
-    lock = _session_locks.setdefault(str(session_id), asyncio.Lock())
+    lock_key = str(session_id)
+    lock = _session_locks.setdefault(lock_key, asyncio.Lock())
 
     async with lock:
         agent_response: str | None = None
@@ -122,3 +123,7 @@ async def process_verified_message(
 
         # Send response via WhatsApp (D-07: WhatsApp client already handles retry)
         await wa_client.send_text_message(phone, agent_response)
+
+    # Clean up lock if no other coroutine is waiting on it (prevent memory leak)
+    if not lock.locked():
+        _session_locks.pop(lock_key, None)
