@@ -99,6 +99,7 @@ async def test_agent_rebuilds_last_twenty_messages_in_chronological_order(
         CHAT_HISTORY_K=20,
         MAX_AGENT_ITERATIONS=10,
         MAX_AGENT_EXECUTION_TIME=45.0,
+        RAG_SIMILARITY_THRESHOLD=0.45,
     )
 
     response = await invoke_agent(

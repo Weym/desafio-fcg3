@@ -24,8 +24,8 @@ async def test_student_gets_portuguese_response_with_mcp_and_rag_tools_wired(
         calls["embeddings"] = settings.EMBEDDING_PROVIDER
         return SimpleNamespace(name="fake_embeddings")
 
-    def fake_create_rag_tool(db_pool, embeddings):
-        calls["rag"] = (db_pool, embeddings)
+    def fake_create_rag_tool(db_pool, embeddings, similarity_threshold=0.45):
+        calls["rag"] = (db_pool, embeddings, similarity_threshold)
         return SimpleNamespace(name="search_knowledge_base")
 
     def fake_create_chat_agent(settings, tools, system_prompt: str):
@@ -66,6 +66,7 @@ async def test_student_gets_portuguese_response_with_mcp_and_rag_tools_wired(
         MAX_AGENT_ITERATIONS=10,
         MAX_AGENT_EXECUTION_TIME=45.0,
         LLM_PROVIDER="openai",
+        RAG_SIMILARITY_THRESHOLD=0.45,
     )
 
     response = await invoke_agent(
