@@ -53,8 +53,14 @@ async def call_api_raw(
     client: httpx.AsyncClient,
     method: str,
     path: str,
+    *,
+    student_id: str | None = None,
     **kwargs: Any,
 ) -> tuple[httpx.Response, bool]:
+    if student_id is not None:
+        existing_headers = kwargs.get("headers") or {}
+        kwargs["headers"] = {**existing_headers, "X-Student-Id": student_id}
+
     try:
         response = await client.request(method, path, **kwargs)
         response.raise_for_status()
@@ -84,9 +90,11 @@ async def call_api(
     client: httpx.AsyncClient,
     method: str,
     path: str,
+    *,
+    student_id: str | None = None,
     **kwargs: Any,
 ) -> tuple[dict[str, Any], bool]:
-    response, retried = await call_api_raw(client, method, path, **kwargs)
+    response, retried = await call_api_raw(client, method, path, student_id=student_id, **kwargs)
     data = response.json()
     if not isinstance(data, dict):
         raise ToolError(GENERIC_SERVER_ERROR)
