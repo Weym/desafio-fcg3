@@ -30,7 +30,7 @@ Aluno envia mensagem no WhatsApp e recebe resposta precisa sobre sua situação 
 - ✓ Alunos: CRUD, resumo acadêmico com CRA, cursos disponíveis com filtro de pré-requisitos — validated in Phase 3
 - ✓ Staff Dashboard: KPIs agregados de todos os domínios — validated in Phase 3
 - ✓ AI Service: agente ReAct em LangChain com MCP tools, resposta em português e regressões de chat/runtime — validated in Phase 5
-- ✓ AI Service: pipeline RAG com threshold 0.75 e ingest da knowledge base em `ai_service/ingest.py` — validated in Phase 5
+- ✓ AI Service: pipeline RAG com threshold configurável via `RAG_SIMILARITY_THRESHOLD` (default 0.45, calibrado para embeddings proxied via OpenRouter) e ingest da knowledge base em `ai_service/ingest.py` — validated in Phase 5
 - ✓ AI Service: provider agnóstico via `LLM_PROVIDER` (`openai`/`gemini`) — validated in Phase 5
 
 ### Active
@@ -115,4 +115,4 @@ Este documento evolui a cada transição de fase e marco de milestone.
 4. Atualizar Context com estado atual
 
 ---
-*Last updated: 2026-04-26 after Phase 5 Nyquist audit closure*
+*Last updated: 2026-05-02 after Phase 5 gap closure (Plan 05-10) — RAG threshold configurable, MCP action_logs UUID fix*
