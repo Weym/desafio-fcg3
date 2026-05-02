@@ -7,11 +7,14 @@ from typing import Any
 from langchain_core.tools import tool
 
 
-SIMILARITY_THRESHOLD = 0.75
 MAX_RESULTS = 3
 
 
-def create_rag_tool(db_pool: Any, embeddings: Any):
+def create_rag_tool(
+    db_pool: Any,
+    embeddings: Any,
+    similarity_threshold: float = 0.45,
+):
     """Create the LangChain knowledge-base search tool bound to a DB pool."""
 
     @tool
@@ -41,7 +44,7 @@ def create_rag_tool(db_pool: Any, embeddings: Any):
             with connection.cursor() as cursor:
                 cursor.execute(
                     query,
-                    (vector_str, vector_str, SIMILARITY_THRESHOLD),
+                    (vector_str, vector_str, similarity_threshold),
                 )
                 rows = cursor.fetchall()
 

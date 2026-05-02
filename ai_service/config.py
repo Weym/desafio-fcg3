@@ -34,6 +34,9 @@ class Settings:
         os.environ.get("MAX_AGENT_EXECUTION_TIME", "45.0")
     )
     CHAT_HISTORY_K: int = int(os.environ.get("CHAT_HISTORY_K", "20"))
+    RAG_SIMILARITY_THRESHOLD: float = float(
+        os.environ.get("RAG_SIMILARITY_THRESHOLD", "0.45")
+    )
 
     def __post_init__(self) -> None:
         if not self.DATABASE_URL:

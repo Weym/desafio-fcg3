@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from ai_service.rag import SIMILARITY_THRESHOLD, create_rag_tool
+from ai_service.rag import create_rag_tool
 
 
 class _FakeCursor:
@@ -63,12 +63,14 @@ def test_retrieval_uses_threshold_and_formats_top_chunks(monkeypatch: pytest.Mon
     cursor = _FakeCursor(rows)
     fake_embeddings = FakeEmbeddings()
 
-    tool = create_rag_tool(_FakePool(cursor), fake_embeddings)
+    tool = create_rag_tool(
+        _FakePool(cursor), fake_embeddings, similarity_threshold=0.75
+    )
     result = tool.func("prazo de matrícula")
 
     assert "Prazo de matrícula até sexta." in result
     assert "Trancamento vai até 30/04." in result
-    assert cursor.calls[0][1] == ("[0.1, 0.2]", "[0.1, 0.2]", SIMILARITY_THRESHOLD)
+    assert cursor.calls[0][1] == ("[0.1, 0.2]", "[0.1, 0.2]", 0.75)
     assert "LIMIT 3" in cursor.calls[0][0]
 
 
@@ -81,6 +83,23 @@ def test_retrieval_returns_empty_string_when_no_chunk_meets_threshold(
 
     cursor = _FakeCursor([])
 
-    tool = create_rag_tool(_FakePool(cursor), FakeEmbeddings())
+    tool = create_rag_tool(
+        _FakePool(cursor), FakeEmbeddings(), similarity_threshold=0.75
+    )
 
     assert tool.func("assunto sem resultado") == ""
+
+
+def test_retrieval_uses_custom_threshold() -> None:
+    class FakeEmbeddings:
+        def embed_query(self, query: str):
+            return [0.5, 0.6]
+
+    cursor = _FakeCursor([("Chunk content.", "faq.md", "faq", 0.50)])
+    tool = create_rag_tool(
+        _FakePool(cursor), FakeEmbeddings(), similarity_threshold=0.40
+    )
+    result = tool.func("test query")
+
+    assert "Chunk content." in result
+    assert cursor.calls[0][1] == ("[0.5, 0.6]", "[0.5, 0.6]", 0.40)

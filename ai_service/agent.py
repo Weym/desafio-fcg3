@@ -86,7 +86,11 @@ async def invoke_agent(
 
     mcp_tools = await load_mcp_tools(settings.MCP_SERVER_URL, session_id)
     embeddings = create_embeddings(settings)
-    rag_tool = create_rag_tool(db_pool, embeddings)
+    rag_tool = create_rag_tool(
+        db_pool,
+        embeddings,
+        similarity_threshold=settings.RAG_SIMILARITY_THRESHOLD,
+    )
     agent = create_chat_agent(settings, [*mcp_tools, rag_tool], system_prompt)
 
     history_messages = load_chat_history(
