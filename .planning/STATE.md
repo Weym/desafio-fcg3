@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-05-02T20:29:14.389Z"
+last_updated: "2026-05-02T21:29:43.701Z"
 last_activity: 2026-05-02
 progress:
   total_phases: 6
   completed_phases: 6
-  total_plans: 46
-  completed_plans: 46
+  total_plans: 47
+  completed_plans: 47
   percent: 100
 ---
 
@@ -17,8 +17,8 @@ progress:
 
 ## Current Position
 
-Phase: 06
-Plan: Not started
+Phase: 05 (ai-service) — EXECUTING
+Plan: 2 of 11
 Status: Ready to execute
 Last activity: 2026-05-02
 
@@ -49,6 +49,7 @@ Progress: [█████████░] 90%
 | Phase 06 P04 | 13 min | 2 tasks | 17 files |
 | Phase 05 P10 | 2 min | 2 tasks | 6 files |
 | Phase 01-infrastructure-schema P08 | 1 min | 3 tasks | 2 files |
+| Phase 05 P11 | 4 min | 2 tasks | 11 files |
 
 ## Phase Status
 
@@ -130,6 +131,8 @@ Recent decisions affecting current work:
 - [Phase 05]: mcp_action_logs INSERT now uses server-side gen_random_uuid() for the id column instead of adding Python-side UUID generation — schema owns the default, positional parameters unchanged, middleware test destructuring preserved
 - [Phase 01-infrastructure-schema]: knowledge_base_chunks placed first in WARNING_TABLES — no FK deps, safe truncate order
 - [Phase 01-infrastructure-schema]: Docker pre-flight check requires postgres + fastapi-app services only (minimum for phase_01 tests)
+- [Phase 05]: Centralized student_id kwarg in call_api_raw/call_api rather than per-tool header manipulation
+- [Phase 05]: All 16 tools now resolve student_id via Depends(resolve_student_id) — backend requires X-Student-Id on all X-Service-Token requests
 
 ### Key Decisions Pending
 
