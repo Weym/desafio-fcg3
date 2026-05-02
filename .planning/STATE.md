@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-05-02T19:17:34.030Z"
+last_updated: "2026-05-02T20:29:14.389Z"
 last_activity: 2026-05-02
 progress:
   total_phases: 6
   completed_phases: 6
-  total_plans: 45
-  completed_plans: 45
+  total_plans: 46
+  completed_plans: 46
   percent: 100
 ---
 
@@ -48,6 +48,7 @@ Progress: [█████████░] 90%
 | Phase 06 P03 | 2 min | 2 tasks | 4 files |
 | Phase 06 P04 | 13 min | 2 tasks | 17 files |
 | Phase 05 P10 | 2 min | 2 tasks | 6 files |
+| Phase 01-infrastructure-schema P08 | 1 min | 3 tasks | 2 files |
 
 ## Phase Status
 
@@ -127,6 +128,8 @@ Recent decisions affecting current work:
 - [Phase 06]: Included chat_sessions/chat_messages in SQLite test tables; patch_webhook_db fixture for async_session redirect; MagicMock for httpx Response (sync .json() method)
 - [Phase 05]: RAG similarity threshold made configurable via RAG_SIMILARITY_THRESHOLD env var (default 0.45) because OpenRouter embedding proxy caps similarity at ~0.67 for perfect matches — 0.75 default was too aggressive
 - [Phase 05]: mcp_action_logs INSERT now uses server-side gen_random_uuid() for the id column instead of adding Python-side UUID generation — schema owns the default, positional parameters unchanged, middleware test destructuring preserved
+- [Phase 01-infrastructure-schema]: knowledge_base_chunks placed first in WARNING_TABLES — no FK deps, safe truncate order
+- [Phase 01-infrastructure-schema]: Docker pre-flight check requires postgres + fastapi-app services only (minimum for phase_01 tests)
 
 ### Key Decisions Pending
 

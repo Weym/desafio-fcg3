@@ -40,6 +40,7 @@
 - [x] Plan 1.5: Gap closure — repair backend import path so `fastapi-app` starts healthy in Docker
 - [x] Plan 1.6: Gap closure — clarify Phase 1 cold-start verification evidence in UAT/validation/bootstrap docs
 - [x] Plan 1.7: Gap closure — restore Docker runtime PostgreSQL credentials so `alembic upgrade head` and `python -m scripts.seed` work again from `fastapi-app`
+- [ ] Plan 1.8: Gap closure — seed test isolation: add knowledge_base_chunks to TRUNCATE list, Docker health pre-flight check in phase_01 conftest
 
 ---
 
@@ -182,7 +183,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Infrastructure & Schema | 7/7 | Complete | 2026-04-24 |
+| 1. Infrastructure & Schema | 7/8 | In Progress | 2026-04-24 |
 | 2. Authentication | 4/4 | Complete | 2026-04-24 |
 | 3. Business Feature Slices | 14/14 | Complete | 2026-04-25 |
 | 4. MCP Server | 6/6 | Complete | 2026-04-25 |
