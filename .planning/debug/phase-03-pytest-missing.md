@@ -1,8 +1,8 @@
 ---
-status: investigating
+status: resolved
 trigger: "Diagnose the Phase 03 UAT gap below. Find root cause only; do not fix code."
 created: 2026-04-25T00:00:00Z
-updated: 2026-04-25T00:00:00Z
+updated: 2026-05-02T00:00:00Z
 ---
 
 ## Current Focus
@@ -46,7 +46,7 @@ started: Discovered during Phase 03 verification on the live Docker stack.
 
 ## Resolution
 
-root_cause: The `fastapi-app` container is defined as a runtime-only image, but Phase 03 UAT expects it to double as a verification container. Its build installs only `backend/requirements.txt`, where pytest is absent, and the image/compose setup also excludes the `tests/` tree. That build/runtime mismatch makes the documented in-container pytest regression commands impossible.
-fix: 
-verification: 
-files_changed: []
+root_cause: The `fastapi-app` container was defined as a runtime-only image, but Phase 03 UAT expects it to double as a verification container. Its build installed only `backend/requirements.txt`, where pytest is absent, and the image/compose setup also excluded the `tests/` tree. That build/runtime mismatch made the documented in-container pytest regression commands impossible.
+fix: Applied in commit 211b18a — Dockerfile now installs both requirements.txt and requirements-dev.txt (bringing in pytest, pytest-asyncio, pytest-cov, freezegun), copies tests/ and pyproject.toml into the image; docker-compose.yml now bind-mounts ./backend/tests:/app/tests and ./backend/pyproject.toml:/app/pyproject.toml so live changes are reflected.
+verification: Rebuild fastapi-app container and run `docker compose exec -T fastapi-app sh -lc "cd /app && pytest tests -q"` — pytest should discover and execute the test suite.
+files_changed: [backend/Dockerfile, docker-compose.yml]

@@ -1,141 +1,149 @@
 ---
 phase: 05-ai-service
-reviewed: 2026-05-02T00:00:00Z
+plan: "05-11"
+reviewed: 2026-05-02T21:30:00Z
 depth: standard
-files_reviewed: 5
+files_reviewed: 11
 files_reviewed_list:
-  - ai_service/config.py
-  - ai_service/rag.py
-  - ai_service/tests/test_rag_retrieval.py
-  - mcp_server/middleware.py
-  - mcp_server/tests/test_middleware_logging.py
+  - mcp_server/api_client.py
+  - mcp_server/tools/student_tools.py
+  - mcp_server/tools/enrollment_tools.py
+  - mcp_server/tools/grade_tools.py
+  - mcp_server/tools/document_tools.py
+  - mcp_server/tools/scheduling_tools.py
+  - mcp_server/tools/curriculum_tools.py
+  - mcp_server/tests/test_api_client.py
+  - mcp_server/tests/test_tool_http_wiring.py
+  - mcp_server/tests/test_tool_schemas.py
+  - ai_service/prompts/system_prompt.txt
 findings:
   critical: 0
-  warning: 1
-  info: 4
-  total: 5
+  warning: 3
+  info: 3
+  total: 6
 status: issues_found
 ---
 
-# Phase 05: Code Review Report
+# Phase 05 (Plan 05-11): Code Review Report
 
-**Reviewed:** 2026-05-02T00:00:00Z
+**Reviewed:** 2026-05-02T21:30:00Z
 **Depth:** standard
-**Files Reviewed:** 5
+**Files Reviewed:** 11
 **Status:** issues_found
 
 ## Summary
 
-Reviewed the files touched by Plan 05-10 (the gap-closure plan that made the RAG similarity threshold configurable and fixed the `mcp_action_logs` INSERT to populate the NOT NULL `id` column via `gen_random_uuid()`).
+Plan 05-11 is a gap-closure plan for the MCP Server tools and AI service. The code is well-structured: tools follow a consistent pattern (dependency-injected `student_id`, `call_api` wrapper with retry logic, proper `ToolError` propagation). The `api_client.py` retry mechanism correctly distinguishes 4xx (no retry) from 5xx/timeout (one retry), matching the project conventions. The `student_id` is properly hidden from LLM-exposed tool schemas and injected via `Depends(resolve_student_id)` — the core IDOR-prevention security constraint is satisfied.
 
-**Core refactors are correct:**
-
-- **RAG threshold refactor** — `create_rag_tool` now accepts `similarity_threshold` as a keyword argument (default `0.45`), the module-level `SIMILARITY_THRESHOLD = 0.75` constant is gone, and the caller in `ai_service/agent.py` explicitly threads `settings.RAG_SIMILARITY_THRESHOLD` through. The parameter is referenced correctly inside the SQL `execute(...)` call, the defaults in `config.py` (`0.45`) and `rag.py` (`0.45`) agree, and the new unit tests exercise the custom-threshold path.
-- **MCP INSERT fix** — The INSERT into `mcp_action_logs` now includes the `id` column populated by `gen_random_uuid()` as a SQL literal. Parameter numbering is intact: 8 placeholders (`$1..$8`) for 8 Python positional arguments (chat_session_id, tool_name, input_params, output_result, None, latency_ms, retry, effective_status). This matches the Alembic schema in `006_create_chat_knowledge_tables.py` where `id` is `UUID NOT NULL` with no server default. The success test adds an `"gen_random_uuid()" in query` assertion, and the 9-tuple unpacking of `await_args.args` in the existing tests correctly accounts for the unchanged parameter count.
-
-**Security:** `_sanitize_input_params` continues to strip `student_id` before logging (project invariant preserved). `gen_random_uuid()` is a SQL literal, not interpolated user input — no injection risk. No hardcoded secrets.
-
-One warning and four info-level items below, none blocking.
+Three warnings and three info-level items were found. No critical security issues.
 
 ## Warnings
 
-### WR-01: Test `test_retrieval_returns_empty_string_when_no_chunk_meets_threshold` does not actually exercise the threshold filter
+### WR-01: RAG Threshold Inconsistency Between System Prompt and Documentation
 
-**File:** `ai_service/tests/test_rag_retrieval.py:77-90`
-**Issue:** The test name promises that the RAG tool returns `""` when no chunk meets the similarity threshold, but the fake cursor is seeded with `_FakeCursor([])` — i.e., the DB already returns zero rows regardless of threshold. The test verifies the empty-rows → empty-string code path, not the threshold-filtering behavior. There is no assertion that the threshold value was forwarded to the SQL `execute(...)` call in this test, nor is there a test that returns rows with similarity below the threshold to confirm the SQL `WHERE ... >= %s` clause was constructed with the configured value on the no-match path.
-
-Given that the threshold refactor is the entire point of this gap plan, the no-match case should verify that the threshold was actually passed to the query — otherwise a future regression (e.g., accidentally re-introducing a hardcoded threshold, or shadowing the parameter) would go undetected here. The positive-path test (`test_retrieval_uses_threshold_and_formats_top_chunks`) and `test_retrieval_uses_custom_threshold` do assert `cursor.calls[0][1] == (..., ..., threshold)`, but only for cases where rows are returned.
-
-**Fix:** Add a threshold assertion to the no-match test (cheap, one line):
-```python
-def test_retrieval_returns_empty_string_when_no_chunk_meets_threshold(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    class FakeEmbeddings:
-        def embed_query(self, query: str):
-            return [0.3, 0.4]
-
-    cursor = _FakeCursor([])
-
-    tool = create_rag_tool(
-        _FakePool(cursor), FakeEmbeddings(), similarity_threshold=0.75
-    )
-
-    assert tool.func("assunto sem resultado") == ""
-    # Regression guard: threshold must still be forwarded to SQL on no-match path.
-    assert cursor.calls[0][1] == ("[0.3, 0.4]", "[0.3, 0.4]", 0.75)
+**File:** `ai_service/prompts/system_prompt.txt:12`
+**Issue:** The system prompt instructs the LLM to treat scores below `0.45` as irrelevant:
 ```
+Se a base de conhecimento nao retornar contexto relevante (score < 0.45), informe...
+```
+However, every architecture document (`docs/chatbot.md` lines 27, 47, 193, 237-238, 406) defines the RAG threshold as `0.75`. The `ai_service/config.py` defaults `RAG_SIMILARITY_THRESHOLD` to `0.45`, which is the runtime threshold used in `ai_service/rag.py`.
+
+This means the system has two conflicting thresholds:
+- **Runtime RAG retrieval** (config.py + rag.py): filters chunks at `0.45` — chunks between 0.45 and 0.75 *are* returned to the agent.
+- **Documentation** (chatbot.md): says chunks below `0.75` should be discarded.
+
+The system prompt's `0.45` aligns with the runtime default but contradicts the architectural decision. If the runtime threshold is intentionally `0.45` (after experimentation with `test_rag_length.py` showing 0.75 is too aggressive for short queries), the documentation should be updated. If 0.75 is correct, the config default and system prompt should change.
+
+**Fix:** Align all three sources. If 0.45 is the tested threshold:
+```
+# docs/chatbot.md — update threshold references from 0.75 to 0.45
+# system_prompt.txt — already correct at 0.45
+# config.py — already correct at 0.45
+```
+If 0.75 is the intended threshold:
+```python
+# ai_service/config.py line 38
+RAG_SIMILARITY_THRESHOLD: float = float(
+    os.environ.get("RAG_SIMILARITY_THRESHOLD", "0.75")
+)
+```
+```
+# system_prompt.txt line 12
+Se a base de conhecimento nao retornar contexto relevante (score < 0.75), informe
+```
+
+### WR-02: `request_document` Has No Input Validation on `type` Parameter
+
+**File:** `mcp_server/tools/document_tools.py:17-18`
+**Issue:** The `request_document` tool accepts a bare `type: str` parameter, relying entirely on the backend (`docs/api.md`, `backend/src/features/documents/schemas.py:26`) to validate that `type` is one of `transcript`, `enrollment_proof`, `declaration`, `certificate`. The tool description mentions valid types, but the LLM could hallucinate an invalid value (e.g., `"grade_report"`), which would result in a 422 error from the backend.
+
+While the backend does validate, this violates defense-in-depth — the MCP tool should constrain its own inputs. The `docs/mcp.md` (line 363) even defines `"enum": ["transcript", "enrollment_proof", "declaration", "certificate"]` in the schema — the implementation doesn't enforce it.
+
+**Fix:** Use `Literal` type to constrain the parameter:
+```python
+from typing import Literal
+
+async def request_document(
+    type: Literal["transcript", "enrollment_proof", "declaration", "certificate"],
+    student_id: str = Depends(resolve_student_id),
+    ctx: Context = CurrentContext(),
+) -> dict[str, Any]:
+```
+
+### WR-03: `type` Parameter Shadows Python Built-in
+
+**File:** `mcp_server/tools/document_tools.py:18`
+**Issue:** The parameter name `type` shadows Python's built-in `type()` function. While this doesn't cause a runtime bug in this specific function (the built-in isn't used), it's a common code quality anti-pattern that linters flag (e.g., `A002` in Ruff/flake8-builtins). The `docs/mcp.md` schema uses `type` as the field name, so this mirrors the API contract — but the internal parameter name can differ.
+
+**Fix:** Rename the internal parameter to `document_type` and map it in the JSON body:
+```python
+async def request_document(
+    document_type: str,  # or Literal[...] per WR-02
+    student_id: str = Depends(resolve_student_id),
+    ctx: Context = CurrentContext(),
+) -> dict[str, Any]:
+    client = ctx.lifespan_context["http_client"]
+    data, _ = await call_api(
+        client,
+        "POST",
+        "/documents",
+        json={"student_id": student_id, "type": document_type},
+        student_id=student_id,
+    )
+    return data
+```
+Note: Verify that FastMCP exposes the parameter name to the LLM schema. If the LLM-facing schema must say `type`, use `Field(alias="type")` or keep the name and suppress the linter warning.
 
 ## Info
 
-### IN-01: Dead module constant `MAX_RESULTS = 3` in `ai_service/rag.py`
+### IN-01: Unused `asyncio` Import in Test File
 
-**File:** `ai_service/rag.py:10`
-**Issue:** `MAX_RESULTS = 3` is defined at module scope but never referenced. The SQL query hardcodes `LIMIT 3` on line 40. This is leftover from before the threshold refactor and now has two sources of truth (one unused). If someone edits `MAX_RESULTS` thinking it controls the limit, the query will silently keep returning 3 rows.
-**Fix:** Either inline `MAX_RESULTS` into the query via parameterization, or delete the constant:
+**File:** `mcp_server/tests/test_tool_http_wiring.py:3`
+**Issue:** `import asyncio` is present but never used. The file uses `pytest.mark.asyncio` (from pytest-asyncio), not `asyncio.run()`. The sibling file `test_tool_schemas.py` correctly uses `asyncio.run()` for its synchronous test functions, but `test_tool_http_wiring.py` uses async test functions with `pytestmark = pytest.mark.asyncio` instead.
+**Fix:** Remove the unused import:
 ```python
-# Option A (preferred): parameterize
-query = """
-    SELECT content, source, category,
-           1 - (embedding <=> %s::vector) AS similarity
-    FROM knowledge_base_chunks
-    WHERE 1 - (embedding <=> %s::vector) >= %s
-    ORDER BY similarity DESC
-    LIMIT %s
-"""
-cursor.execute(query, (vector_str, vector_str, similarity_threshold, MAX_RESULTS))
-
-# Option B: delete the unused constant
-# (remove line 10)
+# Remove line 3: import asyncio
 ```
 
-### IN-02: Unused `monkeypatch` parameter in two RAG tests
+### IN-02: System Prompt Uses ASCII Instead of UTF-8 Portuguese
 
-**File:** `ai_service/tests/test_rag_retrieval.py:50, 77`
-**Issue:** `test_retrieval_uses_threshold_and_formats_top_chunks` and `test_retrieval_returns_empty_string_when_no_chunk_meets_threshold` accept a `monkeypatch: pytest.MonkeyPatch` argument but never use it. `test_retrieval_uses_custom_threshold` correctly omits it. Unused fixture parameters are harmless but add noise and can mislead readers into assuming some patching is happening.
-**Fix:** Remove the `monkeypatch` parameter from those two tests:
-```python
-def test_retrieval_uses_threshold_and_formats_top_chunks() -> None:
-    ...
-
-def test_retrieval_returns_empty_string_when_no_chunk_meets_threshold() -> None:
-    ...
+**File:** `ai_service/prompts/system_prompt.txt:1-13`
+**Issue:** The system prompt avoids all accented characters (`Voce` instead of `Você`, `acoes` instead of `ações`, `matricula` instead of `matrícula`, `nao` instead of `não`). This is the text the LLM sees as its identity and behavioral instructions. While the LLM will still respond with proper Portuguese regardless, the prompt itself reads unnaturally and could subtly affect tone quality. This may be intentional (ASCII-safe for cross-platform compatibility) but is worth noting.
+**Fix:** If UTF-8 encoding is guaranteed in the Docker container (standard for Python 3.12), use proper Portuguese:
+```
+Você é o assistente virtual da secretaria acadêmica do curso de Ciência da Computação.
 ```
 
-### IN-03: `RAG_SIMILARITY_THRESHOLD` is not bounds-validated
+### IN-03: `student_id` Included in POST JSON Bodies Despite Header Injection
 
-**File:** `ai_service/config.py:37-39`
-**Issue:** The env value is coerced with `float(...)` but not validated to be within the valid cosine-similarity range `[0.0, 1.0]`. The plan's threat model explicitly accepts this (T-05-10-01 in `05-10-PLAN.md`: misconfiguration is a self-evident error, not an attack vector), so this is intentional. Flagging only so the decision is traceable from the source: an operator who sets `RAG_SIMILARITY_THRESHOLD=-1` or `=2.0` gets either "everything matches" or "nothing matches" with no log warning at startup.
-**Fix (optional)** — fail-loud validation at import time:
-```python
-RAG_SIMILARITY_THRESHOLD: float = float(
-    os.environ.get("RAG_SIMILARITY_THRESHOLD", "0.45")
-)
+**File:** `mcp_server/tools/enrollment_tools.py:29`, `mcp_server/tools/document_tools.py:27`, `mcp_server/tools/scheduling_tools.py:54`
+**Issue:** Several tools send `student_id` both in the `X-Student-Id` header (via `call_api(student_id=...)`) AND in the JSON request body (e.g., `json={"student_id": student_id, ...}`). This is functionally correct — the backend uses the header for auth context and the body for resource creation — but creates a dual-path for the same identity value. If the backend ever validates that header and body `student_id` match, this is fine. If not, it's a potential IDOR vector if the two values diverge (though in this code they can't, since both come from `resolve_student_id`).
 
-def __post_init__(self) -> None:
-    # ... existing DATABASE_URL logic ...
-    if not 0.0 <= self.RAG_SIMILARITY_THRESHOLD <= 1.0:
-        raise ValueError(
-            f"RAG_SIMILARITY_THRESHOLD must be in [0.0, 1.0], "
-            f"got {self.RAG_SIMILARITY_THRESHOLD}"
-        )
-```
-Per the ADR / threat model this is a "nice to have," not required.
-
-### IN-04: Retry/error test paths do not re-assert `gen_random_uuid()` in the SQL
-
-**File:** `mcp_server/tests/test_middleware_logging.py:66-93, 95-132`
-**Issue:** The `gen_random_uuid()` assertion was added only to `test_tool_logging_middleware_logs_successful_calls` (line 55). The error-path test (`test_tool_logging_middleware_logs_errors_without_output`) and retry-success test (`test_tool_logging_middleware_records_retry_success_and_latency`) unpack `execute.await_args.args` but skip the `query` string check. Since all three paths go through the same `_log_call` method and the same SQL string, this is not a correctness gap — but if `_log_call` were ever split into success/error branches in the future, the error path could silently drop the `id` column again without test failure.
-**Fix (defense in depth):** In the two tests that currently discard `query` via `_, _, _, ...`, bind it and assert once more:
-```python
-query, _, _, input_params, output_result, _, _, _, status = (
-    mock_context.lifespan_context["db_pool"].execute.await_args.args
-)
-assert "gen_random_uuid()" in query
-```
+This is an informational note, not a bug — the current code is safe because both values come from the same dependency-injected source.
+**Fix:** No action required unless the team wants to remove the body `student_id` and have the backend extract it solely from the header. This would be a backend API contract change.
 
 ---
 
-_Reviewed: 2026-05-02T00:00:00Z_
+_Reviewed: 2026-05-02T21:30:00Z_
 _Reviewer: the agent (gsd-code-reviewer)_
 _Depth: standard_

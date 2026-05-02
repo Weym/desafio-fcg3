@@ -61,8 +61,8 @@ blocked: 0
     - "Consider mounting or otherwise synchronizing Alembic revisions in the dev stack so migration files cannot drift from the running container."
   debug_session: ".planning/debug/phase-03-enrollment-lock-gap.md"
 - truth: "The backend verification container can run the Phase 03 pytest regression commands documented by verification/UAT artifacts."
-  status: failed
-  reason: "User reported: `pytest` and `python -m pytest` fail in `fastapi-app` because the image does not include the pytest package."
+  status: fixed
+  reason: "Fixed in commit 211b18a — Dockerfile now installs requirements-dev.txt (pytest) and copies tests/; docker-compose.yml mounts tests/ and pyproject.toml."
   severity: major
   test: 3
   root_cause: "`fastapi-app` was built as a runtime-only image, but Phase 03 UAT expects it to act as a verification container. The Dockerfile installs only `requirements.txt`, while pytest tooling lives only in `requirements-dev.txt`, and the container/image setup also omits the `tests/` directory."

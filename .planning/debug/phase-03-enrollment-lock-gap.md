@@ -1,5 +1,5 @@
 ---
-status: investigating
+status: resolved
 trigger: "Diagnose the Phase 03 UAT gap below. Find root cause only; do not fix code.
 
 Gap truth:
@@ -14,7 +14,7 @@ Context:
 - `SELECT version_num FROM alembic_version;` in Postgres returned `008a`.
 - `backend/alembic/versions/009_add_locked_status_to_enrollments.py` exists in the repo and upgrades the constraint to include `locked`."
 created: 2026-04-25T00:00:00Z
-updated: 2026-04-25T00:12:00Z
+updated: 2026-05-02T00:00:00Z
 ---
 
 ## Current Focus
@@ -22,7 +22,7 @@ updated: 2026-04-25T00:12:00Z
 hypothesis: Confirmed runtime drift: the live fastapi-app container was built before migration 009a existed, and because compose does not bind-mount `backend/alembic`, the container still sees 008a as its head.
 test: Finalize the diagnosis from container filesystem + compose mount rules + database revision state.
 expecting: These three observations should explain why the DB still enforces the old check constraint even though the repo contains 009a.
-next_action: Record the confirmed root cause and return the diagnosis.
+next_action: Session complete — root cause confirmed and fix already applied.
 
 ## Symptoms
 
@@ -70,6 +70,6 @@ started: Discovered during Phase 03 verification on the live Docker stack.
 
 root_cause: 
 The failure is caused by runtime/image drift, not enrollment logic: the live `fastapi-app` container was started from an image whose baked-in `/app/alembic` tree ends at revision `008a`. Because `docker-compose.yml` only bind-mounts `backend/src` and `backend/scripts` (not `backend/alembic`), the new repo migration `009a` never reached the running container, so Alembic still saw `008a` as head and the database retained the old `ck_enrollments_status` constraint that rejects `locked`.
-fix: 
-verification: 
-files_changed: []
+fix: Two commits applied — (1) `e591719` added Alembic migration 009a to update `ck_enrollments_status` constraint to include `locked`; (2) `de64fbe` bind-mounted `backend/alembic` and `backend/alembic.ini` into the `fastapi-app` Docker container so host-side migrations are visible at runtime without rebuilding the image.
+verification: Rebuild container or restart with updated compose mounts, then run `alembic upgrade head` inside the container. Verify `alembic current` shows `009a (head)` and `python -m scripts.verify_enrollment_lock_gap` passes without `CheckViolationError`.
+files_changed: [docker-compose.yml, backend/Dockerfile, backend/alembic/versions/009_add_locked_status_to_enrollments.py]

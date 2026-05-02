@@ -1,5 +1,5 @@
 ---
-status: investigating
+status: resolved
 trigger: "Truth: Fetching available courses for a student returns a successful list response containing only courses whose prerequisites are already satisfied by that student. Actual: Live verification of GET /api/v1/students/{id}/available-courses returned HTTP 500 Internal Server Error. Observed backend error: FastAPI ResponseValidationError: route declares response_model=list[AvailableCourseItem] but input was {'data': [...]}. Reproduction: call GET /api/v1/students/b14bbb63-0168-4d43-afba-b6bd200b9663/available-courses with valid X-Service-Token and matching X-Student-Id. Severity: blocker"
 created: 2026-04-24T00:00:00Z
 updated: 2026-04-24T00:10:00Z
@@ -46,6 +46,6 @@ started: Observed during Phase 03 UAT test 3.
 ## Resolution
 
 root_cause: The available-courses controller has a response contract mismatch. FastAPI is told to validate the response as list[AvailableCourseItem], but the handler wraps the service result in {"data": ...}. When FastAPI serializes the response, it receives a dict instead of the declared list and raises ResponseValidationError, producing HTTP 500.
-fix: 
-verification: 
-files_changed: []
+fix: Changed controller return type from `-> dict` to `-> list[AvailableCourseItem]` and return statement from `{"data": [...]}` to raw list. Updated docs/api.md to document raw array contract. Applied in commit bede357.
+verification: Code review confirms controller return type, response_model, and docs/api.md are now aligned on `list[AvailableCourseItem]`.
+files_changed: [backend/src/features/students/controllers.py, docs/api.md]

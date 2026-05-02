@@ -1,5 +1,5 @@
 ---
-status: investigating
+status: resolved
 trigger: "/gsd-debug \"Phase 1 seed repeatability failing in backend/tests/phase_01/test_phase_01_schema_seed.py::test_seed_command_is_repeatable_and_preserves_expected_phase_one_fixtures\""
 created: 2026-04-25T01:33:37.5400408-03:00
 updated: 2026-04-25T01:43:20.0000000-03:00
@@ -62,6 +62,6 @@ started: Unknown; current evidence suggests non-persistent or environment/order-
 ## Resolution
 
 root_cause: Most likely not a current code bug in backend/scripts/seed.py. The strongest evidence points to environment/shared-state mismatch around docker-compose-backed phase_01 tests, or a stale/unreproduced failure report.
-fix: No code fix applied; recommend reproducing under a controlled docker state and capturing the exact failing stdout/stderr plus docker compose ps and env context.
-verification: Exact target test was rerun repeatedly and passed each time; full schema seed file also already passed per user report.
-files_changed: []
+fix: Plan 01-08 gap closure applied — added knowledge_base_chunks to seed TRUNCATE list (21/21 tables) and Docker health pre-flight fixture to phase_01 conftest. Commits: 58ffde3, 94885f0, 8f96f27.
+verification: All 3 phase_01 schema seed tests pass; seed idempotency preserved.
+files_changed: [backend/scripts/seed.py, backend/tests/phase_01/conftest.py]

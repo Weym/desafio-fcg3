@@ -1,5 +1,5 @@
 ---
-status: diagnosed
+status: resolved
 trigger: "truth: After a cold start, all four services become healthy and the backend health endpoint responds with live JSON. expected: Stop any running containers, then start the stack from scratch with `docker compose up --build -d`. The four services should boot without crashing, PostgreSQL should become healthy, and the backend health endpoint should respond with live JSON at `http://localhost:8000/health`. actual: User reported immediate `docker compose up --build -d` output showing images built, postgres healthy, api/mcp created/recreated, but no follow-up evidence that services reached healthy or that `/health` was checked. severity: major reproduction: Test 1 in UAT Discovered during UAT."
 created: 2026-04-24T00:00:00Z
 updated: 2026-04-24T15:11:00Z
@@ -51,6 +51,6 @@ started: Discovered during UAT
 ## Resolution
 
 root_cause: The reported UAT failure was caused by incomplete verification procedure/evidence, not by a current implementation defect. The tester captured only the immediate detached `docker compose up --build -d` output, which naturally ends before service healthchecks finish; no follow-up `docker compose ps` or `/health` check was performed before marking Test 1 as an issue.
-fix:
-verification: Reproduced the cold-start flow end-to-end. Immediate startup showed app services still in `health: starting`; after the healthcheck window elapsed, all four services were healthy and backend `/health` returned live JSON.
-files_changed: []
+fix: Rewrote Phase 1 UAT cold-start acceptance (01-UAT.md, 01-VALIDATION.md) to require post-start `docker compose ps` and `curl http://localhost:8000/health` evidence before any failure is recorded. Aligned README bootstrap wording with the same contract. Applied via Plan 01-06 (commits `7fe6da7`, `5e4e597`).
+verification: Reproduced the cold-start flow end-to-end. Immediate startup showed app services still in `health: starting`; after the healthcheck window elapsed, all four services were healthy and backend `/health` returned live JSON. Plan 01-06 SUMMARY confirms both tasks completed and verified.
+files_changed: [.planning/phases/01-infrastructure-schema/01-UAT.md, .planning/phases/01-infrastructure-schema/01-VALIDATION.md, README.md]

@@ -1,8 +1,8 @@
 ---
-status: diagnosed
+status: resolved
 trigger: "Locking an enrollment succeeds after confirmation, marks the enrollment as locked, and preserves the rule that draft-only actions such as dropping a course are no longer allowed afterward. Actual: POST /enrollments/{id}/lock returned HTTP 500 with PostgreSQL CheckViolationError on constraint ck_enrollments_status when updating enrollments.status to 'locked'."
 created: 2026-04-24T00:00:00Z
-updated: 2026-04-24T00:11:00Z
+updated: 2026-05-02T00:00:00Z
 ---
 
 ## Current Focus
@@ -10,7 +10,7 @@ updated: 2026-04-24T00:11:00Z
 hypothesis: Existing database schema still rejects enrollments.status='locked' even though service/model code now uses it.
 test: Compare runtime service/model status values against Alembic-defined check constraints and migration history.
 expecting: If migration/schema mismatch exists, code will allow 'locked' while DB constraint only permits older statuses.
-next_action: return diagnosis with confirmed schema mismatch root cause
+next_action: Session resolved — fix already applied; duplicate of phase-03-enrollment-lock-gap
 
 ## Symptoms
 
@@ -57,7 +57,9 @@ started: Live UAT in phase 03 business feature slices.
 ## Resolution
 
 root_cause:
-  The lock feature writes enrollments.status='locked' in service code, but the actual PostgreSQL schema created by Alembic still enforces ck_enrollments_status as only ('draft', 'confirmed', 'cancelled'). The ORM model was updated without a matching migration, so db.flush() fails with CheckViolationError in migrated environments.
+  The lock feature writes enrollments.status='locked' in service code, but the actual PostgreSQL schema created by Alembic still enforces ck_enrollments_status as only ('draft', 'confirmed', 'cancelled'). The ORM model was updated without a matching migration, so db.flush() fails with CheckViolationError in migrated environments. Additionally, docker-compose.yml did not bind-mount backend/alembic into the container, so even after the migration file existed on the host, running containers could not see it.
 fix:
+  Already applied in the codebase — (1) Alembic migration 009a (backend/alembic/versions/009_add_locked_status_to_enrollments.py) drops and recreates ck_enrollments_status to include 'locked'; (2) docker-compose.yml now bind-mounts backend/alembic and backend/alembic.ini into the fastapi-app container so host-side migrations are visible at runtime. Duplicate of resolved session phase-03-enrollment-lock-gap.
 verification:
-files_changed: []
+  Run `docker compose up -d && docker compose exec fastapi-app alembic upgrade head` then POST /enrollments/{id}/lock on a confirmed enrollment. Verify `alembic current` shows 009a or later and no CheckViolationError occurs.
+files_changed: [backend/alembic/versions/009_add_locked_status_to_enrollments.py, docker-compose.yml]
