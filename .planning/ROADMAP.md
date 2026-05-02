@@ -150,7 +150,7 @@ Plans:
 - [x] 05-07-PLAN.md — Gap closure: package-based AI service runtime alignment and startup regressions
 - [x] 05-08-PLAN.md — Gap closure: align DATABASE_URL credentials with POSTGRES_PASSWORD and fix chat_messages UUID generation
 - [x] 05-09-PLAN.md — Gap closure: propagate POSTGRES_* component var pattern to ingest.py and fix stale regression test
-- [ ] 05-10-PLAN.md — Gap closure: configurable RAG similarity threshold + MCP action logs UUID fix
+- [x] 05-10-PLAN.md — Gap closure: configurable RAG similarity threshold + MCP action logs UUID fix
 
 ---
 

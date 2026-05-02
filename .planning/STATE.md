@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-last_updated: "2026-04-30T19:15:00.000Z"
-last_activity: 2026-04-30
+status: executing
+last_updated: "2026-05-02T19:07:34.026Z"
+last_activity: 2026-05-02
 progress:
   total_phases: 6
   completed_phases: 6
-  total_plans: 44
-  completed_plans: 44
+  total_plans: 45
+  completed_plans: 45
   percent: 100
 ---
 
@@ -17,10 +17,10 @@ progress:
 
 ## Current Position
 
-Phase: 06
-Plan: Not started
-Status: Phase complete — ready for verification
-Last activity: 2026-04-30
+Phase: 05 (ai-service) — EXECUTING
+Plan: 2 of 10
+Status: Ready to execute
+Last activity: 2026-05-02
 
 Progress: [█████████░] 90%
 
@@ -47,6 +47,7 @@ Progress: [█████████░] 90%
 | Phase 06 P02 | 3 min | 2 tasks | 5 files |
 | Phase 06 P03 | 2 min | 2 tasks | 4 files |
 | Phase 06 P04 | 13 min | 2 tasks | 17 files |
+| Phase 05 P10 | 2 min | 2 tasks | 6 files |
 
 ## Phase Status
 
@@ -64,7 +65,7 @@ Progress: [█████████░] 90%
 **Phase 05 UAT re-run complete (2026-04-30) — 1 blocker remains**
 Plans 08-09 fixed the credential alignment and UUID generation issues. Fresh UAT passed 4/6 tests. One blocker: RAG similarity scores via OpenRouter embeddings are systematically low (max ~0.67 vs threshold 0.75), so the knowledge base tool always returns empty. MCP action logging also has a UUID issue (non-blocking for Phase 05 scope but affects Phase 06 integration).
 Next action: `/gsd-plan-phase 05 --gaps` to plan the RAG threshold fix, then execute.
-Resume file: `.planning/phases/05-ai-service/05-UAT.md`
+Resume file: None
 
 ## Accumulated Context
 
@@ -124,6 +125,8 @@ Recent decisions affecting current work:
 - [Phase 06]: Background task opens own async_session (CRITICAL-4) — never request-scoped; AI service retry: 1 retry then fallback; per-session asyncio.Lock keyed by session_id; pg_cron auto-close every hour for 24h inactive sessions
 - [Phase 06]: Used require_role('staff') for chat visibility endpoints — simpler than dual-auth for pure staff-only access
 - [Phase 06]: Included chat_sessions/chat_messages in SQLite test tables; patch_webhook_db fixture for async_session redirect; MagicMock for httpx Response (sync .json() method)
+- [Phase 05]: RAG similarity threshold made configurable via RAG_SIMILARITY_THRESHOLD env var (default 0.45) because OpenRouter embedding proxy caps similarity at ~0.67 for perfect matches — 0.75 default was too aggressive
+- [Phase 05]: mcp_action_logs INSERT now uses server-side gen_random_uuid() for the id column instead of adding Python-side UUID generation — schema owns the default, positional parameters unchanged, middleware test destructuring preserved
 
 ### Key Decisions Pending
 
