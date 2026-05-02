@@ -40,7 +40,7 @@
 - [x] Plan 1.5: Gap closure — repair backend import path so `fastapi-app` starts healthy in Docker
 - [x] Plan 1.6: Gap closure — clarify Phase 1 cold-start verification evidence in UAT/validation/bootstrap docs
 - [x] Plan 1.7: Gap closure — restore Docker runtime PostgreSQL credentials so `alembic upgrade head` and `python -m scripts.seed` work again from `fastapi-app`
-- [ ] Plan 1.8: Gap closure — seed test isolation: add knowledge_base_chunks to TRUNCATE list, Docker health pre-flight check in phase_01 conftest
+- [x] Plan 1.8: Gap closure — seed test isolation: add knowledge_base_chunks to TRUNCATE list, Docker health pre-flight check in phase_01 conftest
 
 ---
 
@@ -130,7 +130,7 @@ Plans:
 **Goal:** The LangChain ReAct agent answers student academic questions in Portuguese, using MCP tools for live data and PGVector RAG for regulation and policy, with any LLM provider configurable by environment variable.
 **Depends on:** Phase 4
 **Requirements:** AI-01, AI-02, AI-03, AI-04, AI-05
-**Verification:** `gaps_found` — plans `05-01` through `05-09` complete. UAT re-run (2026-04-30) passed 4/6 tests. 1 blocker: RAG threshold too high for OpenRouter embeddings (scores 0.49-0.67 vs threshold 0.75). Non-blocking: MCP action_logs UUID missing. Plan 10 addresses both.
+**Verification:** `gaps_found` — plans `05-01` through `05-10` complete. HUMAN-UAT (2026-05-02) found 2 blockers: MCP X-Student-Id header not injected (all tool calls fail), system prompt threshold mismatch (0.75 vs 0.45). Plan 11 addresses both.
 
 ### Success Criteria
 1. Agent receives a student message, selects appropriate MCP tools, calls them, and generates a coherent Portuguese-language response — observable end-to-end without WhatsApp by directly invoking the service HTTP endpoint.
@@ -139,7 +139,7 @@ Plans:
 4. Setting `LLM_PROVIDER=gemini` in the environment switches the agent to Gemini without any code changes; setting `LLM_PROVIDER=openai` uses OpenAI — both produce valid responses.
 5. Running `python -m ai_service.ingest` processes all five knowledge base documents (`matricula.md`, `regulamento.pdf`, `faq.md`, `calendario.md`, `curriculo.md`), generates embeddings, and stores chunks in `knowledge_base_chunks`.
 
-**Plans:** 10 plans
+**Plans:** 11 plans
 
 Plans:
 - [x] 05-01-PLAN.md — AI service scaffold: FastAPI app, psycopg3 DB layer, LLM factory, system prompt, config
@@ -152,6 +152,7 @@ Plans:
 - [x] 05-08-PLAN.md — Gap closure: align DATABASE_URL credentials with POSTGRES_PASSWORD and fix chat_messages UUID generation
 - [x] 05-09-PLAN.md — Gap closure: propagate POSTGRES_* component var pattern to ingest.py and fix stale regression test
 - [x] 05-10-PLAN.md — Gap closure: configurable RAG similarity threshold + MCP action logs UUID fix
+- [ ] 05-11-PLAN.md — Gap closure: X-Student-Id header injection in MCP api_client + system prompt threshold fix
 
 ---
 
@@ -183,9 +184,9 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Infrastructure & Schema | 7/8 | In Progress | 2026-04-24 |
+| 1. Infrastructure & Schema | 8/8 | Complete | 2026-05-02 |
 | 2. Authentication | 4/4 | Complete | 2026-04-24 |
 | 3. Business Feature Slices | 14/14 | Complete | 2026-04-25 |
 | 4. MCP Server | 6/6 | Complete | 2026-04-25 |
-| 5. AI Service | 9/10 | Gaps Found | - |
+| 5. AI Service | 10/11 | Gaps Found | - |
 | 6. WhatsApp Webhook & Integration | 4/4 | Complete | 2026-04-30 |
