@@ -1,184 +1,141 @@
 ---
 phase: 05-ai-service
-reviewed: 2026-04-27T17:32:00Z
+reviewed: 2026-05-02T00:00:00Z
 depth: standard
-files_reviewed: 11
+files_reviewed: 5
 files_reviewed_list:
-  - docker-compose.yml
   - ai_service/config.py
-  - ai_service/database.py
-  - ai_service/main.py
-  - ai_service/agent.py
-  - ai_service/llm_factory.py
   - ai_service/rag.py
-  - ai_service/mcp_tools.py
-  - ai_service/ingest.py
-  - ai_service/tests/test_runtime_entrypoint.py
+  - ai_service/tests/test_rag_retrieval.py
+  - mcp_server/middleware.py
+  - mcp_server/tests/test_middleware_logging.py
 findings:
   critical: 0
-  warning: 4
-  info: 3
-  total: 7
+  warning: 1
+  info: 4
+  total: 5
 status: issues_found
 ---
 
 # Phase 05: Code Review Report
 
-**Reviewed:** 2026-04-27T17:32:00Z
+**Reviewed:** 2026-05-02T00:00:00Z
 **Depth:** standard
-**Files Reviewed:** 11
+**Files Reviewed:** 5
 **Status:** issues_found
 
 ## Summary
 
-Initial review covered all AI service source files and `docker-compose.yml` after Plan 05-08 changes. Plan 05-09 gap closure fixed the critical `ingest.py` DATABASE_URL regression (CR-01) and updated the regression test to assert `POSTGRES_*` component vars. Both fixes are correct and resolve the original findings. The incremental review of Plan 05-09 changes found one new warning (redundant double-normalization) and one new info item (inconsistent settings access pattern). All previously-reported warnings (WR-01 through WR-03) and info items (IN-01, IN-02) from the original review remain open and are carried forward below.
+Reviewed the files touched by Plan 05-10 (the gap-closure plan that made the RAG similarity threshold configurable and fixed the `mcp_action_logs` INSERT to populate the NOT NULL `id` column via `gen_random_uuid()`).
 
-Authentication, service token validation, and the core chat flow remain well-implemented.
+**Core refactors are correct:**
 
-## Resolved Issues (Plan 05-09)
+- **RAG threshold refactor** — `create_rag_tool` now accepts `similarity_threshold` as a keyword argument (default `0.45`), the module-level `SIMILARITY_THRESHOLD = 0.75` constant is gone, and the caller in `ai_service/agent.py` explicitly threads `settings.RAG_SIMILARITY_THRESHOLD` through. The parameter is referenced correctly inside the SQL `execute(...)` call, the defaults in `config.py` (`0.45`) and `rag.py` (`0.45`) agree, and the new unit tests exercise the custom-threshold path.
+- **MCP INSERT fix** — The INSERT into `mcp_action_logs` now includes the `id` column populated by `gen_random_uuid()` as a SQL literal. Parameter numbering is intact: 8 placeholders (`$1..$8`) for 8 Python positional arguments (chat_session_id, tool_name, input_params, output_result, None, latency_ms, retry, effective_status). This matches the Alembic schema in `006_create_chat_knowledge_tables.py` where `id` is `UUID NOT NULL` with no server default. The success test adds an `"gen_random_uuid()" in query` assertion, and the 9-tuple unpacking of `await_args.args` in the existing tests correctly accounts for the unchanged parameter count.
 
-### ~~CR-01~~: `ingest.py` broken — `DATABASE_URL` no longer available ✅ FIXED
+**Security:** `_sanitize_input_params` continues to strip `student_id` before logging (project invariant preserved). `gen_random_uuid()` is a SQL literal, not interpolated user input — no injection risk. No hardcoded secrets.
 
-**Resolved by:** commit `20315cc` (Plan 05-09)
-**Fix applied:** `IngestSettings.from_env()` now imports `settings` from `ai_service.config` to obtain `DATABASE_URL`, which handles `POSTGRES_*` component fallback via `Settings.__post_init__()`. The fix matches the suggested approach from the original review exactly.
-
-## Critical Issues
-
-_No critical issues. CR-01 was resolved by Plan 05-09._
+One warning and four info-level items below, none blocking.
 
 ## Warnings
 
-### WR-01: OpenRouter provider broken in `agent.py` — no `base_url` or `api_key` override
+### WR-01: Test `test_retrieval_returns_empty_string_when_no_chunk_meets_threshold` does not actually exercise the threshold filter
 
-**File:** `ai_service/agent.py:28` / `ai_service/llm_factory.py:21-22`
-**Issue:** When `LLM_PROVIDER=openrouter`, `get_model_string()` returns `"openai:{model}"`. The `create_agent()` function from `langchain.agents` uses `init_chat_model` internally to create a `ChatOpenAI` instance from this string. This instance will use `OPENAI_API_KEY` env var by default and the standard OpenAI base URL — neither of which is correct for OpenRouter. The `create_llm()` function in `llm_factory.py` (lines 45-52) correctly passes `api_key=settings.OPENROUTER_API_KEY` and `base_url="https://openrouter.ai/api/v1"`, but `create_chat_agent()` in `agent.py` never calls `create_llm()` — it passes the string to `create_agent()` instead.
+**File:** `ai_service/tests/test_rag_retrieval.py:77-90`
+**Issue:** The test name promises that the RAG tool returns `""` when no chunk meets the similarity threshold, but the fake cursor is seeded with `_FakeCursor([])` — i.e., the DB already returns zero rows regardless of threshold. The test verifies the empty-rows → empty-string code path, not the threshold-filtering behavior. There is no assertion that the threshold value was forwarded to the SQL `execute(...)` call in this test, nor is there a test that returns rows with similarity below the threshold to confirm the SQL `WHERE ... >= %s` clause was constructed with the configured value on the no-match path.
 
-Result: OpenRouter will fail at runtime with either a missing API key error or will hit the wrong API endpoint.
+Given that the threshold refactor is the entire point of this gap plan, the no-match case should verify that the threshold was actually passed to the query — otherwise a future regression (e.g., accidentally re-introducing a hardcoded threshold, or shadowing the parameter) would go undetected here. The positive-path test (`test_retrieval_uses_threshold_and_formats_top_chunks`) and `test_retrieval_uses_custom_threshold` do assert `cursor.calls[0][1] == (..., ..., threshold)`, but only for cases where rows are returned.
 
-**Fix:** Use `create_llm()` to get a proper model instance instead of `get_model_string()`:
+**Fix:** Add a threshold assertion to the no-match test (cheap, one line):
 ```python
-# ai_service/agent.py — replace create_chat_agent()
-def create_chat_agent(settings: Any, tools: list[Any], system_prompt: str) -> Any:
-    """Create a provider-agnostic LangChain ReAct agent."""
-    from ai_service.llm_factory import create_llm
+def test_retrieval_returns_empty_string_when_no_chunk_meets_threshold(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class FakeEmbeddings:
+        def embed_query(self, query: str):
+            return [0.3, 0.4]
 
-    return create_agent(
-        model=create_llm(settings),
-        tools=tools,
-        system_prompt=system_prompt,
+    cursor = _FakeCursor([])
+
+    tool = create_rag_tool(
+        _FakePool(cursor), FakeEmbeddings(), similarity_threshold=0.75
     )
-```
 
-### WR-02: RAG tool requires `OPENAI_API_KEY` even when using non-OpenAI LLM providers
-
-**File:** `ai_service/agent.py:86` / `ai_service/rag.py:16-22`
-**Issue:** `create_rag_tool(db_pool, settings.OPENAI_API_KEY)` passes `OPENAI_API_KEY` which may be `None` when using `gemini` or `openrouter` as LLM provider. The embedding model `text-embedding-3-small` is fixed to OpenAI (per project constraint), so `OPENAI_API_KEY` is always required for RAG — but there's no validation or clear error message when it's missing. `OpenAIEmbeddings(api_key=None)` will raise a cryptic error at query time.
-
-**Fix:** Add an explicit guard at agent initialization:
-```python
-# ai_service/agent.py — inside invoke_agent(), before create_rag_tool()
-if not settings.OPENAI_API_KEY:
-    logger.error(
-        "OPENAI_API_KEY is required for RAG embeddings regardless of LLM_PROVIDER"
-    )
-    return FALLBACK_MESSAGE
-
-rag_tool = create_rag_tool(db_pool, settings.OPENAI_API_KEY)
-```
-
-### WR-03: Synchronous DB calls in async route handler block the event loop
-
-**File:** `ai_service/main.py:113-118` and `ai_service/main.py:128-133`
-**Issue:** `save_chat_message()` and `load_chat_history()` (called via `invoke_agent`) are synchronous functions using `psycopg` (sync driver) with a synchronous `ConnectionPool`. These are called directly from the `async def chat()` route handler. Synchronous database I/O blocks the asyncio event loop, preventing other concurrent requests from being processed. With the current single-service design this may be acceptable for MVP, but under load (multiple concurrent WhatsApp messages), requests will queue behind each other's DB calls.
-
-**Fix:** Wrap synchronous DB calls in `asyncio.to_thread()` to avoid blocking the event loop:
-```python
-import asyncio
-
-# In the chat() handler:
-await asyncio.to_thread(
-    save_chat_message,
-    pool=app.state.db_pool,
-    session_id=request.session_id,
-    role="user",
-    content=request.message,
-)
-```
-
-Alternatively, migrate to `psycopg` async driver (`AsyncConnectionPool`) for native async DB access.
-
-### WR-04: Redundant double-normalization of DATABASE_URL in `ingest.py` *(NEW — Plan 05-09)*
-
-**File:** `ai_service/ingest.py:49`
-**Issue:** `IngestSettings.from_env()` calls `normalize_psycopg_dsn(database_url)` on line 49, where `database_url` is `app_settings.DATABASE_URL`. However, `Settings.__post_init__()` in `config.py` (lines 36-54) already normalizes the URL — it either constructs a clean `postgresql://` URL from `POSTGRES_*` components, or normalizes an existing `DATABASE_URL` env var via the same `normalize_psycopg_dsn()` function. The second normalization in `ingest.py` is always a no-op since the URL is already in `postgresql://` format.
-
-This is not a bug (the function is idempotent), but it obscures the invariant that `settings.DATABASE_URL` is always pre-normalized, and creates a maintenance trap — a future developer might think normalization is still needed here and propagate the pattern elsewhere.
-
-**Fix:** Remove the redundant normalization:
-```python
-return cls(
-    database_url=database_url,  # Already normalized by Settings.__post_init__()
-    openai_api_key=openai_api_key,
-)
-```
-
-And remove the now-unused import at line 15:
-```python
-# Remove: from ai_service.database import normalize_psycopg_dsn
+    assert tool.func("assunto sem resultado") == ""
+    # Regression guard: threshold must still be forwarded to SQL on no-match path.
+    assert cursor.calls[0][1] == ("[0.3, 0.4]", "[0.3, 0.4]", 0.75)
 ```
 
 ## Info
 
-### IN-01: `create_llm()` function in `llm_factory.py` is unused dead code
+### IN-01: Dead module constant `MAX_RESULTS = 3` in `ai_service/rag.py`
 
-**File:** `ai_service/llm_factory.py:29-57`
-**Issue:** The `create_llm()` function is defined but never imported or called anywhere in the codebase. Only `get_model_string()` is used (by `agent.py`). If WR-01 is fixed by switching to `create_llm()`, this becomes the correct approach. Otherwise, this is dead code that should be removed or documented as a future migration path.
+**File:** `ai_service/rag.py:10`
+**Issue:** `MAX_RESULTS = 3` is defined at module scope but never referenced. The SQL query hardcodes `LIMIT 3` on line 40. This is leftover from before the threshold refactor and now has two sources of truth (one unused). If someone edits `MAX_RESULTS` thinking it controls the limit, the query will silently keep returning 3 rows.
+**Fix:** Either inline `MAX_RESULTS` into the query via parameterization, or delete the constant:
+```python
+# Option A (preferred): parameterize
+query = """
+    SELECT content, source, category,
+           1 - (embedding <=> %s::vector) AS similarity
+    FROM knowledge_base_chunks
+    WHERE 1 - (embedding <=> %s::vector) >= %s
+    ORDER BY similarity DESC
+    LIMIT %s
+"""
+cursor.execute(query, (vector_str, vector_str, similarity_threshold, MAX_RESULTS))
 
-### IN-02: `mcp-server` receives excessive environment variables in docker-compose.yml
-
-**File:** `docker-compose.yml:120-141`
-**Issue:** The `mcp-server` service receives `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_WEBHOOK_VERIFY_TOKEN`, `WHATSAPP_APP_SECRET`, `RESEND_API_KEY`, `JWT_SECRET`, `LLM_PROVIDER`, `LLM_MODEL`, `OPENAI_API_KEY`, `GEMINI_API_KEY`, `OPENROUTER_API_KEY`, and `FCM_CREDENTIALS_PATH`. Per the architecture, the MCP server only needs database access (`POSTGRES_*` or `DATABASE_URL`), `MCP_SERVICE_TOKEN`, and `FASTAPI_URL`. Passing WhatsApp tokens, JWT secrets, and LLM API keys to the MCP server container violates the principle of least privilege — these secrets are only needed by `fastapi-app` and `langchain-service` respectively.
-
-**Fix:** Trim the MCP server environment to only what it needs:
-```yaml
-mcp-server:
-  environment:
-    POSTGRES_DB: ${POSTGRES_DB}
-    POSTGRES_USER: ${POSTGRES_USER}
-    POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    POSTGRES_HOST: postgres
-    POSTGRES_PORT: 5432
-    MCP_SERVICE_TOKEN: ${MCP_SERVICE_TOKEN}
-    FASTAPI_URL: ${FASTAPI_URL}
+# Option B: delete the unused constant
+# (remove line 10)
 ```
 
-### IN-03: `ingest.py` reads `OPENAI_API_KEY` from `os.environ` instead of shared Settings *(NEW — Plan 05-09)*
+### IN-02: Unused `monkeypatch` parameter in two RAG tests
 
-**File:** `ai_service/ingest.py:41`
-**Issue:** Plan 05-09 correctly switched `DATABASE_URL` to use the shared `app_settings` object, but `OPENAI_API_KEY` on line 41 is still read directly from `os.environ.get("OPENAI_API_KEY")` instead of using `app_settings.OPENAI_API_KEY`. Both resolve to the same value, so this is not a bug. However, it creates an inconsistent access pattern within the same 10-line method — half uses the Settings object, half bypasses it. If Settings ever adds validation or defaulting for `OPENAI_API_KEY`, `ingest.py` would silently skip it.
-
-**Fix:** Use the shared settings consistently:
+**File:** `ai_service/tests/test_rag_retrieval.py:50, 77`
+**Issue:** `test_retrieval_uses_threshold_and_formats_top_chunks` and `test_retrieval_returns_empty_string_when_no_chunk_meets_threshold` accept a `monkeypatch: pytest.MonkeyPatch` argument but never use it. `test_retrieval_uses_custom_threshold` correctly omits it. Unused fixture parameters are harmless but add noise and can mislead readers into assuming some patching is happening.
+**Fix:** Remove the `monkeypatch` parameter from those two tests:
 ```python
-@classmethod
-def from_env(cls) -> "IngestSettings":
-    from ai_service.config import settings as app_settings
+def test_retrieval_uses_threshold_and_formats_top_chunks() -> None:
+    ...
 
-    database_url = app_settings.DATABASE_URL
-    openai_api_key = app_settings.OPENAI_API_KEY
+def test_retrieval_returns_empty_string_when_no_chunk_meets_threshold() -> None:
+    ...
+```
 
-    if not openai_api_key:
-        raise RuntimeError(
-            "Missing required environment variable: OPENAI_API_KEY"
+### IN-03: `RAG_SIMILARITY_THRESHOLD` is not bounds-validated
+
+**File:** `ai_service/config.py:37-39`
+**Issue:** The env value is coerced with `float(...)` but not validated to be within the valid cosine-similarity range `[0.0, 1.0]`. The plan's threat model explicitly accepts this (T-05-10-01 in `05-10-PLAN.md`: misconfiguration is a self-evident error, not an attack vector), so this is intentional. Flagging only so the decision is traceable from the source: an operator who sets `RAG_SIMILARITY_THRESHOLD=-1` or `=2.0` gets either "everything matches" or "nothing matches" with no log warning at startup.
+**Fix (optional)** — fail-loud validation at import time:
+```python
+RAG_SIMILARITY_THRESHOLD: float = float(
+    os.environ.get("RAG_SIMILARITY_THRESHOLD", "0.45")
+)
+
+def __post_init__(self) -> None:
+    # ... existing DATABASE_URL logic ...
+    if not 0.0 <= self.RAG_SIMILARITY_THRESHOLD <= 1.0:
+        raise ValueError(
+            f"RAG_SIMILARITY_THRESHOLD must be in [0.0, 1.0], "
+            f"got {self.RAG_SIMILARITY_THRESHOLD}"
         )
+```
+Per the ADR / threat model this is a "nice to have," not required.
 
-    return cls(
-        database_url=database_url,
-        openai_api_key=openai_api_key,
-    )
+### IN-04: Retry/error test paths do not re-assert `gen_random_uuid()` in the SQL
+
+**File:** `mcp_server/tests/test_middleware_logging.py:66-93, 95-132`
+**Issue:** The `gen_random_uuid()` assertion was added only to `test_tool_logging_middleware_logs_successful_calls` (line 55). The error-path test (`test_tool_logging_middleware_logs_errors_without_output`) and retry-success test (`test_tool_logging_middleware_records_retry_success_and_latency`) unpack `execute.await_args.args` but skip the `query` string check. Since all three paths go through the same `_log_call` method and the same SQL string, this is not a correctness gap — but if `_log_call` were ever split into success/error branches in the future, the error path could silently drop the `id` column again without test failure.
+**Fix (defense in depth):** In the two tests that currently discard `query` via `_, _, _, ...`, bind it and assert once more:
+```python
+query, _, _, input_params, output_result, _, _, _, status = (
+    mock_context.lifespan_context["db_pool"].execute.await_args.args
+)
+assert "gen_random_uuid()" in query
 ```
 
 ---
 
-_Reviewed: 2026-04-27T17:32:00Z_
+_Reviewed: 2026-05-02T00:00:00Z_
 _Reviewer: the agent (gsd-code-reviewer)_
 _Depth: standard_
