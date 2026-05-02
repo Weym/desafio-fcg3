@@ -1,38 +1,43 @@
 ---
 phase: 05-ai-service
-verified: 2026-04-27T19:45:00Z
+verified: 2026-05-02T19:30:00Z
 status: human_needed
 score: 5/5 must-haves verified
-overrides_applied: 0
+overrides_applied: 1
+overrides:
+  - must_have: "RAG retriever finds relevant policy chunks from the knowledge base with cosine similarity threshold calibrated at ≥ 0.75"
+    reason: "Threshold was intentionally lowered from 0.75 to 0.45 (and made configurable via RAG_SIMILARITY_THRESHOLD env var) during Plan 05-10 gap closure. OpenRouter-proxied text-embedding-3-small produces a different similarity distribution than OpenAI direct — UAT evidence showed even exact-title matches only score 0.6685 (range 0.49–0.67 for relevant content). The threshold remains calibrated — it is now calibrated for the actual embedding provider in use. Rationale documented in 05-10-PLAN.md."
+    accepted_by: "user (stated in verification prompt)"
+    accepted_at: "2026-05-02T19:30:00Z"
 re_verification:
-  previous_status: gaps_found
-  previous_score: 4/5
+  previous_status: human_needed
+  previous_score: 5/5
   gaps_closed:
-    - "ingest.py reads DATABASE_URL directly from os.environ instead of using Settings object — will fail in Docker where DATABASE_URL is not set"
-    - "test_compose_limits_ai_service_env_to_runtime_dependencies now fails because Plan 08 removed DATABASE_URL from langchain-service compose config but the test still asserts its presence"
+    - "UAT Test 3 blocker: RAG SIMILARITY_THRESHOLD=0.75 too high for OpenRouter embedding distribution — fixed by Plan 05-10 (default 0.45, configurable via env var)"
+    - "UAT Additional Finding: mcp_action_logs INSERT missing gen_random_uuid() for id column — fixed by Plan 05-10"
+    - "Cross-phase regression: test_agent_flow.py SimpleNamespace settings missing RAG_SIMILARITY_THRESHOLD — fixed by commit 158b9d5"
+    - "Cross-phase regression: test_conversation_memory.py SimpleNamespace settings missing RAG_SIMILARITY_THRESHOLD — fixed by commit 158b9d5"
+    - "Cross-phase regression: fake_create_rag_tool stub signature missing similarity_threshold kwarg — fixed by commit 158b9d5"
   gaps_remaining: []
   regressions: []
 human_verification:
-  - test: "Cold start smoke test — docker compose down && docker compose up -d --build, then docker compose exec langchain-service curl -sf http://localhost:8001/health"
-    expected: "Returns {\"status\":\"healthy\"} with no import or startup errors"
-    why_human: "Requires running Docker containers with live PostgreSQL connection"
-  - test: "Knowledge base ingest — docker compose exec langchain-service python -m ai_service.ingest with valid OPENAI_API_KEY"
-    expected: "Processes 5 documents, generates embeddings, stores chunks, writes .last_ingest.json"
-    why_human: "Requires live OpenAI API key and running PostgreSQL with pgvector"
-  - test: "Academic policy answer — POST /chat with valid X-Service-Token and academic question"
-    expected: "Returns Portuguese answer grounded in knowledge base content"
-    why_human: "Requires live LLM provider, MCP server, and ingested knowledge base"
-  - test: "Provider switch — set LLM_PROVIDER=gemini, restart, send same question"
-    expected: "Different LLM produces valid response without code changes"
-    why_human: "Requires live Gemini API key and container restart"
+  - test: "End-to-end academic answer with tuned threshold (re-run UAT Test 3)"
+    expected: "POST /chat with valid X-Service-Token and Portuguese academic question returns a response grounded in knowledge base content (not the generic fallback). With RAG_SIMILARITY_THRESHOLD=0.45 default and OpenRouter embeddings scoring ~0.49-0.67 for relevant content, the RAG tool should now return chunks. Agent should cite specific policy details (e.g., enrollment rules, deadlines) rather than saying it has no information."
+    why_human: "Requires live OpenRouter/OpenAI LLM, live OpenRouter embeddings, live PostgreSQL with ingested knowledge_base_chunks, and running MCP server. This specifically validates Plan 05-10 Task 1 (configurable threshold) against real embedding scores — unit tests cover the code contract but not the embedding provider behavior."
+  - test: "End-to-end agent tool call without MCP action-log crash (validates Plan 05-10 Task 2)"
+    expected: "POST /chat with a question that forces the agent to invoke an MCP tool (e.g., \"Quais sao minhas matriculas ativas?\") completes without the cascading agent failure previously caused by NOT NULL violation on mcp_action_logs.id. Verify by querying: SELECT id, tool_name, status FROM mcp_action_logs ORDER BY created_at DESC LIMIT 5 — should show newly populated rows with non-null UUIDs."
+    why_human: "Requires live MCP server, live LLM, live PostgreSQL. Unit test now asserts gen_random_uuid() appears in the SQL string, but only a live Postgres INSERT confirms the id column is populated without error."
+  - test: "Provider switch (Gemini) produces valid response"
+    expected: "Set LLM_PROVIDER=gemini with valid GEMINI_API_KEY, restart langchain-service, send the same Portuguese academic question. Gemini produces a valid Portuguese response without any code changes. (This SC #4 test was never exercised in 05-UAT.md — default provider during UAT was OpenAI/OpenRouter.)"
+    why_human: "Requires live Gemini API key and container restart. Code-level verification confirms llm_factory.py handles the provider string mapping and instantiation, but only a live call confirms the credentials, model name, and response parsing all work end-to-end."
 ---
 
 # Phase 5: AI Service Verification Report
 
 **Phase Goal:** The LangChain ReAct agent answers student academic questions in Portuguese, using MCP tools for live data and PGVector RAG for regulation and policy, with any LLM provider configurable by environment variable.
-**Verified:** 2026-04-27T19:45:00Z
+**Verified:** 2026-05-02T19:30:00Z
 **Status:** human_needed
-**Re-verification:** Yes — after Plan 09 gap closure (ingest.py DATABASE_URL sourcing + stale regression test)
+**Re-verification:** Yes — after Plan 05-10 gap closure (RAG threshold configurable + MCP UUID fix + cross-phase regression fix)
 
 ## Goal Achievement
 
@@ -40,132 +45,131 @@ human_verification:
 
 | # | Truth | Status | Evidence |
 |---|-------|--------|----------|
-| 1 | Agent receives a student message, selects MCP tools, and generates a Portuguese response end-to-end | ✓ VERIFIED | `agent.py` creates ReAct agent with `create_agent(model=get_model_string(settings), tools=[...mcp_tools, rag_tool], system_prompt=...)`. `main.py /chat` saves user message → calls `invoke_agent` → saves assistant response. System prompt enforces Portuguese. Fallback message in Portuguese. |
-| 2 | Conversation context rebuilt from last 20 messages on every invocation | ✓ VERIFIED | `database.py:load_chat_history` queries `chat_messages ORDER BY created_at DESC LIMIT %s` with `k=20`; reverses to chronological order. `agent.py:89-93` calls it before agent invocation. No in-memory state — fully stateless. |
-| 3 | RAG retriever finds relevant policy chunks with cosine similarity ≥ 0.75 | ✓ VERIFIED | `rag.py:40-42` uses `WHERE 1 - (embedding <=> %s::vector) >= 0.75 ORDER BY similarity DESC LIMIT 3`. Returns empty string when no chunks pass threshold. `@tool` decorated for LangChain use. |
-| 4 | LLM provider is configurable via LLM_PROVIDER env var (openai, gemini) | ✓ VERIFIED | `config.py:16` reads `LLM_PROVIDER`. `llm_factory.py:17-22` maps to `openai:{model}` or `google_genai:{model}`. Also supports `openrouter`. `create_llm()` instantiates correct provider class. |
-| 5 | Running python -m ai_service.ingest processes all 5 knowledge documents and stores chunks in PGVector | ✓ VERIFIED | **Gap CLOSED by Plan 09.** `ingest.py:38` now imports `from ai_service.config import settings as app_settings` and reads `app_settings.DATABASE_URL` instead of `os.environ.get("DATABASE_URL")`. Behavioral spot-check confirmed: with only POSTGRES_* vars set (no DATABASE_URL), `IngestSettings.from_env()` produces a valid `postgresql://` URL. All 5 knowledge files present in `ai_service/knowledge/`. |
+| 1 | Agent receives a student message, selects MCP tools, calls them, and generates a Portuguese response end-to-end | ✓ VERIFIED (code) | `agent.py:invoke_agent` loads MCP tools (`load_mcp_tools`), creates RAG tool, builds ReAct agent via `create_agent`, injects Portuguese system prompt. `main.py /chat` saves user turn → invokes agent → saves assistant turn. UAT Tests 1, 4, 5, 6 previously passed live. Live re-run of Test 3 needed to confirm grounded answer with new threshold. |
+| 2 | Conversation context rebuilt from last 20 messages on every invocation | ✓ VERIFIED | `database.py:load_chat_history` SELECTs `chat_messages ORDER BY created_at DESC LIMIT %s` with k=20; `agent.py:96-100` calls it before every agent invocation. UAT Test 4 previously passed live — agent correctly referenced prior conversation. |
+| 3 | RAG retriever finds relevant policy chunks with cosine similarity above calibrated threshold | ✓ VERIFIED (override) | Threshold now sourced from `settings.RAG_SIMILARITY_THRESHOLD` (default 0.45, env-configurable). `rag.py:38` uses `WHERE 1 - (embedding <=> %s::vector) >= %s`; `rag.py:47` passes threshold as SQL parameter. Original ROADMAP specified ≥ 0.75 — documented override applied per user instruction because OpenRouter embedding proxy caps at ~0.67 for relevant content. |
+| 4 | LLM provider configurable via LLM_PROVIDER env var (openai, gemini, openrouter) | ✓ VERIFIED (code) | `config.py:16` reads `LLM_PROVIDER`. `llm_factory.py` handles openai/gemini/openrouter via `get_model_string` (model-string path used by `create_agent`) and `create_llm`. Unit tests `test_llm_factory.py` cover all three providers and the unsupported-provider error path — all pass. Live provider-switch (Gemini) remains a human-verification item. |
+| 5 | Running `python -m ai_service.ingest` processes all 5 knowledge documents into PGVector | ✓ VERIFIED | `ingest.py:38` imports `ai_service.config.settings` and uses `app_settings.DATABASE_URL`. All 5 knowledge files present in `ai_service/knowledge/` (matricula.md, faq.md, calendario.md, curriculo.md, regulamento.pdf). UAT Test 2 previously passed live — 5 docs ingested into 17 chunks. |
 
-**Score:** 5/5 truths verified
+**Score:** 5/5 truths verified (1 via documented override)
 
 ### Required Artifacts
 
 | Artifact | Expected | Status | Details |
 |----------|----------|--------|---------|
-| `ai_service/main.py` | FastAPI app with /health and /chat | ✓ VERIFIED (166 lines) | Lifespan manages DB pool + system prompt; X-Service-Token auth via `hmac.compare_digest`; ChatRequest/ChatResponse models; user+assistant persistence; Portuguese fallback |
-| `ai_service/config.py` | Settings via env vars | ✓ VERIFIED (57 lines) | 12 env vars; `__post_init__` builds DATABASE_URL from POSTGRES_* components when empty; frozen dataclass |
-| `ai_service/database.py` | psycopg3 pool + chat history | ✓ VERIFIED (78 lines) | create_pool, load_chat_history (DESC→reverse), save_chat_message (gen_random_uuid()), check_db_health, normalize_psycopg_dsn |
-| `ai_service/agent.py` | ReAct agent factory + invoke | ✓ VERIFIED (118 lines) | create_chat_agent with model string; _extract_response_text walks reversed messages for last AIMessage; asyncio.wait_for timeout; fallback message |
-| `ai_service/rag.py` | RAG tool with pgvector search | ✓ VERIFIED (68 lines) | create_rag_tool factory; @tool decorated; cosine similarity ≥ 0.75; LIMIT 3; text-embedding-3-small; returns formatted chunks or empty string |
-| `ai_service/ingest.py` | Knowledge base ingestion | ✓ VERIFIED (267 lines) | **Gap CLOSED.** `IngestSettings.from_env()` now delegates to `ai_service.config.settings.DATABASE_URL`. Full pipeline: chunking, embedding, delete-then-insert per source. |
-| `ai_service/llm_factory.py` | Provider-agnostic LLM factory | ✓ VERIFIED (57 lines) | get_model_string for openai/gemini/openrouter; create_llm instantiates correct provider class |
-| `ai_service/mcp_tools.py` | MCP tool loading | ✓ VERIFIED (30 lines) | MultiServerMCPClient with X-Chat-Session-ID header; async get_tools() |
-| `ai_service/prompts/system_prompt.txt` | Canonical system prompt | ✓ VERIFIED (13 lines) | Portuguese academic assistant prompt; 8 rules from docs/chatbot.md |
-| `ai_service/requirements.txt` | Python dependencies | ✓ VERIFIED | langchain, langchain-mcp-adapters, langchain-openai, langchain-google-genai, psycopg, fastapi, uvicorn, etc. |
-| `ai_service/knowledge/` | 5 knowledge base documents | ✓ VERIFIED | matricula.md, faq.md, calendario.md, curriculo.md, regulamento.pdf all present |
-| `ai_service/Dockerfile` | Container startup | ✓ VERIFIED | `CMD ["python", "-m", "ai_service.main"]`; copies package correctly |
-| `docker-compose.yml` | langchain-service config | ✓ VERIFIED | `command: python -m ai_service.main`; `./ai_service:/app/ai_service` mount; POSTGRES_* component vars; no DATABASE_URL; no host port |
-| `ai_service/tests/test_runtime_entrypoint.py` | Runtime regressions | ✓ VERIFIED (77 lines) | **Gap CLOSED.** Asserts POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_HOST, POSTGRES_PORT. Negative assertion: `DATABASE_URL:` not in langchain-service env. All 4 compose/file tests pass (1 import test pre-existing failure due to missing langchain_mcp_adapters in local dev). |
-| `ai_service/tests/test_chat_gap_closure.py` | Chat persistence tests | ✓ VERIFIED (114 lines) | Tests extract_response_text, chat_persists_user_before_agent, chat_persists_fallback (cannot run locally — requires langchain_mcp_adapters; designed for Docker) |
+| `ai_service/config.py` | Settings with RAG_SIMILARITY_THRESHOLD | ✓ VERIFIED | Lines 37-39 add field; default 0.45; reads `RAG_SIMILARITY_THRESHOLD` env var. Existing 12 env vars preserved; DATABASE_URL POSTGRES_* fallback intact. |
+| `ai_service/rag.py` | create_rag_tool with configurable threshold | ✓ VERIFIED | Line 13-17: signature accepts `similarity_threshold: float = 0.45`. Line 47: threshold passed as SQL parameter. Hardcoded `SIMILARITY_THRESHOLD = 0.75` module constant removed. |
+| `ai_service/agent.py` | invoke_agent passes threshold from settings | ✓ VERIFIED | Lines 89-93: `create_rag_tool(db_pool, embeddings, similarity_threshold=settings.RAG_SIMILARITY_THRESHOLD)`. |
+| `ai_service/main.py` | FastAPI /health and /chat with X-Service-Token | ✓ VERIFIED | Service-token check at lines 22-36; lifespan manages DB pool; user + assistant persistence. |
+| `ai_service/database.py` | psycopg3 pool + chat history + save | ✓ VERIFIED | `load_chat_history` (DESC→reverse → chronological), `save_chat_message` (gen_random_uuid()), `check_db_health`. |
+| `ai_service/llm_factory.py` | Provider-agnostic factory | ✓ VERIFIED | get_model_string + create_llm support openai/gemini/openrouter; clear error for unsupported. |
+| `ai_service/ingest.py` | 5-doc pipeline using shared Settings | ✓ VERIFIED | Reads DATABASE_URL + embedding config from `ai_service.config.settings`. Delete-then-insert per source. |
+| `ai_service/mcp_tools.py` | MCP client with X-Chat-Session-ID header | ✓ VERIFIED | MultiServerMCPClient with per-session header; async `load_mcp_tools`. |
+| `ai_service/prompts/system_prompt.txt` | Portuguese academic assistant prompt | ✓ VERIFIED | 13 lines, 8 rules from docs/chatbot.md. |
+| `ai_service/knowledge/` | 5 documents present | ✓ VERIFIED | matricula.md, faq.md, calendario.md, curriculo.md, regulamento.pdf — all present. |
+| `mcp_server/middleware.py` | INSERT INTO mcp_action_logs with id + gen_random_uuid() | ✓ VERIFIED | Line 103 adds `id,` to column list; line 113 adds `gen_random_uuid(),` as first VALUES entry; positional parameters $1-$8 unchanged. |
+| `docker-compose.yml` | langchain-service runs package entrypoint, POSTGRES_* env | ✓ VERIFIED | `command: python -m ai_service.main`, bind-mount `./ai_service:/app/ai_service`, POSTGRES_* component vars (no DATABASE_URL), no host port exposed. |
+| `ai_service/tests/test_rag_retrieval.py` | Threshold configurability tests | ✓ VERIFIED | `test_retrieval_uses_custom_threshold` present (line 75 passing); no import of removed SIMILARITY_THRESHOLD constant; all 3 tests pass. |
+| `mcp_server/tests/test_middleware_logging.py` | gen_random_uuid() assertion | ✓ VERIFIED | `assert "gen_random_uuid()" in query` present; 10/10 tests pass. |
+| `ai_service/tests/test_agent_flow.py` | SimpleNamespace settings include RAG_SIMILARITY_THRESHOLD | ✓ VERIFIED | Commit 158b9d5 added RAG_SIMILARITY_THRESHOLD=0.45 to SimpleNamespace (line 69) and extended `fake_create_rag_tool` to accept `similarity_threshold=0.45` kwarg (line 27); test passes. |
+| `ai_service/tests/test_conversation_memory.py` | SimpleNamespace settings include RAG_SIMILARITY_THRESHOLD | ✓ VERIFIED | Commit 158b9d5 added RAG_SIMILARITY_THRESHOLD=0.45 (line 102); test passes. |
 
 ### Key Link Verification
 
 | From | To | Via | Status | Details |
 |------|----|-----|--------|---------|
-| `main.py` | `config.py` | `from ai_service.config import settings` | ✓ WIRED | Line 15 |
-| `main.py` | `database.py` | `create_pool, save_chat_message, check_db_health` | ✓ WIRED | Line 16; used in lifespan (pool), /chat (save), /health (check) |
-| `main.py` | `agent.py` | `invoke_agent` | ✓ WIRED | Line 14; called in /chat endpoint line 120 |
-| `agent.py` | `mcp_tools.py` | `from ai_service.mcp_tools import load_mcp_tools` | ✓ WIRED | Line 14; called in invoke_agent line 85 |
-| `agent.py` | `rag.py` | `from ai_service.rag import create_rag_tool` | ✓ WIRED | Line 15; called in invoke_agent line 86 |
-| `agent.py` | `llm_factory.py` | `from ai_service.llm_factory import get_model_string` | ✓ WIRED | Line 13; used in create_chat_agent line 29 |
-| `agent.py` | `database.py` | `from ai_service.database import load_chat_history` | ✓ WIRED | Line 12; called in invoke_agent line 89 |
-| `mcp_tools.py` | MCP server | `MultiServerMCPClient` with `X-Chat-Session-ID` | ✓ WIRED | Lines 19-29 |
-| `rag.py` | `knowledge_base_chunks` | pgvector cosine similarity | ✓ WIRED | Lines 35-53 with parameterized query |
-| `rag.py` | OpenAI Embeddings | `embed_query` via text-embedding-3-small | ✓ WIRED | Lines 19-22 and 32 |
-| `ingest.py` | `config.py` | `from ai_service.config import settings as app_settings` | ✓ WIRED | **Gap CLOSED.** Line 38; uses `app_settings.DATABASE_URL` |
-| `ingest.py` | `database.py` | `normalize_psycopg_dsn` | ✓ WIRED | Line 15 |
-| `ingest.py` | `knowledge_base_chunks` | DELETE + INSERT per source | ✓ WIRED | Lines 140-163 |
-| `Dockerfile` | `main.py` | `python -m ai_service.main` | ✓ WIRED | Line 15 |
-| `docker-compose.yml` | `main.py` | `command: python -m ai_service.main` | ✓ WIRED | Line 115 |
-| `docker-compose.yml` | bind mount | `./ai_service:/app/ai_service` | ✓ WIRED | Line 102 |
+| `main.py` | `config.py` | `from ai_service.config import settings` | ✓ WIRED | Used in lifespan, auth, /chat |
+| `main.py` | `database.py` | `create_pool`, `save_chat_message`, `check_db_health` | ✓ WIRED | Pool in lifespan; save on user + assistant turns; health check |
+| `main.py` | `agent.py` | `invoke_agent` | ✓ WIRED | Called in /chat handler with session_id |
+| `agent.py` | `mcp_tools.py` | `load_mcp_tools(MCP_SERVER_URL, session_id)` | ✓ WIRED | Per-session client for X-Chat-Session-ID header |
+| `agent.py` | `rag.py` | `create_rag_tool(db_pool, embeddings, similarity_threshold=settings.RAG_SIMILARITY_THRESHOLD)` | ✓ WIRED | **Plan 05-10 new wiring** — threshold flows from Settings into tool factory |
+| `agent.py` | `llm_factory.py` | `get_model_string(settings)` in create_chat_agent | ✓ WIRED | Produces `openai:{model}` / `google_genai:{model}` string for `create_agent` |
+| `agent.py` | `database.py` | `load_chat_history(db_pool, session_id, k=settings.CHAT_HISTORY_K)` | ✓ WIRED | Called before every agent invocation |
+| `rag.py` | `knowledge_base_chunks` | pgvector `embedding <=> %s::vector` with threshold parameter | ✓ WIRED | Parameterized similarity threshold; LIMIT 3 |
+| `rag.py` | OpenAI Embeddings | `embeddings.embed_query(query)` | ✓ WIRED | via text-embedding-3-small |
+| `ingest.py` | `config.py` | `from ai_service.config import settings as app_settings` | ✓ WIRED | Lines 38, 188 |
+| `mcp_server/middleware.py` | `mcp_action_logs.id` | INSERT with `gen_random_uuid()` in VALUES | ✓ WIRED | **Plan 05-10 new wiring** — server-side UUID generation, positional params unchanged |
+| `Dockerfile` | `main.py` | `CMD ["python", "-m", "ai_service.main"]` | ✓ WIRED | Package entrypoint |
+| `docker-compose.yml` | `main.py` | `command: python -m ai_service.main` | ✓ WIRED | Plus bind mount and POSTGRES_* env |
 
 ### Data-Flow Trace (Level 4)
 
 | Artifact | Data Variable | Source | Produces Real Data | Status |
 |----------|---------------|--------|--------------------|--------|
-| `main.py /chat` | `response_text` | `invoke_agent()` → `create_agent().ainvoke()` | LLM-generated response | ✓ FLOWING — agent invocation returns real LLM output |
-| `main.py /chat` | `request.message` | HTTP POST body | User input | ✓ FLOWING — saved to chat_messages before agent |
-| `database.py load_chat_history` | `rows` | SQL query to `chat_messages` | DB query result | ✓ FLOWING — parameterized SELECT with LIMIT |
-| `rag.py search_knowledge_base` | `rows` | SQL query to `knowledge_base_chunks` | DB query with pgvector | ✓ FLOWING — cosine similarity query |
-| `agent.py _extract_response_text` | `result["messages"]` | LangChain agent output | Agent message list | ✓ FLOWING — reversed scan for last AIMessage |
-| `ingest.py IngestSettings.from_env` | `database_url` | `app_settings.DATABASE_URL` via config.py | Settings singleton with POSTGRES_* fallback | ✓ FLOWING — behavioral spot-check confirmed URL derived from component vars |
+| `main.py /chat` | `response_text` | `invoke_agent` → `create_agent().ainvoke()` → LangChain | Real LLM call | ✓ FLOWING (unit tests cover contract; live LLM call confirmed by prior UAT Test 4) |
+| `database.py load_chat_history` | `rows` | SQL SELECT on chat_messages | DB query | ✓ FLOWING (parameterized LIMIT k) |
+| `rag.py search_knowledge_base` | `rows` | SQL SELECT with pgvector + threshold parameter | DB query | ✓ FLOWING (threshold now env-configurable) |
+| `agent.py invoke_agent` | `similarity_threshold` | `settings.RAG_SIMILARITY_THRESHOLD` from env | Real config value | ✓ FLOWING (Plan 05-10 new path — unit test `test_retrieval_uses_custom_threshold` confirms value propagates to SQL params) |
+| `mcp_server middleware` | `id` | `gen_random_uuid()` server-side in INSERT | Postgres-generated UUID | ✓ FLOWING at code level — live INSERT remains human-verification item |
 
 ### Behavioral Spot-Checks
 
 | Behavior | Command | Result | Status |
 |----------|---------|--------|--------|
-| All source files parse without syntax errors | `python -c "import ast; ..."` for 8 files | All 8 files parse OK | ✓ PASS |
-| IngestSettings derives DATABASE_URL from POSTGRES_* | Simulated Docker env (no DATABASE_URL, POSTGRES_* set) | `postgresql://fcg3:test_pass@postgres:5432/fcg3` | ✓ PASS |
-| Runtime entrypoint tests pass | `pytest test_runtime_entrypoint.py -v -k "not test_import"` | 4 passed, 0 failed | ✓ PASS |
-| Regression test asserts POSTGRES_* component vars | Inspected assertions in test file lines 61-65 | 5 POSTGRES_* assertions + negative DATABASE_URL assertion | ✓ PASS |
-| DATABASE_URL absent from langchain-service compose section | docker-compose.yml lines 85-116 | Only POSTGRES_* vars present; no DATABASE_URL | ✓ PASS |
-| Plan 09 commits exist in git | `git log --oneline 20315cc eb35c8f` | Both verified: `20315cc` (ingest fix), `eb35c8f` (test fix) | ✓ PASS |
+| ai_service test suite | `pytest ai_service/tests/ -v` | 20 passed, 0 failed | ✓ PASS |
+| MCP middleware logging tests | `pytest mcp_server/tests/test_middleware_logging.py -v` | 10 passed, 0 failed | ✓ PASS |
+| RAG threshold configurability | `grep -n "RAG_SIMILARITY_THRESHOLD" ai_service/config.py ai_service/rag.py ai_service/agent.py` | Returns wiring in all 3 files | ✓ PASS |
+| Hardcoded threshold removed | `grep -n "SIMILARITY_THRESHOLD = 0.75" ai_service/rag.py` | Empty result | ✓ PASS |
+| MCP INSERT has gen_random_uuid() | `grep -n "gen_random_uuid" mcp_server/middleware.py` | Line 113 | ✓ PASS |
+| Plan 05-10 commits present | `git log --oneline` | 97fb2d1 (feat RAG), 34d881e (fix UUID), 158b9d5 (fix regression) | ✓ PASS |
+| Cross-phase regression fix wires similarity_threshold into fake stub | `git show 158b9d5` | Diff adds kwarg + SimpleNamespace field to 2 test files | ✓ PASS |
+| All 5 knowledge docs present | `ls ai_service/knowledge/` | matricula.md, faq.md, calendario.md, curriculo.md, regulamento.pdf | ✓ PASS |
+| Live chat happy path (Test 3) | N/A — requires live LLM + DB + MCP | — | ? SKIP (human_verification) |
+| Live provider switch (Gemini) | N/A — requires live Gemini key + restart | — | ? SKIP (human_verification) |
+| Live MCP tool call without crash | N/A — requires live stack | — | ? SKIP (human_verification) |
 
 ### Requirements Coverage
 
 | Requirement | Source Plan | Description | Status | Evidence |
 |-------------|------------|-------------|--------|----------|
-| AI-01 | 05-01, 05-04, 05-05, 05-06 | ReAct agent processes messages, calls MCP tools, generates Portuguese response | ✓ SATISFIED | agent.py creates ReAct agent; loads MCP + RAG tools; main.py /chat wires end-to-end; system prompt enforces Portuguese |
-| AI-02 | 05-01, 05-04, 05-05, 05-06 | Conversation memory rebuilt from DB (last 20) on every invocation | ✓ SATISFIED | database.py load_chat_history queries last 20 messages; agent.py injects into agent input; main.py saves user+assistant turns |
-| AI-03 | 05-03 | RAG search with cosine similarity ≥ 0.75 threshold | ✓ SATISFIED | rag.py implements pgvector query with WHERE similarity >= 0.75, LIMIT 3, returns formatted chunks or empty |
-| AI-04 | 05-01, 05-04 | LLM provider configurable via env var | ✓ SATISFIED | config.py reads LLM_PROVIDER; llm_factory.py maps to provider:model strings for openai/gemini/openrouter |
-| AI-05 | 05-02, 05-09 | Ingest script processes 5 knowledge docs into PGVector | ✓ SATISFIED | **Unblocked by Plan 09.** ingest.py full pipeline present; IngestSettings now derives DATABASE_URL from shared config.settings; all 5 knowledge docs present |
+| AI-01 | 05-01, 05-04, 05-05, 05-06 | ReAct agent processes messages, calls MCP tools, generates Portuguese response | ✓ SATISFIED | agent.py creates ReAct agent via `create_agent`; loads MCP + RAG tools; main.py /chat wires end-to-end; system prompt enforces Portuguese; fallback message is Portuguese. UAT Tests 1, 4, 5, 6 previously passed live. |
+| AI-02 | 05-01, 05-04, 05-05 | Conversation memory rebuilt from DB (last 20) on every invocation | ✓ SATISFIED | database.py load_chat_history DESC→reverse→chronological with k=20; agent.py injects on every call; no in-memory state. UAT Test 4 previously passed live. |
+| AI-03 | 05-03, 05-10 | RAG search with calibrated cosine similarity threshold | ✓ SATISFIED (override) | rag.py uses parameterized threshold; default 0.45 via settings (documented OpenRouter calibration per Plan 05-10 rationale). Override accepted per verification prompt. |
+| AI-04 | 05-01, 05-04 | LLM provider configurable via env var | ✓ SATISFIED (code) | config.py reads LLM_PROVIDER; llm_factory.py handles openai/gemini/openrouter; unit tests cover all three. Live Gemini switch remains human-verification. |
+| AI-05 | 05-02, 05-09 | Ingest script processes 5 knowledge docs into PGVector | ✓ SATISFIED | ingest.py uses shared Settings for DATABASE_URL; delete-then-insert per source; all 5 knowledge docs present. UAT Test 2 previously passed live (5 docs → 17 chunks). |
+| MCP-03 | 05-10 (cross-phase fix) | MCP action log INSERT succeeds (no NOT NULL violation on id) | ✓ SATISFIED | middleware.py INSERT now lists `id` and uses `gen_random_uuid()` in VALUES; unit test asserts `"gen_random_uuid()" in query`; live INSERT confirmation remains human-verification. |
 
 ### Anti-Patterns Found
 
 | File | Line | Pattern | Severity | Impact |
 |------|------|---------|----------|--------|
-| `ai_service/agent.py` | 28-29 | `get_model_string(settings)` instead of `create_llm(settings)` for OpenRouter | ⚠️ Warning | OpenRouter provider path may not work correctly since `create_agent` uses model string, not a pre-built model instance — WR-01 from 05-REVIEW.md. Not a blocker for openai/gemini. |
-| `ai_service/main.py` | 113-133 | Synchronous DB calls in async handler | ℹ️ Info | WR-03 from 05-REVIEW.md — `save_chat_message` is sync psycopg3 in an async endpoint. Acceptable for MVP load. |
-| `ai_service/tests/test_runtime_entrypoint.py` | 12 | `test_import_preserves_health_and_chat_routes` fails locally (missing `langchain_mcp_adapters`) | ℹ️ Info | Pre-existing issue — package only available inside Docker. Not a Plan 09 regression. Other 4 tests pass. |
+| `ai_service/agent.py` | ~28-29 | `get_model_string(settings)` instead of `create_llm(settings)` for OpenRouter | ⚠️ Warning | Legacy finding from 05-REVIEW.md (WR-01). OpenRouter path relies on model-string inference; may not honor custom base_url/api_key via `create_agent`. Not a blocker for Phase 5 passing — affects OpenRouter provider path only. |
+| `ai_service/main.py` | 113-133 | Synchronous psycopg3 calls in async handler | ℹ️ Info | Legacy finding from 05-REVIEW.md (WR-03). Acceptable for MVP load; not a functional defect. |
+| `ai_service/tests/` | N/A | No integration test for live provider switch (AI-04) | ℹ️ Info | Unit tests cover code contract for all three providers; live switch verification deferred to human_verification. |
 
 ### Human Verification Required
 
-### 1. Cold Start Smoke Test
+### 1. End-to-End Academic Answer with Tuned Threshold (Re-run UAT Test 3)
 
-**Test:** Kill containers (`docker compose down`), rebuild (`docker compose up -d --build`), then `docker compose exec langchain-service curl -sf http://localhost:8001/health`
-**Expected:** Returns `{"status":"healthy"}` with no import/startup errors
-**Why human:** Requires live Docker + PostgreSQL connection — validates full container wiring
+**Test:** From inside the Docker network, send a POST to `/chat` with a valid `X-Service-Token` and a Portuguese academic question such as `"Quais sao as regras de matricula?"`
+**Expected:** Response contains a Portuguese answer grounded in knowledge base content — cites specific enrollment rules rather than the generic "nao encontrei informacao" fallback. With `RAG_SIMILARITY_THRESHOLD=0.45` (new default) and OpenRouter embeddings scoring ~0.49-0.67 for relevant content, the RAG tool should now return matching chunks.
+**Why human:** Requires live OpenRouter/OpenAI LLM, live OpenRouter embeddings, running PostgreSQL with ingested knowledge_base_chunks, and running MCP server. This specifically validates Plan 05-10 Task 1 against real embedding scores — unit tests cover the code contract but not the embedding provider's actual score distribution.
 
-### 2. Knowledge Base Ingest (Gap Closure Validation)
+### 2. End-to-End Agent Tool Call Without MCP Action-Log Crash (Plan 05-10 Task 2 Validation)
 
-**Test:** Run `docker compose exec langchain-service python -m ai_service.ingest` with valid `OPENAI_API_KEY` in `.env`
-**Expected:** Processes 5 documents, prints chunk counts per category, writes `.last_ingest.json`
-**Why human:** Requires live OpenAI API key for embedding generation and running PostgreSQL with pgvector — this specifically validates Plan 09's fix
+**Test:** Send a POST `/chat` with a question that forces the agent to invoke an MCP tool, such as `"Quais sao minhas matriculas ativas?"` (expected to trigger `get_enrollments` or similar). After the call, run `SELECT id, tool_name, status FROM mcp_action_logs ORDER BY created_at DESC LIMIT 5;` inside the postgres container.
+**Expected:** The /chat call completes without the cascading agent failure previously caused by the NOT NULL violation. The query returns recent rows with non-null UUIDs in the `id` column — confirming `gen_random_uuid()` is populating it correctly.
+**Why human:** Requires live MCP server, live LLM, live PostgreSQL. Unit test asserts the SQL string contains `gen_random_uuid()` but only a live Postgres INSERT confirms the id column is populated without error.
 
-### 3. Academic Policy Answer
+### 3. Provider Switch (Gemini) Produces Valid Response
 
-**Test:** Send authorized `POST /chat` with `X-Service-Token` and question "Quais sao as regras de matricula?"
-**Expected:** Portuguese answer grounded in knowledge base content — not generic fallback
-**Why human:** Requires live LLM provider, running MCP server, and ingested knowledge base
-
-### 4. Provider Switch
-
-**Test:** Set `LLM_PROVIDER=gemini`, restart langchain-service, send same academic question
-**Expected:** Gemini produces valid Portuguese response without code changes
-**Why human:** Requires live Gemini API key and container restart
+**Test:** In `.env` set `LLM_PROVIDER=gemini` with a valid `GEMINI_API_KEY`, run `docker compose restart langchain-service`, then send the same Portuguese academic question from Test 1.
+**Expected:** Gemini produces a valid Portuguese response without any code changes — demonstrating SC #4's provider agnosticism end-to-end. Previously not exercised in live UAT (default provider was OpenAI/OpenRouter).
+**Why human:** Requires live Gemini API key and container restart. Code-level verification confirms `llm_factory.py` handles the provider string mapping and instantiation; only a live call confirms credentials, model name, and response parsing all work.
 
 ### Gaps Summary
 
-**All gaps from previous verification are now CLOSED:**
+**All code-level gaps from previous verifications are now CLOSED.**
 
-Plan 09 successfully fixed both remaining gaps:
-- ✅ **ingest.py DATABASE_URL sourcing** — `IngestSettings.from_env()` now imports `ai_service.config.settings.DATABASE_URL` (line 38-40) instead of reading `os.environ.get("DATABASE_URL")`. Behavioral spot-check confirmed: with only POSTGRES_* vars set, produces valid `postgresql://fcg3:test_pass@postgres:5432/fcg3`.
-- ✅ **Stale regression test** — `test_compose_limits_ai_service_env_to_runtime_dependencies` now asserts 5 POSTGRES_* component vars (lines 61-65) and has a negative assertion that `DATABASE_URL:` is not present (line 77). All 4 compose/file tests pass green.
+Plan 05-10 successfully closed both remaining runtime blockers from 05-UAT.md:
 
-**No new gaps found.** All 5 ROADMAP success criteria are satisfied at the code level. 4 human verification items remain (require live Docker + API keys) to confirm runtime behavior.
+- ✅ **RAG threshold too aggressive for OpenRouter** (UAT Test 3 blocker) — `RAG_SIMILARITY_THRESHOLD` added to `ai_service.config.Settings` with default 0.45 (env-configurable); `create_rag_tool` accepts `similarity_threshold` kwarg; `invoke_agent` passes `settings.RAG_SIMILARITY_THRESHOLD`; hardcoded `SIMILARITY_THRESHOLD = 0.75` module constant removed; new unit test `test_retrieval_uses_custom_threshold` confirms propagation. Threshold change is a documented calibration override (accepted per verification prompt), not a reduction in SC strictness.
+- ✅ **MCP action logs NOT NULL violation** (UAT Additional Finding) — `mcp_server/middleware.py` INSERT now lists `id` first and uses `gen_random_uuid()` in VALUES clause; positional parameters $1-$8 unchanged; unit test asserts `"gen_random_uuid()" in query`. Eliminates the cascading agent failure that crashed tool-invoking chat flows.
+- ✅ **Cross-phase regression from Plan 05-10** — commit 158b9d5 updated `test_agent_flow.py` and `test_conversation_memory.py` SimpleNamespace settings mocks to include `RAG_SIMILARITY_THRESHOLD=0.45` and extended the `fake_create_rag_tool` stub to accept the new `similarity_threshold` kwarg. All 20 ai_service tests pass (up from 18 pre-fix, plus 2 that would have broken without the regression fix).
+
+**No new code-level gaps found.** All 5 ROADMAP success criteria are satisfied at the code level, with SC #3 accepted via documented override. Three human-verification items remain (require live Docker + API keys) to confirm runtime behavior — in particular to re-run the specific UAT case (Test 3) that previously failed and to exercise SC #4 live with Gemini.
 
 ---
 
-_Verified: 2026-04-27T19:45:00Z_
+_Verified: 2026-05-02T19:30:00Z_
 _Verifier: the agent (gsd-verifier)_
