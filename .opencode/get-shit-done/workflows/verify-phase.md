@@ -20,8 +20,8 @@ Then verify each level against the actual codebase.
 </core_principle>
 
 <required_reading>
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/verification-patterns.md
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/templates/verification-report.md
+@./desafio-fcg3/.opencode/get-shit-done/references/verification-patterns.md
+@./desafio-fcg3/.opencode/get-shit-done/templates/verification-report.md
 </required_reading>
 
 <process>

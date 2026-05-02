@@ -22,7 +22,7 @@ Output: updated VALIDATION.md + generated test files.
 </objective>
 
 <execution_context>
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/validate-phase.md
+@./desafio-fcg3/.opencode/get-shit-done/workflows/validate-phase.md
 </execution_context>
 
 <context>
@@ -30,6 +30,6 @@ Phase: $ARGUMENTS — optional, defaults to last completed phase.
 </context>
 
 <process>
-Execute @./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/validate-phase.md.
+Execute @./desafio-fcg3/.opencode/get-shit-done/workflows/validate-phase.md.
 Preserve all workflow gates.
 </process>

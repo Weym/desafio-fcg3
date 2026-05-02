@@ -19,11 +19,11 @@ Routes to the update workflow which handles:
   </objective>
 
 <execution_context>
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/update.md
+@./desafio-fcg3/.opencode/get-shit-done/workflows/update.md
 </execution_context>
 
 <process>
-**Follow the update workflow** from `@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/update.md`.
+**Follow the update workflow** from `@./desafio-fcg3/.opencode/get-shit-done/workflows/update.md`.
 
 The workflow handles all logic including:
 

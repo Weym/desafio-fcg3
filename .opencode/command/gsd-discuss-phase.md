@@ -29,10 +29,10 @@ Extract implementation decisions that downstream agents need — researcher and 
 </objective>
 
 <execution_context>
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/discuss-phase.md
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/discuss-phase-assumptions.md
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/discuss-phase-power.md
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/templates/context.md
+@./desafio-fcg3/.opencode/get-shit-done/workflows/discuss-phase.md
+@./desafio-fcg3/.opencode/get-shit-done/workflows/discuss-phase-assumptions.md
+@./desafio-fcg3/.opencode/get-shit-done/workflows/discuss-phase-power.md
+@./desafio-fcg3/.opencode/get-shit-done/templates/context.md
 </execution_context>
 
 <runtime_note>
@@ -51,9 +51,9 @@ Context files are resolved in-workflow using `init phase-op` and roadmap/state t
 DISCUSS_MODE=$(node "./desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.discuss_mode 2>/dev/null || echo "discuss")
 ```
 
-If `DISCUSS_MODE` is `"assumptions"`: Read and execute @./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/discuss-phase-assumptions.md end-to-end.
+If `DISCUSS_MODE` is `"assumptions"`: Read and execute @./desafio-fcg3/.opencode/get-shit-done/workflows/discuss-phase-assumptions.md end-to-end.
 
-If `DISCUSS_MODE` is `"discuss"` (or unset, or any other value): Read and execute @./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/discuss-phase.md end-to-end.
+If `DISCUSS_MODE` is `"discuss"` (or unset, or any other value): Read and execute @./desafio-fcg3/.opencode/get-shit-done/workflows/discuss-phase.md end-to-end.
 
 **MANDATORY:** The execution_context files listed above ARE the instructions. Read the workflow file BEFORE taking any action. The objective and success_criteria sections in this command file are summaries — the workflow file contains the complete step-by-step process with all required behaviors, config checks, and interaction patterns. Do not improvise from the summary.
 </process>

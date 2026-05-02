@@ -5,11 +5,11 @@ Create executable phase prompts (PLAN.md files) for a roadmap phase with integra
 <required_reading>
 Read all files referenced by the invoking prompt's execution_context before starting.
 
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/ui-brand.md
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/revision-loop.md
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/gate-prompts.md
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/agent-contracts.md
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/gates.md
+@./desafio-fcg3/.opencode/get-shit-done/references/ui-brand.md
+@./desafio-fcg3/.opencode/get-shit-done/references/revision-loop.md
+@./desafio-fcg3/.opencode/get-shit-done/references/gate-prompts.md
+@./desafio-fcg3/.opencode/get-shit-done/references/agent-contracts.md
+@./desafio-fcg3/.opencode/get-shit-done/references/gates.md
 </required_reading>
 
 <available_agent_types>

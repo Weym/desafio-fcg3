@@ -19,9 +19,9 @@ Accepts an optional topic argument: `/gsd-explore authentication strategy`
 </objective>
 
 <execution_context>
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/explore.md
+@./desafio-fcg3/.opencode/get-shit-done/workflows/explore.md
 </execution_context>
 
 <process>
-Execute the explore workflow from @./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/explore.md end-to-end.
+Execute the explore workflow from @./desafio-fcg3/.opencode/get-shit-done/workflows/explore.md end-to-end.
 </process>

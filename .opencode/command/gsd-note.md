@@ -21,8 +21,8 @@ Runs inline — no Task, no question, no Bash.
 </objective>
 
 <execution_context>
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/note.md
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/ui-brand.md
+@./desafio-fcg3/.opencode/get-shit-done/workflows/note.md
+@./desafio-fcg3/.opencode/get-shit-done/references/ui-brand.md
 </execution_context>
 
 <context>
@@ -30,6 +30,6 @@ $ARGUMENTS
 </context>
 
 <process>
-Execute the note workflow from @./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/note.md end-to-end.
+Execute the note workflow from @./desafio-fcg3/.opencode/get-shit-done/workflows/note.md end-to-end.
 Capture the note, list notes, or promote to todo — depending on arguments.
 </process>

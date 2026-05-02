@@ -19,7 +19,7 @@ Routes to the pause-work workflow which handles:
   </objective>
 
 <execution_context>
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/pause-work.md
+@./desafio-fcg3/.opencode/get-shit-done/workflows/pause-work.md
 </execution_context>
 
 <context>
@@ -27,7 +27,7 @@ State and phase progress are gathered in-workflow with targeted reads.
 </context>
 
 <process>
-**Follow the pause-work workflow** from `@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/pause-work.md`.
+**Follow the pause-work workflow** from `@./desafio-fcg3/.opencode/get-shit-done/workflows/pause-work.md`.
 
 The workflow handles all logic including:
 

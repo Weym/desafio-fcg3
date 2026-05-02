@@ -20,11 +20,11 @@ Routes to the settings workflow which handles:
   </objective>
 
 <execution_context>
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/settings.md
+@./desafio-fcg3/.opencode/get-shit-done/workflows/settings.md
 </execution_context>
 
 <process>
-**Follow the settings workflow** from `@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/settings.md`.
+**Follow the settings workflow** from `@./desafio-fcg3/.opencode/get-shit-done/workflows/settings.md`.
 
 The workflow handles all logic including:
 

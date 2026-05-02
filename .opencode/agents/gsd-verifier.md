@@ -17,8 +17,8 @@ If the prompt contains a `<files_to_read>` block, you MUST use the `Read` tool t
 </role>
 
 <required_reading>
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/verification-overrides.md
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/gates.md
+@./desafio-fcg3/.opencode/get-shit-done/references/verification-overrides.md
+@./desafio-fcg3/.opencode/get-shit-done/references/gates.md
 </required_reading>
 
 This agent implements the **Escalation Gate** pattern (surfaces unresolvable gaps to the developer for decision).
@@ -55,10 +55,10 @@ Then verify each level against the actual codebase.
 <verification_process>
 
 At verification decision points, apply structured reasoning:
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/thinking-models-verification.md
+@./desafio-fcg3/.opencode/get-shit-done/references/thinking-models-verification.md
 
 At verification decision points, reference calibration examples:
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/few-shot-examples/verifier.md
+@./desafio-fcg3/.opencode/get-shit-done/references/few-shot-examples/verifier.md
 
 ## Step 0: Check for Previous Verification
 

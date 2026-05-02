@@ -485,7 +485,7 @@ _(If no gaps: "None — existing test infrastructure covers all phase requiremen
 <execution_flow>
 
 At research decision points, apply structured reasoning:
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/thinking-models-research.md
+@./desafio-fcg3/.opencode/get-shit-done/references/thinking-models-research.md
 
 ## Step 1: Receive Scope and Load Context
 

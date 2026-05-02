@@ -39,7 +39,7 @@ Key characteristics of the input:
   </input>
 
 <reference>
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/user-profiling.md
+@./desafio-fcg3/.opencode/get-shit-done/references/user-profiling.md
 
 This is the detection heuristics rubric. Read it in full before analyzing any messages. It defines:
 

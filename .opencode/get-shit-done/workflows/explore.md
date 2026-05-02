@@ -6,8 +6,8 @@ offers mid-conversation research when useful, then routes crystallized outputs t
 <required_reading>
 Read all files referenced by the invoking prompt's execution_context before starting.
 
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/questioning.md
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/domain-probes.md
+@./desafio-fcg3/.opencode/get-shit-done/references/questioning.md
+@./desafio-fcg3/.opencode/get-shit-done/references/domain-probes.md
 </required_reading>
 
 <available_agent_types>

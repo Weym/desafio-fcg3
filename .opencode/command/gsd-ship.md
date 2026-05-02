@@ -17,7 +17,7 @@ Closes the plan → execute → verify → ship loop.
 </objective>
 
 <execution_context>
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/ship.md
+@./desafio-fcg3/.opencode/get-shit-done/workflows/ship.md
 </execution_context>
 
-Execute the ship workflow from @./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/ship.md end-to-end.
+Execute the ship workflow from @./desafio-fcg3/.opencode/get-shit-done/workflows/ship.md end-to-end.

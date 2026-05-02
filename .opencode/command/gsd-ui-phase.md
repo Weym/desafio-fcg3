@@ -20,8 +20,8 @@ Flow: Validate → Research UI → Verify UI-SPEC → Done
 </objective>
 
 <execution_context>
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/ui-phase.md
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/ui-brand.md
+@./desafio-fcg3/.opencode/get-shit-done/workflows/ui-phase.md
+@./desafio-fcg3/.opencode/get-shit-done/references/ui-brand.md
 </execution_context>
 
 <context>
@@ -29,6 +29,6 @@ Phase number: $ARGUMENTS — optional, auto-detects next unplanned phase if omit
 </context>
 
 <process>
-Execute @./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/ui-phase.md end-to-end.
+Execute @./desafio-fcg3/.opencode/get-shit-done/workflows/ui-phase.md end-to-end.
 Preserve all workflow gates.
 </process>

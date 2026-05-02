@@ -19,7 +19,7 @@ Routes to the add-phase workflow which handles:
   </objective>
 
 <execution_context>
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/add-phase.md
+@./desafio-fcg3/.opencode/get-shit-done/workflows/add-phase.md
 </execution_context>
 
 <context>
@@ -29,7 +29,7 @@ Roadmap and state are resolved in-workflow via `init phase-op` and targeted tool
 </context>
 
 <process>
-**Follow the add-phase workflow** from `@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/add-phase.md`.
+**Follow the add-phase workflow** from `@./desafio-fcg3/.opencode/get-shit-done/workflows/add-phase.md`.
 
 The workflow handles all logic including:
 

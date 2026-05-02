@@ -14,10 +14,10 @@ Use when `.planning/phases/` has accumulated directories from past milestones.
 </objective>
 
 <execution_context>
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/cleanup.md
+@./desafio-fcg3/.opencode/get-shit-done/workflows/cleanup.md
 </execution_context>
 
 <process>
-Follow the cleanup workflow at @./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/cleanup.md.
+Follow the cleanup workflow at @./desafio-fcg3/.opencode/get-shit-done/workflows/cleanup.md.
 Identify completed milestones, show a dry-run summary, and archive on confirmation.
 </process>

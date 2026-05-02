@@ -18,9 +18,9 @@ Lightweight alternative to `/gsd-map-codebase` — spawns one mapper agent inste
 </objective>
 
 <execution_context>
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/scan.md
+@./desafio-fcg3/.opencode/get-shit-done/workflows/scan.md
 </execution_context>
 
 <process>
-Execute the scan workflow from @./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/scan.md end-to-end.
+Execute the scan workflow from @./desafio-fcg3/.opencode/get-shit-done/workflows/scan.md end-to-end.
 </process>

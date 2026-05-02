@@ -18,7 +18,7 @@ Output: MILESTONE_SUMMARY written to `.planning/reports/`, presented inline, opt
 </objective>
 
 <execution_context>
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/milestone-summary.md
+@./desafio-fcg3/.opencode/get-shit-done/workflows/milestone-summary.md
 </execution_context>
 
 <context>
@@ -37,7 +37,7 @@ Output: MILESTONE_SUMMARY written to `.planning/reports/`, presented inline, opt
   </context>
 
 <process>
-Read and execute the milestone-summary workflow from @./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/milestone-summary.md end-to-end.
+Read and execute the milestone-summary workflow from @./desafio-fcg3/.opencode/get-shit-done/workflows/milestone-summary.md end-to-end.
 </process>
 
 <success_criteria>

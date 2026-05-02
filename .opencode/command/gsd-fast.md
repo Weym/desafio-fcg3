@@ -21,9 +21,9 @@ you could describe in one sentence and execute in under 2 minutes.
 </objective>
 
 <execution_context>
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/fast.md
+@./desafio-fcg3/.opencode/get-shit-done/workflows/fast.md
 </execution_context>
 
 <process>
-Execute the fast workflow from @./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/fast.md end-to-end.
+Execute the fast workflow from @./desafio-fcg3/.opencode/get-shit-done/workflows/fast.md end-to-end.
 </process>

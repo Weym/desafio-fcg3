@@ -1019,7 +1019,7 @@ Gather symptoms through questioning. Update file after EACH answer.
 
 <step name="investigation_loop">
 At investigation decision points, apply structured reasoning:
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/thinking-models-debug.md
+@./desafio-fcg3/.opencode/get-shit-done/references/thinking-models-debug.md
 
 **Autonomous investigation. Update file continuously.**
 
@@ -1045,7 +1045,7 @@ At investigation decision points, apply structured reasoning:
 
 **Phase 1.5: Check common bug patterns**
 
-- Read @./desafio-fcg3/src/backend/.opencode/get-shit-done/references/common-bug-patterns.md
+- Read @./desafio-fcg3/.opencode/get-shit-done/references/common-bug-patterns.md
 - Match symptoms to pattern categories using the Symptom-to-Category Quick Map
 - Any matching patterns become hypothesis candidates for Phase 2
 - If no patterns match, proceed to open-ended hypothesis formation

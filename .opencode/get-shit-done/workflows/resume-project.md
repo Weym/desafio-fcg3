@@ -11,7 +11,7 @@ Instantly restore full project context so "Where were we?" has an immediate, com
 </purpose>
 
 <required_reading>
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/continuation-format.md
+@./desafio-fcg3/.opencode/get-shit-done/references/continuation-format.md
 </required_reading>
 
 <process>

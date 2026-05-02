@@ -495,8 +495,8 @@ Output: [Artifacts created]
 </objective>
 
 <execution_context>
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/execute-plan.md
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/templates/summary.md
+@./desafio-fcg3/.opencode/get-shit-done/workflows/execute-plan.md
+@./desafio-fcg3/.opencode/get-shit-done/templates/summary.md
 </execution_context>
 
 <context>
@@ -1078,7 +1078,7 @@ cat "$phase_dir"/*-DISCOVERY.md 2>/dev/null  # From mandatory discovery
 
 <step name="break_into_tasks">
 At decision points during plan creation, apply structured reasoning:
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/thinking-models-planning.md
+@./desafio-fcg3/.opencode/get-shit-done/references/thinking-models-planning.md
 
 Decompose phase into tasks. **Think dependencies first, not sequence.**
 

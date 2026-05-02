@@ -17,7 +17,7 @@ Verify milestone achieved its definition of done. Check requirements coverage, c
 </objective>
 
 <execution_context>
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/audit-milestone.md
+@./desafio-fcg3/.opencode/get-shit-done/workflows/audit-milestone.md
 </execution_context>
 
 <context>
@@ -31,6 +31,6 @@ Glob: .planning/phases/_/_-VERIFICATION.md
 </context>
 
 <process>
-Execute the audit-milestone workflow from @./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/audit-milestone.md end-to-end.
+Execute the audit-milestone workflow from @./desafio-fcg3/.opencode/get-shit-done/workflows/audit-milestone.md end-to-end.
 Preserve all workflow gates (scope determination, verification reading, integration check, requirements coverage, routing).
 </process>

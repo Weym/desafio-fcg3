@@ -21,11 +21,11 @@ Routes to the resume-project workflow which handles:
   </objective>
 
 <execution_context>
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/resume-project.md
+@./desafio-fcg3/.opencode/get-shit-done/workflows/resume-project.md
 </execution_context>
 
 <process>
-**Follow the resume-project workflow** from `@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/resume-project.md`.
+**Follow the resume-project workflow** from `@./desafio-fcg3/.opencode/get-shit-done/workflows/resume-project.md`.
 
 The workflow handles all resumption logic including:
 

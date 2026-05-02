@@ -18,7 +18,7 @@ Output: Forensic report saved to `.planning/forensics/`, presented inline, with 
 </objective>
 
 <execution_context>
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/forensics.md
+@./desafio-fcg3/.opencode/get-shit-done/workflows/forensics.md
 </execution_context>
 
 <context>
@@ -36,7 +36,7 @@ Output: Forensic report saved to `.planning/forensics/`, presented inline, with 
   </context>
 
 <process>
-Read and execute the forensics workflow from @./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/forensics.md end-to-end.
+Read and execute the forensics workflow from @./desafio-fcg3/.opencode/get-shit-done/workflows/forensics.md end-to-end.
 </process>
 
 <success_criteria>

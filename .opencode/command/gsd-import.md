@@ -21,9 +21,9 @@ Future: `--prd` mode for PRD extraction is planned for a follow-up PR.
 </objective>
 
 <execution_context>
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/import.md
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/ui-brand.md
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/gate-prompts.md
+@./desafio-fcg3/.opencode/get-shit-done/workflows/import.md
+@./desafio-fcg3/.opencode/get-shit-done/references/ui-brand.md
+@./desafio-fcg3/.opencode/get-shit-done/references/gate-prompts.md
 </execution_context>
 
 <context>

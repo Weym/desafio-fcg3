@@ -14,7 +14,7 @@ Valid GSD subagent types (use exact names — do not fall back to 'general-purpo
 
 ## Step 0: Resolve Model Profile
 
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/model-profile-resolution.md
+@./desafio-fcg3/.opencode/get-shit-done/references/model-profile-resolution.md
 
 Resolve model for:
 
@@ -22,7 +22,7 @@ Resolve model for:
 
 ## Step 1: Normalize and Validate Phase
 
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/phase-argument-parsing.md
+@./desafio-fcg3/.opencode/get-shit-done/references/phase-argument-parsing.md
 
 ```bash
 PHASE_INFO=$(node "./desafio-fcg3/src/backend/.opencode/get-shit-done/bin/gsd-tools.cjs" roadmap get-phase "${PHASE}")

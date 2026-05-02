@@ -18,9 +18,9 @@ Supports `--force` flag to bypass safety gates (checkpoint, error state, verific
 </objective>
 
 <execution_context>
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/next.md
+@./desafio-fcg3/.opencode/get-shit-done/workflows/next.md
 </execution_context>
 
 <process>
-Execute the next workflow from @./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/next.md end-to-end.
+Execute the next workflow from @./desafio-fcg3/.opencode/get-shit-done/workflows/next.md end-to-end.
 </process>

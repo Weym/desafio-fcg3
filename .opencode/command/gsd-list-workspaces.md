@@ -10,10 +10,10 @@ Scan `~/gsd-workspaces/` for workspace directories containing `WORKSPACE.md` man
 </objective>
 
 <execution_context>
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/list-workspaces.md
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/ui-brand.md
+@./desafio-fcg3/.opencode/get-shit-done/workflows/list-workspaces.md
+@./desafio-fcg3/.opencode/get-shit-done/references/ui-brand.md
 </execution_context>
 
 <process>
-Execute the list-workspaces workflow from @./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/list-workspaces.md end-to-end.
+Execute the list-workspaces workflow from @./desafio-fcg3/.opencode/get-shit-done/workflows/list-workspaces.md end-to-end.
 </process>

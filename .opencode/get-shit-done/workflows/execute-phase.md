@@ -27,9 +27,9 @@ via filesystem and git state.
 <required_reading>
 Read STATE.md before any operation to load project context.
 
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/agent-contracts.md
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/context-budget.md
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/gates.md
+@./desafio-fcg3/.opencode/get-shit-done/references/agent-contracts.md
+@./desafio-fcg3/.opencode/get-shit-done/references/context-budget.md
+@./desafio-fcg3/.opencode/get-shit-done/references/gates.md
 </required_reading>
 
 <available_agent_types>
@@ -387,10 +387,10 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
        </parallel_execution>
 
        <execution_context>
-       @./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/execute-plan.md
-       @./desafio-fcg3/src/backend/.opencode/get-shit-done/templates/summary.md
-       @./desafio-fcg3/src/backend/.opencode/get-shit-done/references/checkpoints.md
-       @./desafio-fcg3/src/backend/.opencode/get-shit-done/references/tdd.md
+       @./desafio-fcg3/.opencode/get-shit-done/workflows/execute-plan.md
+       @./desafio-fcg3/.opencode/get-shit-done/templates/summary.md
+       @./desafio-fcg3/.opencode/get-shit-done/references/checkpoints.md
+       @./desafio-fcg3/.opencode/get-shit-done/references/tdd.md
        </execution_context>
 
        <files_to_read>

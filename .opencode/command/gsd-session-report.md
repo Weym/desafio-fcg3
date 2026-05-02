@@ -11,9 +11,9 @@ Generate a structured SESSION_REPORT.md document capturing session outcomes, wor
 </objective>
 
 <execution_context>
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/session-report.md
+@./desafio-fcg3/.opencode/get-shit-done/workflows/session-report.md
 </execution_context>
 
 <process>
-Execute the session-report workflow from @./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/session-report.md end-to-end.
+Execute the session-report workflow from @./desafio-fcg3/.opencode/get-shit-done/workflows/session-report.md end-to-end.
 </process>

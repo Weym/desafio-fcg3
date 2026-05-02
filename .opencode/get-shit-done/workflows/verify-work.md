@@ -23,7 +23,7 @@ No Pass/Fail buttons. No severity questions. Just: "Here's what should happen. D
 </philosophy>
 
 <template>
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/templates/UAT.md
+@./desafio-fcg3/.opencode/get-shit-done/templates/UAT.md
 </template>
 
 <process>
@@ -490,7 +490,7 @@ Spawning parallel debug agents to investigate each issue.
 ```
 
 - Load diagnose-issues workflow
-- Follow @./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/diagnose-issues.md
+- Follow @./desafio-fcg3/.opencode/get-shit-done/workflows/diagnose-issues.md
 - Spawn parallel debug agents for each issue
 - Collect root causes
 - Update UAT.md with root causes

@@ -9,9 +9,9 @@ Read all files referenced by the invoking prompt's execution_context before star
 
 Key references:
 
-- @./desafio-fcg3/src/backend/.opencode/get-shit-done/references/ui-brand.md (display patterns)
-- @./desafio-fcg3/src/backend/.opencode/get-shit-done/agents/gsd-user-profiler.md (profiler agent definition)
-- @./desafio-fcg3/src/backend/.opencode/get-shit-done/references/user-profiling.md (profiling reference doc)
+- @./desafio-fcg3/.opencode/get-shit-done/references/ui-brand.md (display patterns)
+- @./desafio-fcg3/.opencode/get-shit-done/agents/gsd-user-profiler.md (profiler agent definition)
+- @./desafio-fcg3/.opencode/get-shit-done/references/user-profiling.md (profiling reference doc)
   </required_reading>
 
 <process>
@@ -178,7 +178,7 @@ The agent prompt should follow this structure:
 ```
 Read the profiling reference document and the sampled session messages, then analyze the developer's behavioral patterns across all 8 dimensions.
 
-Reference: @./desafio-fcg3/src/backend/.opencode/get-shit-done/references/user-profiling.md
+Reference: @./desafio-fcg3/.opencode/get-shit-done/references/user-profiling.md
 Session data: @{temp_dir}/profile-sample.jsonl
 
 Analyze these messages and return your analysis in the <analysis> JSON format specified in the reference document.

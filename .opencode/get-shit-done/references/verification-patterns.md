@@ -642,7 +642,7 @@ Some things can't be verified programmatically. Flag these for human testing:
 
 For automation-first checkpoint patterns, server lifecycle management, CLI installation handling, and error recovery protocols, see:
 
-**@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/checkpoints.md** → `<automation_reference>` section
+**@./desafio-fcg3/.opencode/get-shit-done/references/checkpoints.md** → `<automation_reference>` section
 
 Key principles:
 

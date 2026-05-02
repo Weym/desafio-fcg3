@@ -18,8 +18,8 @@ Output: Milestone archived (roadmap + requirements), PROJECT.md evolved, git tag
 <execution_context>
 **Load these files NOW (before proceeding):**
 
-- @./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/complete-milestone.md (main workflow)
-- @./desafio-fcg3/src/backend/.opencode/get-shit-done/templates/milestone-archive.md (archive template)
+- @./desafio-fcg3/.opencode/get-shit-done/workflows/complete-milestone.md (main workflow)
+- @./desafio-fcg3/.opencode/get-shit-done/templates/milestone-archive.md (archive template)
   </execution_context>
 
 <context>

@@ -18,8 +18,8 @@ Routes to the profile-user workflow which orchestrates the full flow: consent ga
 </objective>
 
 <execution_context>
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/profile-user.md
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/ui-brand.md
+@./desafio-fcg3/.opencode/get-shit-done/workflows/profile-user.md
+@./desafio-fcg3/.opencode/get-shit-done/references/ui-brand.md
 </execution_context>
 
 <context>

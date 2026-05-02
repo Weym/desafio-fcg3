@@ -12,7 +12,7 @@ Scan all phases for pending, skipped, blocked, and human_needed UAT items. Cross
 </objective>
 
 <execution_context>
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/audit-uat.md
+@./desafio-fcg3/.opencode/get-shit-done/workflows/audit-uat.md
 </execution_context>
 
 <context>

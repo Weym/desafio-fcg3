@@ -38,10 +38,10 @@ Output: [What artifacts will be created]
 </objective>
 
 <execution_context>
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/execute-plan.md
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/templates/summary.md
+@./desafio-fcg3/.opencode/get-shit-done/workflows/execute-plan.md
+@./desafio-fcg3/.opencode/get-shit-done/templates/summary.md
 [If plan contains checkpoint tasks (type="checkpoint:*"), add:]
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/checkpoints.md
+@./desafio-fcg3/.opencode/get-shit-done/references/checkpoints.md
 </execution_context>
 
 <context>
@@ -88,7 +88,7 @@ Output: [What artifacts will be created]
   <done>[Acceptance criteria]</done>
 </task>
 
-<!-- For checkpoint task examples and patterns, see @./desafio-fcg3/src/backend/.opencode/get-shit-done/references/checkpoints.md -->
+<!-- For checkpoint task examples and patterns, see @./desafio-fcg3/.opencode/get-shit-done/references/checkpoints.md -->
 
 <task type="checkpoint:decision" gate="blocking">
   <decision>[What needs deciding]</decision>
@@ -399,9 +399,9 @@ Output: Working dashboard component.
 </objective>
 
 <execution_context>
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/execute-plan.md
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/templates/summary.md
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/checkpoints.md
+@./desafio-fcg3/.opencode/get-shit-done/workflows/execute-plan.md
+@./desafio-fcg3/.opencode/get-shit-done/templates/summary.md
+@./desafio-fcg3/.opencode/get-shit-done/references/checkpoints.md
 </execution_context>
 
 <context>

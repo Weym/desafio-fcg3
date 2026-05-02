@@ -20,9 +20,9 @@ Three modes:
   </objective>
 
 <execution_context>
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/undo.md
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/ui-brand.md
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/gate-prompts.md
+@./desafio-fcg3/.opencode/get-shit-done/workflows/undo.md
+@./desafio-fcg3/.opencode/get-shit-done/references/ui-brand.md
+@./desafio-fcg3/.opencode/get-shit-done/references/gate-prompts.md
 </execution_context>
 
 <context>
@@ -30,5 +30,5 @@ $ARGUMENTS
 </context>
 
 <process>
-Execute the undo workflow from @./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/undo.md end-to-end.
+Execute the undo workflow from @./desafio-fcg3/.opencode/get-shit-done/workflows/undo.md end-to-end.
 </process>

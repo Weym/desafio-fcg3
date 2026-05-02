@@ -17,10 +17,10 @@ Remove a workspace directory after confirmation. For worktree strategy, runs `gi
 </objective>
 
 <execution_context>
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/remove-workspace.md
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/references/ui-brand.md
+@./desafio-fcg3/.opencode/get-shit-done/workflows/remove-workspace.md
+@./desafio-fcg3/.opencode/get-shit-done/references/ui-brand.md
 </execution_context>
 
 <process>
-Execute the remove-workspace workflow from @./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/remove-workspace.md end-to-end.
+Execute the remove-workspace workflow from @./desafio-fcg3/.opencode/get-shit-done/workflows/remove-workspace.md end-to-end.
 </process>

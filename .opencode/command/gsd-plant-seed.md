@@ -19,9 +19,9 @@ Consumed by: /gsd-new-milestone (scans seeds and presents matches)
 </objective>
 
 <execution_context>
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/plant-seed.md
+@./desafio-fcg3/.opencode/get-shit-done/workflows/plant-seed.md
 </execution_context>
 
 <process>
-Execute the plant-seed workflow from @./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/plant-seed.md end-to-end.
+Execute the plant-seed workflow from @./desafio-fcg3/.opencode/get-shit-done/workflows/plant-seed.md end-to-end.
 </process>

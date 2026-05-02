@@ -26,9 +26,9 @@ Flags:
   </objective>
 
 <execution_context>
-@./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/audit-fix.md
+@./desafio-fcg3/.opencode/get-shit-done/workflows/audit-fix.md
 </execution_context>
 
 <process>
-Execute the audit-fix workflow from @./desafio-fcg3/src/backend/.opencode/get-shit-done/workflows/audit-fix.md end-to-end.
+Execute the audit-fix workflow from @./desafio-fcg3/.opencode/get-shit-done/workflows/audit-fix.md end-to-end.
 </process>
