@@ -7,6 +7,8 @@ from collections.abc import Sequence
 from pathlib import Path
 from urllib.parse import quote_plus
 
+import pytest
+
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 BACKEND_ROOT = REPO_ROOT / "backend"
@@ -143,3 +145,29 @@ def run_alembic_check() -> subprocess.CompletedProcess[str]:
 
 def run_seed() -> subprocess.CompletedProcess[str]:
     return run_fastapi_container_command("python", "-m", "scripts.seed")
+
+
+@pytest.fixture(scope="session", autouse=True)
+def require_docker_healthy():
+    """Pre-flight check: verify Docker containers are running before phase_01 tests.
+
+    Phase_01 tests execute commands inside shared Docker containers (postgres, fastapi-app).
+    If containers are not running, tests fail with cryptic subprocess errors.
+    This fixture fails fast with a clear diagnostic message instead.
+    """
+    result = subprocess.run(
+        ["docker", "compose", "ps", "--status", "running", "--format", "{{.Service}}"],
+        capture_output=True,
+        text=True,
+        timeout=30,
+    )
+    running_services = set(result.stdout.strip().splitlines())
+    required = {"postgres", "fastapi-app"}
+    missing = required - running_services
+
+    if missing:
+        pytest.fail(
+            f"Docker pre-flight check failed: containers not running: {', '.join(sorted(missing))}.\n"
+            f"Running services: {running_services or '(none)'}.\n"
+            f"Run 'docker compose up -d' before executing phase_01 tests."
+        )
