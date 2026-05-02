@@ -18,6 +18,8 @@ re_verification:
     - "Cross-phase regression: test_agent_flow.py SimpleNamespace settings missing RAG_SIMILARITY_THRESHOLD — fixed by commit 158b9d5"
     - "Cross-phase regression: test_conversation_memory.py SimpleNamespace settings missing RAG_SIMILARITY_THRESHOLD — fixed by commit 158b9d5"
     - "Cross-phase regression: fake_create_rag_tool stub signature missing similarity_threshold kwarg — fixed by commit 158b9d5"
+    - "HUMAN-UAT Blocker 1: MCP server not injecting X-Student-Id header on proxied requests — all tool calls failing with IDENTIFICACAO_AUSENTE — fixed by Plan 05-11 (centralized header injection in api_client.py, all 16 tools wired)"
+    - "HUMAN-UAT Blocker 2: System prompt told agent RAG threshold is 0.75 when code uses 0.45 — fixed by Plan 05-11 (threshold in system_prompt.txt corrected to 0.45)"
   gaps_remaining: []
   regressions: []
 human_verification:
@@ -37,7 +39,7 @@ human_verification:
 **Phase Goal:** The LangChain ReAct agent answers student academic questions in Portuguese, using MCP tools for live data and PGVector RAG for regulation and policy, with any LLM provider configurable by environment variable.
 **Verified:** 2026-05-02T19:30:00Z
 **Status:** human_needed
-**Re-verification:** Yes — after Plan 05-10 gap closure (RAG threshold configurable + MCP UUID fix + cross-phase regression fix)
+**Re-verification:** Yes — after Plan 05-10 gap closure (RAG threshold configurable + MCP UUID fix + cross-phase regression fix) and Plan 05-11 gap closure (X-Student-Id header injection + system prompt threshold fix)
 
 ## Goal Achievement
 
@@ -166,6 +168,11 @@ Plan 05-10 successfully closed both remaining runtime blockers from 05-UAT.md:
 - ✅ **RAG threshold too aggressive for OpenRouter** (UAT Test 3 blocker) — `RAG_SIMILARITY_THRESHOLD` added to `ai_service.config.Settings` with default 0.45 (env-configurable); `create_rag_tool` accepts `similarity_threshold` kwarg; `invoke_agent` passes `settings.RAG_SIMILARITY_THRESHOLD`; hardcoded `SIMILARITY_THRESHOLD = 0.75` module constant removed; new unit test `test_retrieval_uses_custom_threshold` confirms propagation. Threshold change is a documented calibration override (accepted per verification prompt), not a reduction in SC strictness.
 - ✅ **MCP action logs NOT NULL violation** (UAT Additional Finding) — `mcp_server/middleware.py` INSERT now lists `id` first and uses `gen_random_uuid()` in VALUES clause; positional parameters $1-$8 unchanged; unit test asserts `"gen_random_uuid()" in query`. Eliminates the cascading agent failure that crashed tool-invoking chat flows.
 - ✅ **Cross-phase regression from Plan 05-10** — commit 158b9d5 updated `test_agent_flow.py` and `test_conversation_memory.py` SimpleNamespace settings mocks to include `RAG_SIMILARITY_THRESHOLD=0.45` and extended the `fake_create_rag_tool` stub to accept the new `similarity_threshold` kwarg. All 20 ai_service tests pass (up from 18 pre-fix, plus 2 that would have broken without the regression fix).
+
+Plan 05-11 closed the two HUMAN-UAT blockers:
+
+- ✅ **MCP X-Student-Id header not injected** (HUMAN-UAT Blocker 1) — `api_client.py` `call_api_raw` and `call_api` now accept `student_id: str | None = None` kwarg; when provided, merges `X-Student-Id` header. All 16 MCP tools pass `student_id=student_id`. 9 tools that previously lacked it now resolve via `Depends(resolve_student_id)`. 4 regression tests added. 57 MCP server tests pass.
+- ✅ **System prompt threshold mismatch** (HUMAN-UAT Blocker 2) — `system_prompt.txt` corrected from 0.75 to 0.45 to match `RAG_SIMILARITY_THRESHOLD` code default.
 
 **No new code-level gaps found.** All 5 ROADMAP success criteria are satisfied at the code level, with SC #3 accepted via documented override. Three human-verification items remain (require live Docker + API keys) to confirm runtime behavior — in particular to re-run the specific UAT case (Test 3) that previously failed and to exercise SC #4 live with Gemini.
 
