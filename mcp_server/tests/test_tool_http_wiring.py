@@ -24,13 +24,13 @@ TOOL_SPECS = [
         "name": "get_student_info",
         "module": student_tools,
         "kwargs": {"student_id": "student-123"},
-        "expected": ("GET", "/students/student-123/academic-summary", {}),
+        "expected": ("GET", "/students/student-123/academic-summary", {"student_id": "student-123"}),
     },
     {
         "name": "get_available_courses",
         "module": student_tools,
         "kwargs": {"student_id": "student-123"},
-        "expected": ("GET", "/students/student-123/available-courses", {}),
+        "expected": ("GET", "/students/student-123/available-courses", {"student_id": "student-123"}),
     },
     {
         "name": "get_grades",
@@ -39,32 +39,32 @@ TOOL_SPECS = [
         "expected": (
             "GET",
             "/students/student-123/grades",
-            {"params": {"semester_year": "2025.1"}},
+            {"params": {"semester_year": "2025.1"}, "student_id": "student-123"},
         ),
     },
     {
         "name": "get_transcript",
         "module": grade_tools,
         "kwargs": {"student_id": "student-123"},
-        "expected": ("GET", "/students/student-123/transcript", {}),
+        "expected": ("GET", "/students/student-123/transcript", {"student_id": "student-123"}),
     },
     {
         "name": "get_curriculum",
         "module": curriculum_tools,
-        "kwargs": {},
-        "expected": ("GET", "/curriculum/active", {}),
+        "kwargs": {"student_id": "student-123"},
+        "expected": ("GET", "/curriculum/active", {"student_id": "student-123"}),
     },
     {
         "name": "get_course_prerequisites",
         "module": curriculum_tools,
-        "kwargs": {"course_id": "course-456"},
-        "expected": ("GET", "/courses/course-456/prerequisites", {}),
+        "kwargs": {"course_id": "course-456", "student_id": "student-123"},
+        "expected": ("GET", "/courses/course-456/prerequisites", {"student_id": "student-123"}),
     },
     {
         "name": "get_enrollment_period",
         "module": curriculum_tools,
-        "kwargs": {},
-        "expected": ("GET", "/enrollment-periods/current", {}),
+        "kwargs": {"student_id": "student-123"},
+        "expected": ("GET", "/enrollment-periods/current", {"student_id": "student-123"}),
     },
     {
         "name": "create_enrollment",
@@ -82,31 +82,32 @@ TOOL_SPECS = [
                     "student_id": "student-123",
                     "enrollment_period_id": "period-789",
                     "course_ids": ["course-a", "course-b"],
-                }
+                },
+                "student_id": "student-123",
             },
         ),
     },
     {
         "name": "confirm_enrollment",
         "module": enrollment_tools,
-        "kwargs": {"enrollment_id": "enrollment-111"},
-        "expected": ("POST", "/enrollments/enrollment-111/confirm", {}),
+        "kwargs": {"enrollment_id": "enrollment-111", "student_id": "student-123"},
+        "expected": ("POST", "/enrollments/enrollment-111/confirm", {"student_id": "student-123"}),
     },
     {
         "name": "drop_course",
         "module": enrollment_tools,
-        "kwargs": {"enrollment_id": "enrollment-111", "course_id": "course-456"},
+        "kwargs": {"enrollment_id": "enrollment-111", "course_id": "course-456", "student_id": "student-123"},
         "expected": (
             "DELETE",
             "/enrollments/enrollment-111/courses/course-456",
-            {},
+            {"student_id": "student-123"},
         ),
     },
     {
         "name": "lock_enrollment",
         "module": enrollment_tools,
-        "kwargs": {"enrollment_id": "enrollment-111"},
-        "expected": ("POST", "/enrollments/enrollment-111/lock", {}),
+        "kwargs": {"enrollment_id": "enrollment-111", "student_id": "student-123"},
+        "expected": ("POST", "/enrollments/enrollment-111/lock", {"student_id": "student-123"}),
     },
     {
         "name": "request_document",
@@ -115,23 +116,26 @@ TOOL_SPECS = [
         "expected": (
             "POST",
             "/documents",
-            {"json": {"student_id": "student-123", "type": "transcript"}},
+            {
+                "json": {"student_id": "student-123", "type": "transcript"},
+                "student_id": "student-123",
+            },
         ),
     },
     {
         "name": "get_document_status",
         "module": document_tools,
-        "kwargs": {"document_id": "document-222"},
-        "expected": ("GET", "/documents/document-222", {}),
+        "kwargs": {"document_id": "document-222", "student_id": "student-123"},
+        "expected": ("GET", "/documents/document-222", {"student_id": "student-123"}),
     },
     {
         "name": "get_available_slots",
         "module": scheduling_tools,
-        "kwargs": {"date_from": "2026-04-25", "date_to": "2026-04-30"},
+        "kwargs": {"date_from": "2026-04-25", "date_to": "2026-04-30", "student_id": "student-123"},
         "expected": (
             "GET",
             "/scheduling/slots",
-            {"params": {"date_from": "2026-04-25", "date_to": "2026-04-30"}},
+            {"params": {"date_from": "2026-04-25", "date_to": "2026-04-30"}, "student_id": "student-123"},
         ),
     },
     {
@@ -150,15 +154,16 @@ TOOL_SPECS = [
                     "student_id": "student-123",
                     "slot_id": "slot-333",
                     "reason": "Emitir documento",
-                }
+                },
+                "student_id": "student-123",
             },
         ),
     },
     {
         "name": "cancel_appointment",
         "module": scheduling_tools,
-        "kwargs": {"appointment_id": "appointment-444"},
-        "expected": ("PUT", "/appointments/appointment-444/cancel", {}),
+        "kwargs": {"appointment_id": "appointment-444", "student_id": "student-123"},
+        "expected": ("PUT", "/appointments/appointment-444/cancel", {"student_id": "student-123"}),
     },
 ]
 
@@ -195,13 +200,14 @@ async def test_tools_call_expected_backend_http_contract(
     assert kwargs == expected_kwargs
 
     signature = inspect.signature(tool.fn)
+    # After gap fix 05-11: every tool passes student_id to call_api for X-Student-Id injection
     if "student_id" in spec["kwargs"]:
         assert "student_id" in signature.parameters
+        assert kwargs.get("student_id") == spec["kwargs"]["student_id"]
         if "json" in kwargs:
-            assert kwargs["json"]["student_id"] == spec["kwargs"]["student_id"]
-        else:
-            assert spec["kwargs"]["student_id"] in path
+            if "student_id" in kwargs["json"]:
+                assert kwargs["json"]["student_id"] == spec["kwargs"]["student_id"]
+        elif spec["kwargs"]["student_id"] in path:
+            pass  # student_id used in URL path — also valid
     else:
         assert "student_id" not in signature.parameters
-        assert "student-123" not in path
-        assert "student_id" not in (kwargs.get("json") or {})

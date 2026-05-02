@@ -25,16 +25,8 @@ EXPECTED_TOOL_NAMES = {
     "get_enrollment_period",
 }
 
-STUDENT_SCOPED_TOOLS = {
-    "get_student_info",
-    "get_grades",
-    "get_transcript",
-    "get_available_courses",
-    "create_enrollment",
-    "request_document",
-    "book_appointment",
-}
-
+# After gap fix 05-11: all tools now resolve student_id for X-Student-Id header injection
+STUDENT_SCOPED_TOOLS = EXPECTED_TOOL_NAMES
 
 def test_registered_tool_names_match_docs_table():
     tools = asyncio.run(mcp.list_tools())
@@ -55,8 +47,6 @@ def test_student_scoped_tools_keep_student_id_as_hidden_dependency():
 
     for tool in tools:
         signature = inspect.signature(tool.fn)
-        if tool.name in STUDENT_SCOPED_TOOLS:
-            dependency = signature.parameters["student_id"].default
-            assert dependency.__class__.__name__ == "_Depends"
-        else:
-            assert "student_id" not in signature.parameters
+        assert tool.name in STUDENT_SCOPED_TOOLS, f"Unexpected tool: {tool.name}"
+        dependency = signature.parameters["student_id"].default
+        assert dependency.__class__.__name__ == "_Depends"

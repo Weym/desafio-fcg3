@@ -25,6 +25,7 @@ def register_document_tools(mcp: FastMCP) -> None:
             "POST",
             "/documents",
             json={"student_id": student_id, "type": type},
+            student_id=student_id,
         )
         return data
 
@@ -35,8 +36,9 @@ def register_document_tools(mcp: FastMCP) -> None:
     )
     async def get_document_status(
         document_id: str,
+        student_id: str = Depends(resolve_student_id),
         ctx: Context = CurrentContext(),
     ) -> dict[str, Any]:
         client = ctx.lifespan_context["http_client"]
-        data, _ = await call_api(client, "GET", f"/documents/{document_id}")
+        data, _ = await call_api(client, "GET", f"/documents/{document_id}", student_id=student_id)
         return data

@@ -24,6 +24,7 @@ def register_student_tools(mcp: FastMCP) -> None:
             client,
             "GET",
             f"/students/{student_id}/academic-summary",
+            student_id=student_id,
         )
         return data
 
@@ -41,5 +42,6 @@ def register_student_tools(mcp: FastMCP) -> None:
             client,
             "GET",
             f"/students/{student_id}/available-courses",
+            student_id=student_id,
         )
         return data

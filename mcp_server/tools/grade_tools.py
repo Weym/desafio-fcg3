@@ -27,6 +27,7 @@ def register_grade_tools(mcp: FastMCP) -> None:
             "GET",
             f"/students/{student_id}/grades",
             params=params,
+            student_id=student_id,
         )
         return data
 
@@ -44,5 +45,6 @@ def register_grade_tools(mcp: FastMCP) -> None:
             client,
             "GET",
             f"/students/{student_id}/transcript",
+            student_id=student_id,
         )
         return data

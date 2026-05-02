@@ -30,6 +30,7 @@ def register_enrollment_tools(mcp: FastMCP) -> None:
                 "enrollment_period_id": enrollment_period_id,
                 "course_ids": course_ids,
             },
+            student_id=student_id,
         )
         return data
 
@@ -39,6 +40,7 @@ def register_enrollment_tools(mcp: FastMCP) -> None:
     )
     async def confirm_enrollment(
         enrollment_id: str,
+        student_id: str = Depends(resolve_student_id),
         ctx: Context = CurrentContext(),
     ) -> dict[str, Any]:
         client = ctx.lifespan_context["http_client"]
@@ -46,6 +48,7 @@ def register_enrollment_tools(mcp: FastMCP) -> None:
             client,
             "POST",
             f"/enrollments/{enrollment_id}/confirm",
+            student_id=student_id,
         )
         return data
 
@@ -56,6 +59,7 @@ def register_enrollment_tools(mcp: FastMCP) -> None:
     async def drop_course(
         enrollment_id: str,
         course_id: str,
+        student_id: str = Depends(resolve_student_id),
         ctx: Context = CurrentContext(),
     ) -> dict[str, Any]:
         client = ctx.lifespan_context["http_client"]
@@ -63,6 +67,7 @@ def register_enrollment_tools(mcp: FastMCP) -> None:
             client,
             "DELETE",
             f"/enrollments/{enrollment_id}/courses/{course_id}",
+            student_id=student_id,
         )
         return data
 
@@ -72,6 +77,7 @@ def register_enrollment_tools(mcp: FastMCP) -> None:
     )
     async def lock_enrollment(
         enrollment_id: str,
+        student_id: str = Depends(resolve_student_id),
         ctx: Context = CurrentContext(),
     ) -> dict[str, Any]:
         client = ctx.lifespan_context["http_client"]
@@ -79,5 +85,6 @@ def register_enrollment_tools(mcp: FastMCP) -> None:
             client,
             "POST",
             f"/enrollments/{enrollment_id}/lock",
+            student_id=student_id,
         )
         return data

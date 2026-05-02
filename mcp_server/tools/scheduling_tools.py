@@ -18,6 +18,7 @@ def register_scheduling_tools(mcp: FastMCP) -> None:
     async def get_available_slots(
         date_from: str | None = None,
         date_to: str | None = None,
+        student_id: str = Depends(resolve_student_id),
         ctx: Context = CurrentContext(),
     ) -> dict[str, Any]:
         client = ctx.lifespan_context["http_client"]
@@ -31,6 +32,7 @@ def register_scheduling_tools(mcp: FastMCP) -> None:
             "GET",
             "/scheduling/slots",
             params=params or None,
+            student_id=student_id,
         )
         return data
 
@@ -50,6 +52,7 @@ def register_scheduling_tools(mcp: FastMCP) -> None:
             "POST",
             "/appointments",
             json={"student_id": student_id, "slot_id": slot_id, "reason": reason},
+            student_id=student_id,
         )
         return data
 
@@ -59,6 +62,7 @@ def register_scheduling_tools(mcp: FastMCP) -> None:
     )
     async def cancel_appointment(
         appointment_id: str,
+        student_id: str = Depends(resolve_student_id),
         ctx: Context = CurrentContext(),
     ) -> dict[str, Any]:
         client = ctx.lifespan_context["http_client"]
@@ -66,5 +70,6 @@ def register_scheduling_tools(mcp: FastMCP) -> None:
             client,
             "PUT",
             f"/appointments/{appointment_id}/cancel",
+            student_id=student_id,
         )
         return data

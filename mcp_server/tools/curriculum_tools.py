@@ -3,9 +3,10 @@ from __future__ import annotations
 from typing import Any
 
 from fastmcp import Context, FastMCP
-from fastmcp.dependencies import CurrentContext
+from fastmcp.dependencies import CurrentContext, Depends
 
 from mcp_server.api_client import call_api
+from mcp_server.dependencies import resolve_student_id
 
 
 def register_curriculum_tools(mcp: FastMCP) -> None:
@@ -15,10 +16,11 @@ def register_curriculum_tools(mcp: FastMCP) -> None:
         annotations={"readOnlyHint": True},
     )
     async def get_curriculum(
+        student_id: str = Depends(resolve_student_id),
         ctx: Context = CurrentContext(),
     ) -> dict[str, Any]:
         client = ctx.lifespan_context["http_client"]
-        data, _ = await call_api(client, "GET", "/curriculum/active")
+        data, _ = await call_api(client, "GET", "/curriculum/active", student_id=student_id)
         return data
 
     @mcp.tool(
@@ -28,10 +30,11 @@ def register_curriculum_tools(mcp: FastMCP) -> None:
     )
     async def get_course_prerequisites(
         course_id: str,
+        student_id: str = Depends(resolve_student_id),
         ctx: Context = CurrentContext(),
     ) -> dict[str, Any]:
         client = ctx.lifespan_context["http_client"]
-        data, _ = await call_api(client, "GET", f"/courses/{course_id}/prerequisites")
+        data, _ = await call_api(client, "GET", f"/courses/{course_id}/prerequisites", student_id=student_id)
         return data
 
     @mcp.tool(
@@ -40,8 +43,9 @@ def register_curriculum_tools(mcp: FastMCP) -> None:
         annotations={"readOnlyHint": True},
     )
     async def get_enrollment_period(
+        student_id: str = Depends(resolve_student_id),
         ctx: Context = CurrentContext(),
     ) -> dict[str, Any]:
         client = ctx.lifespan_context["http_client"]
-        data, _ = await call_api(client, "GET", "/enrollment-periods/current")
+        data, _ = await call_api(client, "GET", "/enrollment-periods/current", student_id=student_id)
         return data
