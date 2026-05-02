@@ -36,6 +36,7 @@ from src.infrastructure.database import async_session
 
 
 WARNING_TABLES = [
+    "knowledge_base_chunks",
     "mcp_action_logs",
     "chat_messages",
     "chat_sessions",
