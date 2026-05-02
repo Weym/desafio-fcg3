@@ -100,6 +100,7 @@ class ToolLoggingMiddleware(Middleware):
         await db_pool.execute(
             """
             INSERT INTO mcp_action_logs (
+                id,
                 chat_session_id,
                 tool_name,
                 input_params,
@@ -109,7 +110,7 @@ class ToolLoggingMiddleware(Middleware):
                 retry,
                 status
             )
-            VALUES ($1, $2, $3::jsonb, $4::jsonb, $5, $6, $7, $8)
+            VALUES (gen_random_uuid(), $1, $2, $3::jsonb, $4::jsonb, $5, $6, $7, $8)
             """,
             chat_session_id,
             tool_name,

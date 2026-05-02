@@ -52,6 +52,7 @@ async def test_tool_logging_middleware_logs_successful_calls(
         mock_context.lifespan_context["db_pool"].execute.await_args.args
     )
     assert "INSERT INTO mcp_action_logs" in query
+    assert "gen_random_uuid()" in query
     assert chat_session_id == UUID("11111111-1111-1111-1111-111111111111")
     assert tool_name == "get_grades"
     assert input_params == '{"semester_year": "2025.1"}'
