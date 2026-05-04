@@ -12,6 +12,7 @@ import '../../features/client/screens/client_home_screen.dart';
 import '../../features/client/screens/client_chat_screen.dart';
 import '../../features/client/screens/client_chat_detail_screen.dart';
 import '../../features/client/screens/client_documents_screen.dart';
+import '../../features/client/screens/client_notifications_screen.dart';
 import '../../features/client/screens/client_support_screen.dart';
 import '../../features/staff/screens/staff_shell.dart';
 import '../../features/staff/screens/staff_home_screen.dart';
@@ -125,7 +126,7 @@ GoRouter appRouter(Ref ref) {
             path: RoutePaths.clientNotifications,
             name: RouteNames.clientNotifications,
             builder: (context, state) =>
-                const _PlaceholderScreen(title: 'Notificacoes'),
+                const ClientNotificationsScreen(),
           ),
           GoRoute(
             path: RoutePaths.clientSupport,
@@ -169,7 +170,7 @@ GoRouter appRouter(Ref ref) {
   );
 }
 
-/// Placeholder for screens not yet implemented (Phase 8/9)
+/// Placeholder for staff screens not yet implemented (Phase 9)
 class _PlaceholderScreen extends StatelessWidget {
   final String title;
   const _PlaceholderScreen({required this.title});
