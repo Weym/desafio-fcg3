@@ -1,7 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-class AuthInterceptor extends Interceptor {
+/// Uses QueuedInterceptor to properly serialize async operations.
+/// This prevents the void-async pitfall where handler.next fires before
+/// await completes, and serializes concurrent refresh attempts.
+class AuthInterceptor extends QueuedInterceptor {
   final FlutterSecureStorage _storage;
   final Dio _dio; // Separate Dio instance for refresh to avoid interceptor loop
 
@@ -15,7 +18,7 @@ class AuthInterceptor extends Interceptor {
         _dio = refreshDio;
 
   @override
-  void onRequest(
+  Future<void> onRequest(
       RequestOptions options, RequestInterceptorHandler handler) async {
     final token = await _storage.read(key: _accessTokenKey);
     if (token != null) {
@@ -25,7 +28,8 @@ class AuthInterceptor extends Interceptor {
   }
 
   @override
-  void onError(DioException err, ErrorInterceptorHandler handler) async {
+  Future<void> onError(
+      DioException err, ErrorInterceptorHandler handler) async {
     if (err.response?.statusCode == 401 &&
         !err.requestOptions.extra.containsKey('isRetry')) {
       // Attempt silent refresh
@@ -36,8 +40,17 @@ class AuthInterceptor extends Interceptor {
             '/auth/refresh',
             data: {'refresh_token': refreshToken},
           );
-          final newAccessToken = response.data['token'] as String;
-          final newRefreshToken = response.data['refresh_token'] as String;
+
+          // Safe type checking (WR-01 fix)
+          final data = response.data;
+          if (data is! Map<String, dynamic>) {
+            return handler.next(err);
+          }
+          final newAccessToken = data['token'] as String?;
+          final newRefreshToken = data['refresh_token'] as String?;
+          if (newAccessToken == null || newRefreshToken == null) {
+            return handler.next(err);
+          }
 
           await _storage.write(key: _accessTokenKey, value: newAccessToken);
           await _storage.write(key: _refreshTokenKey, value: newRefreshToken);

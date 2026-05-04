@@ -78,9 +78,18 @@ class Auth extends _$Auth {
         final errorData = e.response?.data;
         int? remaining;
         if (errorData is Map<String, dynamic>) {
-          final details = (errorData['error'] as Map<String, dynamic>?)?['details'];
-          if (details is List && details.isNotEmpty) {
-            remaining = int.tryParse(details[0]['message']?.toString() ?? '');
+          try {
+            final error = errorData['error'] as Map<String, dynamic>?;
+            final details = error?['details'];
+            if (details is List && details.isNotEmpty) {
+              final firstDetail = details[0];
+              if (firstDetail is Map<String, dynamic>) {
+                remaining = int.tryParse(
+                    firstDetail['message']?.toString() ?? '');
+              }
+            }
+          } catch (_) {
+            // Gracefully ignore malformed error responses
           }
         }
         state = AuthError(

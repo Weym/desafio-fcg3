@@ -208,7 +208,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               if (value == null || value.trim().isEmpty) {
                 return 'Email obrigatorio';
               }
-              if (!value.contains('@')) {
+              final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
+              if (!emailRegex.hasMatch(value.trim())) {
                 return 'Email invalido';
               }
               return null;

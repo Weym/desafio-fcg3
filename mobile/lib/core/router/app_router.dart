@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -14,19 +15,23 @@ import 'route_names.dart';
 
 part 'app_router.g.dart';
 
-final _rootNavigatorKey = GlobalKey<NavigatorState>();
-final _clientShellKey = GlobalKey<NavigatorState>();
-final _staffShellKey = GlobalKey<NavigatorState>();
-
 @riverpod
 GoRouter appRouter(Ref ref) {
-  final authState = ref.watch(authProvider);
+  // Use a ValueNotifier + ref.listen to trigger GoRouter.refreshListenable
+  // instead of ref.watch, which would recreate the entire GoRouter on every
+  // auth state change (causing GlobalKey reuse crashes and navigation stack loss).
+  final authNotifier = ValueNotifier<AuthState>(ref.read(authProvider));
+  ref.listen(authProvider, (_, next) {
+    authNotifier.value = next;
+  });
+  ref.onDispose(() => authNotifier.dispose());
 
   return GoRouter(
-    navigatorKey: _rootNavigatorKey,
     initialLocation: RoutePaths.splash,
-    debugLogDiagnostics: true,
+    debugLogDiagnostics: kDebugMode, // IN-02: only log in debug builds
+    refreshListenable: authNotifier,
     redirect: (context, state) {
+      final authState = authNotifier.value;
       final currentPath = state.matchedLocation;
       final isOnSplash = currentPath == RoutePaths.splash;
       final isOnLogin = currentPath == RoutePaths.login;
@@ -47,7 +52,9 @@ GoRouter appRouter(Ref ref) {
 
         // Redirect away from splash/login
         if (isOnSplash || isOnLogin) {
-          return user.isStudent ? RoutePaths.clientHome : RoutePaths.staffDashboard;
+          return user.isStudent
+              ? RoutePaths.clientHome
+              : RoutePaths.staffDashboard;
         }
 
         // Role guards: student blocked from /staff/*
@@ -82,7 +89,6 @@ GoRouter appRouter(Ref ref) {
 
       // Client shell with 5 tabs
       ShellRoute(
-        navigatorKey: _clientShellKey,
         builder: (context, state, child) => ClientShell(child: child),
         routes: [
           GoRoute(
@@ -93,29 +99,32 @@ GoRouter appRouter(Ref ref) {
           GoRoute(
             path: RoutePaths.clientChat,
             name: RouteNames.clientChat,
-            builder: (context, state) => const _PlaceholderScreen(title: 'Chat'),
+            builder: (context, state) =>
+                const _PlaceholderScreen(title: 'Chat'),
           ),
           GoRoute(
             path: RoutePaths.clientDocuments,
             name: RouteNames.clientDocuments,
-            builder: (context, state) => const _PlaceholderScreen(title: 'Documentos'),
+            builder: (context, state) =>
+                const _PlaceholderScreen(title: 'Documentos'),
           ),
           GoRoute(
             path: RoutePaths.clientNotifications,
             name: RouteNames.clientNotifications,
-            builder: (context, state) => const _PlaceholderScreen(title: 'Notificacoes'),
+            builder: (context, state) =>
+                const _PlaceholderScreen(title: 'Notificacoes'),
           ),
           GoRoute(
             path: RoutePaths.clientSupport,
             name: RouteNames.clientSupport,
-            builder: (context, state) => const _PlaceholderScreen(title: 'Suporte'),
+            builder: (context, state) =>
+                const _PlaceholderScreen(title: 'Suporte'),
           ),
         ],
       ),
 
       // Staff shell with 4 tabs
       ShellRoute(
-        navigatorKey: _staffShellKey,
         builder: (context, state, child) => StaffShell(child: child),
         routes: [
           GoRoute(
@@ -126,17 +135,20 @@ GoRouter appRouter(Ref ref) {
           GoRoute(
             path: RoutePaths.staffSchedule,
             name: RouteNames.staffSchedule,
-            builder: (context, state) => const _PlaceholderScreen(title: 'Agenda'),
+            builder: (context, state) =>
+                const _PlaceholderScreen(title: 'Agenda'),
           ),
           GoRoute(
             path: RoutePaths.staffAI,
             name: RouteNames.staffAI,
-            builder: (context, state) => const _PlaceholderScreen(title: 'IA'),
+            builder: (context, state) =>
+                const _PlaceholderScreen(title: 'IA'),
           ),
           GoRoute(
             path: RoutePaths.staffDocuments,
             name: RouteNames.staffDocuments,
-            builder: (context, state) => const _PlaceholderScreen(title: 'Documentos'),
+            builder: (context, state) =>
+                const _PlaceholderScreen(title: 'Documentos'),
           ),
         ],
       ),
