@@ -35,9 +35,9 @@
 **Plans:** 3 plans
 
 Plans:
-- [ ] 07-01-PLAN.md — Project infrastructure (dependencies, folder structure, Dio, theme, models, AuthService)
-- [ ] 07-02-PLAN.md — Auth feature (Riverpod providers, auth state, login screen with OTP flow)
-- [ ] 07-03-PLAN.md — Navigation & splash (GoRouter, route guards, ShellRoute, BottomNav shells, placeholder homes)
+- [x] 07-01-PLAN.md — Project infrastructure (dependencies, folder structure, Dio, theme, models, AuthService)
+- [x] 07-02-PLAN.md — Auth feature (Riverpod providers, auth state, login screen with OTP flow)
+- [x] 07-03-PLAN.md — Navigation & splash (GoRouter, route guards, ShellRoute, BottomNav shells, placeholder homes)
 
 ---
 
