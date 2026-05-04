@@ -32,8 +32,12 @@
 4. Role-based navigation: student sees only Client routes (Dashboard, Chat, Documents, Notifications, Support); staff sees only Provider routes (Dashboard, Schedule, AI Data, Documents).
 5. Invalid OTP entry shows clear error; 3 failed attempts shows "new code sent" message matching backend behavior.
 
-### Plans
-*(Not yet planned)*
+**Plans:** 3 plans
+
+Plans:
+- [ ] 07-01-PLAN.md — Project infrastructure (dependencies, folder structure, Dio, theme, models, AuthService)
+- [ ] 07-02-PLAN.md — Auth feature (Riverpod providers, auth state, login screen with OTP flow)
+- [ ] 07-03-PLAN.md — Navigation & splash (GoRouter, route guards, ShellRoute, BottomNav shells, placeholder homes)
 
 ---
 
@@ -93,7 +97,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 7. Flutter Scaffold & Auth | 0/0 | Not Started | - |
+| 7. Flutter Scaffold & Auth | 0/3 | Planned | - |
 | 8. Client Interface | 0/0 | Not Started | - |
 | 9. Staff Interface | 0/0 | Not Started | - |
 | 10. Cross-Platform Polish | 0/0 | Not Started | - |
