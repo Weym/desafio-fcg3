@@ -9,6 +9,9 @@ import '../../features/auth/screens/login_screen.dart';
 import '../../features/splash/screens/splash_screen.dart';
 import '../../features/client/screens/client_shell.dart';
 import '../../features/client/screens/client_home_screen.dart';
+import '../../features/client/screens/client_chat_screen.dart';
+import '../../features/client/screens/client_chat_detail_screen.dart';
+import '../../features/client/screens/client_documents_screen.dart';
 import '../../features/client/screens/client_support_screen.dart';
 import '../../features/staff/screens/staff_shell.dart';
 import '../../features/staff/screens/staff_home_screen.dart';
@@ -100,14 +103,23 @@ GoRouter appRouter(Ref ref) {
           GoRoute(
             path: RoutePaths.clientChat,
             name: RouteNames.clientChat,
-            builder: (context, state) =>
-                const _PlaceholderScreen(title: 'Chat'),
+            builder: (context, state) => const ClientChatScreen(),
+            routes: [
+              GoRoute(
+                path: ':sessionId',
+                name: RouteNames.clientChatDetail,
+                builder: (context, state) {
+                  final sessionId = state.pathParameters['sessionId']!;
+                  return ClientChatDetailScreen(sessionId: sessionId);
+                },
+              ),
+            ],
           ),
           GoRoute(
             path: RoutePaths.clientDocuments,
             name: RouteNames.clientDocuments,
             builder: (context, state) =>
-                const _PlaceholderScreen(title: 'Documentos'),
+                const ClientDocumentsScreen(),
           ),
           GoRoute(
             path: RoutePaths.clientNotifications,

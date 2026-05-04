@@ -10,6 +10,9 @@ class RouteNames {
   static const String clientNotifications = 'client-notifications';
   static const String clientSupport = 'client-support';
 
+  // Client detail
+  static const String clientChatDetail = 'client-chat-detail';
+
   // Staff tabs
   static const String staffDashboard = 'staff-dashboard';
   static const String staffSchedule = 'staff-schedule';
@@ -24,6 +27,7 @@ class RoutePaths {
   // Client
   static const String clientHome = '/client';
   static const String clientChat = '/client/chat';
+  static const String clientChatDetail = '/client/chat/:sessionId';
   static const String clientDocuments = '/client/documents';
   static const String clientNotifications = '/client/notifications';
   static const String clientSupport = '/client/support';
