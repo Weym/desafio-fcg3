@@ -107,6 +107,8 @@ Aluno envia mensagem no WhatsApp e recebe resposta precisa sobre sua situação 
   - Phase 5: LangChain ReAct agent, RAG pipeline, provider-agnostic LLM
   - Phase 6: WhatsApp webhook, end-to-end chatbot flow, chat visibility
 - M2 (v2.0) started: Flutter Frontend — 4 phases planned (Phase 7-10)
+  - Phase 7: Flutter scaffold, OTP auth, role-based navigation, GoRouter + Riverpod
+  - Phase 8: 6 client screens (Dashboard, Chat, Documents, Notifications, Support) — complete
 
 ## Evolution
 
@@ -126,4 +128,4 @@ Este documento evolui a cada transição de fase e marco de milestone.
 4. Atualizar Context com estado atual
 
 ---
-*Last updated: 2026-05-04 — Milestone v2.0 (Flutter Frontend) started, 4 phases planned (Phase 7-10)*
+*Last updated: 2026-05-04 — Phase 8 (Client Interface) complete, 6 client screens functional*
