@@ -20,7 +20,7 @@ progress:
 Phase: 05 (ai-service) — EXECUTING
 Plan: 2 of 11
 Status: Ready to execute
-Last activity: 2026-05-02
+Last activity: 2026-05-04 - Completed quick task 260504-i90: Expandir a base de conhecimento do RAG
 
 Progress: [█████████░] 90%
 
@@ -160,6 +160,7 @@ Recent decisions affecting current work:
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 260427-h6x | adicionar opcao de escolher provedor e modelo do embedding via env | 2026-04-27 | 0aceac2 | [260427-h6x-adicionar-opcao-de-escolher-provedor-e-m](./quick/260427-h6x-adicionar-opcao-de-escolher-provedor-e-m/) |
+| 260504-i90 | Expandir a base de conhecimento do RAG | 2026-05-04 | e470f57 | [260504-i90-expandir-a-base-de-conhecimento-do-rag](./quick/260504-i90-expandir-a-base-de-conhecimento-do-rag/) |
 
 ## Session Continuity
 
