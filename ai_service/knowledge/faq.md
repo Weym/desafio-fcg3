@@ -53,3 +53,51 @@ O canal prioritario e o e-mail institucional da secretaria academica do curso. T
 ### O que fazer se eu nao encontrar uma disciplina no sistema?
 
 Primeiro, verifique se o periodo de matricula esta aberto. Depois, confira se todos os pre-requisitos foram cumpridos e se a disciplina esta prevista para oferta naquele semestre. Se a indisponibilidade persistir, procure a secretaria com detalhes do caso. Podem existir ajustes de oferta, correcao de cadastro ou orientacoes especificas para sua turma.
+
+### Como consulto minhas notas no sistema?
+
+O aluno pode consultar suas notas parciais e finais pelo sistema academico ou pelo aplicativo institucional do Instituto Federal de Tecnologia. As notas sao lancadas pelos docentes ao longo do semestre, conforme o cronograma de cada disciplina. Notas finais consolidadas ficam disponiveis apos o encerramento do periodo letivo e o fechamento de diario pelo professor.
+
+### O que acontece se eu reprovar por falta?
+
+A reprovacao por falta ocorre quando o aluno ultrapassa vinte e cinco por cento de ausencias nas aulas de uma disciplina. Nesse caso, o estudante e reprovado independentemente de sua media de notas. A reprovacao por falta e registrada no historico escolar e impacta negativamente o CRA. O aluno devera cursar novamente a disciplina em semestre posterior quando houver oferta disponivel.
+
+### Como funciona o trancamento tardio de disciplina?
+
+O trancamento tardio e aquele solicitado apos o encerramento da janela regular de trancamento definida no calendario academico. Esse tipo de pedido exige justificativa robusta e documentacao comprobatoria, como atestado medico ou comprovante de mudanca de situacao laboral. A coordenacao analisa cada caso individualmente e o deferimento nao e garantido.
+
+### Posso aproveitar disciplinas cursadas em outro curso ou instituicao?
+
+O aproveitamento de estudos no Instituto Federal de Tecnologia e possivel quando a disciplina cursada em outra instituicao ou curso possui equivalencia de conteudo e carga horaria com o componente da matriz curricular vigente. O aluno deve protocolar pedido na secretaria com ementa, programa e historico da disciplina original. A coordenacao avalia a compatibilidade e emite parecer.
+
+### Como funciona a transferencia interna ou externa?
+
+A transferencia interna permite ao aluno mudar de curso dentro do Instituto Federal de Tecnologia, enquanto a transferencia externa envolve ingresso proveniente de outra instituicao. Ambas dependem de disponibilidade de vaga, compatibilidade curricular e analise documental. O aluno deve solicitar dentro do prazo definido em edital especifico e aguardar parecer da coordenacao do curso de destino.
+
+### Quais sao os requisitos para iniciar o estagio supervisionado?
+
+Para iniciar o estagio supervisionado no Instituto Federal de Tecnologia, o aluno deve estar matriculado a partir do setimo semestre e ter integralizado pelo menos setenta por cento da carga horaria total do curso. Alem disso, e necessario ter professor orientador designado e convenio firmado entre a instituicao e a empresa concedente do estagio.
+
+### Como escolho meu orientador de TCC?
+
+O aluno deve identificar um professor do corpo docente do curso cuja area de pesquisa ou atuacao seja compativel com o tema pretendido para o Trabalho de Conclusao de Curso. A escolha e formalizada mediante aceite do professor e registro na coordenacao. Cada orientador tem limite de orientandos simultaneos, portanto e recomendavel buscar o orientador com antecedencia.
+
+### O que e jubilamento e como evitar?
+
+O jubilamento e o desligamento do aluno que excede o tempo maximo permitido para conclusao do curso. No Instituto Federal de Tecnologia, o prazo maximo e de quatorze semestres para o curso de Ciencia da Computacao. Para evitar o jubilamento, o aluno deve manter progressao curricular constante, evitar trancamentos desnecessarios e priorizar disciplinas obrigatorias pendentes.
+
+### Como solicito regime especial de frequencia?
+
+O regime especial de frequencia deve ser solicitado mediante requerimento formal a secretaria academica, acompanhado de documentacao comprobatoria da condicao que justifica o pedido. Gestantes, portadores de doencas infectocontagiosas e atletas convocados para competicoes oficiais tem direito ao regime conforme legislacao federal. O pedido e analisado pela coordenacao em ate cinco dias uteis.
+
+### Posso trancar disciplinas individualmente apos o prazo regular?
+
+O trancamento parcial apos o prazo regular e tratado como excecao e depende de justificativa aceita pela coordenacao. Motivos como problema grave de saude, mudanca inesperada de trabalho ou situacao familiar critica podem ser considerados. O aluno deve protocolar pedido com documentacao e aguardar analise. A simples preferencia por nao continuar cursando a disciplina nao e aceita como justificativa.
+
+### Como funciona a lista de espera em disciplinas lotadas?
+
+Quando uma disciplina atinge o limite maximo de vagas durante o periodo de matricula, os alunos que tentarem se inscrever sao colocados em lista de espera ordenada por prioridade. Se vagas forem liberadas por cancelamentos ou desistencias durante a janela de ajuste, o sistema realoca automaticamente os alunos da lista por ordem de classificacao. O aluno e notificado quando efetivado na turma.
+
+### Qual a diferenca entre nota minima e media final?
+
+A nota minima e o valor abaixo do qual o aluno e reprovado diretamente sem direito a exame final, que no Instituto Federal de Tecnologia e tres virgula zero. A media final e o resultado do calculo de aprovacao apos o exame final, obtida pela formula que soma a media semestral e a nota do exame dividida por dois. Para aprovacao, a media final deve ser igual ou superior a cinco virgula zero.
