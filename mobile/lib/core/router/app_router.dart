@@ -9,6 +9,7 @@ import '../../features/auth/screens/login_screen.dart';
 import '../../features/splash/screens/splash_screen.dart';
 import '../../features/client/screens/client_shell.dart';
 import '../../features/client/screens/client_home_screen.dart';
+import '../../features/client/screens/client_support_screen.dart';
 import '../../features/staff/screens/staff_shell.dart';
 import '../../features/staff/screens/staff_home_screen.dart';
 import 'route_names.dart';
@@ -118,7 +119,7 @@ GoRouter appRouter(Ref ref) {
             path: RoutePaths.clientSupport,
             name: RouteNames.clientSupport,
             builder: (context, state) =>
-                const _PlaceholderScreen(title: 'Suporte'),
+                const ClientSupportScreen(),
           ),
         ],
       ),
