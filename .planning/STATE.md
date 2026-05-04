@@ -3,23 +3,23 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-05-04T17:36:12.450Z"
+last_updated: "2026-05-04T18:07:55.724Z"
 last_activity: 2026-05-04
 progress:
   total_phases: 4
   completed_phases: 1
-  total_plans: 3
-  completed_plans: 3
-  percent: 100
+  total_plans: 8
+  completed_plans: 4
+  percent: 50
 ---
 
 # Project State
 
 ## Current Position
 
-Phase: 08
-Plan: Not started
-Status: Executing Phase 07
+Phase: 08 (Client Interface) — EXECUTING
+Plan: 2 of 5
+Status: Ready to execute
 Last activity: 2026-05-04
 
 Progress: [░░░░░░░░░░] 0%
@@ -40,7 +40,7 @@ Progress: [░░░░░░░░░░] 0%
 Previous milestone (M1 Backend + AI + MCP) delivered 6 phases, 47 plans.
 
 Next action: `/gsd-discuss-phase 7` or `/gsd-plan-phase 7`
-Resume file: .planning/phases/08-client-interface/08-CONTEXT.md
+Resume file: None
 
 ## Accumulated Context
 
@@ -51,6 +51,7 @@ Recent decisions affecting current work:
 - [Milestone v2.0]: Phase numbering continues from M1 (Phase 7+) — no reset
 - [Milestone v2.0]: Frontend requirements derived from `requerimentos_frontend.md` with 2 user profiles (Client, Provider/Staff)
 - [Milestone v2.0]: Flutter mobile/web using existing REST API surface from M1 — no backend changes needed
+- [Phase 08]: Client data layer uses @JsonSerializable codegen + DioClient injection + @riverpod annotations for 3 domains (chat, documents, appointments)
 
 ### Key Decisions Pending
 

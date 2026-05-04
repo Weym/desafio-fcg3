@@ -57,7 +57,7 @@ Plans:
 **Plans:** 5 plans
 
 Plans:
-- [ ] 08-01-PLAN.md — Data layer: models, services, and Riverpod providers for all client domains
+- [x] 08-01-PLAN.md — Data layer: models, services, and Riverpod providers for all client domains
 - [ ] 08-02-PLAN.md — Dashboard (Home) with 3 summary cards + Support & Contact screen
 - [ ] 08-03-PLAN.md — Documents screen with filter chips, status cards, and request bottom sheet
 - [ ] 08-04-PLAN.md — Chat History screen (session list + detail with messages/actions tabs)

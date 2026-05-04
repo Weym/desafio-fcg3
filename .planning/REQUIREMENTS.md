@@ -18,11 +18,11 @@
 
 ### Client Screens
 
-- [ ] **UI-C01**: Cliente visualiza dashboard home com resumo das ações e agendamentos realizados via WhatsApp
-- [ ] **UI-C02**: Cliente consulta histórico de chats/atendimentos com status das solicitações abertas
-- [ ] **UI-C03**: Cliente solicita envio ou emissão de novos documentos pela interface
-- [ ] **UI-C04**: Cliente acessa mural de documentos para visualização, download e gerenciamento de documentos emitidos ou recebidos
-- [ ] **UI-C05**: Cliente recebe e consulta central de notificações com alertas, lembretes de agendamento e atualizações de status
+- [x] **UI-C01**: Cliente visualiza dashboard home com resumo das ações e agendamentos realizados via WhatsApp
+- [x] **UI-C02**: Cliente consulta histórico de chats/atendimentos com status das solicitações abertas
+- [x] **UI-C03**: Cliente solicita envio ou emissão de novos documentos pela interface
+- [x] **UI-C04**: Cliente acessa mural de documentos para visualização, download e gerenciamento de documentos emitidos ou recebidos
+- [x] **UI-C05**: Cliente recebe e consulta central de notificações com alertas, lembretes de agendamento e atualizações de status
 - [ ] **UI-C06**: Cliente acessa canal direto de suporte e contato técnico/administrativo
 
 ---
@@ -38,7 +38,7 @@
 
 ### Non-Functional
 
-- [ ] **UI-NFR-01**: Interface intuitiva priorizando clareza para o cliente
+- [x] **UI-NFR-01**: Interface intuitiva priorizando clareza para o cliente
 - [ ] **UI-NFR-02**: Aplicação Flutter adaptável a smartphones, tablets e web
 - [ ] **UI-NFR-03**: Autenticação com separação rigorosa de permissões e rotas entre Cliente e Fornecedor
 - [ ] **UI-NFR-04**: Sincronização eficiente dos dados do WhatsApp/IA com latência percebida < 2s para dados cacheados
@@ -81,13 +81,13 @@
 | UI-INFRA-02 | Phase 7: Flutter Scaffold & Auth | Pending |
 | UI-INFRA-03 | Phase 7: Flutter Scaffold & Auth | Pending |
 | UI-NFR-03 | Phase 7: Flutter Scaffold & Auth | Pending |
-| UI-C01 | Phase 8: Client Interface | Pending |
-| UI-C02 | Phase 8: Client Interface | Pending |
-| UI-C03 | Phase 8: Client Interface | Pending |
-| UI-C04 | Phase 8: Client Interface | Pending |
-| UI-C05 | Phase 8: Client Interface | Pending |
+| UI-C01 | Phase 8: Client Interface | Complete |
+| UI-C02 | Phase 8: Client Interface | Complete |
+| UI-C03 | Phase 8: Client Interface | Complete |
+| UI-C04 | Phase 8: Client Interface | Complete |
+| UI-C05 | Phase 8: Client Interface | Complete |
 | UI-C06 | Phase 8: Client Interface | Pending |
-| UI-NFR-01 | Phase 8: Client Interface | Pending |
+| UI-NFR-01 | Phase 8: Client Interface | Complete |
 | UI-F01 | Phase 9: Staff Interface | Pending |
 | UI-F02 | Phase 9: Staff Interface | Pending |
 | UI-F03 | Phase 9: Staff Interface | Pending |
