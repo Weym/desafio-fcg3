@@ -1,0 +1,36 @@
+class RouteNames {
+  // Auth
+  static const String splash = 'splash';
+  static const String login = 'login';
+
+  // Client tabs
+  static const String clientHome = 'client-home';
+  static const String clientChat = 'client-chat';
+  static const String clientDocuments = 'client-documents';
+  static const String clientNotifications = 'client-notifications';
+  static const String clientSupport = 'client-support';
+
+  // Staff tabs
+  static const String staffDashboard = 'staff-dashboard';
+  static const String staffSchedule = 'staff-schedule';
+  static const String staffAI = 'staff-ai';
+  static const String staffDocuments = 'staff-documents';
+}
+
+class RoutePaths {
+  static const String splash = '/';
+  static const String login = '/login';
+
+  // Client
+  static const String clientHome = '/client';
+  static const String clientChat = '/client/chat';
+  static const String clientDocuments = '/client/documents';
+  static const String clientNotifications = '/client/notifications';
+  static const String clientSupport = '/client/support';
+
+  // Staff
+  static const String staffDashboard = '/staff';
+  static const String staffSchedule = '/staff/schedule';
+  static const String staffAI = '/staff/ai';
+  static const String staffDocuments = '/staff/documents';
+}
