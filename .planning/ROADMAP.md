@@ -1,182 +1,91 @@
 # Roadmap — Desafio FCG3
 
-**Milestone:** M1 — Backend + AI Service + MCP Server
+**Milestone:** M2 — Flutter Frontend
 **Granularity:** Standard
-**Coverage:** 69/69 requirements mapped
-**Last Updated:** 2026-04-30
+**Coverage:** 17/17 requirements mapped
+**Last Updated:** 2026-05-04
+**Previous Milestone:** M1 — Backend + AI Service + MCP Server (Phases 1-6, complete)
 
 ---
 
 ## Phases
 
-- [x] **Phase 1: Infrastructure & Schema** — Docker Compose running, all application tables migrated, seed data loaded
-- [x] **Phase 2: Authentication** — OTP email flow, JWT with roles, session revocation, auth middleware
-- [x] **Phase 3: Business Feature Slices** — All FastAPI feature endpoints (students, courses, enrollment, grades, documents, appointments, staff dashboard)
-- [x] **Phase 4: MCP Server** — 16 tools over streamable-http, student_id injection, mcp_action_logs
-- [ ] **Phase 5: AI Service** — LangChain ReAct agent, RAG pipeline, provider-agnostic LLM, knowledge base ingest (reopened after partial UAT)
-- [x] **Phase 6: WhatsApp Webhook & Integration** — End-to-end chatbot flow, webhook hardening, chat visibility, test suite
+- [ ] **Phase 7: Flutter Scaffold & Auth** — App boots with role-based navigation, OTP authentication, secure JWT storage
+- [ ] **Phase 8: Client Interface** — All 6 client screens consuming the REST API (dashboard, chat history, documents, notifications, support)
+- [ ] **Phase 9: Staff Interface** — All 4 staff/provider management screens (dashboard, schedule, AI data, document management)
+- [ ] **Phase 10: Cross-Platform Polish** — Responsiveness on all form factors, performance optimization, data sync efficiency
 
 ---
 
 ## Phase Details
 
-### Phase 1: Infrastructure & Schema
+### Phase 7: Flutter Scaffold & Auth
 
-**Goal:** The four-service Docker stack starts cleanly and every application table exists in the database, seeded with curriculum data ready for testing.
-**Depends on:** None
-**Requirements:** INFRA-01, INFRA-02, INFRA-03, INFRA-04
+**Goal:** The Flutter app boots, detects authentication state, authenticates students and staff via the existing FastAPI OTP flow, stores JWT securely, and routes users to role-appropriate home screens.
+**Depends on:** M1 Phase 2 (Authentication endpoints), M1 Phase 1 (Docker stack running)
+**Requirements:** UI-INFRA-01, UI-INFRA-02, UI-INFRA-03, UI-NFR-03
 
 ### Success Criteria
-1. Running `docker compose up` brings all four containers (postgres, fastapi-app, langchain-service, mcp-server) to a healthy state with passing healthchecks.
-2. Running `alembic upgrade head` creates all application tables (21 in the current documented schema, including the pgvector extension as migration #001) and the HNSW index on `knowledge_base_chunks.embedding` — verified by `\dt` in psql.
-3. All required environment variables are documented in `.env.example` so the project can be configured from scratch without reading source code.
-4. Running the seed script populates the `curriculum`, `curriculum_courses`, and `courses` tables with 8 semesters and ~40 disciplines including prerequisite relationships.
+1. App launches and detects no saved token → navigates to login screen; saved valid token → navigates directly to role-appropriate home.
+2. User enters email → receives OTP → enters 6-digit code → receives JWT → app navigates to Client home (student) or Staff dashboard (staff).
+3. JWT is persisted in flutter_secure_storage and survives app restart; expired or revoked token is detected and routes back to login.
+4. Role-based navigation: student sees only Client routes (Dashboard, Chat, Documents, Notifications, Support); staff sees only Provider routes (Dashboard, Schedule, AI Data, Documents).
+5. Invalid OTP entry shows clear error; 3 failed attempts shows "new code sent" message matching backend behavior.
 
 ### Plans
-- [x] Plan 1.1: Docker Compose & networking — define four services with `service_healthy` depends_on, app-network and data-network, port mappings
-- [x] Plan 1.2: Alembic async configuration — `env.py` async setup, migration #001 (pgvector extension), full schema migrations for all application tables + indexes
-- [x] Plan 1.3: Environment configuration — `.env.example` with all variables; `config.py` / `settings.py` with Pydantic BaseSettings
-- [x] Plan 1.4: Seed script — `scripts/seed.py` loading curriculum, courses, and prerequisites for CC 8-semester program
-- [x] Plan 1.5: Gap closure — repair backend import path so `fastapi-app` starts healthy in Docker
-- [x] Plan 1.6: Gap closure — clarify Phase 1 cold-start verification evidence in UAT/validation/bootstrap docs
-- [x] Plan 1.7: Gap closure — restore Docker runtime PostgreSQL credentials so `alembic upgrade head` and `python -m scripts.seed` work again from `fastapi-app`
-- [x] Plan 1.8: Gap closure — seed test isolation: add knowledge_base_chunks to TRUNCATE list, Docker health pre-flight check in phase_01 conftest
+*(Not yet planned)*
 
 ---
 
-### Phase 2: Authentication
+### Phase 8: Client Interface
 
-**Goal:** Students and staff can authenticate via email OTP, receive role-bearing JWTs, and the auth middleware is ready to protect all downstream endpoints.
-**Depends on:** Phase 1
-**Requirements:** AUTH-01, AUTH-02, AUTH-03, AUTH-04, AUTH-05
+**Goal:** All 6 client-facing screens are functional, consuming data from the FastAPI REST API — the student can view their academic situation, chat history, documents, and notifications from the app.
+**Depends on:** Phase 7
+**Requirements:** UI-C01, UI-C02, UI-C03, UI-C04, UI-C05, UI-C06, UI-NFR-01
 
 ### Success Criteria
-1. User can request a 6-digit OTP to their email and receive it within seconds via Resend; the code expires after 5 minutes.
-2. User can submit the OTP and receive a JWT containing `role` (student | staff) and a unique `jti`; the verification code is marked used and cannot be reused.
-3. System automatically invalidates a code and issues a new one after 3 failed attempts; expired codes do not count toward the attempt limit.
-4. Authenticated user can call `POST /auth/logout` and subsequent requests with the same JWT are rejected (jti revoked in `sessions` table).
-5. Authenticated user can call `GET /auth/me` and receive their own profile data.
+1. Client Dashboard displays a summary of recent WhatsApp actions and upcoming appointments fetched from `/students/{id}/summary`.
+2. Chat History screen lists chat sessions and allows viewing messages per session, with status indicators for open requests.
+3. Document Board shows issued/received documents with download capability; Document Request screen triggers new document issuance via `POST /documents`.
+4. Notification Center displays alerts, appointment reminders, and status updates — with unread indicators.
+5. Support & Contact screen provides a direct channel for the client to reach administrative support.
 
 ### Plans
-- [x] Plan 2.1: OTP request & email delivery — `POST /auth/request-code`, Resend integration, rate limiting, `verification_codes` table writes
-- [x] Plan 2.2: OTP verification & JWT issuance — `POST /auth/verify-code`, attempt counting, code invalidation, JWT with role + jti, session creation
-- [x] Plan 2.3: Auth middleware & dependencies — `get_current_user`, `require_role`, JWT validation, jti revocation check, `X-Service-Token` dependency for MCP routes
-- [x] Plan 2.4: Session management — `POST /auth/logout`, `GET /auth/me`, integration tests (TEST-01 coverage)
+*(Not yet planned)*
 
 ---
 
-### Phase 3: Business Feature Slices
+### Phase 9: Staff Interface
 
-**Goal:** All FastAPI business endpoints are operational, role-gated, and IDOR-safe — providing the complete API surface that the MCP server will proxy in Phase 4.
-**Depends on:** Phase 2
-**Requirements:** STU-01, STU-02, STU-03, STU-04, STU-05, STU-06, STU-07, COURSE-01, COURSE-02, COURSE-03, CURR-01, CURR-02, ENROLL-01, ENROLL-02, ENROLL-03, ENROLL-04, ENROLL-05, ENROLL-06, ENROLL-07, ENROLL-08, ENROLL-STAFF-01, ENROLL-STAFF-02, ENROLL-STAFF-03, GRADES-01, GRADES-02, GRADES-03, GRADES-04, DOCS-01, DOCS-02, DOCS-03, DOCS-04, APPT-01, APPT-02, APPT-03, APPT-04, APPT-STAFF-01, STAFF-01
-**Verification:** `complete` — gap-closure plans `03-12` through `03-14` now cover Docker/runtime proof plus the final COURSE-03 cycle-safety regression.
+**Goal:** All 4 staff/provider management screens are functional with admin-level data access — the provider can manage appointments, view AI insights, and handle documents from the app.
+**Depends on:** Phase 7
+**Requirements:** UI-F01, UI-F02, UI-F03, UI-F04
 
 ### Success Criteria
-1. Staff can list, create, update, and soft-delete students; both student and staff can view student detail and academic summary including CRA, with ownership verified on every mutating operation.
-2. Authenticated user can browse courses and curriculum; system returns full recursive prerequisite tree for any course; student receives a filtered list of disciplines eligible for enrollment respecting all unmet prerequisites.
-3. Student can move an enrollment through the full draft → confirmed lifecycle, drop individual courses or lock the entire enrollment, and the system rejects enrollment outside the active period or with unmet prerequisites.
-4. Student can view grades per discipline and full academic history; CRA is calculated correctly (credit-weighted, excluding in-progress and locked statuses, safe against division by zero); staff can post and update grades.
-5. Student can request documents and list their statuses; staff can update document status and attach a file URL; student can book, view, and cancel appointments; staff can create scheduling slots.
+1. Staff Dashboard displays business KPIs: total students, active enrollments, pending documents, upcoming appointments, active chat sessions — fetched from `/staff/dashboard`.
+2. Schedule Control screen lists appointments with approve/reschedule/cancel actions calling the appointments API.
+3. AI Data Interaction screen shows structured information, summaries, and insights extracted from WhatsApp conversations (via chat sessions and MCP action logs endpoints).
+4. Document Management screen allows sending documents to client boards and managing pending document requests with status updates.
 
-**Plans:** 14 plans
-
-Plans:
-- [x] 03-01-PLAN.md — Shared infrastructure: pagination, error handling, dual-auth, IDOR protection, base CRUD service
-- [x] 03-02-PLAN.md — Students slice: CRUD, academic summary (STU-06), available courses with prereq filter (STU-07)
-- [x] 03-03-PLAN.md — Courses & curriculum slice: listing, detail, recursive CTE prerequisite tree (COURSE-03), curriculum endpoints
-- [x] 03-04-PLAN.md — Enrollment slice: period management, draft-confirm flow, course drop/lock, prereq+period validation, IDOR checks
-- [x] 03-05-PLAN.md — Grades slice: grades by discipline/period, transcript, CRA calculation (D-07/D-08), staff grade entry
-- [x] 03-06-PLAN.md — Documents slice: student request/listing, staff status update + file URL
-- [x] 03-07-PLAN.md — Appointments slice: slot creation, availability query, SELECT FOR UPDATE booking, cancellation
-- [x] 03-08-PLAN.md — Staff dashboard: KPI aggregation (total students, active enrollments, pending docs, appointments, chat sessions)
-- [x] 03-09-PLAN.md — Gap closure: available-courses raw-list contract regression + docs alignment
-- [x] 03-10-PLAN.md — Gap closure: enrollment `locked` constraint migration + PostgreSQL verifier
-- [x] 03-11-PLAN.md — Gap closure: academic summary next_appointment slot semantics regression
-- [x] 03-12-PLAN.md — Gap closure: bind-mount Alembic assets and preflight enrollment runtime verification
-- [x] 03-13-PLAN.md — Gap closure: enable in-container pytest verification in `fastapi-app` and align Phase 03 validation docs
-- [x] 03-14-PLAN.md — Gap closure: recursive prerequisite tree cycle-safety fix + focused regression coverage
+### Plans
+*(Not yet planned)*
 
 ---
 
-### Phase 4: MCP Server
+### Phase 10: Cross-Platform Polish
 
-**Goal:** The MCP server exposes all 16 tools over streamable-http transport, injects student_id from session context (never from the agent), and logs every tool call to mcp_action_logs.
-**Depends on:** Phase 3
-**Requirements:** MCP-01, MCP-02, MCP-03, MCP-04, MCP-05
-**Verification:** `complete` — plans `04-01` through `04-06` are complete, `04-VALIDATION.md` closed the 2026-04-25 Nyquist validation audit, `04-SECURITY.md` closed the threat audit, and `04-UAT.md` completed user-facing verification after the follow-up cold-start/runtime fixes.
-
-### Success Criteria
-1. MCP server starts and is reachable at port 8002; all 16 tools listed in `docs/mcp.md` are registered and callable over streamable-http transport.
-2. `student_id` does not appear in any tool's input schema — it is resolved from the active session context inside the MCP server before every API call.
-3. Every tool invocation produces a row in `mcp_action_logs` with tool_name, input_params (without student_id), output_result, latency_ms, retry status, and reasoning when available.
-4. Requests from MCP to FastAPI without a valid `X-Service-Token` (compared via `hmac.compare_digest`) are rejected with 401.
-5. On a 5xx response or timeout from FastAPI, MCP retries exactly once; 4xx responses are not retried.
-
-**Plans:** 6 plans
-
-Plans:
-- [x] 04-01-PLAN.md — MCP scaffold: FastMCP app, settings, asyncpg pool, httpx client, healthcheck, session resolver, tool call middleware (logging + retry)
-- [x] 04-02-PLAN.md — Read-only tools (Group A): get_student_info, get_available_courses, get_grades, get_transcript, get_curriculum, get_course_prerequisites, get_enrollment_period
-- [x] 04-03-PLAN.md — Write/action tools (Group B): create_enrollment, confirm_enrollment, drop_course, lock_enrollment, request_document, get_document_status, get_available_slots, book_appointment, cancel_appointment
-- [x] 04-04-PLAN.md — Integration tests: session resolution, middleware retry/logging, tool schema validation, student_id absence, X-Service-Token verification
-- [x] 04-05-PLAN.md — Gap closure: repair MCP package startup, Docker/compose entrypoint alignment, and import-safe runtime regressions
-- [x] 04-06-PLAN.md — Gap closure: enforce mandatory audit logging/session guards and add failure-path regressions
-
----
-
-### Phase 5: AI Service
-
-**Goal:** The LangChain ReAct agent answers student academic questions in Portuguese, using MCP tools for live data and PGVector RAG for regulation and policy, with any LLM provider configurable by environment variable.
-**Depends on:** Phase 4
-**Requirements:** AI-01, AI-02, AI-03, AI-04, AI-05
-**Verification:** `gaps_found` — plans `05-01` through `05-10` complete. HUMAN-UAT (2026-05-02) found 2 blockers: MCP X-Student-Id header not injected (all tool calls fail), system prompt threshold mismatch (0.75 vs 0.45). Plan 11 addresses both.
+**Goal:** The Flutter app renders correctly on smartphones, tablets, and web; data synchronization is efficient; the user experience is polished across all form factors.
+**Depends on:** Phase 8, Phase 9
+**Requirements:** UI-NFR-02, UI-NFR-04
 
 ### Success Criteria
-1. Agent receives a student message, selects appropriate MCP tools, calls them, and generates a coherent Portuguese-language response — observable end-to-end without WhatsApp by directly invoking the service HTTP endpoint.
-2. Conversation context is rebuilt from the last 20 messages stored in `chat_messages` on every invocation; restarting the langchain-service container does not lose conversation history.
-3. RAG retriever finds relevant policy chunks from the knowledge base with cosine similarity threshold calibrated at ≥ 0.75 (distance ≤ 0.25); irrelevant queries return no RAG context rather than noisy chunks.
-4. Setting `LLM_PROVIDER=gemini` in the environment switches the agent to Gemini without any code changes; setting `LLM_PROVIDER=openai` uses OpenAI — both produce valid responses.
-5. Running `python -m ai_service.ingest` processes all five knowledge base documents (`matricula.md`, `regulamento.pdf`, `faq.md`, `calendario.md`, `curriculo.md`), generates embeddings, and stores chunks in `knowledge_base_chunks`.
+1. All screens render correctly and are usable on phone (360dp width), tablet (768dp width), and web (1280dp+ width).
+2. Consistent loading states, error handling, and empty states across all screens.
+3. Data fetches complete in < 2s for cached data and < 5s for fresh API calls, with visual feedback during loading.
+4. UI passes basic accessibility checks: sufficient contrast ratio, minimum 48dp touch targets, text scales with system font size.
 
-**Plans:** 11 plans
-
-Plans:
-- [x] 05-01-PLAN.md — AI service scaffold: FastAPI app, psycopg3 DB layer, LLM factory, system prompt, config
-- [x] 05-02-PLAN.md — Knowledge base ingest: document chunking, text-embedding-3-small embeddings, PGVector storage
-- [x] 05-03-PLAN.md — RAG pipeline: search_knowledge_base tool with pgvector cosine similarity, 0.75 threshold
-- [x] 05-04-PLAN.md — ReAct agent: create_agent with MCP tool binding (langchain-mcp-adapters), conversation memory, provider-agnostic LLM
-- [x] 05-05-PLAN.md — AI service /chat endpoint: receives message + session_id, invokes agent, saves response to chat_messages
-- [x] 05-06-PLAN.md — Gap closure: assistant-only response extraction and direct `/chat` user-turn persistence regressions
-- [x] 05-07-PLAN.md — Gap closure: package-based AI service runtime alignment and startup regressions
-- [x] 05-08-PLAN.md — Gap closure: align DATABASE_URL credentials with POSTGRES_PASSWORD and fix chat_messages UUID generation
-- [x] 05-09-PLAN.md — Gap closure: propagate POSTGRES_* component var pattern to ingest.py and fix stale regression test
-- [x] 05-10-PLAN.md — Gap closure: configurable RAG similarity threshold + MCP action logs UUID fix
-- [x] 05-11-PLAN.md — Gap closure: X-Student-Id header injection in MCP api_client + system prompt threshold fix
-
----
-
-### Phase 6: WhatsApp Webhook & Integration
-
-**Goal:** A student can send a WhatsApp message and receive an AI-powered response about their academic situation — the end-to-end chatbot flow is operational and hardened against the five-second timeout, signature spoofing, and background task failures.
-**Depends on:** Phase 5
-**Requirements:** WH-01, WH-02, WH-03, WH-04, WH-05, CHAT-01, CHAT-02, CHAT-03, TEST-01, TEST-02, TEST-03, TEST-04, TEST-05
-**Verification:** `complete` — all 4 plans executed, code review (7 findings fixed), UAT 4/4 passed, HUMAN-UAT 3/3 passed. End-to-end WhatsApp flow verified. pg_cron infrastructure gap resolved with custom Docker image.
-
-### Success Criteria
-1. WhatsApp webhook challenge (`GET /webhook/whatsapp?hub.challenge=...`) is answered correctly, enabling webhook registration with Meta.
-2. A text message sent via WhatsApp arrives at `POST /webhook/whatsapp`, passes HMAC-SHA256 validation, gets saved to `chat_messages`, and returns 200 OK in under 5 seconds — with background agent processing dispatched via `asyncio.create_task` and a `done_callback` that logs any exception.
-3. A media message (audio, image, video, document, sticker, location) receives the appropriate standard reply without involving the agent; the media type is recorded in `chat_messages`.
-4. Sending the same WhatsApp message ID twice results in only one `chat_messages` row (deduplication by `whatsapp_message_id`).
-5. Staff can list chat sessions and view messages for any session; staff can view MCP action logs for a session showing tool calls, parameters, and reasoning.
-
-**Plans:** 4 plans
-
-Plans:
-- [x] 06-01-PLAN.md — Webhook core: WhatsApp client, HMAC validation, GET/POST endpoints, verification state migration, message routing
-- [x] 06-02-PLAN.md — Background processing: AI service integration, retry/fallback, per-session lock, session lifecycle, pg_cron auto-close
-- [x] 06-03-PLAN.md — Chat visibility: staff endpoints for sessions, messages, and MCP action logs
-- [x] 06-04-PLAN.md — Test suite: TEST-04 (HMAC + dedup + media), TEST-05 (service token), verification state, background tasks, chat visibility
+### Plans
+*(Not yet planned)*
 
 ---
 
@@ -184,9 +93,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Infrastructure & Schema | 8/8 | Complete | 2026-05-02 |
-| 2. Authentication | 4/4 | Complete | 2026-04-24 |
-| 3. Business Feature Slices | 14/14 | Complete | 2026-04-25 |
-| 4. MCP Server | 6/6 | Complete | 2026-04-25 |
-| 5. AI Service | 10/11 | Gaps Found | - |
-| 6. WhatsApp Webhook & Integration | 4/4 | Complete | 2026-04-30 |
+| 7. Flutter Scaffold & Auth | 0/0 | Not Started | - |
+| 8. Client Interface | 0/0 | Not Started | - |
+| 9. Staff Interface | 0/0 | Not Started | - |
+| 10. Cross-Platform Polish | 0/0 | Not Started | - |

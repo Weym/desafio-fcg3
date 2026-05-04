@@ -1,241 +1,96 @@
 # Requirements — Desafio FCG3
 
-**Version:** 1.0
-**Milestone:** M1 — Backend + AI Service + MCP Server
-**Date:** 2026-04-15
+**Version:** 2.0
+**Milestone:** M2 — Flutter Frontend
+**Date:** 2026-05-04
 
 ---
 
-## v1 Requirements
+## v2 Requirements
 
-### Infraestrutura
+### Flutter Infrastructure & Auth
 
-- [x] **INFRA-01**: Sistema pode ser iniciado com `docker compose up` — 4 containers sobem com healthchecks (postgres+pgvector, fastapi-app, langchain-service, mcp-server)
-- [x] **INFRA-02**: Schema completo do banco (17 tabelas + HNSW index) é criado via Alembic migrations (migration #001: extensão pgvector)
-- [ ] **INFRA-03**: `.env.example` documenta todas as variáveis de ambiente necessárias (DATABASE_URL, MCP_SERVICE_TOKEN, WHATSAPP_TOKEN, WHATSAPP_APP_SECRET, RESEND_API_KEY, LLM_PROVIDER, LLM_MODEL, OPENAI_API_KEY)
-- [x] **INFRA-04**: Seed data do currículo de Ciência da Computação (8 períodos, ~40 disciplinas com pré-requisitos) está disponível e pode ser executado via script
-
----
-
-### Autenticação
-
-- [ ] **AUTH-01**: Aluno ou staff pode solicitar código OTP de 6 dígitos enviado por email via Resend (expira em 5 minutos)
-- [ ] **AUTH-02**: Aluno ou staff pode verificar código e receber JWT com campo `role` (student | staff) e `jti` único
-- [ ] **AUTH-03**: Sistema invalida o código após 3 tentativas incorretas e envia novo código automaticamente; códigos expirados não incrementam o contador
-- [ ] **AUTH-04**: Usuário autenticado pode encerrar sessão (JWT revogado por `jti` na tabela `sessions`)
-- [ ] **AUTH-05**: Usuário autenticado pode consultar seus próprios dados (`GET /auth/me`)
+- [ ] **UI-INFRA-01**: App inicia com navegação baseada em perfil — Client e Provider/Staff veem rotas dedicadas
+- [ ] **UI-INFRA-02**: Fluxo de autenticação (OTP email → JWT) integrado com backend FastAPI existente
+- [ ] **UI-INFRA-03**: JWT armazenado via flutter_secure_storage com detecção de expiração/revogação e redirecionamento para login
 
 ---
 
-### Students (Alunos)
+### Client Screens
 
-- [ ] **STU-01**: Staff pode listar alunos com paginação e filtros (busca por nome, semestre, status)
-- [ ] **STU-02**: Staff pode criar aluno (nome, email, telefone, número de matrícula, currículo)
-- [ ] **STU-03**: Staff pode atualizar dados de um aluno
-- [ ] **STU-04**: Staff pode desativar aluno (soft delete — status: inactive)
-- [ ] **STU-05**: Aluno ou staff pode consultar detalhe de um aluno
-- [x] **STU-06**: Sistema retorna resumo acadêmico do aluno (semestre, disciplinas concluídas, CRA, status, documentos pendentes, próximo agendamento) — endpoint usado pelo MCP `get_student_info`
-- [x] **STU-07**: Sistema retorna disciplinas disponíveis para matrícula do aluno respeitando pré-requisitos — endpoint usado pelo MCP `get_available_courses`
-
----
-
-### Courses & Curriculum (Disciplinas e Currículo)
-
-- [ ] **COURSE-01**: Usuário autenticado pode listar disciplinas com filtro por nome e período
-- [ ] **COURSE-02**: Usuário autenticado pode consultar detalhes de uma disciplina incluindo créditos, carga horária e pré-requisitos diretos
-- [x] **COURSE-03**: Sistema retorna árvore completa de pré-requisitos de uma disciplina (recursivo via CTE) — endpoint usado pelo MCP `get_course_prerequisites`
-- [ ] **CURR-01**: Sistema retorna currículo ativo com disciplinas organizadas por período — endpoint usado pelo MCP `get_curriculum`
-- [ ] **CURR-02**: Usuário autenticado pode consultar um currículo específico por ID
+- [ ] **UI-C01**: Cliente visualiza dashboard home com resumo das ações e agendamentos realizados via WhatsApp
+- [ ] **UI-C02**: Cliente consulta histórico de chats/atendimentos com status das solicitações abertas
+- [ ] **UI-C03**: Cliente solicita envio ou emissão de novos documentos pela interface
+- [ ] **UI-C04**: Cliente acessa mural de documentos para visualização, download e gerenciamento de documentos emitidos ou recebidos
+- [ ] **UI-C05**: Cliente recebe e consulta central de notificações com alertas, lembretes de agendamento e atualizações de status
+- [ ] **UI-C06**: Cliente acessa canal direto de suporte e contato técnico/administrativo
 
 ---
 
-### Enrollment (Matrículas)
+### Staff/Provider Screens
 
-- [ ] **ENROLL-01**: Sistema retorna período de matrícula ativo (datas, semestre letivo, status) — endpoint usado pelo MCP `get_enrollment_period`
-- [ ] **ENROLL-02**: Aluno pode criar matrícula em rascunho com uma ou mais disciplinas durante período ativo
-- [ ] **ENROLL-03**: Aluno pode confirmar matrícula (draft → confirmed) durante período ativo
-- [ ] **ENROLL-04**: Aluno pode modificar disciplinas de uma matrícula enquanto em draft
-- [ ] **ENROLL-05**: Aluno pode remover disciplina individual de uma matrícula — endpoint usado pelo MCP `drop_course`
-- [x] **ENROLL-06**: Aluno pode trancar a matrícula inteira do período — endpoint usado pelo MCP `lock_enrollment`
-- [ ] **ENROLL-07**: Aluno pode listar suas matrículas com filtro por semestre e status
-- [ ] **ENROLL-08**: Sistema bloqueia criação de matrícula fora do período ativo, com disciplinas cujos pré-requisitos não foram cumpridos, ou com disciplinas duplicadas
-- [ ] **ENROLL-STAFF-01**: Staff pode criar período de matrícula (nome, tipo, datas de início/fim, semestre letivo)
-- [ ] **ENROLL-STAFF-02**: Staff pode atualizar período de matrícula (incluindo ativar/desativar)
-- [ ] **ENROLL-STAFF-03**: Staff pode listar todos os períodos de matrícula
+- [ ] **UI-F01**: Fornecedor consulta dashboard de gestão com métricas e visões gerais sobre o negócio, atendimentos e interações do bot
+- [ ] **UI-F02**: Fornecedor gerencia, aprova, reagenda ou cancela compromissos gerados via WhatsApp
+- [ ] **UI-F03**: Fornecedor visualiza dados estruturados, resumos e insights extraídos pela IA a partir das conversas
+- [ ] **UI-F04**: Fornecedor envia documentos para o mural dos clientes e gerencia solicitações pendentes
 
 ---
 
-### Grades (Notas)
+### Non-Functional
 
-- [ ] **GRADES-01**: Aluno pode consultar suas notas por disciplina e período letivo
-- [ ] **GRADES-02**: Aluno pode consultar histórico escolar completo com todas as disciplinas e notas
-- [x] **GRADES-03**: Sistema calcula e retorna CRA ponderado por créditos (exclui disciplinas em andamento e trancadas; protegido contra divisão por zero)
-- [ ] **GRADES-04**: Staff pode lançar ou atualizar notas (N1, N2) de um aluno em uma disciplina; nota final é calculada automaticamente
-
----
-
-### Documents (Documentos)
-
-- [ ] **DOCS-01**: Aluno pode listar seus documentos com filtro por tipo e status
-- [ ] **DOCS-02**: Aluno pode consultar detalhe de um documento, incluindo URL de download quando status=ready
-- [ ] **DOCS-03**: Aluno pode solicitar emissão de documento (transcript, enrollment_proof, declaration, certificate) — endpoint usado pelo MCP `request_document`
-- [ ] **DOCS-04**: Staff pode atualizar status de um documento e vincular a URL do arquivo gerado
+- [ ] **UI-NFR-01**: Interface intuitiva priorizando clareza para o cliente
+- [ ] **UI-NFR-02**: Aplicação Flutter adaptável a smartphones, tablets e web
+- [ ] **UI-NFR-03**: Autenticação com separação rigorosa de permissões e rotas entre Cliente e Fornecedor
+- [ ] **UI-NFR-04**: Sincronização eficiente dos dados do WhatsApp/IA com latência percebida < 2s para dados cacheados
 
 ---
 
-### Scheduling (Agendamentos)
+## v1 Requirements (Previous Milestone — M1 Backend + AI + MCP)
 
-- [ ] **APPT-01**: Aluno pode consultar slots de atendimento disponíveis com filtro por data e responsável — endpoint usado pelo MCP `get_available_slots`
-- [ ] **APPT-02**: Aluno pode agendar atendimento em um slot disponível com motivo (SELECT FOR UPDATE no slot para evitar race condition) — endpoint usado pelo MCP `book_appointment`
-- [ ] **APPT-03**: Aluno pode cancelar um agendamento próprio — endpoint usado pelo MCP `cancel_appointment`
-- [ ] **APPT-04**: Aluno ou staff pode listar agendamentos com filtro por status
-- [ ] **APPT-STAFF-01**: Staff pode criar slots de atendimento (data, horário início/fim, duração por slot em minutos)
+> M1 requirements are preserved in git history. See `REQUIREMENTS.md` at any commit before 2026-05-04.
+> 69/69 M1 requirements were mapped. Key validated items are tracked in PROJECT.md Validated section.
 
 ---
 
-### Staff Dashboard & CRM
+## Future Requirements (Deferred)
 
-- [ ] **STAFF-01**: Staff pode consultar dashboard com KPIs: total de alunos, matrículas ativas, documentos pendentes, agendamentos futuros, sessões de chat ativas, status do período de matrícula
-
----
-
-### Webhook & Chat (WhatsApp)
-
-- [x] **WH-01**: Sistema recebe mensagens do WhatsApp e valida assinatura HMAC-SHA256 (`X-Hub-Signature-256`) antes de qualquer processamento
-- [x] **WH-02**: Sistema responde 200 OK em < 5 segundos e despacha processamento da mensagem em background com `asyncio.create_task` + `add_done_callback` para visibilidade de falhas
-- [x] **WH-03**: Sistema trata mensagens de mídia (áudio, imagem, vídeo, documento, sticker, localização) com resposta padrão sem passar pelo agente; tipo de mídia é registrado em `chat_messages`
-- [x] **WH-04**: Sistema deduplica mensagens por `whatsapp_message_id` — mensagem com ID já existente é ignorada
-- [x] **WH-05**: Sistema responde ao challenge de verificação do webhook WhatsApp (`GET /webhook/whatsapp` com `hub.challenge`)
-- [x] **CHAT-01**: Staff pode listar sessões de chat com filtro por aluno e status
-- [x] **CHAT-02**: Usuário autenticado pode listar mensagens de uma sessão de chat
-- [x] **CHAT-03**: Staff pode consultar logs MCP de uma sessão de chat (tool_name, params, resultado, reasoning, latência)
-
----
-
-### MCP Server
-
-- [x] **MCP-01**: MCP Server implementa as 16 ferramentas documentadas em `docs/mcp.md` via Streamable HTTP transport
-- [x] **MCP-02**: MCP Server injeta `student_id` do contexto da sessão ativa em todas as tools que operam sobre dados do aluno — `student_id` nunca aparece nos schemas das tools
-- [x] **MCP-03**: Cada chamada de tool gera registro em `mcp_action_logs` com tool_name, input_params (sem student_id), output_result, reasoning, latency_ms, retry e status
-- [x] **MCP-04**: Chamadas internas à API são autenticadas via `X-Service-Token`; comparação usa `hmac.compare_digest` (constant-time)
-- [x] **MCP-05**: Em caso de falha 5xx ou timeout, MCP realiza uma única retentativa imediata; erros 4xx não geram retry
-
----
-
-### AI Service (LangChain)
-
-- [x] **AI-01**: Agente ReAct processa mensagens de texto, decide quais MCP tools chamar e gera resposta em português
-- [x] **AI-02**: Memória de conversa é reconstruída do banco a cada invocação (últimas 20 mensagens da sessão) — não depende de estado em memória
-- [x] **AI-03**: RAG busca chunks relevantes no PGVector com threshold de distância coseno calibrado (baseline: ≤ 0.25 de distância = ≥ 0.75 de similaridade)
-- [x] **AI-04**: LLM provider é configurável via variável de ambiente `LLM_PROVIDER` (valores: `openai`, `gemini`) — troca de provider não requer alteração de código
-- [x] **AI-05**: Script `ai_service/ingest.py` (executável via `python -m ai_service.ingest`) ingere documentos da knowledge base (`matricula.md`, `regulamento.pdf`, `faq.md`, `calendario.md`, `curriculo.md`) gerando embeddings e armazenando chunks no PGVector
-
----
-
-### Testes
-
-- [ ] **TEST-01**: Testes de integração cobrem fluxo de auth completo (OTP → JWT → logout → token revogado; esgotamento de tentativas → novo código enviado)
-- [ ] **TEST-02**: Testes de integração cobrem matrícula (draft-confirm, pré-requisito não cumprido, período fechado, ownership check / prevenção de IDOR)
-- [ ] **TEST-03**: Testes unitários cobrem cálculo de CRA (ponderação por créditos, exclusão de em andamento, divisão por zero)
-- [x] **TEST-04**: Testes de integração cobrem webhook (HMAC válido, HMAC inválido → 403, deduplicação por wamid, rota de mídia)
-- [x] **TEST-05**: Testes de integração cobrem middleware X-Service-Token (token ausente → 401, token inválido → 401) e prevenção de IDOR nos endpoints MCP
-
----
-
-## v2 Requirements (Deferred)
-
-- Push notifications via FCM (registro de token, envio de notificação)
-- Cache de sessões de conversa em Redis (sessões ativas não precisam recarregar do banco)
-- Limpeza automática de verification_codes e sessions expiradas via pg_cron
+- Push notifications via FCM (registro de token, envio por tipo de evento)
 - Transcrição de áudio via Whisper API
 - Análise de imagens via GPT-4o Vision
-- URL de download de documentos com expiração (signed URLs)
+- Cache de sessões em Redis
+- Sentry / monitoramento externo
 
 ---
 
 ## Out of Scope
 
-- Flutter mobile app — foco deste ciclo é backend + AI + MCP
-- Staff não recebe push notifications no MVP
-- Administração da knowledge base via UI — ingestão via script apenas
-- Progressão automática de semestre dos alunos — atualização manual via staff
-- Waiver de pré-requisitos — sistema não permite exceções no MVP
-- Monitoramento externo (Sentry, Datadog) — logging estruturado via stdout
+- Backend API changes — all endpoints built in M1; frontend consumes as-is
+- WhatsApp bot features — complete in M1 Phase 6
+- Knowledge base administration via UI — ingest via script only
+- Offline-first / local caching strategy — pós-MVP
 
 ---
 
 ## Traceability
 
-*Mapeamento de requisitos para fases do roadmap — gerado pelo roadmapper em 2026-04-15.*
+*Mapeamento de requisitos para fases do roadmap — gerado em 2026-05-04.*
 
-| REQ-ID | Fase | Status |
-|--------|------|--------|
-| INFRA-01 | Phase 1: Infrastructure & Schema | Complete |
-| INFRA-02 | Phase 1: Infrastructure & Schema | Complete |
-| INFRA-03 | Phase 1: Infrastructure & Schema | Pending |
-| INFRA-04 | Phase 1: Infrastructure & Schema | Complete |
-| AUTH-01 | Phase 2: Authentication | Pending |
-| AUTH-02 | Phase 2: Authentication | Pending |
-| AUTH-03 | Phase 2: Authentication | Pending |
-| AUTH-04 | Phase 2: Authentication | Pending |
-| AUTH-05 | Phase 2: Authentication | Pending |
-| STU-01 | Phase 3: Business Feature Slices | Pending |
-| STU-02 | Phase 3: Business Feature Slices | Pending |
-| STU-03 | Phase 3: Business Feature Slices | Pending |
-| STU-04 | Phase 3: Business Feature Slices | Pending |
-| STU-05 | Phase 3: Business Feature Slices | Pending |
-| STU-06 | Phase 3: Business Feature Slices | Complete |
-| STU-07 | Phase 3: Business Feature Slices | Complete |
-| COURSE-01 | Phase 3: Business Feature Slices | Pending |
-| COURSE-02 | Phase 3: Business Feature Slices | Pending |
-| COURSE-03 | Phase 3: Business Feature Slices | Complete |
-| CURR-01 | Phase 3: Business Feature Slices | Pending |
-| CURR-02 | Phase 3: Business Feature Slices | Pending |
-| ENROLL-01 | Phase 3: Business Feature Slices | Pending |
-| ENROLL-02 | Phase 3: Business Feature Slices | Pending |
-| ENROLL-03 | Phase 3: Business Feature Slices | Pending |
-| ENROLL-04 | Phase 3: Business Feature Slices | Pending |
-| ENROLL-05 | Phase 3: Business Feature Slices | Pending |
-| ENROLL-06 | Phase 3: Business Feature Slices | Complete |
-| ENROLL-07 | Phase 3: Business Feature Slices | Pending |
-| ENROLL-08 | Phase 3: Business Feature Slices | Pending |
-| ENROLL-STAFF-01 | Phase 3: Business Feature Slices | Pending |
-| ENROLL-STAFF-02 | Phase 3: Business Feature Slices | Pending |
-| ENROLL-STAFF-03 | Phase 3: Business Feature Slices | Pending |
-| GRADES-01 | Phase 3: Business Feature Slices | Pending |
-| GRADES-02 | Phase 3: Business Feature Slices | Pending |
-| GRADES-03 | Phase 3: Business Feature Slices | Complete |
-| GRADES-04 | Phase 3: Business Feature Slices | Pending |
-| DOCS-01 | Phase 3: Business Feature Slices | Pending |
-| DOCS-02 | Phase 3: Business Feature Slices | Pending |
-| DOCS-03 | Phase 3: Business Feature Slices | Pending |
-| DOCS-04 | Phase 3: Business Feature Slices | Pending |
-| APPT-01 | Phase 3: Business Feature Slices | Pending |
-| APPT-02 | Phase 3: Business Feature Slices | Pending |
-| APPT-03 | Phase 3: Business Feature Slices | Pending |
-| APPT-04 | Phase 3: Business Feature Slices | Pending |
-| APPT-STAFF-01 | Phase 3: Business Feature Slices | Pending |
-| STAFF-01 | Phase 3: Business Feature Slices | Pending |
-| MCP-01 | Phase 4: MCP Server | Complete |
-| MCP-02 | Phase 4: MCP Server | Complete |
-| MCP-03 | Phase 4: MCP Server | Complete |
-| MCP-04 | Phase 4: MCP Server | Complete |
-| MCP-05 | Phase 4: MCP Server | Complete |
-| AI-01 | Phase 5: AI Service | Complete |
-| AI-02 | Phase 5: AI Service | Complete |
-| AI-03 | Phase 5: AI Service | Complete |
-| AI-04 | Phase 5: AI Service | Complete |
-| AI-05 | Phase 5: AI Service | Complete |
-| WH-01 | Phase 6: WhatsApp Webhook & Integration | Complete |
-| WH-02 | Phase 6: WhatsApp Webhook & Integration | Complete |
-| WH-03 | Phase 6: WhatsApp Webhook & Integration | Complete |
-| WH-04 | Phase 6: WhatsApp Webhook & Integration | Complete |
-| WH-05 | Phase 6: WhatsApp Webhook & Integration | Complete |
-| CHAT-01 | Phase 6: WhatsApp Webhook & Integration | Complete |
-| CHAT-02 | Phase 6: WhatsApp Webhook & Integration | Complete |
-| CHAT-03 | Phase 6: WhatsApp Webhook & Integration | Complete |
-| TEST-01 | Phase 6: WhatsApp Webhook & Integration | Pending |
-| TEST-02 | Phase 6: WhatsApp Webhook & Integration | Pending |
-| TEST-03 | Phase 6: WhatsApp Webhook & Integration | Pending |
-| TEST-04 | Phase 6: WhatsApp Webhook & Integration | Complete |
-| TEST-05 | Phase 6: WhatsApp Webhook & Integration | Complete |
+| REQ-ID | Phase | Status |
+|--------|-------|--------|
+| UI-INFRA-01 | Phase 7: Flutter Scaffold & Auth | Pending |
+| UI-INFRA-02 | Phase 7: Flutter Scaffold & Auth | Pending |
+| UI-INFRA-03 | Phase 7: Flutter Scaffold & Auth | Pending |
+| UI-NFR-03 | Phase 7: Flutter Scaffold & Auth | Pending |
+| UI-C01 | Phase 8: Client Interface | Pending |
+| UI-C02 | Phase 8: Client Interface | Pending |
+| UI-C03 | Phase 8: Client Interface | Pending |
+| UI-C04 | Phase 8: Client Interface | Pending |
+| UI-C05 | Phase 8: Client Interface | Pending |
+| UI-C06 | Phase 8: Client Interface | Pending |
+| UI-NFR-01 | Phase 8: Client Interface | Pending |
+| UI-F01 | Phase 9: Staff Interface | Pending |
+| UI-F02 | Phase 9: Staff Interface | Pending |
+| UI-F03 | Phase 9: Staff Interface | Pending |
+| UI-F04 | Phase 9: Staff Interface | Pending |
+| UI-NFR-02 | Phase 10: Cross-Platform Polish | Pending |
+| UI-NFR-04 | Phase 10: Cross-Platform Polish | Pending |

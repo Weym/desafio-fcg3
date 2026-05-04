@@ -49,7 +49,6 @@ Aluno envia mensagem no WhatsApp e recebe resposta precisa sobre sua situação 
 
 ### Out of Scope
 
-- Flutter mobile (app) — fora deste ciclo; foco é backend + AI + MCP
 - Push notifications FCM — adiar para ciclo seguinte
 - Whisper API (transcrição de áudio) — pós-MVP
 - GPT-4o Vision (análise de imagens) — pós-MVP
@@ -88,14 +87,26 @@ Aluno envia mensagem no WhatsApp e recebe resposta precisa sobre sua situação 
 | `student_id` injetado pelo MCP (nunca exposto ao agente) | Prevenção de IDOR — o agente não pode forjar student_id | ✓ Validated in Phase 4 |
 | Agendamentos incluídos neste ciclo | Requisito confirmado pelo usuário | ✓ Validated in Phase 3 |
 
+## Current Milestone: v2.0 Flutter Frontend
+
+**Goal:** Deliver the Flutter mobile/web application with role-based navigation (Client and Provider/Staff), consuming the FastAPI REST API built in M1.
+
+**Target features:**
+- Flutter scaffold with role-based navigation and OTP authentication
+- 6 client screens: Dashboard, Chat History, Document Requests, Document Board, Notifications, Support
+- 4 staff/provider screens: Management Dashboard, Schedule Control, AI Data Interaction, Document Management
+- Cross-platform responsiveness (smartphones, tablets, web) and performance polish
+
 ## Current State
 
-- Phase 1 concluída: stack Docker de 4 serviços sobe localmente, schema da aplicação está migrado, e a base possui seed de desenvolvimento com currículo e fixtures acadêmicos.
-- Phase 2 concluída: autenticação completa via OTP/email (Resend), JWT com roles (student/staff), refresh-token rotation com SELECT FOR UPDATE, middleware de auth (get_current_user, require_role, require_service_token), rate limiting via SlowAPI, 47 testes passando.
-- Phase 3 concluída: 7 feature slices (Students, Courses, Enrollment, Grades, Documents, Appointments, Staff Dashboard) com 35 endpoints REST, IDOR protection, dual-auth (JWT + X-Service-Token), state machine enforcement, SELECT FOR UPDATE para booking e enrollment confirmation, CRA calculation, recursive CTE para prerequisite tree. Bug de SELECT FOR UPDATE com outer join corrigido em UAT.
-- Phase 4 concluída: MCP Server com as 16 tools documentadas em `docs/mcp.md`, injeção de `student_id` por contexto de sessão, `mcp_action_logs`, gap closures 04-05/04-06 e audit Nyquist concluído em 2026-04-25.
-- Phase 5 concluída: AI Service com agente LangChain ReAct, pipeline RAG, provider agnóstico, ingest da base de conhecimento, auditoria Nyquist fechada em `05-VALIDATION.md` e suíte `ai_service/tests` verde com `16 passed`.
-- Próximo foco: Phase 6 (WhatsApp Webhook & Integration) — fluxo fim a fim do chatbot, hardening do webhook, visibilidade de chat e suite de integração.
+- M1 (v1.0) complete: Backend + AI Service + MCP Server — 6 phases, 47 plans executed
+  - Phase 1: Docker stack (4 services), Alembic schema, seed data
+  - Phase 2: OTP/email auth (Resend), JWT with roles, middleware
+  - Phase 3: 7 feature slices, 35 REST endpoints, IDOR protection
+  - Phase 4: MCP Server, 16 tools, student_id injection, action logging
+  - Phase 5: LangChain ReAct agent, RAG pipeline, provider-agnostic LLM
+  - Phase 6: WhatsApp webhook, end-to-end chatbot flow, chat visibility
+- M2 (v2.0) started: Flutter Frontend — 4 phases planned (Phase 7-10)
 
 ## Evolution
 
@@ -115,4 +126,4 @@ Este documento evolui a cada transição de fase e marco de milestone.
 4. Atualizar Context com estado atual
 
 ---
-*Last updated: 2026-05-02 after Phase 5 gap closure (Plan 05-10) — RAG threshold configurable, MCP action_logs UUID fix*
+*Last updated: 2026-05-04 — Milestone v2.0 (Flutter Frontend) started, 4 phases planned (Phase 7-10)*
