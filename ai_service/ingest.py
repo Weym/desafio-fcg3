@@ -19,7 +19,8 @@ AUDIT_PATH = KNOWLEDGE_DIR / ".last_ingest.json"
 
 CATEGORY_MAP = {
     "matricula.md": "regras_matricula",
-    "regulamento.pdf": "regulamento",
+    "regulamento.md": "regulamento",
+    "documentos.md": "documentos",
     "faq.md": "faq",
     "calendario.md": "agendamento",
     "curriculo.md": "curriculo",
