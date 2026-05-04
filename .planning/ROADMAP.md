@@ -54,13 +54,13 @@ Plans:
 4. Notification Center displays alerts, appointment reminders, and status updates — with unread indicators.
 5. Support & Contact screen provides a direct channel for the client to reach administrative support.
 
-**Plans:** 5 plans
+**Plans:** 4/5 plans executed
 
 Plans:
 - [x] 08-01-PLAN.md — Data layer: models, services, and Riverpod providers for all client domains
 - [x] 08-02-PLAN.md — Dashboard (Home) with 3 summary cards + Support & Contact screen
 - [x] 08-03-PLAN.md — Documents screen with filter chips, status cards, and request bottom sheet
-- [ ] 08-04-PLAN.md — Chat History screen (session list + detail with messages/actions tabs)
+- [x] 08-04-PLAN.md — Chat History screen (session list + detail with messages/actions tabs)
 - [ ] 08-05-PLAN.md — Notifications (derived) screen + final router wiring
 
 ---
@@ -104,6 +104,6 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 7. Flutter Scaffold & Auth | 0/3 | Planned | - |
-| 8. Client Interface | 0/0 | Not Started | - |
+| 8. Client Interface | 4/5 | In Progress|  |
 | 9. Staff Interface | 0/0 | Not Started | - |
 | 10. Cross-Platform Polish | 0/0 | Not Started | - |
