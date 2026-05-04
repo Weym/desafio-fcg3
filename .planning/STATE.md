@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-05-04T18:07:55.724Z"
+last_updated: "2026-05-04T18:13:55.903Z"
 last_activity: 2026-05-04
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 8
-  completed_plans: 4
-  percent: 50
+  completed_plans: 5
+  percent: 63
 ---
 
 # Project State
@@ -18,7 +18,7 @@ progress:
 ## Current Position
 
 Phase: 08 (Client Interface) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
 Last activity: 2026-05-04
 
@@ -52,6 +52,7 @@ Recent decisions affecting current work:
 - [Milestone v2.0]: Frontend requirements derived from `requerimentos_frontend.md` with 2 user profiles (Client, Provider/Staff)
 - [Milestone v2.0]: Flutter mobile/web using existing REST API surface from M1 — no backend changes needed
 - [Phase 08]: Client data layer uses @JsonSerializable codegen + DioClient injection + @riverpod annotations for 3 domains (chat, documents, appointments)
+- [Phase 08]: url_launcher added for support screen external app actions (email, phone, WhatsApp)
 
 ### Key Decisions Pending
 

@@ -23,7 +23,7 @@
 - [x] **UI-C03**: Cliente solicita envio ou emissão de novos documentos pela interface
 - [x] **UI-C04**: Cliente acessa mural de documentos para visualização, download e gerenciamento de documentos emitidos ou recebidos
 - [x] **UI-C05**: Cliente recebe e consulta central de notificações com alertas, lembretes de agendamento e atualizações de status
-- [ ] **UI-C06**: Cliente acessa canal direto de suporte e contato técnico/administrativo
+- [x] **UI-C06**: Cliente acessa canal direto de suporte e contato técnico/administrativo
 
 ---
 
@@ -86,7 +86,7 @@
 | UI-C03 | Phase 8: Client Interface | Complete |
 | UI-C04 | Phase 8: Client Interface | Complete |
 | UI-C05 | Phase 8: Client Interface | Complete |
-| UI-C06 | Phase 8: Client Interface | Pending |
+| UI-C06 | Phase 8: Client Interface | Complete |
 | UI-NFR-01 | Phase 8: Client Interface | Complete |
 | UI-F01 | Phase 9: Staff Interface | Pending |
 | UI-F02 | Phase 9: Staff Interface | Pending |
