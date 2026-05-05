@@ -100,8 +100,14 @@ Plans:
 3. Data fetches complete in < 2s for cached data and < 5s for fresh API calls, with visual feedback during loading.
 4. UI passes basic accessibility checks: sufficient contrast ratio, minimum 48dp touch targets, text scales with system font size.
 
-### Plans
-*(Not yet planned)*
+**Plans:** 5 plans
+
+Plans:
+- [ ] 10-01-PLAN.md — Theme foundation (dark mode, spacing tokens, breakpoints, responsive typography)
+- [ ] 10-02-PLAN.md — Shared UX widgets (skeleton, empty, error, offline banner, responsive container)
+- [ ] 10-03-PLAN.md — Adaptive navigation shells + master-detail split view
+- [ ] 10-04-PLAN.md — Data cache TTL + prefetch strategy
+- [ ] 10-05-PLAN.md — Screen integration (all screens → shared widgets, responsive grid, theme toggle, a11y)
 
 ---
 
@@ -112,4 +118,4 @@ Plans:
 | 7. Flutter Scaffold & Auth | 0/3 | Planned | - |
 | 8. Client Interface | 4/5 | In Progress|  |
 | 9. Staff Interface | 3/5 | In Progress|  |
-| 10. Cross-Platform Polish | 0/0 | Not Started | - |
+| 10. Cross-Platform Polish | 0/5 | Planned | - |
