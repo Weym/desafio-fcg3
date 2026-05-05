@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/providers/dio_provider.dart';
+import '../../../core/providers/cache_provider.dart';
 import '../models/chat_session_model.dart';
 import '../models/chat_message_model.dart';
 import '../models/action_log_model.dart';
@@ -17,7 +18,9 @@ ChatService chatService(Ref ref) {
 @riverpod
 Future<List<ChatSessionModel>> chatSessions(Ref ref) async {
   final service = ref.watch(chatServiceProvider);
-  return service.getSessions();
+  final sessions = await service.getSessions();
+  CacheTTL.schedule(ref, 'chatSessions');
+  return sessions;
 }
 
 @riverpod

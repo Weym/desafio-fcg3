@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/providers/dio_provider.dart';
+import '../../../core/providers/cache_provider.dart';
 import '../models/staff_dashboard_model.dart';
 import '../services/staff_dashboard_service.dart';
 
@@ -15,5 +16,7 @@ StaffDashboardService staffDashboardService(Ref ref) {
 @riverpod
 Future<StaffDashboardModel> staffDashboard(Ref ref) async {
   final service = ref.watch(staffDashboardServiceProvider);
-  return service.getDashboard();
+  final dashboard = await service.getDashboard();
+  CacheTTL.schedule(ref, 'staffDashboard');
+  return dashboard;
 }

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/providers/dio_provider.dart';
+import '../../../core/providers/cache_provider.dart';
 import '../../client/models/document_model.dart';
 import '../models/student_summary_model.dart';
 import '../services/staff_document_service.dart';
@@ -16,7 +17,9 @@ StaffDocumentService staffDocumentService(Ref ref) {
 @riverpod
 Future<List<DocumentModel>> staffDocuments(Ref ref) async {
   final service = ref.watch(staffDocumentServiceProvider);
-  return service.getDocuments();
+  final docs = await service.getDocuments();
+  CacheTTL.schedule(ref, 'staffDocuments');
+  return docs;
 }
 
 @riverpod
