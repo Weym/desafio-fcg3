@@ -15,7 +15,13 @@ import '../../features/client/screens/client_documents_screen.dart';
 import '../../features/client/screens/client_notifications_screen.dart';
 import '../../features/client/screens/client_support_screen.dart';
 import '../../features/staff/screens/staff_shell.dart';
-import '../../features/staff/screens/staff_home_screen.dart';
+import '../../features/staff/screens/staff_dashboard_screen.dart';
+import '../../features/staff/screens/staff_schedule_screen.dart';
+import '../../features/staff/screens/staff_appointment_detail_screen.dart';
+import '../../features/staff/screens/staff_ai_screen.dart';
+import '../../features/staff/screens/staff_chat_detail_screen.dart';
+import '../../features/staff/screens/staff_documents_screen.dart';
+import '../../features/client/models/appointment_model.dart';
 import 'route_names.dart';
 
 part 'app_router.g.dart';
@@ -144,47 +150,46 @@ GoRouter appRouter(Ref ref) {
           GoRoute(
             path: RoutePaths.staffDashboard,
             name: RouteNames.staffDashboard,
-            builder: (context, state) => const StaffHomeScreen(),
+            builder: (context, state) => const StaffDashboardScreen(),
           ),
           GoRoute(
             path: RoutePaths.staffSchedule,
             name: RouteNames.staffSchedule,
-            builder: (context, state) =>
-                const _PlaceholderScreen(title: 'Agenda'),
+            builder: (context, state) => const StaffScheduleScreen(),
+            routes: [
+              GoRoute(
+                path: ':appointmentId',
+                name: RouteNames.staffAppointmentDetail,
+                builder: (context, state) {
+                  final appointment = state.extra as AppointmentModel;
+                  return StaffAppointmentDetailScreen(
+                      appointment: appointment);
+                },
+              ),
+            ],
           ),
           GoRoute(
             path: RoutePaths.staffAI,
             name: RouteNames.staffAI,
-            builder: (context, state) =>
-                const _PlaceholderScreen(title: 'IA'),
+            builder: (context, state) => const StaffAiScreen(),
+            routes: [
+              GoRoute(
+                path: ':sessionId',
+                name: RouteNames.staffChatDetail,
+                builder: (context, state) {
+                  final sessionId = state.pathParameters['sessionId']!;
+                  return StaffChatDetailScreen(sessionId: sessionId);
+                },
+              ),
+            ],
           ),
           GoRoute(
             path: RoutePaths.staffDocuments,
             name: RouteNames.staffDocuments,
-            builder: (context, state) =>
-                const _PlaceholderScreen(title: 'Documentos'),
+            builder: (context, state) => const StaffDocumentsScreen(),
           ),
         ],
       ),
     ],
   );
-}
-
-/// Placeholder for staff screens not yet implemented (Phase 9)
-class _PlaceholderScreen extends StatelessWidget {
-  final String title;
-  const _PlaceholderScreen({required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(title)),
-      body: Center(
-        child: Text(
-          title,
-          style: Theme.of(context).textTheme.headlineMedium,
-        ),
-      ),
-    );
-  }
 }
