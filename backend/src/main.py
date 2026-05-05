@@ -6,6 +6,7 @@ import resend
 from fastapi import FastAPI, Request
 from fastapi.exceptions import HTTPException, RequestValidationError
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from slowapi.errors import RateLimitExceeded
 
 from src.shared.rate_limit import limiter, rate_limit_exceeded_handler
@@ -109,3 +110,8 @@ app.include_router(chat_router, prefix="/api/v1")
 @app.get("/health")
 async def health() -> dict[str, str]:
     return {"status": "ok"}
+
+
+# Static file serving for uploads (MVP — production should use nginx/CDN)
+os.makedirs("uploads/documents", exist_ok=True)
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")

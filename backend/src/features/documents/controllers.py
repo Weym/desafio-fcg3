@@ -1,6 +1,6 @@
 """Route handlers for the Documents feature slice.
 
-4 endpoints covering all DOCS-* requirements:
+5 endpoints covering all DOCS-* requirements:
 
 Student-facing (dual-auth for MCP access):
 - POST /documents — create document request (DOCS-03)
@@ -9,13 +9,16 @@ Student-facing (dual-auth for MCP access):
 
 Staff:
 - PUT /documents/{id}/status — update status and attach file URL (DOCS-04)
+- POST /documents/upload — staff file upload (DOCS-05)
 """
 
 from __future__ import annotations
 
+import os
+import uuid as uuid_mod
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, UploadFile, File, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.infrastructure.database import get_db_session
@@ -141,3 +144,66 @@ async def update_document_status(
     )
     await db.commit()
     return DocumentResponse.model_validate(document)
+
+
+# ------------------------------------------------------------------
+# DOCS-05: POST /documents/upload — staff file upload
+# ------------------------------------------------------------------
+
+UPLOAD_DIR = "uploads/documents"
+MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
+ALLOWED_EXTENSIONS = {".pdf", ".png", ".jpg", ".jpeg"}
+
+
+@documents_router.post("/upload")
+async def upload_document(
+    file: UploadFile = File(...),
+    user: UserContext = Depends(get_current_user_or_service),
+) -> dict:
+    """Upload a document file (staff only).
+
+    T-09-08: Validates file extension server-side (ALLOWED_EXTENSIONS).
+    T-09-09: Validates max file size (10MB) to prevent DoS.
+    Uses uuid prefix in filename to prevent path traversal.
+    """
+    require_staff(user)
+
+    # Validate extension
+    ext = os.path.splitext(file.filename or "")[1].lower()
+    if ext not in ALLOWED_EXTENSIONS:
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "error": {
+                    "code": "INVALID_FILE_TYPE",
+                    "message": f"Allowed types: PDF, PNG, JPG. Got: {ext}",
+                }
+            },
+        )
+
+    # Read and validate size
+    content = await file.read()
+    if len(content) > MAX_FILE_SIZE:
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "error": {
+                    "code": "FILE_TOO_LARGE",
+                    "message": "Maximum file size is 10MB",
+                }
+            },
+        )
+
+    # Save file with uuid prefix to prevent naming collisions and path traversal
+    os.makedirs(UPLOAD_DIR, exist_ok=True)
+    file_id = str(uuid_mod.uuid4())
+    safe_filename = f"{file_id}_{file.filename}"
+    file_path = os.path.join(UPLOAD_DIR, safe_filename)
+
+    with open(file_path, "wb") as f:
+        f.write(content)
+
+    return {
+        "url": f"/uploads/documents/{safe_filename}",
+        "filename": file.filename,
+    }
