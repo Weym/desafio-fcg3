@@ -39,9 +39,9 @@
 ### Non-Functional
 
 - [x] **UI-NFR-01**: Interface intuitiva priorizando clareza para o cliente
-- [ ] **UI-NFR-02**: Aplicação Flutter adaptável a smartphones, tablets e web
+- [x] **UI-NFR-02**: Aplicação Flutter adaptável a smartphones, tablets e web
 - [ ] **UI-NFR-03**: Autenticação com separação rigorosa de permissões e rotas entre Cliente e Fornecedor
-- [ ] **UI-NFR-04**: Sincronização eficiente dos dados do WhatsApp/IA com latência percebida < 2s para dados cacheados
+- [x] **UI-NFR-04**: Sincronização eficiente dos dados do WhatsApp/IA com latência percebida < 2s para dados cacheados
 
 ---
 
@@ -92,5 +92,5 @@
 | UI-F02 | Phase 9: Staff Interface | Complete |
 | UI-F03 | Phase 9: Staff Interface | Complete |
 | UI-F04 | Phase 9: Staff Interface | Complete |
-| UI-NFR-02 | Phase 10: Cross-Platform Polish | Pending |
-| UI-NFR-04 | Phase 10: Cross-Platform Polish | Pending |
+| UI-NFR-02 | Phase 10: Cross-Platform Polish | Complete |
+| UI-NFR-04 | Phase 10: Cross-Platform Polish | Complete |
