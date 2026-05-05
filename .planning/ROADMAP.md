@@ -77,8 +77,14 @@ Plans:
 3. AI Data Interaction screen shows structured information, summaries, and insights extracted from WhatsApp conversations (via chat sessions and MCP action logs endpoints).
 4. Document Management screen allows sending documents to client boards and managing pending document requests with status updates.
 
-### Plans
-*(Not yet planned)*
+**Plans:** 5 plans
+
+Plans:
+- [ ] 09-01-PLAN.md — Staff data layer (models, services, Riverpod providers + file_picker dep)
+- [ ] 09-02-PLAN.md — Dashboard screen (KPI grid) + Schedule screen (appointments + create slot)
+- [ ] 09-03-PLAN.md — AI Data screen (sessions list + statistics tabs + chat detail)
+- [ ] 09-04-PLAN.md — Document Management screen (filter + status update + send doc) + backend upload endpoint
+- [ ] 09-05-PLAN.md — Router wiring (replace placeholders, add sub-routes for detail screens)
 
 ---
 
