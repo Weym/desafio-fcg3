@@ -7,7 +7,7 @@ class UserModel {
   final String id;
   final String name;
   final String email;
-  @JsonKey(name: 'type')
+  @JsonKey(readValue: _readRole)
   final String role; // 'student' or 'staff'
   final String? phone;
 
@@ -26,3 +26,5 @@ class UserModel {
   bool get isStudent => role == 'student';
   bool get isStaff => role == 'staff';
 }
+
+Object? _readRole(Map json, String key) => json['role'] ?? json['type'];

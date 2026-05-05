@@ -7,18 +7,18 @@ part of 'auth_tokens.dart';
 // **************************************************************************
 
 AuthResponse _$AuthResponseFromJson(Map<String, dynamic> json) => AuthResponse(
-  token: json['token'] as String,
-  user: UserModel.fromJson(json['user'] as Map<String, dynamic>),
-  expiresAt: json['expires_at'] as String,
-  refreshToken: json['refresh_token'] as String?,
+  accessToken: json['access_token'] as String,
+  refreshToken: json['refresh_token'] as String,
+  tokenType: json['token_type'] as String,
+  expiresIn: (json['expires_in'] as num).toInt(),
 );
 
 Map<String, dynamic> _$AuthResponseToJson(AuthResponse instance) =>
     <String, dynamic>{
-      'token': instance.token,
-      'user': instance.user,
-      'expires_at': instance.expiresAt,
+      'access_token': instance.accessToken,
       'refresh_token': instance.refreshToken,
+      'token_type': instance.tokenType,
+      'expires_in': instance.expiresIn,
     };
 
 RequestCodeResponse _$RequestCodeResponseFromJson(Map<String, dynamic> json) =>
