@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 import resend
 from fastapi import FastAPI, Request
 from fastapi.exceptions import HTTPException, RequestValidationError
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from slowapi.errors import RateLimitExceeded
@@ -39,6 +40,14 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
 
 
 app = FastAPI(title="Desafio FCG3 - API", version="0.1.0", lifespan=lifespan)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$",
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Exception handlers — AppException (business logic) before slowapi/HTTP handlers
 register_exception_handlers(app)
@@ -91,7 +100,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     )
 
 # Routers
-app.include_router(auth_router)
+app.include_router(auth_router, prefix="/api/v1")
 app.include_router(students_router, prefix="/api/v1")
 app.include_router(courses_router, prefix="/api/v1")
 app.include_router(curriculum_router, prefix="/api/v1")
