@@ -1,12 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/router/route_names.dart';
 import '../../../core/responsive/breakpoints.dart';
 import '../../../shared/widgets/app_offline_banner.dart';
+import '../providers/staff_dashboard_provider.dart';
+import '../providers/staff_schedule_provider.dart';
+import '../providers/staff_document_provider.dart';
+import '../providers/staff_chat_provider.dart';
 
-class StaffShell extends StatelessWidget {
+class StaffShell extends ConsumerStatefulWidget {
   final Widget child;
   const StaffShell({super.key, required this.child});
+
+  @override
+  ConsumerState<StaffShell> createState() => _StaffShellState();
+}
+
+class _StaffShellState extends ConsumerState<StaffShell> {
+  @override
+  void initState() {
+    super.initState();
+    // Prefetch all staff providers after first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _prefetchAdjacentTabs();
+    });
+  }
+
+  void _prefetchAdjacentTabs() {
+    // Trigger provider reads in background — they'll cache for 5 min
+    ref.read(staffDashboardProvider);
+    ref.read(staffAppointmentsProvider);
+    ref.read(staffDocumentsProvider);
+    ref.read(staffChatSessionsProvider);
+  }
 
   int _currentIndex(BuildContext context) {
     final location = GoRouterState.of(context).matchedLocation;
@@ -87,7 +114,7 @@ class StaffShell extends StatelessWidget {
             body: Column(
               children: [
                 const AppOfflineBanner(),
-                Expanded(child: child),
+                Expanded(child: widget.child),
               ],
             ),
             bottomNavigationBar: BottomNavigationBar(
@@ -118,7 +145,7 @@ class StaffShell extends StatelessWidget {
                       destinations: _railDestinations,
                     ),
                     const VerticalDivider(width: 1, thickness: 1),
-                    Expanded(child: child),
+                    Expanded(child: widget.child),
                   ],
                 ),
               ),

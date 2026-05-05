@@ -1,12 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/router/route_names.dart';
 import '../../../core/responsive/breakpoints.dart';
 import '../../../shared/widgets/app_offline_banner.dart';
+import '../providers/chat_provider.dart';
+import '../providers/document_provider.dart';
+import '../providers/appointment_provider.dart';
 
-class ClientShell extends StatelessWidget {
+class ClientShell extends ConsumerStatefulWidget {
   final Widget child;
   const ClientShell({super.key, required this.child});
+
+  @override
+  ConsumerState<ClientShell> createState() => _ClientShellState();
+}
+
+class _ClientShellState extends ConsumerState<ClientShell> {
+  @override
+  void initState() {
+    super.initState();
+    // Prefetch all client providers after first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _prefetchAdjacentTabs();
+    });
+  }
+
+  void _prefetchAdjacentTabs() {
+    // Trigger provider reads in background — they'll cache for 5 min
+    ref.read(chatSessionsProvider);
+    ref.read(documentsProvider);
+    ref.read(appointmentsProvider);
+  }
 
   int _currentIndex(BuildContext context) {
     final location = GoRouterState.of(context).matchedLocation;
@@ -100,7 +125,7 @@ class ClientShell extends StatelessWidget {
             body: Column(
               children: [
                 const AppOfflineBanner(),
-                Expanded(child: child),
+                Expanded(child: widget.child),
               ],
             ),
             bottomNavigationBar: BottomNavigationBar(
@@ -131,7 +156,7 @@ class ClientShell extends StatelessWidget {
                       destinations: _railDestinations,
                     ),
                     const VerticalDivider(width: 1, thickness: 1),
-                    Expanded(child: child),
+                    Expanded(child: widget.child),
                   ],
                 ),
               ),
