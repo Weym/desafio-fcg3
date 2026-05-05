@@ -87,13 +87,28 @@ async def generate_and_send_code(session: AsyncSession, email: str) -> Generated
                 f"Valido por {settings.otp_expiry_seconds // 60} minutos.</p>"
             ),
         }
-        await resend.Emails.send_async(params)
+        try:
+            await resend.Emails.send_async(params)
+        except Exception as exc:
+            # D-08 timing parity + availability: never leak Resend status to client.
+            # Row is already persisted; user can still verify if they obtain the code
+            # (via logs in dev or via email once Resend is configured in prod).
+            log.warning("Resend send failed (non-fatal): %s", exc)
     # else: P-04 — silent drop, still persisted a dummy row to equalize timing
 
     return GeneratedCode(plaintext=plaintext, expires_at=expires_at)
 
 
 def verify_code_hash(submitted: str, stored_hash: str, stored_salt: str) -> bool:
-    """Compare submitted code against stored hash using the same salt (constant-time)."""
+    """Compare submitted code against stored hash using the same salt (constant-time).
+
+    DEV ONLY: if settings.dev_master_otp is set AND matches the submitted code,
+    the hash check is bypassed. This must be unset (DEV_MASTER_OTP env var absent)
+    in any non-development environment.
+    """
+    settings = get_settings()
+    if settings.dev_master_otp and hmac.compare_digest(submitted, settings.dev_master_otp):
+        log.warning("DEV_MASTER_OTP bypass used for OTP verification")
+        return True
     computed = _hash_code(submitted, stored_salt)
     return hmac.compare_digest(computed, stored_hash)

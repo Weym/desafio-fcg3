@@ -52,9 +52,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (!_emailFormKey.currentState!.validate()) return;
     setState(() => _isSubmitting = true);
 
-    final result = await ref.read(authProvider.notifier).requestCode(
-      _emailController.text.trim(),
-    );
+    final result = await ref
+        .read(authProvider.notifier)
+        .requestCode(_emailController.text.trim());
 
     setState(() => _isSubmitting = false);
 
@@ -80,10 +80,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     setState(() => _isSubmitting = true);
 
-    final result = await ref.read(authProvider.notifier).verifyCode(
-      _emailController.text.trim(),
-      code,
-    );
+    final result = await ref
+        .read(authProvider.notifier)
+        .verifyCode(_emailController.text.trim(), code);
 
     setState(() => _isSubmitting = false);
 
@@ -100,7 +99,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (authState is AuthError) {
       message = authState.message;
       if (authState.attemptsRemaining != null) {
-        message = '$message (${authState.attemptsRemaining} tentativas restantes)';
+        message =
+            '$message (${authState.attemptsRemaining} tentativas restantes)';
       }
     }
 
@@ -122,9 +122,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Future<void> _resendCode() async {
     if (!_canResend) return;
     setState(() => _isSubmitting = true);
-    await ref.read(authProvider.notifier).requestCode(
-      _emailController.text.trim(),
-    );
+    await ref
+        .read(authProvider.notifier)
+        .requestCode(_emailController.text.trim());
     setState(() => _isSubmitting = false);
     _startResendCountdown();
   }
@@ -184,10 +184,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         key: const ValueKey('email_step'),
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            'Entrar',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
+          Text('Entrar', style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 8),
           Text(
             'Informe seu email institucional para receber o codigo de verificacao.',

@@ -60,6 +60,8 @@ services:
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
       FCM_CREDENTIALS_PATH: ${FCM_CREDENTIALS_PATH}
       FASTAPI_URL: ${FASTAPI_URL}
+      # DEV ONLY — remove before any non-dev deploy.
+      DEV_MASTER_OTP: ${DEV_MASTER_OTP:-}
     volumes:
       - ./backend/src:/app/src
       - ./backend/scripts:/app/scripts

@@ -136,6 +136,8 @@ class _UpdateStatusSheetState extends ConsumerState<_UpdateStatusSheet> {
             initialValue: _selectedStatus,
             items: const [
               DropdownMenuItem(
+                  value: 'requested', child: Text('Solicitado')),
+              DropdownMenuItem(
                   value: 'processing', child: Text('Processando')),
               DropdownMenuItem(value: 'ready', child: Text('Pronto')),
               DropdownMenuItem(value: 'delivered', child: Text('Entregue')),

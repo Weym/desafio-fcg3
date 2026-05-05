@@ -84,3 +84,10 @@ class ChatService:
             select(func.count(ChatSession.id)).where(ChatSession.id == session_id)
         )
         return (result.scalar() or 0) > 0
+
+    async def get_session(self, session_id: UUID, db: AsyncSession) -> Optional[ChatSession]:
+        """Fetch a session by id for ownership checks; None if not found."""
+        result = await db.execute(
+            select(ChatSession).where(ChatSession.id == session_id)
+        )
+        return result.scalar_one_or_none()

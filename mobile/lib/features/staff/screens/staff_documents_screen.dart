@@ -4,6 +4,7 @@ import '../../../shared/widgets/app_skeleton_list.dart';
 import '../../../shared/widgets/app_empty_state.dart';
 import '../../../shared/widgets/app_error_state.dart';
 import '../../../shared/widgets/responsive_container.dart';
+import '../../auth/providers/auth_provider.dart';
 import '../../client/models/document_model.dart';
 import '../providers/staff_document_provider.dart';
 import 'widgets/send_document_sheet.dart';
@@ -20,6 +21,13 @@ class StaffDocumentsScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Documentos'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () => ref.read(authProvider.notifier).logout(),
+            tooltip: 'Sair',
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => showSendDocumentSheet(context, ref),
