@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/responsive/breakpoints.dart';
+import '../../../shared/widgets/app_skeleton_list.dart';
+import '../../../shared/widgets/app_empty_state.dart';
+import '../../../shared/widgets/app_error_state.dart';
+import '../../../shared/widgets/responsive_container.dart';
 import '../models/chat_session_model.dart';
 import '../models/chat_message_model.dart';
 import '../providers/chat_provider.dart';
@@ -31,20 +35,14 @@ class _ClientChatScreenState extends ConsumerState<ClientChatScreen> {
         title: const Text('Chat'),
       ),
       body: sessionsAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.error_outline, size: 48),
-              const SizedBox(height: 16),
-              Text('Erro ao carregar sessoes: $error'),
-              const SizedBox(height: 8),
-              ElevatedButton(
-                onPressed: () => ref.invalidate(chatSessionsProvider),
-                child: const Text('Tentar novamente'),
-              ),
-            ],
+        loading: () => const ResponsiveContainer(
+          padding: EdgeInsets.all(16),
+          child: AppSkeletonList(itemCount: 5, itemHeight: 72),
+        ),
+        error: (error, stack) => ResponsiveContainer(
+          padding: const EdgeInsets.all(16),
+          child: AppErrorState(
+            onRetry: () => ref.invalidate(chatSessionsProvider),
           ),
         ),
         data: (sessions) {
@@ -52,22 +50,11 @@ class _ClientChatScreenState extends ConsumerState<ClientChatScreen> {
             return RefreshIndicator(
               onRefresh: _onRefresh,
               child: ListView(
-                children: [
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.6,
-                    child: const Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.smart_toy_outlined, size: 64, color: Colors.grey),
-                          SizedBox(height: 16),
-                          Text(
-                            'Nenhuma sessao de chat',
-                            style: TextStyle(fontSize: 16, color: Colors.grey),
-                          ),
-                        ],
-                      ),
-                    ),
+                children: const [
+                  SizedBox(height: 120),
+                  AppEmptyState(
+                    icon: Icons.chat_bubble_outline,
+                    message: 'Nenhuma conversa encontrada',
                   ),
                 ],
               ),
@@ -78,65 +65,83 @@ class _ClientChatScreenState extends ConsumerState<ClientChatScreen> {
             ..sort((a, b) => b.startedAt.compareTo(a.startedAt));
 
           if (isDesktop) {
-            return Row(
+            return Column(
               children: [
-                SizedBox(
-                  width: MediaQuery.sizeOf(context).width * 0.35,
-                  child: RefreshIndicator(
-                    onRefresh: _onRefresh,
-                    child: ListView.builder(
-                      padding: const EdgeInsets.all(8),
-                      itemCount: sorted.length,
-                      itemBuilder: (context, index) {
-                        final session = sorted[index];
-                        return _SessionCard(
-                          session: session,
-                          selected: session.id == _selectedSessionId,
-                          onTap: () {
-                            setState(() => _selectedSessionId = session.id);
-                          },
-                        );
-                      },
-                    ),
-                  ),
-                ),
-                const VerticalDivider(width: 1, thickness: 1),
+                if (sessionsAsync.isRefreshing)
+                  const LinearProgressIndicator(),
                 Expanded(
-                  child: _selectedSessionId != null
-                      ? _DetailPanel(sessionId: _selectedSessionId!)
-                      : const Center(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.chat_outlined, size: 64, color: Colors.grey),
-                              SizedBox(height: 16),
-                              Text(
-                                'Selecione uma conversa',
-                                style: TextStyle(fontSize: 16, color: Colors.grey),
-                              ),
-                            ],
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        width: MediaQuery.sizeOf(context).width * 0.35,
+                        child: RefreshIndicator(
+                          onRefresh: _onRefresh,
+                          child: ListView.builder(
+                            padding: const EdgeInsets.all(8),
+                            itemCount: sorted.length,
+                            itemBuilder: (context, index) {
+                              final session = sorted[index];
+                              return _SessionCard(
+                                session: session,
+                                selected: session.id == _selectedSessionId,
+                                onTap: () {
+                                  setState(() => _selectedSessionId = session.id);
+                                },
+                              );
+                            },
                           ),
                         ),
+                      ),
+                      const VerticalDivider(width: 1, thickness: 1),
+                      Expanded(
+                        child: _selectedSessionId != null
+                            ? _DetailPanel(sessionId: _selectedSessionId!)
+                            : const Center(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.chat_outlined, size: 64, color: Colors.grey),
+                                    SizedBox(height: 16),
+                                    Text(
+                                      'Selecione uma conversa',
+                                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             );
           }
 
           // Phone/Tablet: existing single-column with GoRouter navigation
-          return RefreshIndicator(
-            onRefresh: _onRefresh,
-            child: ListView.builder(
-              padding: const EdgeInsets.all(8),
-              itemCount: sorted.length,
-              itemBuilder: (context, index) {
-                final session = sorted[index];
-                return _SessionCard(
-                  session: session,
-                  selected: false,
-                  onTap: () => context.go('/client/chat/${session.id}'),
-                );
-              },
-            ),
+          return Column(
+            children: [
+              if (sessionsAsync.isRefreshing)
+                const LinearProgressIndicator(),
+              Expanded(
+                child: RefreshIndicator(
+                  onRefresh: _onRefresh,
+                  child: ResponsiveContainer(
+                    padding: const EdgeInsets.all(8),
+                    child: ListView.builder(
+                      itemCount: sorted.length,
+                      itemBuilder: (context, index) {
+                        final session = sorted[index];
+                        return _SessionCard(
+                          session: session,
+                          selected: false,
+                          onTap: () => context.go('/client/chat/${session.id}'),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ],
           );
         },
       ),
@@ -209,31 +214,15 @@ class _MessagesPanel extends ConsumerWidget {
     final messagesAsync = ref.watch(chatMessagesProvider(sessionId));
 
     return messagesAsync.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, stack) => Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.error_outline, size: 48),
-            const SizedBox(height: 16),
-            Text('Erro ao carregar mensagens: $error'),
-          ],
-        ),
+      loading: () => const AppSkeletonList(itemCount: 5, itemHeight: 56),
+      error: (error, stack) => AppErrorState(
+        onRetry: () => ref.invalidate(chatMessagesProvider(sessionId)),
       ),
       data: (messages) {
         if (messages.isEmpty) {
-          return const Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.chat_bubble_outline, size: 64, color: Colors.grey),
-                SizedBox(height: 16),
-                Text(
-                  'Nenhuma mensagem',
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
-                ),
-              ],
-            ),
+          return const AppEmptyState(
+            icon: Icons.chat_bubble_outline,
+            message: 'Nenhuma mensagem',
           );
         }
 
@@ -259,31 +248,15 @@ class _ActionsPanel extends ConsumerWidget {
     final actionsAsync = ref.watch(actionLogsProvider(sessionId));
 
     return actionsAsync.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, stack) => Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.error_outline, size: 48),
-            const SizedBox(height: 16),
-            Text('Erro ao carregar acoes: $error'),
-          ],
-        ),
+      loading: () => const AppSkeletonList(itemCount: 3, itemHeight: 56),
+      error: (error, stack) => AppErrorState(
+        onRetry: () => ref.invalidate(actionLogsProvider(sessionId)),
       ),
       data: (logs) {
         if (logs.isEmpty) {
-          return const Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.history_outlined, size: 64, color: Colors.grey),
-                SizedBox(height: 16),
-                Text(
-                  'Nenhuma acao registrada',
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
-                ),
-              ],
-            ),
+          return const AppEmptyState(
+            icon: Icons.history_outlined,
+            message: 'Nenhuma acao registrada',
           );
         }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../shared/widgets/responsive_container.dart';
 
 const _supportEmail = 'suporte@universidade.edu';
 const _supportPhone = '+55 21 99999-9999';
@@ -18,9 +19,10 @@ class ClientSupportScreen extends StatelessWidget {
         title: const Text('Suporte'),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          children: [
+        child: ResponsiveContainer(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            children: [
             const SizedBox(height: 16),
             Icon(
               Icons.support_agent,
@@ -115,6 +117,7 @@ class ClientSupportScreen extends StatelessWidget {
               ],
             ),
           ],
+          ),
         ),
       ),
     );

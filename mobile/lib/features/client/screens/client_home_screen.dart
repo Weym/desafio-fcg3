@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/router/route_names.dart';
+import '../../../shared/widgets/app_skeleton_card.dart';
+import '../../../shared/widgets/responsive_container.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../auth/providers/auth_state.dart';
 import '../providers/chat_provider.dart';
@@ -60,21 +62,23 @@ class ClientHomeScreen extends ConsumerWidget {
         onRefresh: () => _onRefresh(ref),
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Ola, $userName!',
-                style: theme.textTheme.headlineSmall,
-              ),
-              const SizedBox(height: 24),
-              _buildChatCard(context, chatSessionsAsync),
-              const SizedBox(height: 12),
-              _buildAppointmentCard(context, appointmentsAsync),
-              const SizedBox(height: 12),
-              _buildDocumentCard(context, documentsAsync),
-            ],
+          child: ResponsiveContainer(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Ola, $userName!',
+                  style: theme.textTheme.headlineSmall,
+                ),
+                const SizedBox(height: 24),
+                _buildChatCard(context, chatSessionsAsync),
+                const SizedBox(height: 12),
+                _buildAppointmentCard(context, appointmentsAsync),
+                const SizedBox(height: 12),
+                _buildDocumentCard(context, documentsAsync),
+              ],
+            ),
           ),
         ),
       ),
@@ -86,13 +90,7 @@ class ClientHomeScreen extends ConsumerWidget {
     AsyncValue<List<ChatSessionModel>> asyncValue,
   ) {
     return asyncValue.when(
-      loading: () => _DashboardCard(
-        icon: Icons.smart_toy_outlined,
-        iconColor: Theme.of(context).colorScheme.primary,
-        title: 'Ultima atividade do bot',
-        subtitle: 'Carregando...',
-        onTap: () {},
-      ),
+      loading: () => const AppSkeletonCard(height: 80),
       error: (error, stack) => _DashboardCard(
         icon: Icons.smart_toy_outlined,
         iconColor: Theme.of(context).colorScheme.primary,
@@ -125,13 +123,7 @@ class ClientHomeScreen extends ConsumerWidget {
     AsyncValue<List<AppointmentModel>> asyncValue,
   ) {
     return asyncValue.when(
-      loading: () => _DashboardCard(
-        icon: Icons.calendar_today_outlined,
-        iconColor: Theme.of(context).colorScheme.tertiary,
-        title: 'Proximo agendamento',
-        subtitle: 'Carregando...',
-        onTap: () {},
-      ),
+      loading: () => const AppSkeletonCard(height: 80),
       error: (error, stack) => _DashboardCard(
         icon: Icons.calendar_today_outlined,
         iconColor: Theme.of(context).colorScheme.tertiary,
@@ -166,13 +158,7 @@ class ClientHomeScreen extends ConsumerWidget {
     AsyncValue<List<DocumentModel>> asyncValue,
   ) {
     return asyncValue.when(
-      loading: () => _DashboardCard(
-        icon: Icons.description_outlined,
-        iconColor: Theme.of(context).colorScheme.secondary,
-        title: 'Status de documentos',
-        subtitle: 'Carregando...',
-        onTap: () {},
-      ),
+      loading: () => const AppSkeletonCard(height: 80),
       error: (error, stack) => _DashboardCard(
         icon: Icons.description_outlined,
         iconColor: Theme.of(context).colorScheme.secondary,

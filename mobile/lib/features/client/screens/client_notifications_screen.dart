@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../shared/widgets/app_skeleton_list.dart';
+import '../../../shared/widgets/app_empty_state.dart';
+import '../../../shared/widgets/app_error_state.dart';
+import '../../../shared/widgets/responsive_container.dart';
 import '../providers/notification_provider.dart';
 import '../providers/document_provider.dart';
 import '../providers/appointment_provider.dart';
@@ -27,32 +31,16 @@ class ClientNotificationsScreen extends ConsumerWidget {
       body: RefreshIndicator(
         onRefresh: () => _onRefresh(ref),
         child: notificationsAsync.when(
-          loading: () => const Center(
-            child: CircularProgressIndicator(),
+          loading: () => const ResponsiveContainer(
+            padding: EdgeInsets.all(16),
+            child: AppSkeletonList(itemCount: 5, itemHeight: 72),
           ),
           error: (error, stack) => ListView(
             children: [
-              const SizedBox(height: 120),
-              Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.error_outline,
-                      size: 64,
-                      color: Theme.of(context).colorScheme.error,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Erro ao carregar notificacoes',
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                    const SizedBox(height: 8),
-                    TextButton(
-                      onPressed: () => _onRefresh(ref),
-                      child: const Text('Tentar novamente'),
-                    ),
-                  ],
+              ResponsiveContainer(
+                padding: const EdgeInsets.all(16),
+                child: AppErrorState(
+                  onRetry: () => _onRefresh(ref),
                 ),
               ),
             ],
@@ -60,41 +48,31 @@ class ClientNotificationsScreen extends ConsumerWidget {
           data: (notifications) {
             if (notifications.isEmpty) {
               return ListView(
-                children: [
-                  const SizedBox(height: 120),
-                  Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.notifications_off_outlined,
-                          size: 64,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurfaceVariant,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Sem notificacoes no momento',
-                          style:
-                              Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurfaceVariant,
-                                  ),
-                        ),
-                      ],
-                    ),
+                children: const [
+                  SizedBox(height: 120),
+                  AppEmptyState(
+                    icon: Icons.notifications_none,
+                    message: 'Nenhuma notificacao',
                   ),
                 ],
               );
             }
 
-            return ListView.builder(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              itemCount: notifications.length,
-              itemBuilder: (context, index) =>
-                  _NotificationItem(notification: notifications[index]),
+            return Column(
+              children: [
+                if (notificationsAsync.isRefreshing)
+                  const LinearProgressIndicator(),
+                Expanded(
+                  child: ResponsiveContainer(
+                    child: ListView.builder(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      itemCount: notifications.length,
+                      itemBuilder: (context, index) =>
+                          _NotificationItem(notification: notifications[index]),
+                    ),
+                  ),
+                ),
+              ],
             );
           },
         ),
