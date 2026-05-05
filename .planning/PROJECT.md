@@ -109,6 +109,7 @@ Aluno envia mensagem no WhatsApp e recebe resposta precisa sobre sua situação 
 - M2 (v2.0) started: Flutter Frontend — 4 phases planned (Phase 7-10)
   - Phase 7: Flutter scaffold, OTP auth, role-based navigation, GoRouter + Riverpod
   - Phase 8: 6 client screens (Dashboard, Chat, Documents, Notifications, Support) — complete
+  - Phase 9: 4 staff screens (Dashboard KPIs, Schedule, AI Data, Document Management) — complete
 
 ## Evolution
 
@@ -128,4 +129,4 @@ Este documento evolui a cada transição de fase e marco de milestone.
 4. Atualizar Context com estado atual
 
 ---
-*Last updated: 2026-05-04 — Phase 8 (Client Interface) complete, 6 client screens functional*
+*Last updated: 2026-05-05 — Phase 9 (Staff Interface) complete, 4 staff screens with KPIs, schedule management, AI insights, and document management*
