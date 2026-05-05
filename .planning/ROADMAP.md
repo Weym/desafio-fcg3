@@ -77,12 +77,12 @@ Plans:
 3. AI Data Interaction screen shows structured information, summaries, and insights extracted from WhatsApp conversations (via chat sessions and MCP action logs endpoints).
 4. Document Management screen allows sending documents to client boards and managing pending document requests with status updates.
 
-**Plans:** 2/5 plans executed
+**Plans:** 3/5 plans executed
 
 Plans:
 - [x] 09-01-PLAN.md — Staff data layer (models, services, Riverpod providers + file_picker dep)
 - [x] 09-02-PLAN.md — Dashboard screen (KPI grid) + Schedule screen (appointments + create slot)
-- [ ] 09-03-PLAN.md — AI Data screen (sessions list + statistics tabs + chat detail)
+- [x] 09-03-PLAN.md — AI Data screen (sessions list + statistics tabs + chat detail)
 - [ ] 09-04-PLAN.md — Document Management screen (filter + status update + send doc) + backend upload endpoint
 - [ ] 09-05-PLAN.md — Router wiring (replace placeholders, add sub-routes for detail screens)
 
@@ -111,5 +111,5 @@ Plans:
 |-------|----------------|--------|-----------|
 | 7. Flutter Scaffold & Auth | 0/3 | Planned | - |
 | 8. Client Interface | 4/5 | In Progress|  |
-| 9. Staff Interface | 2/5 | In Progress|  |
+| 9. Staff Interface | 3/5 | In Progress|  |
 | 10. Cross-Platform Polish | 0/0 | Not Started | - |

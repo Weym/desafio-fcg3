@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-05-05T03:08:43.148Z"
+last_updated: "2026-05-05T03:22:14.667Z"
 last_activity: 2026-05-05
 progress:
   total_phases: 4
   completed_phases: 2
   total_plans: 13
-  completed_plans: 10
-  percent: 77
+  completed_plans: 11
+  percent: 85
 ---
 
 # Project State
@@ -18,7 +18,7 @@ progress:
 ## Current Position
 
 Phase: 09 (staff-interface) — EXECUTING
-Plan: 3 of 5
+Plan: 4 of 5
 Status: Ready to execute
 Last activity: 2026-05-05
 
@@ -63,6 +63,8 @@ Recent decisions affecting current work:
 - [Phase 09]: Staff-specific models only for staff-unique API responses (dashboard KPIs, scheduling slots, student summary)
 - [Phase 09]: Dashboard screen kept separate from staff_home_screen.dart; Plan 05 handles router swap
 - [Phase 09]: Confirmation dialogs use barrierDismissible: false for deliberate staff actions (threat T-09-04)
+- [Phase 09]: Staff chat detail reuses same layout pattern as ClientChatDetailScreen with staff-specific providers
+- [Phase 09]: Statistics tab shows numeric counters only (no charts) per D-12 to avoid extra dependencies
 
 ### Key Decisions Pending
 
