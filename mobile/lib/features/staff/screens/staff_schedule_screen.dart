@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../shared/widgets/app_skeleton_list.dart';
+import '../../../shared/widgets/app_empty_state.dart';
+import '../../../shared/widgets/app_error_state.dart';
+import '../../../shared/widgets/responsive_container.dart';
 import '../../client/models/appointment_model.dart';
 import '../providers/staff_schedule_provider.dart';
 import 'widgets/create_slot_sheet.dart';
@@ -61,71 +65,53 @@ class StaffScheduleScreen extends ConsumerWidget {
           // Appointment list
           Expanded(
             child: appointmentsAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, stack) => Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.error_outline, size: 48),
-                    const SizedBox(height: 16),
-                    const Text('Erro ao carregar agendamentos'),
-                    const SizedBox(height: 8),
-                    ElevatedButton(
-                      onPressed: () =>
-                          ref.invalidate(staffAppointmentsProvider),
-                      child: const Text('Tentar novamente'),
-                    ),
-                  ],
+              loading: () => const ResponsiveContainer(
+                padding: EdgeInsets.all(16),
+                child: AppSkeletonList(itemCount: 5, itemHeight: 72),
+              ),
+              error: (error, stack) => ResponsiveContainer(
+                padding: const EdgeInsets.all(16),
+                child: AppErrorState(
+                  onRetry: () => ref.invalidate(staffAppointmentsProvider),
                 ),
               ),
               data: (appointments) {
                 final filtered = _applyFilter(appointments, filter);
                 if (filtered.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.calendar_today_outlined,
-                          size: 64,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurfaceVariant
-                              .withValues(alpha: 0.5),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Nenhum agendamento encontrado',
-                          style:
-                              Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurfaceVariant,
-                                  ),
-                        ),
-                      ],
-                    ),
+                  return const AppEmptyState(
+                    icon: Icons.calendar_today,
+                    message: 'Nenhum agendamento',
                   );
                 }
-                return RefreshIndicator(
-                  onRefresh: () async {
-                    ref.invalidate(staffAppointmentsProvider);
-                    await ref.read(staffAppointmentsProvider.future);
-                  },
-                  child: ListView.builder(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    itemCount: filtered.length,
-                    itemBuilder: (context, index) => _AppointmentCard(
-                      appointment: filtered[index],
-                      onTap: () => context.push(
-                        '/staff/schedule/${filtered[index].id}',
-                        extra: filtered[index],
+                return Column(
+                  children: [
+                    if (appointmentsAsync.isRefreshing)
+                      const LinearProgressIndicator(),
+                    Expanded(
+                      child: RefreshIndicator(
+                        onRefresh: () async {
+                          ref.invalidate(staffAppointmentsProvider);
+                          await ref.read(staffAppointmentsProvider.future);
+                        },
+                        child: ResponsiveContainer(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                          child: ListView.builder(
+                            itemCount: filtered.length,
+                            itemBuilder: (context, index) => _AppointmentCard(
+                              appointment: filtered[index],
+                              onTap: () => context.push(
+                                '/staff/schedule/${filtered[index].id}',
+                                extra: filtered[index],
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                  ],
                 );
               },
             ),

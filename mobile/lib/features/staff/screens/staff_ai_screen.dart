@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/responsive/breakpoints.dart';
+import '../../../shared/widgets/app_skeleton_list.dart';
+import '../../../shared/widgets/app_empty_state.dart';
+import '../../../shared/widgets/app_error_state.dart';
+import '../../../shared/widgets/responsive_container.dart';
 import '../../client/models/chat_session_model.dart';
 import '../../client/models/chat_message_model.dart';
 import '../providers/staff_chat_provider.dart';
@@ -83,65 +87,26 @@ class _SessionsTab extends ConsumerWidget {
     final sessionsAsync = ref.watch(staffChatSessionsProvider);
 
     return sessionsAsync.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, stack) => ListView(
-        children: [
-          SizedBox(
-            height: MediaQuery.of(context).size.height * 0.6,
-            child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.error_outline, size: 48),
-                  const SizedBox(height: 16),
-                  const Text('Erro ao carregar sessoes'),
-                  const SizedBox(height: 8),
-                  ElevatedButton(
-                    onPressed: () =>
-                        ref.invalidate(staffChatSessionsProvider),
-                    child: const Text('Tentar novamente'),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
+      loading: () => const ResponsiveContainer(
+        padding: EdgeInsets.all(16),
+        child: AppSkeletonList(itemCount: 5, itemHeight: 72),
+      ),
+      error: (error, stack) => ResponsiveContainer(
+        padding: const EdgeInsets.all(16),
+        child: AppErrorState(
+          onRetry: () => ref.invalidate(staffChatSessionsProvider),
+        ),
       ),
       data: (sessions) {
         if (sessions.isEmpty) {
           return RefreshIndicator(
             onRefresh: () => _onRefresh(ref),
             child: ListView(
-              children: [
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.6,
-                  child: Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.chat_bubble_outline,
-                          size: 64,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurfaceVariant
-                              .withValues(alpha: 0.5),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Nenhuma sessao registrada',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyLarge
-                              ?.copyWith(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSurfaceVariant,
-                              ),
-                        ),
-                      ],
-                    ),
-                  ),
+              children: const [
+                SizedBox(height: 120),
+                AppEmptyState(
+                  icon: Icons.chat_bubble_outline,
+                  message: 'Nenhuma conversa encontrada',
                 ),
               ],
             ),
@@ -152,63 +117,81 @@ class _SessionsTab extends ConsumerWidget {
           ..sort((a, b) => b.startedAt.compareTo(a.startedAt));
 
         if (isDesktop) {
-          return Row(
+          return Column(
             children: [
-              SizedBox(
-                width: MediaQuery.sizeOf(context).width * 0.35,
-                child: RefreshIndicator(
-                  onRefresh: () => _onRefresh(ref),
-                  child: ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: sorted.length,
-                    itemBuilder: (context, index) {
-                      final session = sorted[index];
-                      return _SessionCard(
-                        session: session,
-                        selected: session.id == selectedSessionId,
-                        onTap: () => onSessionSelected(session.id),
-                      );
-                    },
-                  ),
-                ),
-              ),
-              const VerticalDivider(width: 1, thickness: 1),
+              if (sessionsAsync.isRefreshing)
+                const LinearProgressIndicator(),
               Expanded(
-                child: selectedSessionId != null
-                    ? _ChatDetailPanel(sessionId: selectedSessionId!)
-                    : const Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.psychology_outlined, size: 64, color: Colors.grey),
-                            SizedBox(height: 16),
-                            Text(
-                              'Selecione uma sessao',
-                              style: TextStyle(fontSize: 16, color: Colors.grey),
-                            ),
-                          ],
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: MediaQuery.sizeOf(context).width * 0.35,
+                      child: RefreshIndicator(
+                        onRefresh: () => _onRefresh(ref),
+                        child: ListView.builder(
+                          padding: const EdgeInsets.all(16),
+                          itemCount: sorted.length,
+                          itemBuilder: (context, index) {
+                            final session = sorted[index];
+                            return _SessionCard(
+                              session: session,
+                              selected: session.id == selectedSessionId,
+                              onTap: () => onSessionSelected(session.id),
+                            );
+                          },
                         ),
                       ),
+                    ),
+                    const VerticalDivider(width: 1, thickness: 1),
+                    Expanded(
+                      child: selectedSessionId != null
+                          ? _ChatDetailPanel(sessionId: selectedSessionId!)
+                          : const Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.psychology_outlined, size: 64, color: Colors.grey),
+                                  SizedBox(height: 16),
+                                  Text(
+                                    'Selecione uma sessao',
+                                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                                  ),
+                                ],
+                              ),
+                            ),
+                    ),
+                  ],
+                ),
               ),
             ],
           );
         }
 
         // Phone/Tablet: existing single-column with GoRouter navigation
-        return RefreshIndicator(
-          onRefresh: () => _onRefresh(ref),
-          child: ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: sorted.length,
-            itemBuilder: (context, index) {
-              final session = sorted[index];
-              return _SessionCard(
-                session: session,
-                selected: false,
-                onTap: () => context.push('/staff/ai/${session.id}'),
-              );
-            },
-          ),
+        return Column(
+          children: [
+            if (sessionsAsync.isRefreshing)
+              const LinearProgressIndicator(),
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: () => _onRefresh(ref),
+                child: ResponsiveContainer(
+                  padding: const EdgeInsets.all(16),
+                  child: ListView.builder(
+                    itemCount: sorted.length,
+                    itemBuilder: (context, index) {
+                      final session = sorted[index];
+                      return _SessionCard(
+                        session: session,
+                        selected: false,
+                        onTap: () => context.push('/staff/ai/${session.id}'),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
+          ],
         );
       },
     );
@@ -279,37 +262,15 @@ class _MessagesPanel extends ConsumerWidget {
     final messagesAsync = ref.watch(staffChatMessagesProvider(sessionId));
 
     return messagesAsync.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, stack) => Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.error_outline, size: 48),
-            const SizedBox(height: 16),
-            const Text('Erro ao carregar mensagens'),
-            const SizedBox(height: 8),
-            ElevatedButton(
-              onPressed: () =>
-                  ref.invalidate(staffChatMessagesProvider(sessionId)),
-              child: const Text('Tentar novamente'),
-            ),
-          ],
-        ),
+      loading: () => const AppSkeletonList(itemCount: 5, itemHeight: 56),
+      error: (error, stack) => AppErrorState(
+        onRetry: () => ref.invalidate(staffChatMessagesProvider(sessionId)),
       ),
       data: (messages) {
         if (messages.isEmpty) {
-          return const Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.chat_bubble_outline, size: 64, color: Colors.grey),
-                SizedBox(height: 16),
-                Text(
-                  'Nenhuma mensagem nesta sessao',
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
-                ),
-              ],
-            ),
+          return const AppEmptyState(
+            icon: Icons.chat_bubble_outline,
+            message: 'Nenhuma mensagem nesta sessao',
           );
         }
 
@@ -339,37 +300,15 @@ class _ActionsPanel extends ConsumerWidget {
     final actionsAsync = ref.watch(staffActionLogsProvider(sessionId));
 
     return actionsAsync.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, stack) => Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.error_outline, size: 48),
-            const SizedBox(height: 16),
-            const Text('Erro ao carregar acoes'),
-            const SizedBox(height: 8),
-            ElevatedButton(
-              onPressed: () =>
-                  ref.invalidate(staffActionLogsProvider(sessionId)),
-              child: const Text('Tentar novamente'),
-            ),
-          ],
-        ),
+      loading: () => const AppSkeletonList(itemCount: 3, itemHeight: 56),
+      error: (error, stack) => AppErrorState(
+        onRetry: () => ref.invalidate(staffActionLogsProvider(sessionId)),
       ),
       data: (logs) {
         if (logs.isEmpty) {
-          return const Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.history_outlined, size: 64, color: Colors.grey),
-                SizedBox(height: 16),
-                Text(
-                  'Nenhuma acao registrada',
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
-                ),
-              ],
-            ),
+          return const AppEmptyState(
+            icon: Icons.history_outlined,
+            message: 'Nenhuma acao registrada',
           );
         }
 
@@ -567,20 +506,14 @@ class _StatisticsTab extends ConsumerWidget {
     final statsAsync = ref.watch(staffChatStatisticsProvider);
 
     return statsAsync.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, stack) => Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.error_outline, size: 48),
-            const SizedBox(height: 16),
-            const Text('Erro ao carregar estatisticas'),
-            const SizedBox(height: 8),
-            ElevatedButton(
-              onPressed: () => ref.invalidate(staffChatStatisticsProvider),
-              child: const Text('Tentar novamente'),
-            ),
-          ],
+      loading: () => const ResponsiveContainer(
+        padding: EdgeInsets.all(16),
+        child: AppSkeletonList(itemCount: 3, itemHeight: 80),
+      ),
+      error: (error, stack) => ResponsiveContainer(
+        padding: const EdgeInsets.all(16),
+        child: AppErrorState(
+          onRetry: () => ref.invalidate(staffChatStatisticsProvider),
         ),
       ),
       data: (data) {
@@ -589,31 +522,13 @@ class _StatisticsTab extends ConsumerWidget {
         final closedSessions = data['closed_sessions'] ?? 0;
 
         if (totalSessions == 0 && activeSessions == 0 && closedSessions == 0) {
-          return Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.insights_outlined,
-                  size: 64,
-                  color: Theme.of(context)
-                      .colorScheme
-                      .onSurfaceVariant
-                      .withValues(alpha: 0.5),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Dados insuficientes para estatisticas',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                ),
-              ],
-            ),
+          return const AppEmptyState(
+            icon: Icons.insights_outlined,
+            message: 'Dados insuficientes para estatisticas',
           );
         }
 
-        return Padding(
+        return ResponsiveContainer(
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [

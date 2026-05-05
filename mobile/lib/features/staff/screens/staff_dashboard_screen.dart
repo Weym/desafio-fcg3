@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/responsive/breakpoints.dart';
 import '../../../core/router/route_names.dart';
+import '../../../shared/widgets/app_skeleton_card.dart';
+import '../../../shared/widgets/app_error_state.dart';
+import '../../../shared/widgets/responsive_container.dart';
 import '../models/staff_dashboard_model.dart';
 import '../providers/staff_dashboard_provider.dart';
 
@@ -17,90 +21,107 @@ class StaffDashboardScreen extends ConsumerWidget {
         title: const Text('Dashboard'),
       ),
       body: dashboardAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(
+        loading: () => const ResponsiveContainer(
+          padding: EdgeInsets.all(16),
           child: Column(
-            mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.error_outline, size: 48),
-              const SizedBox(height: 16),
-              const Text('Erro ao carregar dashboard'),
-              const SizedBox(height: 8),
-              ElevatedButton(
-                onPressed: () => ref.invalidate(staffDashboardProvider),
-                child: const Text('Tentar novamente'),
-              ),
+              AppSkeletonCard(height: 80),
+              AppSkeletonCard(height: 80),
+              AppSkeletonCard(height: 80),
             ],
           ),
         ),
-        data: (dashboard) => RefreshIndicator(
-          onRefresh: () async {
-            ref.invalidate(staffDashboardProvider);
-            await ref.read(staffDashboardProvider.future);
-          },
-          child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Enrollment Period Banner (D-02)
-                if (dashboard.enrollmentPeriod != null &&
-                    dashboard.enrollmentPeriod!.isActive)
-                  _EnrollmentBanner(period: dashboard.enrollmentPeriod!),
-                if (dashboard.enrollmentPeriod != null &&
-                    dashboard.enrollmentPeriod!.isActive)
-                  const SizedBox(height: 16),
-                // KPI Grid (D-01)
-                GridView.count(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  childAspectRatio: 1.4,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  children: [
-                    _KpiCard(
-                      icon: Icons.people_outlined,
-                      iconColor: Colors.blue.shade700,
-                      value: dashboard.totalStudents,
-                      label: 'Alunos',
-                      onTap: null,
-                    ),
-                    _KpiCard(
-                      icon: Icons.school_outlined,
-                      iconColor: Colors.purple.shade700,
-                      value: dashboard.activeEnrollments,
-                      label: 'Matriculas',
-                      onTap: null,
-                    ),
-                    _KpiCard(
-                      icon: Icons.folder_outlined,
-                      iconColor: Colors.amber.shade700,
-                      value: dashboard.pendingDocuments,
-                      label: 'Docs Pendentes',
-                      onTap: () => context.go(RoutePaths.staffDocuments),
-                    ),
-                    _KpiCard(
-                      icon: Icons.calendar_today_outlined,
-                      iconColor: Theme.of(context).colorScheme.tertiary,
-                      value: dashboard.upcomingAppointments,
-                      label: 'Agendamentos',
-                      onTap: () => context.go(RoutePaths.staffSchedule),
-                    ),
-                    _KpiCard(
-                      icon: Icons.chat_bubble_outlined,
-                      iconColor: Colors.green.shade700,
-                      value: dashboard.activeChatSessions,
-                      label: 'Chats Ativos',
-                      onTap: () => context.go(RoutePaths.staffAI),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+        error: (error, stack) => ResponsiveContainer(
+          padding: const EdgeInsets.all(16),
+          child: AppErrorState(
+            onRetry: () => ref.invalidate(staffDashboardProvider),
           ),
         ),
+        data: (dashboard) {
+          final width = MediaQuery.sizeOf(context).width;
+          int crossAxisCount = 2;
+          if (AppBreakpoints.isTablet(width)) crossAxisCount = 3;
+          if (AppBreakpoints.isDesktop(width)) crossAxisCount = 4;
+
+          return Column(
+            children: [
+              if (dashboardAsync.isRefreshing)
+                const LinearProgressIndicator(),
+              Expanded(
+                child: RefreshIndicator(
+                  onRefresh: () async {
+                    ref.invalidate(staffDashboardProvider);
+                    await ref.read(staffDashboardProvider.future);
+                  },
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: ResponsiveContainer(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Enrollment Period Banner (D-02)
+                          if (dashboard.enrollmentPeriod != null &&
+                              dashboard.enrollmentPeriod!.isActive)
+                            _EnrollmentBanner(period: dashboard.enrollmentPeriod!),
+                          if (dashboard.enrollmentPeriod != null &&
+                              dashboard.enrollmentPeriod!.isActive)
+                            const SizedBox(height: 16),
+                          // KPI Grid (D-01, D-07 adaptive columns)
+                          GridView.count(
+                            crossAxisCount: crossAxisCount,
+                            crossAxisSpacing: 12,
+                            mainAxisSpacing: 12,
+                            childAspectRatio: 1.4,
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            children: [
+                              _KpiCard(
+                                icon: Icons.people_outlined,
+                                iconColor: Colors.blue.shade700,
+                                value: dashboard.totalStudents,
+                                label: 'Alunos',
+                                onTap: null,
+                              ),
+                              _KpiCard(
+                                icon: Icons.school_outlined,
+                                iconColor: Colors.purple.shade700,
+                                value: dashboard.activeEnrollments,
+                                label: 'Matriculas',
+                                onTap: null,
+                              ),
+                              _KpiCard(
+                                icon: Icons.folder_outlined,
+                                iconColor: Colors.amber.shade700,
+                                value: dashboard.pendingDocuments,
+                                label: 'Docs Pendentes',
+                                onTap: () => context.go(RoutePaths.staffDocuments),
+                              ),
+                              _KpiCard(
+                                icon: Icons.calendar_today_outlined,
+                                iconColor: Theme.of(context).colorScheme.tertiary,
+                                value: dashboard.upcomingAppointments,
+                                label: 'Agendamentos',
+                                onTap: () => context.go(RoutePaths.staffSchedule),
+                              ),
+                              _KpiCard(
+                                icon: Icons.chat_bubble_outlined,
+                                iconColor: Colors.green.shade700,
+                                value: dashboard.activeChatSessions,
+                                label: 'Chats Ativos',
+                                onTap: () => context.go(RoutePaths.staffAI),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

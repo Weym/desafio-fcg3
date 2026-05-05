@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../shared/widgets/app_skeleton_list.dart';
+import '../../../shared/widgets/app_empty_state.dart';
+import '../../../shared/widgets/app_error_state.dart';
+import '../../../shared/widgets/responsive_container.dart';
 import '../../client/models/document_model.dart';
 import '../providers/staff_document_provider.dart';
 import 'widgets/send_document_sheet.dart';
@@ -69,72 +73,51 @@ class StaffDocumentsScreen extends ConsumerWidget {
           // Document list
           Expanded(
             child: documentsAsync.when(
-              loading: () =>
-                  const Center(child: CircularProgressIndicator()),
-              error: (error, stack) => Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.error_outline, size: 48),
-                    const SizedBox(height: 16),
-                    const Text('Erro ao carregar documentos'),
-                    const SizedBox(height: 8),
-                    ElevatedButton(
-                      onPressed: () =>
-                          ref.invalidate(staffDocumentsProvider),
-                      child: const Text('Tentar novamente'),
-                    ),
-                  ],
+              loading: () => const ResponsiveContainer(
+                padding: EdgeInsets.all(16),
+                child: AppSkeletonList(itemCount: 5, itemHeight: 72),
+              ),
+              error: (error, stack) => ResponsiveContainer(
+                padding: const EdgeInsets.all(16),
+                child: AppErrorState(
+                  onRetry: () => ref.invalidate(staffDocumentsProvider),
                 ),
               ),
               data: (documents) {
                 final filtered = _applyFilter(documents, filter);
                 if (filtered.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.description_outlined,
-                          size: 64,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurfaceVariant
-                              .withValues(alpha: 0.5),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Nenhum documento encontrado',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyLarge
-                              ?.copyWith(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSurfaceVariant,
-                              ),
-                        ),
-                      ],
-                    ),
+                  return const AppEmptyState(
+                    icon: Icons.folder_open,
+                    message: 'Nenhum documento disponivel',
                   );
                 }
-                return RefreshIndicator(
-                  onRefresh: () async {
-                    ref.invalidate(staffDocumentsProvider);
-                    await ref.read(staffDocumentsProvider.future);
-                  },
-                  child: ListView.builder(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
+                return Column(
+                  children: [
+                    if (documentsAsync.isRefreshing)
+                      const LinearProgressIndicator(),
+                    Expanded(
+                      child: RefreshIndicator(
+                        onRefresh: () async {
+                          ref.invalidate(staffDocumentsProvider);
+                          await ref.read(staffDocumentsProvider.future);
+                        },
+                        child: ResponsiveContainer(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                          child: ListView.builder(
+                            itemCount: filtered.length,
+                            itemBuilder: (context, index) => _StaffDocumentCard(
+                              document: filtered[index],
+                              onTap: () => showUpdateStatusSheet(
+                                  context, ref, filtered[index]),
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
-                    itemCount: filtered.length,
-                    itemBuilder: (context, index) => _StaffDocumentCard(
-                      document: filtered[index],
-                      onTap: () => showUpdateStatusSheet(
-                          context, ref, filtered[index]),
-                    ),
-                  ),
+                  ],
                 );
               },
             ),
