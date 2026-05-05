@@ -111,5 +111,5 @@ Plans:
 |-------|----------------|--------|-----------|
 | 7. Flutter Scaffold & Auth | 0/3 | Planned | - |
 | 8. Client Interface | 4/5 | In Progress|  |
-| 9. Staff Interface | 0/0 | Not Started | - |
+| 9. Staff Interface | 0/5 | Planned | - |
 | 10. Cross-Platform Polish | 0/0 | Not Started | - |
