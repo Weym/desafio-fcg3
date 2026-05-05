@@ -98,12 +98,13 @@ class MeResponse(BaseModel):
 ```
 
 Current frontend mismatch to fix:
+
 - `AuthResponse` expects `token`, `user`, and `expires_at`, causing JSON parsing crash when backend returns `access_token`.
 - `AuthProvider.verifyCode` uses `response.user`, but user data must come from `/auth/me` after storing `access_token`.
 - `AuthInterceptor.onError` refresh path reads `data['token']`, but backend `/auth/refresh` returns `access_token`.
 - `UserModel` currently maps role from JSON key `type`; `/auth/me` returns `role`, so align parsing without breaking existing consumers if practical.
-</interfaces>
-</context>
+  </interfaces>
+  </context>
 
 <tasks>
 
@@ -162,18 +163,18 @@ Current frontend mismatch to fix:
 
 ## Trust Boundaries
 
-| Boundary | Description |
-| --- | --- |
-| Flutter app → FastAPI auth API | Untrusted OTP/login inputs cross from client to backend; this plan does not change backend validation. |
-| FastAPI auth API → Flutter secure storage | JWT access/refresh tokens cross into client-side secure storage. |
+| Boundary                                  | Description                                                                                            |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Flutter app → FastAPI auth API            | Untrusted OTP/login inputs cross from client to backend; this plan does not change backend validation. |
+| FastAPI auth API → Flutter secure storage | JWT access/refresh tokens cross into client-side secure storage.                                       |
 
 ## STRIDE Threat Register
 
-| Threat ID | Category | Component | Disposition | Mitigation Plan |
-| --- | --- | --- | --- | --- |
-| T-260505-jur-01 | I | `auth_provider.dart` token storage | mitigate | Store only in `flutter_secure_storage` using existing `_accessTokenKey`/`_refreshTokenKey`; do not introduce SharedPreferences or logs for tokens. |
-| T-260505-jur-02 | S | `auth_interceptor.dart` refresh retry | mitigate | Use backend `access_token` from validated refresh response before retrying; reject malformed refresh payloads instead of retrying with stale/null token. |
-| T-260505-jur-03 | T | Backend auth response contract | mitigate | Preserve backend `TokenPair` contract; only adapt Flutter parsing to prevent client-side contract drift. |
+| Threat ID       | Category | Component                             | Disposition | Mitigation Plan                                                                                                                                          |
+| --------------- | -------- | ------------------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| T-260505-jur-01 | I        | `auth_provider.dart` token storage    | mitigate    | Store only in `flutter_secure_storage` using existing `_accessTokenKey`/`_refreshTokenKey`; do not introduce SharedPreferences or logs for tokens.       |
+| T-260505-jur-02 | S        | `auth_interceptor.dart` refresh retry | mitigate    | Use backend `access_token` from validated refresh response before retrying; reject malformed refresh payloads instead of retrying with stale/null token. |
+| T-260505-jur-03 | T        | Backend auth response contract        | mitigate    | Preserve backend `TokenPair` contract; only adapt Flutter parsing to prevent client-side contract drift.                                                 |
 
 </threat_model>
 
@@ -192,13 +193,14 @@ Manual smoke check after automated tests: run the app against the existing backe
 </verification>
 
 <success_criteria>
+
 - No backend source files are modified for this quick fix.
 - Flutter `verify-code` parsing accepts the backend `TokenPair` shape exactly.
 - Access token is saved before `/auth/me`, enabling `AuthInterceptor` to attach `Authorization: Bearer ...`.
 - Auth state uses `/auth/me` user payload and no longer expects user data inside verify-code response.
 - Refresh interceptor uses `access_token` from `/auth/refresh`.
 - Focused regression tests plus `flutter analyze` and `flutter test` pass.
-</success_criteria>
+  </success_criteria>
 
 <output>
 After completion, create `.planning/quick/260505-jur-corrigir-crash-no-login-otp-alinhando-o-/260505-jur-SUMMARY.md`.
