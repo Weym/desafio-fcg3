@@ -65,13 +65,19 @@ class Auth extends _$Auth {
       final storage = ref.read(flutterSecureStorageProvider);
 
       // Store tokens
-      await storage.write(key: _accessTokenKey, value: response.token);
-      if (response.refreshToken != null) {
-        await storage.write(key: _refreshTokenKey, value: response.refreshToken!);
-      }
+      await storage.write(key: _accessTokenKey, value: response.accessToken);
+      await storage.write(key: _refreshTokenKey, value: response.refreshToken);
 
-      state = AuthAuthenticated(user: response.user);
-      return AuthVerifyResult.success;
+      try {
+        final user = await _authService.getMe();
+        state = AuthAuthenticated(user: user);
+        return AuthVerifyResult.success;
+      } catch (_) {
+        await storage.delete(key: _accessTokenKey);
+        await storage.delete(key: _refreshTokenKey);
+        state = const AuthError(message: 'Erro de conexao. Tente novamente.');
+        return AuthVerifyResult.networkError;
+      }
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
         // Invalid code

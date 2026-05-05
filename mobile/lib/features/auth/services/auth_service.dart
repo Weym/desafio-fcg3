@@ -21,15 +21,14 @@ class AuthService {
   }
 
   /// POST /auth/verify-code
-  /// Returns JWT token + user data
+  /// Returns backend TokenPair used to authorize the following /auth/me call
   Future<AuthResponse> verifyCode({
     required String email,
     required String code,
-    String platform = 'app',
   }) async {
     final response = await _client.dio.post(
       '/auth/verify-code',
-      data: {'email': email, 'code': code, 'platform': platform},
+      data: {'email': email, 'code': code},
     );
     return AuthResponse.fromJson(response.data as Map<String, dynamic>);
   }
