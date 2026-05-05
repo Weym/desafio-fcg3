@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-05-05T02:51:09.620Z"
+last_updated: "2026-05-05T03:08:43.148Z"
 last_activity: 2026-05-05
 progress:
   total_phases: 4
   completed_phases: 2
   total_plans: 13
-  completed_plans: 9
-  percent: 69
+  completed_plans: 10
+  percent: 77
 ---
 
 # Project State
@@ -18,7 +18,7 @@ progress:
 ## Current Position
 
 Phase: 09 (staff-interface) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
 Last activity: 2026-05-05
 
@@ -61,6 +61,8 @@ Recent decisions affecting current work:
 - [Phase 08]: Derived notifications aggregate from documents (7d window) and appointments (48h window) — no backend endpoint needed
 - [Phase 09]: Reuse client models cross-feature for staff services — no duplication of AppointmentModel, DocumentModel, etc.
 - [Phase 09]: Staff-specific models only for staff-unique API responses (dashboard KPIs, scheduling slots, student summary)
+- [Phase 09]: Dashboard screen kept separate from staff_home_screen.dart; Plan 05 handles router swap
+- [Phase 09]: Confirmation dialogs use barrierDismissible: false for deliberate staff actions (threat T-09-04)
 
 ### Key Decisions Pending
 
