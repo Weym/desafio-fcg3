@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/responsive/breakpoints.dart';
 import '../../client/models/chat_session_model.dart';
+import '../../client/models/chat_message_model.dart';
 import '../providers/staff_chat_provider.dart';
 
 class StaffAiScreen extends ConsumerStatefulWidget {
@@ -14,6 +16,7 @@ class StaffAiScreen extends ConsumerStatefulWidget {
 class _StaffAiScreenState extends ConsumerState<StaffAiScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
+  String? _selectedSessionId;
 
   @override
   void initState() {
@@ -29,6 +32,8 @@ class _StaffAiScreenState extends ConsumerState<StaffAiScreen>
 
   @override
   Widget build(BuildContext context) {
+    final isDesktop = AppBreakpoints.isDesktop(MediaQuery.sizeOf(context).width);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Dados da IA'),
@@ -42,9 +47,15 @@ class _StaffAiScreenState extends ConsumerState<StaffAiScreen>
       ),
       body: TabBarView(
         controller: _tabController,
-        children: const [
-          _SessionsTab(),
-          _StatisticsTab(),
+        children: [
+          _SessionsTab(
+            isDesktop: isDesktop,
+            selectedSessionId: _selectedSessionId,
+            onSessionSelected: (id) {
+              setState(() => _selectedSessionId = id);
+            },
+          ),
+          const _StatisticsTab(),
         ],
       ),
     );
@@ -52,7 +63,15 @@ class _StaffAiScreenState extends ConsumerState<StaffAiScreen>
 }
 
 class _SessionsTab extends ConsumerWidget {
-  const _SessionsTab();
+  final bool isDesktop;
+  final String? selectedSessionId;
+  final ValueChanged<String> onSessionSelected;
+
+  const _SessionsTab({
+    required this.isDesktop,
+    required this.selectedSessionId,
+    required this.onSessionSelected,
+  });
 
   Future<void> _onRefresh(WidgetRef ref) async {
     ref.invalidate(staffChatSessionsProvider);
@@ -63,36 +82,36 @@ class _SessionsTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final sessionsAsync = ref.watch(staffChatSessionsProvider);
 
-    return RefreshIndicator(
-      onRefresh: () => _onRefresh(ref),
-      child: sessionsAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => ListView(
-          children: [
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.6,
-              child: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.error_outline, size: 48),
-                    const SizedBox(height: 16),
-                    const Text('Erro ao carregar sessoes'),
-                    const SizedBox(height: 8),
-                    ElevatedButton(
-                      onPressed: () =>
-                          ref.invalidate(staffChatSessionsProvider),
-                      child: const Text('Tentar novamente'),
-                    ),
-                  ],
-                ),
+    return sessionsAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stack) => ListView(
+        children: [
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.6,
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.error_outline, size: 48),
+                  const SizedBox(height: 16),
+                  const Text('Erro ao carregar sessoes'),
+                  const SizedBox(height: 8),
+                  ElevatedButton(
+                    onPressed: () =>
+                        ref.invalidate(staffChatSessionsProvider),
+                    child: const Text('Tentar novamente'),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-        data: (sessions) {
-          if (sessions.isEmpty) {
-            return ListView(
+          ),
+        ],
+      ),
+      data: (sessions) {
+        if (sessions.isEmpty) {
+          return RefreshIndicator(
+            onRefresh: () => _onRefresh(ref),
+            child: ListView(
               children: [
                 SizedBox(
                   height: MediaQuery.of(context).size.height * 0.6,
@@ -125,30 +144,331 @@ class _SessionsTab extends ConsumerWidget {
                   ),
                 ),
               ],
-            );
-          }
+            ),
+          );
+        }
 
-          final sorted = List<ChatSessionModel>.from(sessions)
-            ..sort((a, b) => b.startedAt.compareTo(a.startedAt));
+        final sorted = List<ChatSessionModel>.from(sessions)
+          ..sort((a, b) => b.startedAt.compareTo(a.startedAt));
 
-          return ListView.builder(
+        if (isDesktop) {
+          return Row(
+            children: [
+              SizedBox(
+                width: MediaQuery.sizeOf(context).width * 0.35,
+                child: RefreshIndicator(
+                  onRefresh: () => _onRefresh(ref),
+                  child: ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: sorted.length,
+                    itemBuilder: (context, index) {
+                      final session = sorted[index];
+                      return _SessionCard(
+                        session: session,
+                        selected: session.id == selectedSessionId,
+                        onTap: () => onSessionSelected(session.id),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              const VerticalDivider(width: 1, thickness: 1),
+              Expanded(
+                child: selectedSessionId != null
+                    ? _ChatDetailPanel(sessionId: selectedSessionId!)
+                    : const Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.psychology_outlined, size: 64, color: Colors.grey),
+                            SizedBox(height: 16),
+                            Text(
+                              'Selecione uma sessao',
+                              style: TextStyle(fontSize: 16, color: Colors.grey),
+                            ),
+                          ],
+                        ),
+                      ),
+              ),
+            ],
+          );
+        }
+
+        // Phone/Tablet: existing single-column with GoRouter navigation
+        return RefreshIndicator(
+          onRefresh: () => _onRefresh(ref),
+          child: ListView.builder(
             padding: const EdgeInsets.all(16),
             itemCount: sorted.length,
             itemBuilder: (context, index) {
               final session = sorted[index];
-              return _SessionCard(session: session);
+              return _SessionCard(
+                session: session,
+                selected: false,
+                onTap: () => context.push('/staff/ai/${session.id}'),
+              );
             },
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// Detail panel for desktop master-detail layout (staff AI sessions).
+class _ChatDetailPanel extends ConsumerStatefulWidget {
+  final String sessionId;
+
+  const _ChatDetailPanel({required this.sessionId});
+
+  @override
+  ConsumerState<_ChatDetailPanel> createState() => _ChatDetailPanelState();
+}
+
+class _ChatDetailPanelState extends ConsumerState<_ChatDetailPanel>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Material(
+          color: Theme.of(context).colorScheme.surface,
+          child: TabBar(
+            controller: _tabController,
+            tabs: const [
+              Tab(text: 'Mensagens'),
+              Tab(text: 'Acoes'),
+            ],
+          ),
+        ),
+        Expanded(
+          child: TabBarView(
+            controller: _tabController,
+            children: [
+              _MessagesPanel(sessionId: widget.sessionId),
+              _ActionsPanel(sessionId: widget.sessionId),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _MessagesPanel extends ConsumerWidget {
+  final String sessionId;
+
+  const _MessagesPanel({required this.sessionId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final messagesAsync = ref.watch(staffChatMessagesProvider(sessionId));
+
+    return messagesAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stack) => Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.error_outline, size: 48),
+            const SizedBox(height: 16),
+            const Text('Erro ao carregar mensagens'),
+            const SizedBox(height: 8),
+            ElevatedButton(
+              onPressed: () =>
+                  ref.invalidate(staffChatMessagesProvider(sessionId)),
+              child: const Text('Tentar novamente'),
+            ),
+          ],
+        ),
+      ),
+      data: (messages) {
+        if (messages.isEmpty) {
+          return const Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.chat_bubble_outline, size: 64, color: Colors.grey),
+                SizedBox(height: 16),
+                Text(
+                  'Nenhuma mensagem nesta sessao',
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+              ],
+            ),
           );
-        },
+        }
+
+        final sorted = List<ChatMessageModel>.from(messages)
+          ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+        return ListView.builder(
+          reverse: true,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+          itemCount: sorted.length,
+          itemBuilder: (context, index) {
+            return _MessageBubble(message: sorted[index]);
+          },
+        );
+      },
+    );
+  }
+}
+
+class _ActionsPanel extends ConsumerWidget {
+  final String sessionId;
+
+  const _ActionsPanel({required this.sessionId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final actionsAsync = ref.watch(staffActionLogsProvider(sessionId));
+
+    return actionsAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stack) => Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.error_outline, size: 48),
+            const SizedBox(height: 16),
+            const Text('Erro ao carregar acoes'),
+            const SizedBox(height: 8),
+            ElevatedButton(
+              onPressed: () =>
+                  ref.invalidate(staffActionLogsProvider(sessionId)),
+              child: const Text('Tentar novamente'),
+            ),
+          ],
+        ),
+      ),
+      data: (logs) {
+        if (logs.isEmpty) {
+          return const Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.history_outlined, size: 64, color: Colors.grey),
+                SizedBox(height: 16),
+                Text(
+                  'Nenhuma acao registrada',
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return ListView.builder(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          itemCount: logs.length,
+          itemBuilder: (context, index) {
+            final log = logs[index];
+            return ExpansionTile(
+              leading: Icon(
+                log.isError ? Icons.error_outline : Icons.check_circle_outline,
+                color: log.isError ? Colors.red : Colors.green,
+              ),
+              title: Text(log.toolName),
+              subtitle: Text('${log.status} \u2022 ${log.latencyMs ?? "?"}ms'),
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  child: Text(
+                    'Latencia: ${log.latencyMs ?? "?"}ms',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
+class _MessageBubble extends StatelessWidget {
+  final ChatMessageModel message;
+
+  const _MessageBubble({required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isUser = message.isUser;
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Align(
+        alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: screenWidth * 0.5),
+          child: Column(
+            crossAxisAlignment:
+                isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: isUser
+                      ? theme.colorScheme.primaryContainer
+                      : theme.colorScheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  message.content,
+                  style: theme.textTheme.bodyMedium,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                _formatTime(message.createdAt),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                  fontSize: 11,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
+  }
+
+  String _formatTime(DateTime dt) {
+    final h = dt.hour.toString().padLeft(2, '0');
+    final m = dt.minute.toString().padLeft(2, '0');
+    return '$h:$m';
   }
 }
 
 class _SessionCard extends StatelessWidget {
   final ChatSessionModel session;
+  final VoidCallback onTap;
+  final bool selected;
 
-  const _SessionCard({required this.session});
+  const _SessionCard({
+    required this.session,
+    required this.onTap,
+    required this.selected,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -156,13 +476,16 @@ class _SessionCard extends StatelessWidget {
     final isActive = session.isActive;
 
     return Card(
-      elevation: 1,
+      elevation: selected ? 3 : 1,
+      color: selected
+          ? theme.colorScheme.primaryContainer
+          : null,
       margin: const EdgeInsets.only(bottom: 8),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
       child: InkWell(
-        onTap: () => context.push('/staff/ai/${session.id}'),
+        onTap: onTap,
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(12),
