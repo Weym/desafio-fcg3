@@ -29,10 +29,10 @@
 
 ### Staff/Provider Screens
 
-- [ ] **UI-F01**: Fornecedor consulta dashboard de gestão com métricas e visões gerais sobre o negócio, atendimentos e interações do bot
-- [ ] **UI-F02**: Fornecedor gerencia, aprova, reagenda ou cancela compromissos gerados via WhatsApp
-- [ ] **UI-F03**: Fornecedor visualiza dados estruturados, resumos e insights extraídos pela IA a partir das conversas
-- [ ] **UI-F04**: Fornecedor envia documentos para o mural dos clientes e gerencia solicitações pendentes
+- [x] **UI-F01**: Fornecedor consulta dashboard de gestão com métricas e visões gerais sobre o negócio, atendimentos e interações do bot
+- [x] **UI-F02**: Fornecedor gerencia, aprova, reagenda ou cancela compromissos gerados via WhatsApp
+- [x] **UI-F03**: Fornecedor visualiza dados estruturados, resumos e insights extraídos pela IA a partir das conversas
+- [x] **UI-F04**: Fornecedor envia documentos para o mural dos clientes e gerencia solicitações pendentes
 
 ---
 
@@ -88,9 +88,9 @@
 | UI-C05 | Phase 8: Client Interface | Complete |
 | UI-C06 | Phase 8: Client Interface | Complete |
 | UI-NFR-01 | Phase 8: Client Interface | Complete |
-| UI-F01 | Phase 9: Staff Interface | Pending |
-| UI-F02 | Phase 9: Staff Interface | Pending |
-| UI-F03 | Phase 9: Staff Interface | Pending |
-| UI-F04 | Phase 9: Staff Interface | Pending |
+| UI-F01 | Phase 9: Staff Interface | Complete |
+| UI-F02 | Phase 9: Staff Interface | Complete |
+| UI-F03 | Phase 9: Staff Interface | Complete |
+| UI-F04 | Phase 9: Staff Interface | Complete |
 | UI-NFR-02 | Phase 10: Cross-Platform Polish | Pending |
 | UI-NFR-04 | Phase 10: Cross-Platform Polish | Pending |
