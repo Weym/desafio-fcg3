@@ -46,7 +46,7 @@ class AuthInterceptor extends QueuedInterceptor {
           if (data is! Map<String, dynamic>) {
             return handler.next(err);
           }
-          final newAccessToken = data['token'] as String?;
+          final newAccessToken = data['access_token'] as String?;
           final newRefreshToken = data['refresh_token'] as String?;
           if (newAccessToken == null || newRefreshToken == null) {
             return handler.next(err);
