@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-05-05T17:04:00.000Z"
+last_updated: "2026-05-05T17:31:00.000Z"
 last_activity: 2026-05-05
 progress:
   total_phases: 4
@@ -20,7 +20,7 @@ progress:
 Phase: 10
 Plan: Not started
 Status: Ready to execute
-Last activity: 2026-05-05 - Completed quick task 260505-jcm: Validar e corrigir base URL de autenticação do frontend e adicionar CORS no backend para Flutter web
+Last activity: 2026-05-05 - Completed quick task 260505-jur: Corrigir crash no login OTP alinhando frontend ao TokenPair do backend
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -104,6 +104,7 @@ Recent decisions affecting current work:
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 260505-jcm | Validar e corrigir base URL de autenticação do frontend e adicionar CORS no backend para Flutter web | 2026-05-05 | 4e1ca3d | [260505-jcm-validar-e-corrigir-base-url-de-autentica](./quick/260505-jcm-validar-e-corrigir-base-url-de-autentica/) |
+| 260505-jur | Corrigir crash no login OTP alinhando frontend ao TokenPair do backend | 2026-05-05 | 5fee628 | [260505-jur-corrigir-crash-no-login-otp-alinhando-o-](./quick/260505-jur-corrigir-crash-no-login-otp-alinhando-o-/) |
 
 ## Session Continuity
 
