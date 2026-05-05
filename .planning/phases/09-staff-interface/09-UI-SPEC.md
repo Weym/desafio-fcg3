@@ -43,6 +43,7 @@ Exceptions:
 - KPI card icon containers: 44x44 (matches established client pattern for icon containers in cards)
 - Touch targets on action buttons: minimum 48dp per Material accessibility guidelines
 - Bottom sheet top radius: 16px (established in `document_request_sheet.dart`)
+- 12px (md token) included per Material Design card padding convention and Phase 8 precedent (`_DocumentCard` uses `EdgeInsets.all(12)`)
 
 ---
 
@@ -57,7 +58,7 @@ Exceptions:
 | Caption | `bodySmall` | 12px | 400 (regular) | 1.4 | Timestamps, status labels, filter chip labels |
 | Label | `labelMedium` | 12px | 500 (medium) | 1.3 | Form field labels, action log section headers |
 
-Note: Use `Theme.of(context).textTheme.*` exclusively — never hardcode font sizes inline except for status chips (12px as established in client documents pattern).
+Note: Use `Theme.of(context).textTheme.*` exclusively — never hardcode font sizes inline except for status chips (12px as established in client documents pattern). Weights follow Material 3 TextTheme role defaults — not independently chosen; they are documented here for executor reference only.
 
 ---
 
@@ -166,7 +167,7 @@ Accent reserved for: FABs (create slot, send document), primary action buttons i
 - AppBar with back button, title "Detalhes do Agendamento"
 - Body: `SingleChildScrollView` with `padding: EdgeInsets.all(16)`
 - Info rows: `ListTile`-style with label (bodySmall) + value (bodyMedium)
-- Action buttons at bottom: Row with "Confirmar" (ElevatedButton, primary) + "Cancelar" (OutlinedButton, error color)
+- Action buttons at bottom: Row with "Confirmar Agendamento" (ElevatedButton, primary) + "Cancelar Agendamento" (OutlinedButton, error color)
 - Buttons have minimum height 48px
 
 ### AI Data Tabs (D-10)
@@ -231,9 +232,9 @@ ElevatedButton(child: Text("Tentar novamente"))
 | Create slot sheet title | "Criar Slot de Disponibilidade" |
 | Create slot submit button | "Criar Slot" |
 | Update status sheet title | "Atualizar Status" |
-| Update status submit button | "Salvar" |
+| Update status submit button | "Atualizar Status" |
 | Send document sheet title | "Enviar Documento" |
-| Send document submit button | "Enviar" |
+| Send document submit button | "Enviar Documento" |
 | Send bulk document sheet title | "Enviar para Turma" |
 | Send bulk submit button | "Enviar para Todos" |
 | Cancel appointment dialog title | "Cancelar Agendamento" |
@@ -242,7 +243,7 @@ ElevatedButton(child: Text("Tentar novamente"))
 | Cancel appointment dismiss | "Voltar" |
 | Confirm appointment dialog title | "Confirmar Agendamento" |
 | Confirm appointment dialog body | "Confirmar este agendamento com o aluno?" |
-| Confirm appointment confirm | "Confirmar" |
+| Confirm appointment confirm | "Confirmar Agendamento" |
 | Confirm appointment dismiss | "Voltar" |
 | Empty schedule | "Nenhum agendamento encontrado" |
 | Empty AI sessions | "Nenhuma sessao registrada" |
