@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/router/route_names.dart';
+import '../../../core/theme/theme_provider.dart';
 import '../../../shared/widgets/app_skeleton_card.dart';
 import '../../../shared/widgets/responsive_container.dart';
 import '../../auth/providers/auth_provider.dart';
@@ -51,6 +52,21 @@ class ClientHomeScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Home'),
         actions: [
+          IconButton(
+            icon: Icon(
+              ref.watch(themeModeNotifierProvider) == ThemeMode.dark
+                  ? Icons.light_mode
+                  : Icons.dark_mode,
+            ),
+            onPressed: () {
+              final current = ref.read(themeModeNotifierProvider);
+              final next = current == ThemeMode.dark
+                  ? ThemeMode.light
+                  : ThemeMode.dark;
+              ref.read(themeModeNotifierProvider.notifier).setThemeMode(next);
+            },
+            tooltip: 'Alternar tema',
+          ),
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () => ref.read(authProvider.notifier).logout(),

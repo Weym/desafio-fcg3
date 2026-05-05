@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/responsive/breakpoints.dart';
 import '../../../core/router/route_names.dart';
+import '../../../core/theme/theme_provider.dart';
 import '../../../shared/widgets/app_skeleton_card.dart';
 import '../../../shared/widgets/app_error_state.dart';
 import '../../../shared/widgets/responsive_container.dart';
@@ -19,6 +20,23 @@ class StaffDashboardScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Dashboard'),
+        actions: [
+          IconButton(
+            icon: Icon(
+              ref.watch(themeModeNotifierProvider) == ThemeMode.dark
+                  ? Icons.light_mode
+                  : Icons.dark_mode,
+            ),
+            onPressed: () {
+              final current = ref.read(themeModeNotifierProvider);
+              final next = current == ThemeMode.dark
+                  ? ThemeMode.light
+                  : ThemeMode.dark;
+              ref.read(themeModeNotifierProvider.notifier).setThemeMode(next);
+            },
+            tooltip: 'Alternar tema',
+          ),
+        ],
       ),
       body: dashboardAsync.when(
         loading: () => const ResponsiveContainer(
