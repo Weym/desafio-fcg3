@@ -152,7 +152,6 @@ class _RecordingAuthService extends AuthService {
   Future<AuthResponse> verifyCode({
     required String email,
     required String code,
-    String platform = 'app',
   }) async {
     return const AuthResponse(
       accessToken: 'new-access-token',
