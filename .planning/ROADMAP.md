@@ -84,7 +84,7 @@ Plans:
 - [x] 09-02-PLAN.md — Dashboard screen (KPI grid) + Schedule screen (appointments + create slot)
 - [x] 09-03-PLAN.md — AI Data screen (sessions list + statistics tabs + chat detail)
 - [x] 09-04-PLAN.md — Document Management screen (filter + status update + send doc) + backend upload endpoint
-- [ ] 09-05-PLAN.md — Router wiring (replace placeholders, add sub-routes for detail screens)
+- [x] 09-05-PLAN.md — Router wiring (replace placeholders, add sub-routes for detail screens)
 
 ---
 
