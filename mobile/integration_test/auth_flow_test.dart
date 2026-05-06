@@ -35,8 +35,8 @@ Future<void> performLogin(WidgetTester tester, String email) async {
   await tester.enterText(emailField, email);
   await tester.pumpAndSettle();
 
-  // Tap "Enviar codigo" button
-  final sendCodeButton = find.widgetWithText(ElevatedButton, 'Enviar codigo');
+  // Tap "Enviar código" button
+  final sendCodeButton = find.text('Enviar código');
   expect(sendCodeButton, findsOneWidget,
       reason: 'Send code button should be visible');
   await tester.tap(sendCodeButton);
@@ -111,7 +111,7 @@ void main() {
       await performLogin(tester, TestConfig.staffEmail);
 
       // Should navigate to staff dashboard
-      expect(find.text('Painel de Gestao'), findsOneWidget,
+      expect(find.text('Painel de Gestão'), findsOneWidget,
           reason:
               'Staff dashboard title should be visible after staff login');
     });
