@@ -17,7 +17,7 @@ class Resource(Base):
     __tablename__ = "resources"
     __table_args__ = (
         CheckConstraint(
-            "resource_type IN ('room', 'lab', 'equipment')",
+            "resource_type IN ('room', 'lab', 'equipment', 'auditorium', 'study_room', 'sports_court')",
             name="ck_resources_resource_type",
         ),
     )
@@ -25,9 +25,11 @@ class Resource(Base):
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     resource_type: Mapped[str] = mapped_column(String(20), nullable=False)
+    description: Mapped[str | None] = mapped_column(Text)
     capacity: Mapped[int | None] = mapped_column(Integer)
     location: Mapped[str | None] = mapped_column(String(255))
     is_available: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("true"))
+    requires_authorization: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("false"))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
     scheduling_slots: Mapped[list["SchedulingSlot"]] = relationship(back_populates="resource")
@@ -62,6 +64,7 @@ class Appointment(Base):
     slot_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("scheduling_slots.id"), nullable=False)
     reason: Mapped[str] = mapped_column(Text, nullable=False)
     status: Mapped[str] = mapped_column(String(20), nullable=False, server_default=text("'scheduled'"))
+    authorization_file_url: Mapped[str | None] = mapped_column(String(500))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
     student: Mapped["Student"] = relationship(back_populates="appointments")
