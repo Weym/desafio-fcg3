@@ -173,6 +173,16 @@ async def whatsapp_webhook(request: Request) -> Response:
 
                     # Verified: dispatch to background task (Plan 02)
                     await db.commit()
+
+                    # HI-01: Skip AI dispatch if session is under human intervention
+                    if session.status in ("human_needed", "human_active"):
+                        logger.info(
+                            "Session %s in human intervention (status=%s), skipping AI",
+                            session.id,
+                            session.status,
+                        )
+                        continue
+
                     task = asyncio.create_task(
                         process_verified_message(
                             session.id, text_content, phone, wa_client

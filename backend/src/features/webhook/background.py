@@ -4,15 +4,18 @@ CRITICAL-3: _handle_task_result logs exceptions from background tasks.
 CRITICAL-4: Opens its OWN DB session via async_session_maker — never request-scoped.
 D-06: Retry once on AI service failure, then send fallback message.
 D-09: Per-session asyncio.Lock prevents concurrent processing for same student.
+HI-01: Escalation detection by keywords (before AI) and AI response (after AI).
 """
 
 from __future__ import annotations
 
 import asyncio
 import logging
+from datetime import datetime, timezone
 from uuid import UUID
 
 import httpx
+from sqlalchemy import update
 
 from src.infrastructure.config import get_settings
 from src.infrastructure.database import async_session
@@ -27,6 +30,18 @@ FALLBACK_MESSAGE = (
     "Desculpe, estou com dificuldades tecnicas. "
     "Tente novamente em alguns minutos."
 )
+
+# Escalation constants (HI-01)
+ESCALATION_KEYWORDS = {
+    "atendente", "humano", "pessoa", "secretaria",
+    "falar com alguem", "atendimento humano",
+}
+ESCALATION_BOT_PHRASES = [
+    "procurar a secretaria",
+    "secretaria presencialmente",
+    "entrar em contato com a secretaria",
+]
+ESCALATION_ACK_MESSAGE = "Vou transferir voce para um atendente. Aguarde um momento."
 
 
 def _handle_task_result(task: asyncio.Task) -> None:
@@ -47,6 +62,64 @@ def _handle_task_result(task: asyncio.Task) -> None:
         logger.warning("Background message processing task was cancelled")
 
 
+def _should_escalate_by_keywords(message_text: str) -> bool:
+    """Check if student message contains escalation keywords (HI-01).
+
+    Returns True if any keyword from ESCALATION_KEYWORDS is found
+    as a substring in the normalized (lowercased) message text.
+    """
+    normalized = message_text.strip().lower()
+    return any(keyword in normalized for keyword in ESCALATION_KEYWORDS)
+
+
+def _should_escalate_by_ai_response(ai_response: str) -> bool:
+    """Check if AI response contains escalation-triggering phrases (HI-01).
+
+    Returns True if any phrase from ESCALATION_BOT_PHRASES is found
+    (case-insensitive) in the AI response.
+    """
+    normalized = ai_response.lower()
+    return any(phrase in normalized for phrase in ESCALATION_BOT_PHRASES)
+
+
+async def _escalate_session(
+    session_id: UUID, phone: str, wa_client: WhatsAppClient
+) -> None:
+    """Escalate a chat session to human intervention (HI-01).
+
+    - Sets status to 'human_needed' and escalated_at to now
+    - Saves a system message recording the escalation
+    - Sends acknowledgment to student via WhatsApp
+    - Opens its OWN DB session (CRITICAL-4)
+    """
+    from src.features.chat.models import ChatSession
+
+    async with async_session() as db:
+        await db.execute(
+            update(ChatSession)
+            .where(ChatSession.id == session_id)
+            .values(
+                status="human_needed",
+                escalated_at=datetime.now(timezone.utc),
+            )
+        )
+
+        from src.features.webhook.service import WebhookService
+
+        webhook_service = WebhookService()
+        await webhook_service.save_message(
+            session_id=session_id,
+            role="system",
+            content="[Escalação para atendimento humano]",
+            media_type=None,
+            wamid=None,
+            db=db,
+        )
+        await db.commit()
+
+    await wa_client.send_text_message(phone, ESCALATION_ACK_MESSAGE)
+
+
 async def process_verified_message(
     session_id: UUID,
     message_text: str,
@@ -55,14 +128,24 @@ async def process_verified_message(
 ) -> None:
     """Process a verified student's text message.
 
-    1. Acquire per-session lock (D-09)
-    2. Call AI service with message + session_id
-    3. On failure: retry once, then send fallback (D-06)
-    4. Save assistant response to chat_messages
-    5. Send response via WhatsApp
+    1. Check escalation keywords — if matched, escalate without AI (HI-01)
+    2. Acquire per-session lock (D-09)
+    3. Call AI service with message + session_id
+    4. On failure: retry once, then send fallback (D-06)
+    5. Check AI response for escalation phrases (HI-01)
+    6. Save assistant response to chat_messages
+    7. Send response via WhatsApp
 
     CRITICAL-4: Opens its OWN DB session — never uses the request-scoped one.
     """
+    # HI-01: Check escalation keywords BEFORE AI call
+    if _should_escalate_by_keywords(message_text):
+        logger.info(
+            "Escalation triggered by keyword for session %s", session_id
+        )
+        await _escalate_session(session_id, phone, wa_client)
+        return
+
     settings = get_settings()
     lock_key = str(session_id)
     lock = _session_locks.setdefault(lock_key, asyncio.Lock())
@@ -120,6 +203,33 @@ async def process_verified_message(
                 "AI service unavailable for session %s, sending fallback",
                 session_id,
             )
+
+        # HI-01: Check AI response for escalation phrases
+        if _should_escalate_by_ai_response(agent_response):
+            logger.info(
+                "Escalation triggered by AI response for session %s",
+                session_id,
+            )
+            # Save AI response first (so staff can see what triggered escalation)
+            async with async_session() as db:
+                from src.features.webhook.service import WebhookService
+
+                webhook_service = WebhookService()
+                await webhook_service.save_message(
+                    session_id=session_id,
+                    role="assistant",
+                    content=agent_response,
+                    media_type=None,
+                    wamid=None,
+                    db=db,
+                )
+                await db.commit()
+
+            # Send AI response to student (they see the bot's last message)
+            await wa_client.send_text_message(phone, agent_response)
+            # Then escalate
+            await _escalate_session(session_id, phone, wa_client)
+            return
 
         # Save assistant response to chat_messages (CRITICAL-4: own session)
         async with async_session() as db:
