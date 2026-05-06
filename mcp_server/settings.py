@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
+from urllib.parse import quote_plus
 
 
 def _normalize_asyncpg_dsn(database_url: str) -> str:
@@ -9,6 +10,22 @@ def _normalize_asyncpg_dsn(database_url: str) -> str:
         "postgresql+psycopg://",
         "postgresql://",
         1,
+    )
+
+
+def _build_database_url() -> str:
+    """Resolve DATABASE_URL from env, falling back to POSTGRES_* component vars."""
+    explicit = os.environ.get("DATABASE_URL", "")
+    if explicit:
+        return explicit
+    user = os.environ.get("POSTGRES_USER", "fcg3")
+    password = os.environ.get("POSTGRES_PASSWORD", "change_me_in_production")
+    host = os.environ.get("POSTGRES_HOST", "postgres")
+    port = os.environ.get("POSTGRES_PORT", "5432")
+    db = os.environ.get("POSTGRES_DB", "fcg3")
+    return (
+        f"postgresql+asyncpg://{quote_plus(user)}:{quote_plus(password)}"
+        f"@{host}:{port}/{quote_plus(db)}"
     )
 
 
@@ -38,7 +55,7 @@ class Settings:
 
 
 settings = Settings(
-    database_url=os.environ.get("DATABASE_URL", ""),
+    database_url=_build_database_url(),
     fastapi_base_url=os.environ.get(
         "FASTAPI_BASE_URL",
         "http://fastapi-app:8000/api/v1",

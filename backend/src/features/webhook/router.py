@@ -23,6 +23,7 @@ from src.features.webhook.background import (
 )
 from src.features.webhook.dependencies import get_whatsapp_client, get_webhook_service
 from src.features.webhook.schemas import WhatsAppWebhookPayload
+from src.features.webhook.service import SESSION_CLOSE_KEYWORDS
 from src.infrastructure.config import get_settings
 from src.infrastructure.database import async_session
 from src.infrastructure.whatsapp_client import validate_signature
@@ -92,6 +93,13 @@ async def whatsapp_webhook(request: Request) -> Response:
                     student = await webhook_service.lookup_student_by_phone(
                         phone, db
                     )
+                    logger.info(
+                        "webhook msg: from=%s wamid=%s type=%s student_found=%s",
+                        phone,
+                        wamid,
+                        message.type,
+                        student is not None,
+                    )
                     if student is None:
                         # D-03: Unknown phone, send rejection, no session
                         await wa_client.send_text_message(
@@ -137,8 +145,11 @@ async def whatsapp_webhook(request: Request) -> Response:
                         continue
                     text_content = message.text.body
 
-                    # D-11: "sair"/"encerrar" closes session (checked BEFORE verification)
-                    if text_content.strip().lower() in {"sair", "encerrar"}:
+                    # D-11: close-keywords close the session (checked BEFORE
+                    # verification so users can always escape the OTP flow).
+                    # Vocabulary is the single source of truth in
+                    # `WebhookService` — see `SESSION_CLOSE_KEYWORDS`.
+                    if text_content.strip().lower() in SESSION_CLOSE_KEYWORDS:
                         await webhook_service.save_message(
                             session.id, "user", text_content, None, wamid, db
                         )

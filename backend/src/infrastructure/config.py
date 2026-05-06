@@ -158,6 +158,13 @@ class Settings(BaseSettings):
         default=3,
         description="Max wrong OTP attempts before invalidation (SC-3).",
     )
+    dev_master_otp: str | None = Field(
+        default=None,
+        description=(
+            "DEV ONLY: if set, this plaintext code is accepted by /auth/verify-code "
+            "in place of the real hash check. MUST be unset in production."
+        ),
+    )
 
     rate_limit_email: str = Field(
         default="5/15 minutes",

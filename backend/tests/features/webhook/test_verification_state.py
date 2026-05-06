@@ -209,10 +209,18 @@ class TestVerificationStateMachine:
         assert "invalido" in sent.lower()
         assert "tentativa" in sent.lower()
 
-    async def test_max_attempts_sends_new_code(
+    async def test_max_attempts_closes_session(
         self, db_session, test_student
     ):
-        """Invalid OTP (attempts = max) → invalidate code, send new one."""
+        """Invalid OTP (attempts = max) → invalidate code, CLOSE session, do NOT auto-issue new code.
+
+        Regression test for `.planning/debug/whatsapp-otp-loop-no-cancel.md`:
+        previously the code reached max attempts, silently reissued a fresh OTP,
+        and kept the session in `awaiting_code` — producing an infinite loop.
+        Per CONVENTIONS.md ("Rate limiting: 429 for OTP attempts exhausted"),
+        `MAX_ATTEMPTS_REACHED` is a terminal state: the session must close and
+        no new OTP is issued automatically.
+        """
         session = ChatSession(
             id=uuid.uuid4(),
             student_id=test_student.id,
@@ -249,11 +257,17 @@ class TestVerificationStateMachine:
                 session, "999999", "5521999999999", db_session, wa_client
             )
 
-        # New code should be generated after max attempts
-        mock_otp.assert_called_once()
+        # No new OTP — terminal state, not a reissue
+        mock_otp.assert_not_called()
+        # Session CLOSED (no longer `active`) and the verification code marked used
+        assert session.status == "closed"
+        assert session.ended_at is not None
+        assert vc.used is True
+        # User is informed with a terminal message
         wa_client.send_text_message.assert_called_once()
         sent = wa_client.send_text_message.call_args[0][1]
-        assert "limite" in sent.lower() or "novo codigo" in sent.lower()
+        assert "tentativas" in sent.lower()
+        assert "encerrada" in sent.lower()
 
     async def test_verified_session_not_handled_by_verification_flow(
         self, db_session, test_student, verified_session

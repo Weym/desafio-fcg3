@@ -6,6 +6,7 @@ import '../../../shared/widgets/app_skeleton_list.dart';
 import '../../../shared/widgets/app_empty_state.dart';
 import '../../../shared/widgets/app_error_state.dart';
 import '../../../shared/widgets/responsive_container.dart';
+import '../../auth/providers/auth_provider.dart';
 import '../../client/models/chat_session_model.dart';
 import '../../client/models/chat_message_model.dart';
 import '../providers/staff_chat_provider.dart';
@@ -41,6 +42,13 @@ class _StaffAiScreenState extends ConsumerState<StaffAiScreen>
     return Scaffold(
       appBar: AppBar(
         title: const Text('Dados da IA'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () => ref.read(authProvider.notifier).logout(),
+            tooltip: 'Sair',
+          ),
+        ],
         bottom: TabBar(
           controller: _tabController,
           tabs: const [

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/responsive/breakpoints.dart';
 import '../../../core/router/route_names.dart';
 import '../../../core/theme/theme_provider.dart';
+import '../../auth/providers/auth_provider.dart';
 import '../../../shared/widgets/app_skeleton_card.dart';
 import '../../../shared/widgets/app_error_state.dart';
 import '../../../shared/widgets/responsive_container.dart';
@@ -35,6 +36,11 @@ class StaffDashboardScreen extends ConsumerWidget {
               ref.read(themeModeNotifierProvider.notifier).setThemeMode(next);
             },
             tooltip: 'Alternar tema',
+          ),
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () => ref.read(authProvider.notifier).logout(),
+            tooltip: 'Sair',
           ),
         ],
       ),

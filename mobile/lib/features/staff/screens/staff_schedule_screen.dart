@@ -5,6 +5,7 @@ import '../../../shared/widgets/app_skeleton_list.dart';
 import '../../../shared/widgets/app_empty_state.dart';
 import '../../../shared/widgets/app_error_state.dart';
 import '../../../shared/widgets/responsive_container.dart';
+import '../../auth/providers/auth_provider.dart';
 import '../../client/models/appointment_model.dart';
 import '../providers/staff_schedule_provider.dart';
 import 'widgets/create_slot_sheet.dart';
@@ -20,6 +21,13 @@ class StaffScheduleScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Agenda'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () => ref.read(authProvider.notifier).logout(),
+            tooltip: 'Sair',
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => showCreateSlotSheet(context, ref),

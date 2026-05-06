@@ -198,6 +198,53 @@ class TestProcessVerifiedMessage:
         # async_session() should have been called (own session, not injected)
         mock_session_maker.assert_called_once()
 
+    async def test_ai_service_call_includes_service_token_header(self):
+        """Regression: the AI service `/chat` endpoint is guarded by
+        require_service_token (ai_service/main.py). The webhook must send
+        X-Service-Token on every attempt, otherwise every verified student
+        receives the fallback message regardless of service health.
+        """
+        from src.infrastructure.config import get_settings
+
+        session_id = uuid4()
+        wa_client = AsyncMock()
+        wa_client.send_text_message = AsyncMock(return_value=True)
+
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"response": "ok"}
+
+        mock_http = AsyncMock()
+        mock_http.post = AsyncMock(return_value=mock_response)
+        mock_http.__aenter__ = AsyncMock(return_value=mock_http)
+        mock_http.__aexit__ = AsyncMock(return_value=False)
+
+        mock_db = AsyncMock()
+        mock_db.commit = AsyncMock()
+
+        mock_svc_instance = AsyncMock()
+        mock_svc_instance.save_message = AsyncMock()
+
+        with patch("src.features.webhook.background.httpx.AsyncClient", return_value=mock_http), \
+             patch("src.features.webhook.background.async_session") as mock_session_maker, \
+             patch("src.features.webhook.service.WebhookService", return_value=mock_svc_instance):
+            mock_session_maker.return_value.__aenter__ = AsyncMock(return_value=mock_db)
+            mock_session_maker.return_value.__aexit__ = AsyncMock(return_value=False)
+
+            _session_locks.pop(str(session_id), None)
+            await process_verified_message(
+                session_id, "Quais notas?", "5521999999999", wa_client
+            )
+
+        # http.post was called at least once; inspect the headers kwarg on every call
+        assert mock_http.post.call_count >= 1
+        expected_token = get_settings().mcp_service_token
+        for call in mock_http.post.call_args_list:
+            headers = call.kwargs.get("headers") or {}
+            assert headers.get("X-Service-Token") == expected_token, (
+                f"AI service call is missing X-Service-Token header; got headers={headers!r}"
+            )
+
     async def test_per_session_lock_used(self):
         """D-09: Per-session asyncio.Lock used for concurrent protection."""
         session_id = uuid4()

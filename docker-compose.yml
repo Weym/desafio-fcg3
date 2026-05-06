@@ -6,7 +6,10 @@ services:
       - /bin/bash
       - -ceu
       - |
-          docker-entrypoint.sh postgres -c shared_preload_libraries=pg_cron -c cron.database_name=${POSTGRES_DB:-postgres} &
+          docker-entrypoint.sh postgres \
+            -c shared_preload_libraries=pg_cron \
+            -c cron.database_name=${POSTGRES_DB:-postgres} \
+            -c hba_file=/etc/postgresql/pg_hba_custom.conf &
           postgres_pid=$$!
           trap 'kill -TERM "$$postgres_pid"; wait "$$postgres_pid"' INT TERM
           until pg_isready -h 127.0.0.1 -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-postgres} >/dev/null 2>&1; do
@@ -60,6 +63,8 @@ services:
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
       FCM_CREDENTIALS_PATH: ${FCM_CREDENTIALS_PATH}
       FASTAPI_URL: ${FASTAPI_URL}
+      # DEV ONLY — remove before any non-dev deploy.
+      DEV_MASTER_OTP: ${DEV_MASTER_OTP:-}
     volumes:
       - ./backend/src:/app/src
       - ./backend/scripts:/app/scripts
@@ -100,7 +105,7 @@ services:
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
       EMBEDDING_PROVIDER: ${EMBEDDING_PROVIDER:-openai}
       EMBEDDING_MODEL: ${EMBEDDING_MODEL:-text-embedding-3-small}
-      MCP_SERVER_URL: http://mcp-server:8002/mcp
+      MCP_SERVER_URL: ${MCP_URL}
     volumes:
       - ./ai_service:/app/ai_service
     depends_on:

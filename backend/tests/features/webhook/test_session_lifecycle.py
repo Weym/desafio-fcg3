@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 import pytest
 
 from src.features.chat.models import ChatSession
-from src.features.webhook.service import WebhookService
+from src.features.webhook.service import SESSION_CLOSE_KEYWORDS, WebhookService
 
 
 class TestSessionLifecycle:
@@ -79,9 +79,28 @@ class TestSessionLifecycle:
     async def test_sair_case_insensitive(self, db_session, test_student):
         """D-11: 'SAIR' (uppercase) → still closes (case-insensitive check in router)."""
         # The case-insensitivity is checked in the router:
-        # `text_content.strip().lower() in {"sair", "encerrar"}`
+        # `text_content.strip().lower() in SESSION_CLOSE_KEYWORDS`
         text = "SAIR"
-        assert text.strip().lower() in {"sair", "encerrar"}
+        assert text.strip().lower() in SESSION_CLOSE_KEYWORDS
+
+    @pytest.mark.parametrize(
+        "keyword",
+        ["cancelar", "cancel", "parar", "stop", "CANCELAR", "  Cancelar  "],
+    )
+    def test_user_friendly_cancel_keywords_recognized(self, keyword):
+        """Regression for `.planning/debug/whatsapp-otp-loop-no-cancel.md`.
+
+        Users trapped in the OTP flow naturally reach for "cancelar"/"parar"/
+        "stop" rather than the D-11 "sair"/"encerrar" vocabulary. Recognising
+        only the latter made cancellation undiscoverable and produced an
+        infinite `awaiting_code` loop. This test pins the expanded vocabulary.
+        """
+        assert keyword.strip().lower() in SESSION_CLOSE_KEYWORDS
+
+    def test_legacy_keywords_still_recognized(self):
+        """D-11 vocabulary must remain backward-compatible."""
+        assert "sair" in SESSION_CLOSE_KEYWORDS
+        assert "encerrar" in SESSION_CLOSE_KEYWORDS
 
     async def test_updated_at_touched_on_reuse(self, db_session, test_student):
         """D-12: updated_at is touched when session is reused for inactivity tracking."""
