@@ -244,7 +244,9 @@ class _EnrollmentBanner extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '${period.daysRemaining} dias restantes',
+                  period.daysRemaining != null
+                      ? '${period.daysRemaining} dias restantes'
+                      : 'Periodo ativo',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: colors.primary,
                       ),

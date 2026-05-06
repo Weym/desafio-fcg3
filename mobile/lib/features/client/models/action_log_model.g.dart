@@ -9,6 +9,7 @@ part of 'action_log_model.dart';
 ActionLogModel _$ActionLogModelFromJson(Map<String, dynamic> json) =>
     ActionLogModel(
       id: json['id'] as String,
+      chatSessionId: json['chat_session_id'] as String?,
       toolName: json['tool_name'] as String,
       inputParams: json['input_params'] as Map<String, dynamic>,
       outputResult: json['output_result'] as Map<String, dynamic>?,
@@ -22,6 +23,7 @@ ActionLogModel _$ActionLogModelFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$ActionLogModelToJson(ActionLogModel instance) =>
     <String, dynamic>{
       'id': instance.id,
+      'chat_session_id': instance.chatSessionId,
       'tool_name': instance.toolName,
       'input_params': instance.inputParams,
       'output_result': instance.outputResult,

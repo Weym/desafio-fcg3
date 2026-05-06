@@ -49,7 +49,7 @@ class StaffAppointmentDetailScreen extends ConsumerWidget {
             _InfoRow(
               label: 'Data',
               child: Text(
-                appointment.date ?? 'Nao definida',
+                appointment.slotDate ?? 'Nao definida',
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
             ),
@@ -109,10 +109,10 @@ class StaffAppointmentDetailScreen extends ConsumerWidget {
   }
 
   String _buildTimeText() {
-    if (appointment.startTime == null && appointment.endTime == null) {
+    if (appointment.slotStartTime == null && appointment.endTime == null) {
       return 'Nao definido';
     }
-    final start = appointment.startTime ?? '--:--';
+    final start = appointment.slotStartTime ?? '--:--';
     final end = appointment.endTime ?? '--:--';
     return '$start - $end';
   }

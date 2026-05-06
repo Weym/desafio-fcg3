@@ -8,12 +8,12 @@ class EnrollmentPeriodInfo {
   @JsonKey(name: 'is_active')
   final bool isActive;
   @JsonKey(name: 'days_remaining')
-  final int daysRemaining;
+  final int? daysRemaining;
 
   const EnrollmentPeriodInfo({
     required this.name,
     required this.isActive,
-    required this.daysRemaining,
+    this.daysRemaining,
   });
 
   factory EnrollmentPeriodInfo.fromJson(Map<String, dynamic> json) =>

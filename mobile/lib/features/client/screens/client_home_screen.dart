@@ -206,7 +206,7 @@ class ClientHomeScreen extends ConsumerWidget {
           nextTime = 'Sem agendamentos';
         } else {
           final next = upcoming.first;
-          nextTime = '${next.date ?? ''} ${next.startTime ?? ''}'.trim();
+          nextTime = '${next.slotDate ?? ''} ${next.slotStartTime ?? ''}'.trim();
           if (nextTime.isEmpty) nextTime = 'Agendado';
         }
         return _SummaryGlassCard(

@@ -295,8 +295,8 @@ class _AppointmentCard extends StatelessWidget {
 
   String _buildDateTimeText() {
     final parts = <String>[];
-    if (appointment.date != null) parts.add(appointment.date!);
-    if (appointment.startTime != null) parts.add(appointment.startTime!);
+    if (appointment.slotDate != null) parts.add(appointment.slotDate!);
+    if (appointment.slotStartTime != null) parts.add(appointment.slotStartTime!);
     return parts.isEmpty ? 'Data não definida' : parts.join(' ');
   }
 }

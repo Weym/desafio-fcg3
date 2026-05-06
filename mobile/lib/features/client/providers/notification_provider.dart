@@ -66,15 +66,15 @@ Future<List<DerivedNotification>> derivedNotifications(Ref ref) async {
 
   // Source 2 (per D-16): Upcoming appointments within 48h
   for (final apt in appointments) {
-    if (apt.isUpcoming && apt.date != null) {
+    if (apt.isUpcoming && apt.slotDate != null) {
       try {
-        final aptDate = DateTime.parse(apt.date!);
+        final aptDate = DateTime.parse(apt.slotDate!);
         if (aptDate.difference(now).inHours <= 48 && aptDate.isAfter(now)) {
           notifications.add(DerivedNotification(
             id: 'apt-${apt.id}',
             type: NotificationType.appointmentReminder,
             title: 'Agendamento proximo',
-            subtitle: '${apt.reason} — ${apt.date} ${apt.startTime ?? ""}',
+            subtitle: '${apt.reason} — ${apt.slotDate} ${apt.slotStartTime ?? ""}',
             timestamp: aptDate,
             icon: Icons.access_time,
             color: Colors.blue,
