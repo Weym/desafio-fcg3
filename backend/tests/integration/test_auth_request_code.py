@@ -12,7 +12,7 @@ from src.features.auth.models import VerificationCode
 @pytest.mark.asyncio
 async def test_request_code_returns_200_with_correct_body(client, db_session, mock_resend, seed_users, reset_limiter):
     """POST /auth/request-code for registered email returns 200 with expected body."""
-    response = await client.post("/auth/request-code", json={"email": "student@test.edu"})
+    response = await client.post("/api/v1/auth/request-code", json={"email": "student@test.edu"})
     assert response.status_code == 200
     body = response.json()
     assert body["message"] == "Codigo enviado"
@@ -22,7 +22,7 @@ async def test_request_code_returns_200_with_correct_body(client, db_session, mo
 @pytest.mark.asyncio
 async def test_request_code_creates_verification_row(client, db_session, mock_resend, seed_users, reset_limiter):
     """A verification_codes row is created with non-empty code_hash/code_salt and used=False."""
-    await client.post("/auth/request-code", json={"email": "student@test.edu"})
+    await client.post("/api/v1/auth/request-code", json={"email": "student@test.edu"})
 
     q = await db_session.execute(
         select(VerificationCode).where(VerificationCode.email == "student@test.edu")
@@ -37,7 +37,7 @@ async def test_request_code_creates_verification_row(client, db_session, mock_re
 @pytest.mark.asyncio
 async def test_request_code_does_not_leak_plaintext_in_response(client, db_session, mock_resend, seed_users, reset_limiter):
     """The plaintext code must NOT appear in the response body or headers."""
-    response = await client.post("/auth/request-code", json={"email": "student@test.edu"})
+    response = await client.post("/api/v1/auth/request-code", json={"email": "student@test.edu"})
     body_text = response.text
     # Get the code from the email mock
     assert mock_resend.call_count == 1
@@ -56,7 +56,7 @@ async def test_request_code_does_not_leak_plaintext_in_response(client, db_sessi
 @pytest.mark.asyncio
 async def test_request_code_calls_resend_for_registered_email(client, db_session, mock_resend, seed_users, reset_limiter):
     """mock_resend should be called exactly once for a registered email."""
-    await client.post("/auth/request-code", json={"email": "student@test.edu"})
+    await client.post("/api/v1/auth/request-code", json={"email": "student@test.edu"})
     assert mock_resend.call_count == 1
     call_params = mock_resend.call_args[0][0]
     assert call_params["to"] == ["student@test.edu"]
@@ -66,7 +66,7 @@ async def test_request_code_calls_resend_for_registered_email(client, db_session
 @pytest.mark.asyncio
 async def test_request_code_unregistered_returns_200_same_body(client, db_session, mock_resend, seed_users, reset_limiter):
     """D-08: unregistered email also returns 200 with the same body (no enumeration leak)."""
-    response = await client.post("/auth/request-code", json={"email": "unknown@test.edu"})
+    response = await client.post("/api/v1/auth/request-code", json={"email": "unknown@test.edu"})
     assert response.status_code == 200
     body = response.json()
     assert body["message"] == "Codigo enviado"
