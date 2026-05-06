@@ -1,16 +1,20 @@
 #!/usr/bin/env python3
-"""Destructive seed script for the FCG3 development database.
+"""Conditional seed script for the FCG3 development database.
 
-WARNING: this script truncates and recreates development data for curriculum,
-users, enrollment history, and scheduling fixtures.
+On first boot, seeds the database with development fixtures. On subsequent
+boots, detects existing data and exits cleanly (idempotent).
+
+Use --force to truncate and re-create all development data.
 
 Run with:
   docker compose exec fastapi-app python -m scripts.seed
+  docker compose exec fastapi-app python -m scripts.seed --force
   python -m scripts.seed
 """
 
 from __future__ import annotations
 
+import argparse
 import asyncio
 import sys
 from dataclasses import dataclass
@@ -511,7 +515,32 @@ async def print_summary(session: AsyncSession) -> None:
         print(f"- {label}: {result.scalar_one()}")
 
 
+async def check_data_exists(session: AsyncSession) -> bool:
+    """Return True if students table already has data."""
+    result = await session.execute(text("SELECT COUNT(*) FROM students"))
+    count = result.scalar_one()
+    return count > 0
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="FCG3 development database seeder")
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Force re-seed: truncate existing data and recreate from scratch",
+    )
+    return parser.parse_args()
+
+
 async def main() -> None:
+    args = parse_args()
+
+    async with async_session() as session:
+        if not args.force:
+            if await check_data_exists(session):
+                print("✅ Seed data already exists, skipping. Use --force to re-seed.")
+                return
+
     print("⚠️  WARNING: This script TRUNCATES and recreates development seed data.")
     print("⚠️  Affected tables: " + ", ".join(WARNING_TABLES))
     print("🌱 Starting destructive seed...")
