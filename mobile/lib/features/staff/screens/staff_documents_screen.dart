@@ -220,6 +220,7 @@ class _StaffDocumentCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final isReady = document.status == 'ready';
     final isPending =
         document.status == 'requested' || document.status == 'processing';
@@ -267,7 +268,7 @@ class _StaffDocumentCard extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
               color: isPending
-                  ? Colors.amber.withValues(alpha: 0.1)
+                  ? Colors.amber.withValues(alpha: isDark ? 0.15 : 0.1)
                   : isReady
                       ? colors.tertiaryContainer.withValues(alpha: 0.1)
                       : colors.surfaceContainerHigh,
@@ -286,7 +287,7 @@ class _StaffDocumentCard extends StatelessWidget {
                 fontSize: 10,
                 fontWeight: FontWeight.bold,
                 color: isPending
-                    ? Colors.amber.shade700
+                    ? (isDark ? Colors.amber.shade300 : Colors.amber.shade700)
                     : isReady
                         ? colors.tertiary
                         : colors.onSurfaceVariant,

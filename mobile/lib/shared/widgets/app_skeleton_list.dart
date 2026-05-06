@@ -27,7 +27,7 @@ class AppSkeletonList extends StatelessWidget {
             child: Container(
               height: itemHeight,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: colorScheme.surface,
                 borderRadius: BorderRadius.circular(12),
               ),
             ),

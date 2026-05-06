@@ -215,6 +215,7 @@ class _AppointmentCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final isScheduled = appointment.status == 'scheduled';
 
     return GlassCard(
@@ -262,7 +263,7 @@ class _AppointmentCard extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
               color: isScheduled
-                  ? const Color(0xFF4CAF50).withValues(alpha: 0.1)
+                  ? (isDark ? const Color(0xFF4CAF50).withValues(alpha: 0.15) : const Color(0xFF4CAF50).withValues(alpha: 0.1))
                   : colors.error.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
               border: Border.all(
@@ -277,7 +278,7 @@ class _AppointmentCard extends StatelessWidget {
                 fontSize: 10,
                 fontWeight: FontWeight.bold,
                 color: isScheduled
-                    ? const Color(0xFF2E7D32)
+                    ? (isDark ? const Color(0xFF81C784) : const Color(0xFF2E7D32))
                     : colors.error,
               ),
             ),

@@ -233,6 +233,7 @@ class _DocumentCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final isReady = document.status == 'ready';
 
     return GlassCard(
@@ -282,7 +283,7 @@ class _DocumentCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: isReady
                   ? colors.tertiaryContainer.withValues(alpha: 0.1)
-                  : Colors.amber.withValues(alpha: 0.1),
+                  : Colors.amber.withValues(alpha: isDark ? 0.15 : 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
               border: Border.all(
                 color: isReady
@@ -295,7 +296,7 @@ class _DocumentCard extends StatelessWidget {
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.bold,
-                color: isReady ? colors.tertiary : Colors.amber.shade700,
+                color: isReady ? colors.tertiary : (isDark ? Colors.amber.shade300 : Colors.amber.shade700),
               ),
             ),
           ),

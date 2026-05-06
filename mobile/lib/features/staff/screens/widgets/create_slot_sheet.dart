@@ -139,16 +139,19 @@ class _CreateSlotSheetState extends ConsumerState<_CreateSlotSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.fromLTRB(
-        24,
-        24,
-        24,
-        MediaQuery.of(context).viewInsets.bottom + 40,
-      ),
-      child: Form(
-        key: _formKey,
-        child: Column(
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 500),
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(
+            24,
+            24,
+            24,
+            MediaQuery.of(context).viewInsets.bottom + 40,
+          ),
+          child: Form(
+            key: _formKey,
+            child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -232,6 +235,8 @@ class _CreateSlotSheetState extends ConsumerState<_CreateSlotSheet> {
                   : const Text('Criar Slot'),
             ),
           ],
+        ),
+      ),
         ),
       ),
     );

@@ -85,15 +85,15 @@ class _StaffMessagesTab extends ConsumerWidget {
       ),
       data: (messages) {
         if (messages.isEmpty) {
-          return const Center(
+          return Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.chat_bubble_outline, size: 64, color: Colors.grey),
-                SizedBox(height: 16),
+                Icon(Icons.chat_bubble_outline, size: 64, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                const SizedBox(height: 16),
                 Text(
                   'Nenhuma mensagem nesta sessao',
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                  style: TextStyle(fontSize: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
                 ),
               ],
             ),
@@ -202,15 +202,15 @@ class _StaffActionsTab extends ConsumerWidget {
       ),
       data: (logs) {
         if (logs.isEmpty) {
-          return const Center(
+          return Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.history_outlined, size: 64, color: Colors.grey),
-                SizedBox(height: 16),
+                Icon(Icons.history_outlined, size: 64, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                const SizedBox(height: 16),
                 Text(
                   'Nenhuma acao registrada nesta sessao',
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                  style: TextStyle(fontSize: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
                 ),
               ],
             ),
@@ -241,10 +241,11 @@ class _ActionLogTile extends StatelessWidget {
     return Icons.check_circle_outline;
   }
 
-  Color _statusColor() {
-    if (log.isError) return Colors.red;
-    if (log.status == 'retry_success') return Colors.amber;
-    return Colors.green;
+  Color _statusColor(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    if (log.isError) return Theme.of(context).colorScheme.error;
+    if (log.status == 'retry_success') return isDark ? Colors.amber.shade300 : Colors.amber;
+    return isDark ? const Color(0xFF81C784) : const Color(0xFF4CAF50);
   }
 
   @override
@@ -252,7 +253,7 @@ class _ActionLogTile extends StatelessWidget {
     final theme = Theme.of(context);
 
     return ExpansionTile(
-      leading: Icon(_statusIcon(), color: _statusColor()),
+      leading: Icon(_statusIcon(), color: _statusColor(context)),
       title: Text(log.toolName),
       subtitle: Text('${_formatTime(log.createdAt)} \u2022 ${log.latencyMs ?? '?'}ms'),
       children: [

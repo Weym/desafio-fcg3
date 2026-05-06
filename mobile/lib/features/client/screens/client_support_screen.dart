@@ -71,7 +71,9 @@ class ClientSupportScreen extends ConsumerWidget {
               _ContactOption(
                 icon: Icons.chat,
                 iconColor: const Color(0xFF25D366),
-                bgColor: const Color(0xFFE8F5E9),
+                bgColor: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF25D366).withValues(alpha: 0.12)
+                    : const Color(0xFFE8F5E9),
                 title: 'Conversar no WhatsApp',
                 subtitle: 'Assistente virtual rápido',
                 onTap: () => launchUrl(

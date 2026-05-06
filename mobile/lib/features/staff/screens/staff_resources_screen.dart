@@ -288,6 +288,7 @@ class _ResourceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return GlassCard(
       onTap: onEdit,
@@ -331,7 +332,7 @@ class _ResourceCard extends StatelessWidget {
                       height: 8,
                       decoration: BoxDecoration(
                         color: resource.isAvailable
-                            ? const Color(0xFF4CAF50)
+                            ? (isDark ? const Color(0xFF81C784) : const Color(0xFF4CAF50))
                             : colors.outlineVariant,
                         shape: BoxShape.circle,
                       ),

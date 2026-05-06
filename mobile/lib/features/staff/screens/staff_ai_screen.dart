@@ -129,7 +129,7 @@ class _SessionsTab extends ConsumerWidget {
                 child: Row(
                   children: [
                     SizedBox(
-                      width: MediaQuery.sizeOf(context).width * 0.35,
+                      width: (MediaQuery.sizeOf(context).width * 0.35).clamp(0, 400).toDouble(),
                       child: RefreshIndicator(
                         onRefresh: () => _onRefresh(ref),
                         child: ListView.builder(
@@ -324,7 +324,7 @@ class _ActionsPanel extends ConsumerWidget {
             return ExpansionTile(
               leading: Icon(
                 log.isError ? Icons.error_outline : Icons.check_circle_outline,
-                color: log.isError ? Theme.of(context).colorScheme.error : const Color(0xFF4CAF50),
+                color: log.isError ? Theme.of(context).colorScheme.error : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF81C784) : const Color(0xFF4CAF50)),
               ),
               title: Text(log.toolName),
               subtitle: Text('${log.status} \u2022 ${log.latencyMs ?? "?"}ms'),
@@ -417,6 +417,7 @@ class _SessionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     final isActive = session.isActive;
 
     return GlassCard(
@@ -464,7 +465,7 @@ class _SessionCard extends StatelessWidget {
                 const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
               color: isActive
-                  ? const Color(0xFF4CAF50).withValues(alpha: 0.1)
+                  ? (isDark ? const Color(0xFF4CAF50).withValues(alpha: 0.15) : const Color(0xFF4CAF50).withValues(alpha: 0.1))
                   : colors.surfaceContainerHigh,
               borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
               border: Border.all(
@@ -479,7 +480,7 @@ class _SessionCard extends StatelessWidget {
                 fontSize: 10,
                 fontWeight: FontWeight.bold,
                 color: isActive
-                    ? const Color(0xFF2E7D32)
+                    ? (isDark ? const Color(0xFF81C784) : const Color(0xFF2E7D32))
                     : colors.onSurfaceVariant,
               ),
             ),
@@ -540,7 +541,7 @@ class _StatisticsTab extends ConsumerWidget {
               const SizedBox(height: 12),
               _StatCard(
                 icon: Icons.chat,
-                iconColor: const Color(0xFF4CAF50),
+                iconColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF81C784) : const Color(0xFF4CAF50),
                 value: activeSessions.toString(),
                 label: 'Sessões Ativas',
               ),

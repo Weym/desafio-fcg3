@@ -149,9 +149,12 @@ class _BookingFlowSheetState extends ConsumerState<_BookingFlowSheet> {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
-      child: Column(
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 500),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+          child: Column(
         children: [
           // Drag handle
           Container(
@@ -176,6 +179,8 @@ class _BookingFlowSheetState extends ConsumerState<_BookingFlowSheet> {
                 : _buildStep2(context),
           ),
         ],
+          ),
+        ),
       ),
     );
   }
@@ -219,29 +224,32 @@ class _BookingFlowSheetState extends ConsumerState<_BookingFlowSheet> {
           ),
         ),
         if (widget.resource.requiresAuthorization)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: Colors.amber.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
-              border: Border.all(color: Colors.amber.withValues(alpha: 0.3)),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.lock_outlined, size: 12, color: Colors.amber.shade700),
-                const SizedBox(width: 4),
-                Text(
-                  'Autorização',
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.amber.shade700,
+          Builder(builder: (context) {
+            final isDark = Theme.of(context).brightness == Brightness.dark;
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.amber.withValues(alpha: isDark ? 0.15 : 0.1),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+                border: Border.all(color: Colors.amber.withValues(alpha: 0.3)),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.lock_outlined, size: 12, color: isDark ? Colors.amber.shade300 : Colors.amber.shade700),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Autorização',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.amber.shade300 : Colors.amber.shade700,
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ),
+                ],
+              ),
+            );
+          }),
       ],
     );
   }
@@ -451,78 +459,81 @@ class _BookingFlowSheetState extends ConsumerState<_BookingFlowSheet> {
 
         // Authorization upload (if required)
         if (widget.resource.requiresAuthorization) ...[
-          Container(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            decoration: BoxDecoration(
-              color: Colors.amber.withValues(alpha: 0.05),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-              border: Border.all(color: Colors.amber.withValues(alpha: 0.3)),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(Icons.info_outlined,
-                        size: 18, color: Colors.amber.shade700),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'Este recurso exige documento de autorização (PDF, JPG ou PNG, máx. 5MB)',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.amber.shade700,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    onPressed: _pickFile,
-                    icon: const Icon(Icons.upload_file),
-                    label: Text(
-                      _selectedFile != null
-                          ? _selectedFile!.name
-                          : 'Selecionar Arquivo',
-                    ),
-                  ),
-                ),
-                if (_fileError != null) ...[
-                  const SizedBox(height: 8),
-                  Text(
-                    _fileError!,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: colors.error,
-                    ),
-                  ),
-                ],
-                if (_selectedFile != null) ...[
-                  const SizedBox(height: 8),
+          Builder(builder: (context) {
+            final isDark = Theme.of(context).brightness == Brightness.dark;
+            return Container(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              decoration: BoxDecoration(
+                color: Colors.amber.withValues(alpha: isDark ? 0.08 : 0.05),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                border: Border.all(color: Colors.amber.withValues(alpha: 0.3)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   Row(
                     children: [
-                      Icon(Icons.check_circle,
-                          size: 16, color: colors.tertiary),
-                      const SizedBox(width: 6),
+                      Icon(Icons.info_outlined,
+                          size: 18, color: isDark ? Colors.amber.shade300 : Colors.amber.shade700),
+                      const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          '${_selectedFile!.name} (${(_selectedFile!.size / 1024).toStringAsFixed(0)} KB)',
+                          'Este recurso exige documento de autorização (PDF, JPG ou PNG, máx. 5MB)',
                           style: TextStyle(
                             fontSize: 12,
-                            color: colors.tertiary,
+                            color: isDark ? Colors.amber.shade300 : Colors.amber.shade700,
                           ),
-                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
                   ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: _pickFile,
+                      icon: const Icon(Icons.upload_file),
+                      label: Text(
+                        _selectedFile != null
+                            ? _selectedFile!.name
+                            : 'Selecionar Arquivo',
+                      ),
+                    ),
+                  ),
+                  if (_fileError != null) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      _fileError!,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: colors.error,
+                      ),
+                    ),
+                  ],
+                  if (_selectedFile != null) ...[
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Icon(Icons.check_circle,
+                            size: 16, color: colors.tertiary),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            '${_selectedFile!.name} (${(_selectedFile!.size / 1024).toStringAsFixed(0)} KB)',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: colors.tertiary,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ],
-              ],
-            ),
-          ),
+              ),
+            );
+          }),
           const SizedBox(height: 16),
         ],
 

@@ -154,17 +154,17 @@ class _StaffInterventionChatScreenState
                 ),
                 data: (messages) {
                   if (messages.isEmpty) {
-                    return const Center(
+                    return Center(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(Icons.chat_bubble_outline,
-                              size: 64, color: Colors.grey),
-                          SizedBox(height: 16),
+                              size: 64, color: colors.onSurfaceVariant),
+                          const SizedBox(height: 16),
                           Text(
                             'Nenhuma mensagem nesta conversa',
                             style:
-                                TextStyle(fontSize: 16, color: Colors.grey),
+                                TextStyle(fontSize: 16, color: colors.onSurfaceVariant),
                           ),
                         ],
                       ),
@@ -220,7 +220,7 @@ class _InterventionMessageBubble extends StatelessWidget {
       child: Align(
         alignment: isUser ? Alignment.centerLeft : Alignment.centerRight,
         child: ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: screenWidth * 0.75),
+          constraints: BoxConstraints(maxWidth: (screenWidth * 0.75).clamp(0, 500).toDouble()),
           child: Container(
             padding:
                 const EdgeInsets.symmetric(horizontal: 16, vertical: 12),

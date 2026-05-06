@@ -201,6 +201,7 @@ class _ResourceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return GlassCard(
       onTap: onTap,
@@ -247,7 +248,7 @@ class _ResourceCard extends StatelessWidget {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: Colors.amber.withValues(alpha: 0.1),
+                      color: Colors.amber.withValues(alpha: isDark ? 0.15 : 0.1),
                       borderRadius:
                           BorderRadius.circular(AppSpacing.radiusFull),
                       border: Border.all(
@@ -260,7 +261,7 @@ class _ResourceCard extends StatelessWidget {
                         Icon(
                           Icons.lock_outlined,
                           size: 12,
-                          color: Colors.amber.shade700,
+                          color: isDark ? Colors.amber.shade300 : Colors.amber.shade700,
                         ),
                         const SizedBox(width: 4),
                         Text(
@@ -268,7 +269,7 @@ class _ResourceCard extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
-                            color: Colors.amber.shade700,
+                            color: isDark ? Colors.amber.shade300 : Colors.amber.shade700,
                           ),
                         ),
                       ],

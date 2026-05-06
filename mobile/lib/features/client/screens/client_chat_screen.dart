@@ -78,7 +78,7 @@ class _ClientChatScreenState extends ConsumerState<ClientChatScreen> {
                   child: Row(
                     children: [
                       SizedBox(
-                        width: MediaQuery.sizeOf(context).width * 0.35,
+                        width: (MediaQuery.sizeOf(context).width * 0.35).clamp(0, 400).toDouble(),
                         child: Column(
                           children: [
                             // Search bar
@@ -347,7 +347,7 @@ class _ActionsPanel extends ConsumerWidget {
             return ExpansionTile(
               leading: Icon(
                 log.isError ? Icons.error_outline : Icons.check_circle_outline,
-                color: log.isError ? colors.error : const Color(0xFF4CAF50),
+                color: log.isError ? colors.error : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF81C784) : const Color(0xFF4CAF50)),
               ),
               title: Text(log.toolName),
               subtitle: Text(log.status),
@@ -390,7 +390,7 @@ class _MessageBubble extends StatelessWidget {
       child: Align(
         alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
         child: ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: screenWidth * 0.75),
+          constraints: BoxConstraints(maxWidth: (screenWidth * 0.75).clamp(0, 500).toDouble()),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(

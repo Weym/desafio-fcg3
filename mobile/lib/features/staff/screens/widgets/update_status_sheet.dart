@@ -113,14 +113,17 @@ class _UpdateStatusSheetState extends ConsumerState<_UpdateStatusSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.fromLTRB(
-        24,
-        24,
-        24,
-        MediaQuery.of(context).viewInsets.bottom + 40,
-      ),
-      child: Column(
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 500),
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(
+            24,
+            24,
+            24,
+            MediaQuery.of(context).viewInsets.bottom + 40,
+          ),
+          child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -179,6 +182,8 @@ class _UpdateStatusSheetState extends ConsumerState<_UpdateStatusSheet> {
                 : const Text('Atualizar Status'),
           ),
         ],
+          ),
+        ),
       ),
     );
   }

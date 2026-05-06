@@ -133,7 +133,7 @@ class _MessageBubble extends StatelessWidget {
       child: Align(
         alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
         child: ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: screenWidth * 0.75),
+          constraints: BoxConstraints(maxWidth: (screenWidth * 0.75).clamp(0, 500).toDouble()),
           child: Column(
             crossAxisAlignment:
                 isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
@@ -268,7 +268,7 @@ class _ActionLogTile extends StatelessWidget {
     return ExpansionTile(
       leading: Icon(
         log.isError ? Icons.error_outline : Icons.check_circle_outline,
-        color: log.isError ? theme.colorScheme.error : const Color(0xFF4CAF50),
+        color: log.isError ? theme.colorScheme.error : (theme.brightness == Brightness.dark ? const Color(0xFF81C784) : const Color(0xFF4CAF50)),
       ),
       title: Text(log.toolName),
       subtitle: Text('${_formatDate(log.createdAt)} \u00b7 ${log.status}'),
@@ -334,9 +334,9 @@ class _ActionLogTile extends StatelessWidget {
                 const SizedBox(height: 8),
                 Chip(
                   label: const Text('Retry'),
-                  backgroundColor: Colors.orange.withValues(alpha: 0.2),
-                  labelStyle: const TextStyle(
-                    color: Colors.orange,
+                  backgroundColor: (theme.brightness == Brightness.dark ? Colors.orange.shade300 : Colors.orange).withValues(alpha: 0.2),
+                  labelStyle: TextStyle(
+                    color: theme.brightness == Brightness.dark ? Colors.orange.shade300 : Colors.orange,
                     fontSize: 12,
                   ),
                 ),
