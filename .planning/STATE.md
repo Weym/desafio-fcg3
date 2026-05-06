@@ -17,10 +17,10 @@ progress:
 
 ## Current Position
 
-Phase: 13
-Plan: 2 of ? in progress
+Phase: 14
+Plan: 1 of ? complete
 Status: Executing
-Last activity: 2026-05-06 — Phase 13 Plan 02 complete (Staff Resources Screen with CRUD)
+Last activity: 2026-05-06 — Phase 14 Plan 01 complete (Human Intervention Backend)
 
 Progress: [██████████] 100%
 
@@ -34,15 +34,15 @@ Progress: [██████████] 100%
 | 10 | Cross-Platform Polish | complete |
 | 11 | Alpha Connect Visual Refactoring | complete |
 | 12 | Frontend-Backend Integration | complete |
+| 14 | Human Intervention | in-progress |
 
 ## Current Focus
 
-**Milestone M2 (Flutter Frontend) + Integration — 100% complete.**
-6 phases delivered (Phases 7-12), 22 plans executed.
-Previous milestone (M1 Backend + AI + MCP) delivered 6 phases, 47 plans.
+**Phase 14 (Human Intervention) — Plan 01 complete.**
+Backend: escalation detection, AI skip gate, staff assign/reply/resolve endpoints.
 
-Branch: `feat/frontend-backend-integration`
-Next action: Merge to main or start next milestone.
+Branch: `feat/human-intervention`
+Next action: Execute Plan 14-02 (if exists) or merge.
 
 ## Accumulated Context
 
@@ -50,6 +50,9 @@ Next action: Merge to main or start next milestone.
 
 Recent decisions affecting current work:
 
+- [Phase 14]: Escalation keywords checked BEFORE AI call to save AI service resources
+- [Phase 14]: Staff sees all 'human_needed' + only their own 'human_active' sessions (FIFO by escalated_at)
+- [Phase 14]: AI response escalation saves bot message before escalating — staff has full context
 - [Phase 11]: App renamed from "Desafio FCG3" to "Alpha Connect"
 - [Phase 11]: google_fonts added — Plus Jakarta Sans (headings) + Inter (body)
 - [Phase 11]: Color palette aligned to alpha-connect: primary #3B608F, secondary #6A548A, tertiary #676001
