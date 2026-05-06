@@ -55,6 +55,81 @@ class TestPhoneLookup:
         result = await svc.lookup_student_by_phone("+5521999999999", db_session)
         assert result is None
 
+    async def test_br_ninth_digit_stored_with_9_incoming_without_9(
+        self, db_session
+    ):
+        """Meta Cloud API observed to send 12-digit form '558398257544' when
+        the student is stored with the modern 13-digit form '5583998257544'.
+        Lookup must accept the legacy form (D-04, Brazilian 9th-digit quirk).
+        """
+        student = Student(
+            id=uuid.uuid4(),
+            name="Ninth Digit Student",
+            email="ninth@test.edu",
+            phone="5583998257544",  # stored WITH the mobile 9
+            registration_number="NINTH01",
+            semester=1,
+            status="active",
+            enrollment_year=2024,
+        )
+        db_session.add(student)
+        await db_session.flush()
+
+        svc = WebhookService()
+        # Meta sends WITHOUT the mobile 9 (12 digits)
+        result = await svc.lookup_student_by_phone("558398257544", db_session)
+        assert result is not None
+        assert result.id == student.id
+
+    async def test_br_ninth_digit_stored_without_9_incoming_with_9(
+        self, db_session
+    ):
+        """Converse of the above: student stored in legacy 12-digit form but
+        Meta sends the modern 13-digit form. Lookup must still succeed.
+        """
+        student = Student(
+            id=uuid.uuid4(),
+            name="Legacy Student",
+            email="legacy@test.edu",
+            phone="558398257544",  # stored WITHOUT the mobile 9
+            registration_number="LEG01",
+            semester=1,
+            status="active",
+            enrollment_year=2024,
+        )
+        db_session.add(student)
+        await db_session.flush()
+
+        svc = WebhookService()
+        # Incoming WITH the mobile 9 (13 digits)
+        result = await svc.lookup_student_by_phone("5583998257544", db_session)
+        assert result is not None
+        assert result.id == student.id
+
+    async def test_non_br_phone_unchanged(self, db_session):
+        """Non-Brazilian phones (don't start with 55) are compared verbatim —
+        no variant expansion. E.g., US number '14155550123'.
+        """
+        student = Student(
+            id=uuid.uuid4(),
+            name="US Student",
+            email="us@test.edu",
+            phone="14155550123",
+            registration_number="US01",
+            semester=1,
+            status="active",
+            enrollment_year=2024,
+        )
+        db_session.add(student)
+        await db_session.flush()
+
+        svc = WebhookService()
+        result = await svc.lookup_student_by_phone("14155550123", db_session)
+        assert result is not None
+        assert result.id == student.id
+        # Arbitrary other non-matching string must still not match
+        assert await svc.lookup_student_by_phone("14155550124", db_session) is None
+
 
 class TestUnknownPhoneWebhook:
     """Integration test: unknown phone sends rejection, no session created."""

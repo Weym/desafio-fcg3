@@ -41,6 +41,47 @@ SESSION_CLOSE_KEYWORDS = {"sair", "encerrar"}
 EMAIL_REGEX = re.compile(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")
 
 
+def _phone_variants(phone: str) -> list[str]:
+    """Return lookup variants for a Brazilian-format phone number.
+
+    Handles the Brazilian "9th digit" quirk: mobile numbers from all DDDs
+    officially carry a leading `9` after the area code (13 digits total
+    for Country Code + DDD + 9XXXXXXXX), but the WhatsApp Cloud API is
+    observed to sometimes strip that `9` and deliver the legacy 12-digit
+    form (e.g., `558398257544` instead of `5583998257544`).
+
+    To match either, we return a list containing the original input plus,
+    when applicable, the sibling variant. Comparison is done via IN (...)
+    in the SQL query.
+
+    This function does NOT strip a leading `+` — per D-04 stored phones
+    have no `+`, so a `+`-prefixed input should not match. We only
+    expand within plain digit strings that start with the Brazil
+    country code `55`.
+    """
+    variants = [phone]
+    if not phone.startswith("55") or not phone.isdigit():
+        return variants
+
+    # 12 digits: 55 + DDD(2) + subscriber(8) → add 13-digit variant with `9`
+    if len(phone) == 12:
+        cc_ddd = phone[:4]            # "5583"
+        subscriber = phone[4:]        # "98257544"
+        # Only synthesize a mobile if the 8-digit subscriber starts with 8 or 9
+        # (the Brazilian mobile range). Avoids synthesizing bogus 9-prefixed
+        # numbers for landlines that happen to be 12 digits.
+        if subscriber[0] in ("8", "9"):
+            variants.append(f"{cc_ddd}9{subscriber}")
+        return variants
+
+    # 13 digits: 55 + DDD(2) + 9 + subscriber(8) → add 12-digit variant
+    if len(phone) == 13 and phone[4] == "9":
+        variants.append(phone[:4] + phone[5:])
+        return variants
+
+    return variants
+
+
 class WebhookService:
     """Webhook business logic encapsulating phone lookup, session management,
     and the verification state machine."""
@@ -48,14 +89,17 @@ class WebhookService:
     async def lookup_student_by_phone(
         self, phone: str, db: AsyncSession
     ) -> Optional[Student]:
-        """Look up a student by phone number. Direct string comparison per D-04.
+        """Look up a student by phone number per D-04.
 
-        Phone is stored in international format without + (e.g., '5521999999999').
-        WhatsApp sends in this same format.
+        Accepts both 12-digit (legacy) and 13-digit (with mobile `9`) Brazilian
+        phone formats, because the WhatsApp Cloud API is observed to send the
+        legacy 12-digit form while student records are stored with the modern
+        13-digit form (or vice versa). See `_phone_variants`.
         """
+        variants = _phone_variants(phone)
         result = await db.execute(
             select(Student).where(
-                and_(Student.phone == phone, Student.status == "active")
+                and_(Student.phone.in_(variants), Student.status == "active")
             )
         )
         return result.scalar_one_or_none()

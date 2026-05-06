@@ -92,6 +92,13 @@ async def whatsapp_webhook(request: Request) -> Response:
                     student = await webhook_service.lookup_student_by_phone(
                         phone, db
                     )
+                    logger.info(
+                        "webhook msg: from=%s wamid=%s type=%s student_found=%s",
+                        phone,
+                        wamid,
+                        message.type,
+                        student is not None,
+                    )
                     if student is None:
                         # D-03: Unknown phone, send rejection, no session
                         await wa_client.send_text_message(
