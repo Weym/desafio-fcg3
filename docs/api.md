@@ -1,5 +1,7 @@
 # API - Endpoints
 
+> **Last validated: 2026-05-06** against backend source code (`backend/src/features/`)
+
 ## Convencoes
 
 | Item         | Valor                                        |
@@ -79,7 +81,7 @@ Solicita codigo de verificacao por email ou SMS.
 
 ### `POST /auth/verify-code`
 
-Valida o codigo e retorna token JWT.
+Valida o codigo e retorna par de tokens JWT (access + refresh).
 O aluno tem **3 tentativas**. Ao esgotar, o codigo atual e invalidado e um novo e enviado automaticamente.
 
 **Request:**
@@ -87,8 +89,7 @@ O aluno tem **3 tentativas**. Ao esgotar, o codigo atual e invalidado e um novo 
 ```json
 {
   "email": "aluno@universidade.edu",
-  "code": "123456",
-  "platform": "app"
+  "code": "123456"
 }
 ```
 
@@ -96,14 +97,10 @@ O aluno tem **3 tentativas**. Ao esgotar, o codigo atual e invalidado e um novo 
 
 ```json
 {
-  "token": "eyJhbGciOiJIUzI1NiIs...",
-  "user": {
-    "id": "uuid",
-    "name": "Joao Silva",
-    "type": "student",
-    "email": "aluno@universidade.edu"
-  },
-  "expires_at": "2025-04-14T10:00:00Z"
+  "access_token": "eyJhbGciOiJIUzI1NiIs...",
+  "refresh_token": "eyJhbGciOiJIUzI1NiIs...",
+  "token_type": "bearer",
+  "expires_in": 3600
 }
 ```
 
@@ -113,19 +110,18 @@ O aluno tem **3 tentativas**. Ao esgotar, o codigo atual e invalidado e um novo 
 {
   "error": {
     "code": "INVALID_CODE",
-    "message": "Codigo invalido.",
-    "details": [{ "field": "attempts_remaining", "message": "2" }]
+    "message": "Invalid or expired code"
   }
 }
 ```
 
-**Response (429) — tentativas esgotadas:**
+**Response (401) — tentativas esgotadas:**
 
 ```json
 {
   "error": {
     "code": "MAX_ATTEMPTS_REACHED",
-    "message": "Limite de tentativas atingido. Um novo codigo foi enviado para seu email."
+    "message": "Too many attempts. A new code was sent."
   }
 }
 ```
@@ -139,7 +135,41 @@ Invalida a sessao atual. **Requer autenticacao.**
 **Response (200):**
 
 ```json
-{ "message": "Sessao encerrada" }
+{ "message": "Logged out" }
+```
+
+---
+
+### `POST /auth/refresh`
+
+Renova o par de tokens usando o refresh token. **Rotacao obrigatoria**: cada refresh token so pode ser usado uma vez.
+
+**Request:**
+
+```json
+{ "refresh_token": "eyJhbGciOiJIUzI1NiIs..." }
+```
+
+**Response (200):**
+
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIs...",
+  "refresh_token": "eyJhbGciOiJIUzI1NiIs...",
+  "token_type": "bearer",
+  "expires_in": 3600
+}
+```
+
+**Response (401) — token invalido ou ja usado:**
+
+```json
+{
+  "error": {
+    "code": "invalid_token",
+    "message": "Invalid or expired refresh token"
+  }
+}
 ```
 
 ---
@@ -153,10 +183,9 @@ Retorna dados do usuario autenticado. **Requer autenticacao.**
 ```json
 {
   "id": "uuid",
-  "name": "Joao Silva",
-  "type": "student",
   "email": "aluno@universidade.edu",
-  "phone": "+5521999999999"
+  "name": "Joao Silva",
+  "role": "student"
 }
 ```
 
