@@ -22,8 +22,10 @@
  (completed 2026-05-06)
 - [x] **Phase 12: Frontend-Backend Integration** — Validate API contracts, Docker Compose full stack, OTP bypass for dev, E2E automated tests with real data flowing
  (completed 2026-05-06)
-- [ ] **Phase 13: Resource Allocation** — CRUD de recursos (gestor), agendamento com upload de autorização (aluno), novos tipos de recurso, flag requires_authorization
-- [ ] **Phase 14: Human Intervention** — Tela de intervenção humana (gestor assume chats não resolvidos pelo bot, responde via WhatsApp)
+- [x] **Phase 13: Resource Allocation** — CRUD de recursos (gestor), agendamento com upload de autorização (aluno), novos tipos de recurso, flag requires_authorization
+ (completed 2026-05-06)
+- [x] **Phase 14: Human Intervention** — Tela de intervenção humana (gestor assume chats não resolvidos pelo bot, responde via WhatsApp)
+ (completed 2026-05-06)
 
 ---
 
@@ -43,8 +45,8 @@
 **Plans:** 2 plans
 
 Plans:
-- [ ] 14-01-PLAN.md — Backend: migration, escalation detection, AI skip, assign/reply/resolve endpoints
-- [ ] 14-02-PLAN.md — Frontend staff: intervention screen, chat detail, navigation wiring
+- [x] 14-01-PLAN.md — Backend: migration, escalation detection, AI skip, assign/reply/resolve endpoints
+- [x] 14-02-PLAN.md — Frontend staff: intervention screen, chat detail, navigation wiring
 
 ---
 
@@ -65,9 +67,9 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
-- [ ] 13-01-PLAN.md — Backend: migration, resources CRUD endpoints, upload endpoint, seed expansion
-- [ ] 13-02-PLAN.md — Frontend staff: resources screen with CRUD + navigation wiring
-- [ ] 13-03-PLAN.md — Frontend client: resource booking flow with upload + my appointments
+- [x] 13-01-PLAN.md — Backend: migration, resources CRUD endpoints, upload endpoint, seed expansion
+- [x] 13-02-PLAN.md — Frontend staff: resources screen with CRUD + navigation wiring
+- [x] 13-03-PLAN.md — Frontend client: resource booking flow with upload + my appointments
 
 ---
 
@@ -220,4 +222,5 @@ Plans:
 | 10. Cross-Platform Polish | 5/5 | Complete | 2026-05-05 |
 | 11. Alpha Connect Visual Refactoring | 1/1 | Complete | 2026-05-06 |
 | 12. Frontend-Backend Integration | 3/3 | Complete | 2026-05-06 |
-| 13. Resource Allocation | 0/3 | Planning | — |
+| 13. Resource Allocation | 3/3 | Complete | 2026-05-06 |
+| 14. Human Intervention | 2/2 | Complete | 2026-05-06 |
