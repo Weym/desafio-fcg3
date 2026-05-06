@@ -24,7 +24,7 @@ final staffScheduleServiceProvider = Provider<StaffScheduleService>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef StaffScheduleServiceRef = ProviderRef<StaffScheduleService>;
-String _$staffAppointmentsHash() => r'c6272d3a279afaeb055a288aaf97c2417f549352';
+String _$staffAppointmentsHash() => r'174f42f3850de38b3d840e06e1a468ad06986f63';
 
 /// See also [staffAppointments].
 @ProviderFor(staffAppointments)

@@ -23,7 +23,7 @@ final staffChatServiceProvider = Provider<StaffChatService>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef StaffChatServiceRef = ProviderRef<StaffChatService>;
-String _$staffChatSessionsHash() => r'8e6e7023cde8a3e89550aca5f8e400c1353a4e12';
+String _$staffChatSessionsHash() => r'982c7d1eeab387984aad25b6ef3be2907dbb204c';
 
 /// See also [staffChatSessions].
 @ProviderFor(staffChatSessions)
