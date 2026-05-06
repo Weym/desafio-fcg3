@@ -149,3 +149,4 @@ Additional validations performed (no code fix needed):
 
 To resume work: read this file, then read `.planning/ROADMAP.md` to see current phase and plan status.
 All M2 code work is complete. Remaining items are manual verification (WhatsApp webhook, device testing).
+| 2026-05-06 | fast | fix flutter-web docker build: add mobile/.dockerignore | done |
