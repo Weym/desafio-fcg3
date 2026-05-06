@@ -107,7 +107,6 @@ class _ClientShellState extends ConsumerState<ClientShell> {
                 Expanded(child: widget.child),
               ],
             ),
-            extendBody: true,
             bottomNavigationBar: _GlassBottomNav(
               currentIndex: _currentIndex(context),
               destinations: _destinations,

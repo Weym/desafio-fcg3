@@ -26,13 +26,10 @@ class StaffDocumentsScreen extends ConsumerWidget {
         title: const Text('Documentos'),
         actions: const [AppBarActions()],
       ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 80),
-        child: FloatingActionButton(
-          onPressed: () => showSendDocumentSheet(context, ref),
-          tooltip: 'Enviar Documento',
-          child: const Icon(Icons.add),
-        ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => showSendDocumentSheet(context, ref),
+        tooltip: 'Enviar Documento',
+        child: const Icon(Icons.add),
       ),
       body: Column(
         children: [
