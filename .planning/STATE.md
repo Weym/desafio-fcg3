@@ -17,10 +17,10 @@ progress:
 
 ## Current Position
 
-Phase: 12
-Plan: 3 of 3 complete
-Status: Phase complete
-Last activity: 2026-05-06 — Phase 12 complete + UI fixes (FAB positioning, bottom sheets, 24h time, theme toggle, WhatsApp number)
+Phase: 13
+Plan: 2 of ? in progress
+Status: Executing
+Last activity: 2026-05-06 — Phase 13 Plan 02 complete (Staff Resources Screen with CRUD)
 
 Progress: [██████████] 100%
 
