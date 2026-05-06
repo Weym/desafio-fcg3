@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../../../core/models/user_model.dart';
 import '../../../core/providers/storage_provider.dart';
 import '../../../core/providers/dio_provider.dart';
 import '../services/auth_service.dart';
@@ -127,6 +128,11 @@ class Auth extends _$Auth {
     await storage.delete(key: _accessTokenKey);
     await storage.delete(key: _refreshTokenKey);
     state = const AuthUnauthenticated();
+  }
+
+  /// Set a demo user for previewing screens without backend.
+  void setDemoUser(UserModel user) {
+    state = AuthAuthenticated(user: user);
   }
 }
 

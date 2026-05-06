@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../shared/widgets/app_bar_actions.dart';
 import '../../../shared/widgets/app_skeleton_list.dart';
 import '../../../shared/widgets/app_empty_state.dart';
 import '../../../shared/widgets/app_error_state.dart';
@@ -24,18 +25,16 @@ class StaffScheduleScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Agenda'),
         actions: [
-          Container(
-            margin: const EdgeInsets.only(right: 12),
-            child: IconButton.filled(
-              onPressed: () => showCreateSlotSheet(context, ref),
-              icon: const Icon(Icons.add, size: 24),
-              style: IconButton.styleFrom(
-                backgroundColor: colors.primary,
-                foregroundColor: colors.onPrimary,
-              ),
-              tooltip: 'Novo Slot',
+          IconButton.filled(
+            onPressed: () => showCreateSlotSheet(context, ref),
+            icon: const Icon(Icons.add, size: 24),
+            style: IconButton.styleFrom(
+              backgroundColor: colors.primary,
+              foregroundColor: colors.onPrimary,
             ),
+            tooltip: 'Novo Slot',
           ),
+          const AppBarActions(),
         ],
       ),
       body: Column(

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/router/route_names.dart';
 import '../../../core/theme/app_spacing.dart';
-import '../../../core/theme/theme_provider.dart';
+import '../../../shared/widgets/app_bar_actions.dart';
 import '../../../shared/widgets/app_skeleton_card.dart';
 import '../../../shared/widgets/glass_card.dart';
 import '../../../shared/widgets/responsive_container.dart';
@@ -61,29 +61,7 @@ class ClientHomeScreen extends ConsumerWidget {
             child: Icon(Icons.school_rounded, color: colors.primary),
           ),
         ),
-        actions: [
-          IconButton(
-            icon: Icon(
-              ref.watch(themeModeNotifierProvider) == ThemeMode.dark
-                  ? Icons.light_mode
-                  : Icons.dark_mode,
-              color: colors.primary,
-            ),
-            onPressed: () {
-              final current = ref.read(themeModeNotifierProvider);
-              final next = current == ThemeMode.dark
-                  ? ThemeMode.light
-                  : ThemeMode.dark;
-              ref.read(themeModeNotifierProvider.notifier).setThemeMode(next);
-            },
-            tooltip: 'Alternar tema',
-          ),
-          IconButton(
-            icon: Icon(Icons.logout, color: colors.error),
-            onPressed: () => ref.read(authProvider.notifier).logout(),
-            tooltip: 'Sair',
-          ),
-        ],
+        actions: const [AppBarActions()],
       ),
       body: RefreshIndicator(
         onRefresh: () => _onRefresh(ref),

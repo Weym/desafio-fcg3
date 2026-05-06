@@ -3,12 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/responsive/breakpoints.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../shared/widgets/app_bar_actions.dart';
 import '../../../shared/widgets/app_skeleton_list.dart';
 import '../../../shared/widgets/app_empty_state.dart';
 import '../../../shared/widgets/app_error_state.dart';
 import '../../../shared/widgets/glass_card.dart';
 import '../../../shared/widgets/responsive_container.dart';
-import '../../auth/providers/auth_provider.dart';
 import '../../client/models/chat_session_model.dart';
 import '../../client/models/chat_message_model.dart';
 import '../providers/staff_chat_provider.dart';
@@ -44,13 +44,7 @@ class _StaffAiScreenState extends ConsumerState<StaffAiScreen>
     return Scaffold(
       appBar: AppBar(
         title: const Text('Insights IA'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.logout, color: Theme.of(context).colorScheme.error),
-            onPressed: () => ref.read(authProvider.notifier).logout(),
-            tooltip: 'Sair',
-          ),
-        ],
+        actions: const [AppBarActions()],
         bottom: TabBar(
           controller: _tabController,
           tabs: const [

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../shared/widgets/app_bar_actions.dart';
 import '../../../shared/widgets/glass_card.dart';
 import '../../../shared/widgets/responsive_container.dart';
 
@@ -9,15 +11,18 @@ const _supportPhone = '+55 21 99999-9999';
 const _officeHours = 'Segunda a Sexta, das 08h às 21h';
 const _whatsappUrl = 'https://wa.me/5521999999999';
 
-class ClientSupportScreen extends StatelessWidget {
+class ClientSupportScreen extends ConsumerWidget {
   const ClientSupportScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colors = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Suporte')),
+      appBar: AppBar(
+        title: const Text('Suporte'),
+        actions: const [AppBarActions()],
+      ),
       body: SingleChildScrollView(
         child: ResponsiveContainer(
           padding: const EdgeInsets.all(20),

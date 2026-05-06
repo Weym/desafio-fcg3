@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/models/user_model.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../core/theme/theme_provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/auth_state.dart';
 
@@ -138,6 +140,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     _startResendCountdown();
   }
 
+  /// Enter demo mode with a fake user (no backend needed).
+  void _enterDemoMode(String role) {
+    final demoUser = UserModel(
+      id: 'demo-${role}-001',
+      name: role == 'student' ? 'João Demo' : 'Admin Demo',
+      email: role == 'student' ? 'joao@universidade.edu' : 'admin@universidade.edu',
+      role: role,
+    );
+    ref.read(authProvider.notifier).setDemoUser(demoUser);
+  }
+
   void _onCodeDigitChanged(int index, String value) {
     if (value.length > 1) {
       // Handle paste
@@ -175,6 +188,22 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     return Scaffold(
       backgroundColor: colors.surfaceContainerLow,
+      floatingActionButton: FloatingActionButton.small(
+        onPressed: () {
+          final current = ref.read(themeModeNotifierProvider);
+          final next =
+              current == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
+          ref.read(themeModeNotifierProvider.notifier).setThemeMode(next);
+        },
+        backgroundColor: colors.surfaceContainer,
+        child: Icon(
+          ref.watch(themeModeNotifierProvider) == ThemeMode.dark
+              ? Icons.light_mode
+              : Icons.dark_mode,
+          color: colors.primary,
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(AppSpacing.lg),
@@ -190,7 +219,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     color: colors.surfaceContainerLowest.withValues(alpha: 0.85),
                     borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
                     border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.4),
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white.withValues(alpha: 0.1)
+                          : Colors.white.withValues(alpha: 0.4),
                     ),
                     boxShadow: [
                       BoxShadow(
@@ -274,9 +305,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             keyboardType: TextInputType.emailAddress,
             textInputAction: TextInputAction.done,
             autofillHints: const [AutofillHints.email],
-            decoration: const InputDecoration(
+            style: TextStyle(color: colors.onSurface),
+            decoration: InputDecoration(
               hintText: 'Email acadêmico',
-              prefixIcon: Icon(Icons.email_outlined),
+              hintStyle: TextStyle(color: colors.onSurfaceVariant.withValues(alpha: 0.5)),
+              prefixIcon: Icon(Icons.email_outlined, color: colors.onSurfaceVariant),
             ),
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
@@ -314,6 +347,37 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ],
                     ),
             ),
+          ),
+          const SizedBox(height: AppSpacing.xl),
+
+          // Demo mode buttons (for preview without backend)
+          Divider(color: colors.outlineVariant.withValues(alpha: 0.3)),
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            'MODO DEMONSTRAÇÃO',
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: colors.onSurfaceVariant,
+                  letterSpacing: 1.5,
+                  fontWeight: FontWeight.bold,
+                ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () => _enterDemoMode('student'),
+                  child: const Text('Aluno', style: TextStyle(fontSize: 13)),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () => _enterDemoMode('staff'),
+                  child: const Text('Gestor', style: TextStyle(fontSize: 13)),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -387,7 +451,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   decoration: InputDecoration(
                     counterText: '',
                     contentPadding: EdgeInsets.zero,
+                    filled: true,
+                    fillColor: colors.surfaceContainerHigh.withValues(alpha: 0.5),
                     border: OutlineInputBorder(
+                      borderRadius:
+                          BorderRadius.circular(AppSpacing.radiusMd),
+                      borderSide: BorderSide(
+                        color: colors.outlineVariant.withValues(alpha: 0.3),
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
                       borderRadius:
                           BorderRadius.circular(AppSpacing.radiusMd),
                       borderSide: BorderSide(
@@ -403,9 +476,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                     ),
                   ),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
+                    color: colors.onSurface,
                   ),
                   onChanged: (value) => _onCodeDigitChanged(index, value),
                 ),

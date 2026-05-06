@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../shared/widgets/app_bar_actions.dart';
 import '../../../shared/widgets/app_skeleton_list.dart';
 import '../../../shared/widgets/app_empty_state.dart';
 import '../../../shared/widgets/app_error_state.dart';
@@ -24,18 +25,16 @@ class StaffDocumentsScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Documentos'),
         actions: [
-          Container(
-            margin: const EdgeInsets.only(right: 12),
-            child: IconButton.filled(
-              onPressed: () => showSendDocumentSheet(context, ref),
-              icon: const Icon(Icons.add, size: 24),
-              style: IconButton.styleFrom(
-                backgroundColor: colors.primary,
-                foregroundColor: colors.onPrimary,
-              ),
-              tooltip: 'Enviar Documento',
+          IconButton.filled(
+            onPressed: () => showSendDocumentSheet(context, ref),
+            icon: const Icon(Icons.add, size: 24),
+            style: IconButton.styleFrom(
+              backgroundColor: colors.primary,
+              foregroundColor: colors.onPrimary,
             ),
+            tooltip: 'Enviar Documento',
           ),
+          const AppBarActions(),
         ],
       ),
       body: Column(

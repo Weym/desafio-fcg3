@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../shared/widgets/app_bar_actions.dart';
 import '../models/chat_message_model.dart';
 import '../models/action_log_model.dart';
 import '../providers/chat_provider.dart';
@@ -38,6 +39,7 @@ class _ClientChatDetailScreenState extends ConsumerState<ClientChatDetailScreen>
     return Scaffold(
       appBar: AppBar(
         title: const Text('Conversa'),
+        actions: const [AppBarActions()],
         bottom: TabBar(
           controller: _tabController,
           tabs: const [

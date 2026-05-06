@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../shared/widgets/app_bar_actions.dart';
 import '../../../shared/widgets/app_skeleton_list.dart';
 import '../../../shared/widgets/app_empty_state.dart';
 import '../../../shared/widgets/app_error_state.dart';
@@ -30,6 +31,7 @@ class ClientNotificationsScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Notificações'),
+        actions: const [AppBarActions()],
       ),
       body: RefreshIndicator(
         onRefresh: () => _onRefresh(ref),

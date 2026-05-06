@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/responsive/breakpoints.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../shared/widgets/app_bar_actions.dart';
 import '../../../shared/widgets/app_skeleton_list.dart';
 import '../../../shared/widgets/app_empty_state.dart';
 import '../../../shared/widgets/app_error_state.dart';
@@ -34,7 +35,10 @@ class _ClientChatScreenState extends ConsumerState<ClientChatScreen> {
     final colors = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Chat')),
+      appBar: AppBar(
+        title: const Text('Chat'),
+        actions: const [AppBarActions()],
+      ),
       body: sessionsAsync.when(
         loading: () => const ResponsiveContainer(
           padding: EdgeInsets.all(16),
@@ -203,8 +207,10 @@ class _SearchBar extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
 
     return TextField(
+      style: TextStyle(color: colors.onSurface),
       decoration: InputDecoration(
         hintText: 'Buscar conversas...',
+        hintStyle: TextStyle(color: colors.onSurfaceVariant),
         prefixIcon: Icon(Icons.search, color: colors.outline),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
