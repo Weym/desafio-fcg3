@@ -7,9 +7,9 @@ import '../../../shared/widgets/glass_card.dart';
 import '../../../shared/widgets/responsive_container.dart';
 
 const _supportEmail = 'suporte@universidade.edu';
-const _supportPhone = '+55 21 99999-9999';
+const _supportPhone = '+55 71 9373-5873';
 const _officeHours = 'Segunda a Sexta, das 08h às 21h';
-const _whatsappUrl = 'https://wa.me/5521999999999';
+const _whatsappUrl = 'https://wa.me/557193735873';
 
 class ClientSupportScreen extends ConsumerWidget {
   const ClientSupportScreen({super.key});
