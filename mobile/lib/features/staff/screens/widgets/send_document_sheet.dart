@@ -10,6 +10,7 @@ void showSendDocumentSheet(BuildContext context, WidgetRef ref) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
+    useSafeArea: true,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
     ),
@@ -124,7 +125,7 @@ class _SendDocumentSheetState extends ConsumerState<_SendDocumentSheet> {
         24,
         24,
         24,
-        MediaQuery.of(context).viewInsets.bottom + 24,
+        MediaQuery.of(context).viewInsets.bottom + 40,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,

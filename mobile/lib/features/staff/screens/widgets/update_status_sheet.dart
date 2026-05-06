@@ -10,6 +10,7 @@ void showUpdateStatusSheet(
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
+    useSafeArea: true,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
     ),
@@ -117,7 +118,7 @@ class _UpdateStatusSheetState extends ConsumerState<_UpdateStatusSheet> {
         24,
         24,
         24,
-        MediaQuery.of(context).viewInsets.bottom + 24,
+        MediaQuery.of(context).viewInsets.bottom + 40,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,

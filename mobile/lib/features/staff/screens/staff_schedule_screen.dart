@@ -26,10 +26,13 @@ class StaffScheduleScreen extends ConsumerWidget {
         title: const Text('Agenda'),
         actions: const [AppBarActions()],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => showCreateSlotSheet(context, ref),
-        tooltip: 'Novo Slot',
-        child: const Icon(Icons.add),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 80),
+        child: FloatingActionButton(
+          onPressed: () => showCreateSlotSheet(context, ref),
+          tooltip: 'Novo Slot',
+          child: const Icon(Icons.add),
+        ),
       ),
       body: Column(
         children: [

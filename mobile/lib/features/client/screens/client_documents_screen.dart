@@ -26,10 +26,13 @@ class ClientDocumentsScreen extends ConsumerWidget {
         title: const Text('Documentos'),
         actions: const [AppBarActions()],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => showDocumentRequestSheet(context, ref),
-        tooltip: 'Solicitar Documento',
-        child: const Icon(Icons.add),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 80),
+        child: FloatingActionButton(
+          onPressed: () => showDocumentRequestSheet(context, ref),
+          tooltip: 'Solicitar Documento',
+          child: const Icon(Icons.add),
+        ),
       ),
       body: Column(
         children: [
