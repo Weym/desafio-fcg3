@@ -157,7 +157,7 @@ Commits:
 **Plans:** 3 plans
 
 Plans:
-- [ ] 12-01-PLAN.md — Docker Compose full stack (flutter-web service, conditional seed, .env docs)
+- [x] 12-01-PLAN.md — Docker Compose full stack (flutter-web service, conditional seed, .env docs)
 - [ ] 12-02-PLAN.md — API contract validation and Dart model corrections
 - [ ] 12-03-PLAN.md — E2E integration tests (auth, documents, chat, staff)
 
@@ -172,4 +172,4 @@ Plans:
 | 9. Staff Interface | 5/5 | Complete | 2026-05-05 |
 | 10. Cross-Platform Polish | 5/5 | Complete | 2026-05-05 |
 | 11. Alpha Connect Visual Refactoring | 1/1 | Complete | 2026-05-06 |
-| 12. Frontend-Backend Integration | 0/3 | Planning | — |
+| 12. Frontend-Backend Integration | 1/3 | Executing | — |
