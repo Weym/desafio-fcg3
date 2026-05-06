@@ -27,6 +27,27 @@
 
 ---
 
+### Phase 14: Human Intervention
+
+**Goal:** Complete human intervention system — bot escalates conversations when unable to resolve, staff sees pending sessions, assumes conversations, replies directly to students via WhatsApp, and marks sessions resolved.
+**Depends on:** Phase 13
+**Requirements:** HI-01, HI-02, HI-03, HI-04, HI-05, HI-06, HI-07, HI-08, HI-09, HI-10, HI-11, HI-12, HI-13, HI-14, HI-15, HI-16
+
+### Success Criteria
+1. Chat sessions support 4 status values (active, closed, human_needed, human_active) with assigned_staff_id tracking.
+2. Bot detects escalation keywords ("atendente", "humano", etc.) and AI responses containing "procurar a secretaria" — triggers escalation automatically.
+3. Student receives acknowledgment message on escalation; AI stops processing their messages until resolved.
+4. Staff can list pending interventions, assume a conversation, send replies (delivered via WhatsApp), and resolve sessions.
+5. Flutter staff app has "Intervenção" tab with session cards (student name, RA, status badge, elapsed time) and chat interface.
+
+**Plans:** 2 plans
+
+Plans:
+- [ ] 14-01-PLAN.md — Backend: migration, escalation detection, AI skip, assign/reply/resolve endpoints
+- [ ] 14-02-PLAN.md — Frontend staff: intervention screen, chat detail, navigation wiring
+
+---
+
 ### Phase 13: Resource Allocation
 
 **Goal:** Complete resource allocation system — staff manages resources with authorization flags, students browse/book resources with file upload for restricted ones, expanded resource types and seed data.
