@@ -34,6 +34,7 @@ from src.features.enrollment.routes import (
 )
 from src.features.documents.routes import documents_router
 from src.features.appointments.routes import scheduling_router, appointments_router
+from src.features.resources.routes import resources_router
 from src.features.grades.routes import grades_router
 from src.features.staff.routes import staff_router
 from src.features.webhook.router import router as webhook_router
@@ -121,6 +122,7 @@ app.include_router(staff_enrollment_router, prefix="/api/v1")
 app.include_router(documents_router, prefix="/api/v1")
 app.include_router(scheduling_router, prefix="/api/v1")
 app.include_router(appointments_router, prefix="/api/v1")
+app.include_router(resources_router, prefix="/api/v1")
 app.include_router(grades_router, prefix="/api/v1")
 app.include_router(staff_router, prefix="/api/v1")
 app.include_router(webhook_router, prefix="/api/v1")
@@ -134,4 +136,5 @@ async def health() -> dict[str, str]:
 
 # Static file serving for uploads (MVP — production should use nginx/CDN)
 os.makedirs("uploads/documents", exist_ok=True)
+os.makedirs("uploads/authorizations", exist_ok=True)
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")

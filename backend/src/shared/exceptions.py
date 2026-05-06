@@ -48,6 +48,7 @@ _NOT_FOUND_CODES: dict[str, str] = {
     "grade": "NOTA_NAO_ENCONTRADA",
     "session": "SESSAO_NAO_ENCONTRADA",
     "curriculum": "CURRICULO_NAO_ENCONTRADO",
+    "resource": "RECURSO_NAO_ENCONTRADO",
 }
 
 
