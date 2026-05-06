@@ -1,6 +1,7 @@
-"""Response schemas for chat visibility endpoints (CHAT-03).
+"""Response schemas for chat visibility endpoints (CHAT-03) and human intervention (HI-01).
 
-Staff-only schemas for listing sessions, messages, and MCP action logs.
+Staff-only schemas for listing sessions, messages, MCP action logs,
+and human intervention actions (assign, reply, resolve).
 All schemas use from_attributes=True for ORM compatibility with SQLAlchemy models.
 """
 
@@ -10,7 +11,7 @@ from datetime import datetime
 from typing import Any, Optional
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class ChatSessionResponse(BaseModel):
@@ -19,6 +20,8 @@ class ChatSessionResponse(BaseModel):
     whatsapp_phone: str
     status: str
     verification_state: str
+    assigned_staff_id: UUID | None = None
+    escalated_at: datetime | None = None
     started_at: datetime
     ended_at: Optional[datetime] = None
     updated_at: datetime
@@ -64,3 +67,24 @@ class ChatMessageListResponse(BaseModel):
 
 class MCPActionLogListResponse(BaseModel):
     data: list[MCPActionLogResponse]
+
+
+# --- Human Intervention Schemas (HI-01) ---
+
+
+class StaffReplyRequest(BaseModel):
+    """Request body for staff reply to a human-intervention session."""
+    content: str = Field(..., min_length=1, max_length=4000)
+
+
+class StaffReplyResponse(BaseModel):
+    """Response after staff sends a reply message."""
+    message_id: UUID
+    sent_at: datetime
+
+
+class SessionActionResponse(BaseModel):
+    """Response for assign/resolve session actions."""
+    id: UUID
+    status: str
+    assigned_staff_id: UUID | None = None

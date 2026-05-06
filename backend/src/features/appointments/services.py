@@ -71,6 +71,7 @@ def _build_appointment_response(appointment: Appointment) -> AppointmentResponse
         slot=_build_slot_response(appointment.slot),
         reason=appointment.reason,
         status=appointment.status,
+        authorization_file_url=appointment.authorization_file_url,
         created_at=appointment.created_at,
     )
 
@@ -83,6 +84,7 @@ def _build_appointment_list_item(appointment: Appointment) -> AppointmentListIte
         slot_start_time=_time_to_str(appointment.slot.start_time),
         reason=appointment.reason,
         status=appointment.status,
+        authorization_file_url=appointment.authorization_file_url,
         created_at=appointment.created_at,
     )
 
@@ -426,6 +428,51 @@ class AppointmentService:
 
         items = [_build_appointment_list_item(a) for a in appointments]
         return items, total
+
+    # ------------------------------------------------------------------
+    # Upload authorization file helpers
+    # ------------------------------------------------------------------
+
+    async def get_appointment_for_upload(
+        self,
+        db: AsyncSession,
+        appointment_id: UUID,
+    ) -> Appointment | None:
+        """Get an appointment by ID for file upload (without full response build)."""
+        result = await db.execute(
+            select(Appointment).where(Appointment.id == appointment_id)
+        )
+        return result.scalar_one_or_none()
+
+    async def set_authorization_file(
+        self,
+        db: AsyncSession,
+        appointment_id: UUID,
+        file_url: str,
+    ) -> AppointmentResponse:
+        """Set the authorization_file_url on an appointment and return full response."""
+        result = await db.execute(
+            select(Appointment)
+            .options(
+                joinedload(Appointment.slot).joinedload(SchedulingSlot.resource),
+            )
+            .where(Appointment.id == appointment_id)
+        )
+        appointment = result.scalar_one()
+        appointment.authorization_file_url = file_url
+        await db.flush()
+        await db.refresh(appointment)
+
+        # Re-load with relationships
+        result = await db.execute(
+            select(Appointment)
+            .options(
+                joinedload(Appointment.slot).joinedload(SchedulingSlot.resource),
+            )
+            .where(Appointment.id == appointment_id)
+        )
+        appointment = result.scalar_one()
+        return _build_appointment_response(appointment)
 
 
 # Module-level singletons for convenience

@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/responsive/breakpoints.dart';
+import '../../../core/theme/app_spacing.dart';
+import '../../../shared/widgets/app_bar_actions.dart';
 import '../../../shared/widgets/app_skeleton_list.dart';
 import '../../../shared/widgets/app_empty_state.dart';
 import '../../../shared/widgets/app_error_state.dart';
+import '../../../shared/widgets/glass_card.dart';
 import '../../../shared/widgets/responsive_container.dart';
-import '../../auth/providers/auth_provider.dart';
 import '../../client/models/chat_session_model.dart';
 import '../../client/models/chat_message_model.dart';
 import '../providers/staff_chat_provider.dart';
@@ -41,19 +43,13 @@ class _StaffAiScreenState extends ConsumerState<StaffAiScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dados da IA'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () => ref.read(authProvider.notifier).logout(),
-            tooltip: 'Sair',
-          ),
-        ],
+        title: const Text('Insights IA'),
+        actions: const [AppBarActions()],
         bottom: TabBar(
           controller: _tabController,
           tabs: const [
-            Tab(text: 'Sessoes'),
-            Tab(text: 'Estatisticas'),
+            Tab(text: 'Sessões'),
+            Tab(text: 'Estatísticas'),
           ],
         ),
       ),
@@ -133,7 +129,7 @@ class _SessionsTab extends ConsumerWidget {
                 child: Row(
                   children: [
                     SizedBox(
-                      width: MediaQuery.sizeOf(context).width * 0.35,
+                      width: (MediaQuery.sizeOf(context).width * 0.35).clamp(0, 400).toDouble(),
                       child: RefreshIndicator(
                         onRefresh: () => _onRefresh(ref),
                         child: ListView.builder(
@@ -154,15 +150,15 @@ class _SessionsTab extends ConsumerWidget {
                     Expanded(
                       child: selectedSessionId != null
                           ? _ChatDetailPanel(sessionId: selectedSessionId!)
-                          : const Center(
+                          : Center(
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(Icons.psychology_outlined, size: 64, color: Colors.grey),
-                                  SizedBox(height: 16),
+                                  Icon(Icons.psychology_outlined, size: 64, color: Theme.of(context).colorScheme.outlineVariant),
+                                  const SizedBox(height: 16),
                                   Text(
-                                    'Selecione uma sessao',
-                                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                                    'Selecione uma sessão',
+                                    style: TextStyle(fontSize: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
                                   ),
                                 ],
                               ),
@@ -328,7 +324,7 @@ class _ActionsPanel extends ConsumerWidget {
             return ExpansionTile(
               leading: Icon(
                 log.isError ? Icons.error_outline : Icons.check_circle_outline,
-                color: log.isError ? Colors.red : Colors.green,
+                color: log.isError ? Theme.of(context).colorScheme.error : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF81C784) : const Color(0xFF4CAF50)),
               ),
               title: Text(log.toolName),
               subtitle: Text('${log.status} \u2022 ${log.latencyMs ?? "?"}ms'),
@@ -420,80 +416,76 @@ class _SessionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     final isActive = session.isActive;
 
-    return Card(
-      elevation: selected ? 3 : 1,
-      color: selected
-          ? theme.colorScheme.primaryContainer
-          : null,
-      margin: const EdgeInsets.only(bottom: 8),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: Colors.green.shade700.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(
-                  Icons.chat_bubble_outline,
-                  color: Colors.green.shade700,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      session.whatsappPhone ??
-                          'Sessao #${session.id.substring(0, 8)}',
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      _formatDate(session.startedAt),
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: isActive
-                      ? Colors.green.shade100
-                      : Colors.grey.shade200,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  isActive ? 'Ativa' : 'Encerrada',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: isActive
-                        ? Colors.green.shade800
-                        : Colors.grey.shade700,
+    return GlassCard(
+      onTap: onTap,
+      padding: const EdgeInsets.all(AppSpacing.md),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: colors.primaryContainer.withValues(alpha: 0.3),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+            ),
+            child: Icon(
+              Icons.chat_bubble_outline,
+              color: colors.primary,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  session.whatsappPhone ??
+                      'Sessão #${session.id.substring(0, 8)}',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: colors.onSurface,
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 4),
+                Text(
+                  _formatDate(session.startedAt),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colors.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
+          Container(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: isActive
+                  ? (isDark ? const Color(0xFF4CAF50).withValues(alpha: 0.15) : const Color(0xFF4CAF50).withValues(alpha: 0.1))
+                  : colors.surfaceContainerHigh,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+              border: Border.all(
+                color: isActive
+                    ? const Color(0xFF4CAF50).withValues(alpha: 0.2)
+                    : colors.outlineVariant,
+              ),
+            ),
+            child: Text(
+              isActive ? 'Ativa' : 'Encerrada',
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+                color: isActive
+                    ? (isDark ? const Color(0xFF81C784) : const Color(0xFF2E7D32))
+                    : colors.onSurfaceVariant,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -542,23 +534,23 @@ class _StatisticsTab extends ConsumerWidget {
             children: [
               _StatCard(
                 icon: Icons.forum_outlined,
-                iconColor: Colors.blue,
+                iconColor: Theme.of(context).colorScheme.primary,
                 value: totalSessions.toString(),
-                label: 'Total de Sessoes',
+                label: 'Total de Sessões',
               ),
               const SizedBox(height: 12),
               _StatCard(
                 icon: Icons.chat,
-                iconColor: Colors.green,
+                iconColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF81C784) : const Color(0xFF4CAF50),
                 value: activeSessions.toString(),
-                label: 'Sessoes Ativas',
+                label: 'Sessões Ativas',
               ),
               const SizedBox(height: 12),
               _StatCard(
                 icon: Icons.check_circle_outline,
-                iconColor: Colors.grey,
+                iconColor: Theme.of(context).colorScheme.outline,
                 value: closedSessions.toString(),
-                label: 'Sessoes Encerradas',
+                label: 'Sessões Encerradas',
               ),
               const SizedBox(height: 24),
               Text(
@@ -591,45 +583,41 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colors = theme.colorScheme;
 
-    return Card(
-      elevation: 1,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: iconColor.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(10),
+    return GlassCard(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: iconColor.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+            ),
+            child: Icon(icon, color: iconColor),
+          ),
+          const SizedBox(width: 16),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                value,
+                style: theme.textTheme.headlineLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: colors.onSurface,
+                ),
               ),
-              child: Icon(icon, color: iconColor),
-            ),
-            const SizedBox(width: 16),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  value,
-                  style: theme.textTheme.headlineLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              Text(
+                label,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colors.onSurfaceVariant,
                 ),
-                Text(
-                  label,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

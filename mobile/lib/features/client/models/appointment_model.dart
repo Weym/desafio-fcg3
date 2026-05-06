@@ -9,9 +9,10 @@ class AppointmentModel {
   final String? slotId;
   final String reason;
   final String status; // 'scheduled', 'completed', 'cancelled', 'no_show'
-  final String? date;
-  @JsonKey(name: 'start_time')
-  final String? startTime;
+  @JsonKey(name: 'slot_date')
+  final String? slotDate;
+  @JsonKey(name: 'slot_start_time')
+  final String? slotStartTime;
   @JsonKey(name: 'end_time')
   final String? endTime;
   @JsonKey(name: 'created_at')
@@ -22,8 +23,8 @@ class AppointmentModel {
     this.slotId,
     required this.reason,
     required this.status,
-    this.date,
-    this.startTime,
+    this.slotDate,
+    this.slotStartTime,
     this.endTime,
     required this.createdAt,
   });

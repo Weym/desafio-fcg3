@@ -24,4 +24,9 @@ class AppointmentService {
         .map((e) => AppointmentModel.fromJson(e as Map<String, dynamic>))
         .toList();
   }
+
+  /// PUT /appointments/{id}/cancel — cancel an appointment.
+  Future<void> cancelAppointment(String appointmentId) async {
+    await _client.dio.put('/appointments/$appointmentId/cancel');
+  }
 }

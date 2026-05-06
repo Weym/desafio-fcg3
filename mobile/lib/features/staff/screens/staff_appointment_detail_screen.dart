@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../client/models/appointment_model.dart';
+import '../../../shared/widgets/responsive_container.dart';
 import '../providers/staff_schedule_provider.dart';
 
 class StaffAppointmentDetailScreen extends ConsumerWidget {
@@ -17,9 +18,10 @@ class StaffAppointmentDetailScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Detalhes do Agendamento'),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
+      body: ResponsiveContainer(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Status row
@@ -31,13 +33,13 @@ class StaffAppointmentDetailScreen extends ConsumerWidget {
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: _statusBackgroundColor(appointment.status),
+                  color: _statusBackgroundColor(appointment.status, context),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   _statusLabel(appointment.status),
                   style: TextStyle(
-                    color: _statusTextColor(appointment.status),
+                    color: _statusTextColor(appointment.status, context),
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                   ),
@@ -49,7 +51,7 @@ class StaffAppointmentDetailScreen extends ConsumerWidget {
             _InfoRow(
               label: 'Data',
               child: Text(
-                appointment.date ?? 'Nao definida',
+                appointment.slotDate ?? 'Nao definida',
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
             ),
@@ -105,14 +107,15 @@ class StaffAppointmentDetailScreen extends ConsumerWidget {
           ],
         ),
       ),
+      ),
     );
   }
 
   String _buildTimeText() {
-    if (appointment.startTime == null && appointment.endTime == null) {
+    if (appointment.slotStartTime == null && appointment.endTime == null) {
       return 'Nao definido';
     }
-    final start = appointment.startTime ?? '--:--';
+    final start = appointment.slotStartTime ?? '--:--';
     final end = appointment.endTime ?? '--:--';
     return '$start - $end';
   }
@@ -222,19 +225,27 @@ class _InfoRow extends StatelessWidget {
   }
 }
 
-Color _statusBackgroundColor(String status) => switch (status) {
-      'scheduled' => Colors.green.shade100,
-      'cancelled' => Colors.red.shade100,
-      'completed' || 'no_show' => Colors.grey.shade200,
-      _ => Colors.grey.shade200,
-    };
+Color _statusBackgroundColor(String status, BuildContext context) {
+  final isDark = Theme.of(context).brightness == Brightness.dark;
+  final colors = Theme.of(context).colorScheme;
+  return switch (status) {
+    'scheduled' => isDark ? const Color(0xFF4CAF50).withValues(alpha: 0.15) : Colors.green.shade100,
+    'cancelled' => isDark ? colors.error.withValues(alpha: 0.15) : Colors.red.shade100,
+    'completed' || 'no_show' => isDark ? colors.surfaceContainerHigh : Colors.grey.shade200,
+    _ => isDark ? colors.surfaceContainerHigh : Colors.grey.shade200,
+  };
+}
 
-Color _statusTextColor(String status) => switch (status) {
-      'scheduled' => Colors.green.shade800,
-      'cancelled' => Colors.red.shade800,
-      'completed' || 'no_show' => Colors.grey.shade700,
-      _ => Colors.grey.shade700,
-    };
+Color _statusTextColor(String status, BuildContext context) {
+  final isDark = Theme.of(context).brightness == Brightness.dark;
+  final colors = Theme.of(context).colorScheme;
+  return switch (status) {
+    'scheduled' => isDark ? const Color(0xFF81C784) : Colors.green.shade800,
+    'cancelled' => isDark ? colors.error : Colors.red.shade800,
+    'completed' || 'no_show' => colors.onSurfaceVariant,
+    _ => colors.onSurfaceVariant,
+  };
+}
 
 String _statusLabel(String status) => switch (status) {
       'scheduled' => 'Agendado',

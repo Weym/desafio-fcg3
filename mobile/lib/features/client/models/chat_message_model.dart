@@ -5,18 +5,24 @@ part 'chat_message_model.g.dart';
 @JsonSerializable()
 class ChatMessageModel {
   final String id;
+  @JsonKey(name: 'chat_session_id')
+  final String? chatSessionId;
   final String role; // 'user', 'assistant', 'system'
   final String content;
   @JsonKey(name: 'media_type')
   final String? mediaType;
+  @JsonKey(name: 'whatsapp_message_id')
+  final String? whatsappMessageId;
   @JsonKey(name: 'created_at')
   final DateTime createdAt;
 
   const ChatMessageModel({
     required this.id,
+    this.chatSessionId,
     required this.role,
     required this.content,
     this.mediaType,
+    this.whatsappMessageId,
     required this.createdAt,
   });
 

@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/responsive/breakpoints.dart';
+import '../../../core/theme/app_spacing.dart';
+import '../../../shared/widgets/app_bar_actions.dart';
 import '../../../shared/widgets/app_skeleton_list.dart';
 import '../../../shared/widgets/app_empty_state.dart';
 import '../../../shared/widgets/app_error_state.dart';
+import '../../../shared/widgets/glass_card.dart';
 import '../../../shared/widgets/responsive_container.dart';
 import '../models/chat_session_model.dart';
 import '../models/chat_message_model.dart';
@@ -29,10 +32,12 @@ class _ClientChatScreenState extends ConsumerState<ClientChatScreen> {
   Widget build(BuildContext context) {
     final sessionsAsync = ref.watch(chatSessionsProvider);
     final isDesktop = AppBreakpoints.isDesktop(MediaQuery.sizeOf(context).width);
+    final colors = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Chat'),
+        actions: const [AppBarActions()],
       ),
       body: sessionsAsync.when(
         loading: () => const ResponsiveContainer(
@@ -73,38 +78,59 @@ class _ClientChatScreenState extends ConsumerState<ClientChatScreen> {
                   child: Row(
                     children: [
                       SizedBox(
-                        width: MediaQuery.sizeOf(context).width * 0.35,
-                        child: RefreshIndicator(
-                          onRefresh: _onRefresh,
-                          child: ListView.builder(
-                            padding: const EdgeInsets.all(8),
-                            itemCount: sorted.length,
-                            itemBuilder: (context, index) {
-                              final session = sorted[index];
-                              return _SessionCard(
-                                session: session,
-                                selected: session.id == _selectedSessionId,
-                                onTap: () {
-                                  setState(() => _selectedSessionId = session.id);
-                                },
-                              );
-                            },
-                          ),
+                        width: (MediaQuery.sizeOf(context).width * 0.35).clamp(0, 400).toDouble(),
+                        child: Column(
+                          children: [
+                            // Search bar
+                            Padding(
+                              padding: const EdgeInsets.all(AppSpacing.md),
+                              child: _SearchBar(),
+                            ),
+                            Expanded(
+                              child: RefreshIndicator(
+                                onRefresh: _onRefresh,
+                                child: ListView.separated(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: AppSpacing.md,
+                                  ),
+                                  itemCount: sorted.length,
+                                  separatorBuilder: (_, __) =>
+                                      const SizedBox(height: AppSpacing.sm),
+                                  itemBuilder: (context, index) {
+                                    final session = sorted[index];
+                                    return _SessionCard(
+                                      session: session,
+                                      selected:
+                                          session.id == _selectedSessionId,
+                                      onTap: () {
+                                        setState(() =>
+                                            _selectedSessionId = session.id);
+                                      },
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       const VerticalDivider(width: 1, thickness: 1),
                       Expanded(
                         child: _selectedSessionId != null
                             ? _DetailPanel(sessionId: _selectedSessionId!)
-                            : const Center(
+                            : Center(
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Icon(Icons.chat_outlined, size: 64, color: Colors.grey),
-                                    SizedBox(height: 16),
+                                    Icon(Icons.chat_outlined,
+                                        size: 64, color: colors.outlineVariant),
+                                    const SizedBox(height: 16),
                                     Text(
                                       'Selecione uma conversa',
-                                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: colors.onSurfaceVariant,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -117,24 +143,50 @@ class _ClientChatScreenState extends ConsumerState<ClientChatScreen> {
             );
           }
 
-          // Phone/Tablet: existing single-column with GoRouter navigation
+          // Phone/Tablet: single-column
           return Column(
             children: [
-              if (sessionsAsync.isRefreshing)
-                const LinearProgressIndicator(),
+              if (sessionsAsync.isRefreshing) const LinearProgressIndicator(),
+              // Search bar
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: AppSpacing.sm,
+                ),
+                child: _SearchBar(),
+              ),
+              // Section header
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'CONVERSAS RECENTES',
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.5,
+                          color: colors.onSurfaceVariant,
+                        ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: _onRefresh,
                   child: ResponsiveContainer(
-                    padding: const EdgeInsets.all(8),
-                    child: ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: ListView.separated(
                       itemCount: sorted.length,
+                      separatorBuilder: (_, __) =>
+                          const SizedBox(height: AppSpacing.md),
                       itemBuilder: (context, index) {
                         final session = sorted[index];
                         return _SessionCard(
                           session: session,
                           selected: false,
-                          onTap: () => context.go('/client/chat/${session.id}'),
+                          onTap: () =>
+                              context.go('/client/chat/${session.id}'),
                         );
                       },
                     ),
@@ -149,8 +201,34 @@ class _ClientChatScreenState extends ConsumerState<ClientChatScreen> {
   }
 }
 
+class _SearchBar extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return TextField(
+      style: TextStyle(color: colors.onSurface),
+      decoration: InputDecoration(
+        hintText: 'Buscar conversas...',
+        hintStyle: TextStyle(color: colors.onSurfaceVariant),
+        prefixIcon: Icon(Icons.search, color: colors.outline),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+          borderSide: BorderSide(color: colors.outlineVariant.withValues(alpha: 0.3)),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+          borderSide: BorderSide(color: colors.outlineVariant.withValues(alpha: 0.3)),
+        ),
+        filled: true,
+        fillColor: colors.surfaceContainer.withValues(alpha: 0.5),
+        contentPadding: const EdgeInsets.symmetric(vertical: 14),
+      ),
+    );
+  }
+}
+
 /// Detail panel for desktop master-detail layout.
-/// Shows messages and actions tabs inline.
 class _DetailPanel extends ConsumerStatefulWidget {
   final String sessionId;
 
@@ -186,7 +264,7 @@ class _DetailPanelState extends ConsumerState<_DetailPanel>
             controller: _tabController,
             tabs: const [
               Tab(text: 'Mensagens'),
-              Tab(text: 'Acoes'),
+              Tab(text: 'Ações'),
             ],
           ),
         ),
@@ -246,6 +324,7 @@ class _ActionsPanel extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final actionsAsync = ref.watch(actionLogsProvider(sessionId));
+    final colors = Theme.of(context).colorScheme;
 
     return actionsAsync.when(
       loading: () => const AppSkeletonList(itemCount: 3, itemHeight: 56),
@@ -256,7 +335,7 @@ class _ActionsPanel extends ConsumerWidget {
         if (logs.isEmpty) {
           return const AppEmptyState(
             icon: Icons.history_outlined,
-            message: 'Nenhuma acao registrada',
+            message: 'Nenhuma ação registrada',
           );
         }
 
@@ -268,7 +347,7 @@ class _ActionsPanel extends ConsumerWidget {
             return ExpansionTile(
               leading: Icon(
                 log.isError ? Icons.error_outline : Icons.check_circle_outline,
-                color: log.isError ? Colors.red : Colors.green,
+                color: log.isError ? colors.error : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF81C784) : const Color(0xFF4CAF50)),
               ),
               title: Text(log.toolName),
               subtitle: Text(log.status),
@@ -276,7 +355,7 @@ class _ActionsPanel extends ConsumerWidget {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                   child: Text(
-                    'Latencia: ${log.latencyMs ?? "?"}ms',
+                    'Latência: ${log.latencyMs ?? "?"}ms',
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ),
@@ -302,55 +381,78 @@ class _MessageBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final colors = Theme.of(context).colorScheme;
     final isUser = message.isUser;
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: 12),
       child: Align(
         alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
         child: ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: screenWidth * 0.5),
-          child: Column(
-            crossAxisAlignment:
-                isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                decoration: BoxDecoration(
-                  color: isUser
-                      ? theme.colorScheme.primary
-                      : theme.colorScheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.only(
-                    topLeft: const Radius.circular(12),
-                    topRight: const Radius.circular(12),
-                    bottomLeft:
-                        isUser ? const Radius.circular(12) : Radius.zero,
-                    bottomRight:
-                        isUser ? Radius.zero : const Radius.circular(12),
-                  ),
+          constraints: BoxConstraints(maxWidth: (screenWidth * 0.75).clamp(0, 500).toDouble()),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: isUser
+                  ? colors.primary
+                  : colors.surfaceContainerHighest,
+              borderRadius: BorderRadius.only(
+                topLeft: const Radius.circular(AppSpacing.radiusXl),
+                topRight: const Radius.circular(AppSpacing.radiusXl),
+                bottomLeft: isUser
+                    ? const Radius.circular(AppSpacing.radiusXl)
+                    : Radius.zero,
+                bottomRight: isUser
+                    ? Radius.zero
+                    : const Radius.circular(AppSpacing.radiusXl),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: colors.primary.withValues(alpha: isUser ? 0.15 : 0.05),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
                 ),
-                child: Text(
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment:
+                  isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              children: [
+                Text(
                   message.content,
                   style: TextStyle(
-                    color: isUser
-                        ? theme.colorScheme.onPrimary
-                        : theme.colorScheme.onSurface,
+                    color: isUser ? colors.onPrimary : colors.onSurface,
                     fontSize: 14,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                _formatTime(message.createdAt),
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                  fontSize: 11,
+                const SizedBox(height: 4),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.access_time,
+                      size: 10,
+                      color: isUser
+                          ? colors.onPrimary.withValues(alpha: 0.6)
+                          : colors.onSurfaceVariant,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      _formatTime(message.createdAt),
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: isUser
+                            ? colors.onPrimary.withValues(alpha: 0.6)
+                            : colors.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -372,89 +474,128 @@ class _SessionCard extends StatelessWidget {
   String _formatDate(DateTime dt) {
     final day = dt.day.toString().padLeft(2, '0');
     final month = dt.month.toString().padLeft(2, '0');
-    final year = dt.year;
     final hour = dt.hour.toString().padLeft(2, '0');
     final minute = dt.minute.toString().padLeft(2, '0');
-    return '$day/$month/$year $hour:$minute';
+    return '$day/$month $hour:$minute';
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final colors = Theme.of(context).colorScheme;
     final isActive = session.isActive;
 
-    return Card(
-      elevation: selected ? 3 : 1,
-      color: selected
-          ? theme.colorScheme.primaryContainer
-          : null,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+    return GlassCard(
+      onTap: onTap,
+      padding: const EdgeInsets.all(AppSpacing.md),
+      borderRadius: BorderRadius.circular(
+        selected ? AppSpacing.radiusXl : AppSpacing.radiusLg,
       ),
-      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              CircleAvatar(
-                backgroundColor: isActive
-                    ? theme.colorScheme.primary.withValues(alpha: 0.12)
-                    : Colors.grey.withValues(alpha: 0.12),
-                child: Icon(
-                  Icons.chat,
-                  color: isActive ? theme.colorScheme.primary : Colors.grey,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
+        children: [
+          // Avatar
+          Container(
+            width: 52,
+            height: 52,
+            decoration: BoxDecoration(
+              color: isActive
+                  ? colors.primaryContainer
+                  : colors.secondaryContainer,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+            ),
+            child: Icon(
+              isActive ? Icons.smart_toy : Icons.chat,
+              size: 26,
+              color: isActive
+                  ? colors.onPrimaryContainer
+                  : colors.onSecondaryContainer,
+            ),
+          ),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      _formatDate(session.startedAt),
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
+                    Flexible(
+                      child: Text(
+                        'Sessão ${_formatDate(session.startedAt)}',
+                        style:
+                            Theme.of(context).textTheme.titleSmall?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: colors.onSurface,
+                                ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Text(
-                          isActive ? 'Ativa' : 'Encerrada',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: isActive
-                                ? theme.colorScheme.primary
-                                : theme.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                        if (session.messageCount != null) ...[
-                          const SizedBox(width: 8),
-                          Text(
-                            '${session.messageCount} msgs',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                        ],
-                      ],
+                    Text(
+                      _formatDate(session.startedAt),
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: colors.outline,
+                      ),
                     ),
                   ],
                 ),
-              ),
-              Container(
-                width: 10,
-                height: 10,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: isActive ? Colors.green : Colors.grey,
+                const SizedBox(height: 4),
+                if (session.messageCount != null)
+                  Text(
+                    '${session.messageCount} mensagens',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: colors.onSurfaceVariant,
+                        ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                const SizedBox(height: 6),
+                // Status badge
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 3,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isActive
+                        ? colors.primary.withValues(alpha: 0.1)
+                        : colors.surfaceContainerHigh.withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+                    border: Border.all(
+                      color: isActive
+                          ? colors.primary.withValues(alpha: 0.2)
+                          : colors.outlineVariant,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (isActive)
+                        Container(
+                          width: 6,
+                          height: 6,
+                          margin: const EdgeInsets.only(right: 6),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: colors.primary,
+                          ),
+                        ),
+                      Text(
+                        isActive ? 'Ativa' : 'Encerrada',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: isActive
+                              ? colors.primary
+                              : colors.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

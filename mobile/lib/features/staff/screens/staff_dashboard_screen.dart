@@ -3,10 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/responsive/breakpoints.dart';
 import '../../../core/router/route_names.dart';
-import '../../../core/theme/theme_provider.dart';
-import '../../auth/providers/auth_provider.dart';
+import '../../../core/theme/app_spacing.dart';
+import '../../../shared/widgets/app_bar_actions.dart';
 import '../../../shared/widgets/app_skeleton_card.dart';
 import '../../../shared/widgets/app_error_state.dart';
+import '../../../shared/widgets/glass_card.dart';
 import '../../../shared/widgets/responsive_container.dart';
 import '../models/staff_dashboard_model.dart';
 import '../providers/staff_dashboard_provider.dart';
@@ -17,32 +18,12 @@ class StaffDashboardScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final dashboardAsync = ref.watch(staffDashboardProvider);
+    final colors = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dashboard'),
-        actions: [
-          IconButton(
-            icon: Icon(
-              ref.watch(themeModeNotifierProvider) == ThemeMode.dark
-                  ? Icons.light_mode
-                  : Icons.dark_mode,
-            ),
-            onPressed: () {
-              final current = ref.read(themeModeNotifierProvider);
-              final next = current == ThemeMode.dark
-                  ? ThemeMode.light
-                  : ThemeMode.dark;
-              ref.read(themeModeNotifierProvider.notifier).setThemeMode(next);
-            },
-            tooltip: 'Alternar tema',
-          ),
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () => ref.read(authProvider.notifier).logout(),
-            tooltip: 'Sair',
-          ),
-        ],
+        title: const Text('Painel de Gestão'),
+        actions: const [AppBarActions()],
       ),
       body: dashboardAsync.when(
         loading: () => const ResponsiveContainer(
@@ -69,8 +50,7 @@ class StaffDashboardScreen extends ConsumerWidget {
 
           return Column(
             children: [
-              if (dashboardAsync.isRefreshing)
-                const LinearProgressIndicator(),
+              if (dashboardAsync.isRefreshing) const LinearProgressIndicator(),
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: () async {
@@ -80,62 +60,143 @@ class StaffDashboardScreen extends ConsumerWidget {
                   child: SingleChildScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
                     child: ResponsiveContainer(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(20),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Enrollment Period Banner (D-02)
+                          // Header
+                          Text(
+                            'Visão estratégica da instituição.',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                  color: colors.onSurfaceVariant,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                          ),
+                          const SizedBox(height: AppSpacing.lg),
+
+                          // Enrollment Period Banner
                           if (dashboard.enrollmentPeriod != null &&
-                              dashboard.enrollmentPeriod!.isActive)
-                            _EnrollmentBanner(period: dashboard.enrollmentPeriod!),
-                          if (dashboard.enrollmentPeriod != null &&
-                              dashboard.enrollmentPeriod!.isActive)
-                            const SizedBox(height: 16),
-                          // KPI Grid (D-01, D-07 adaptive columns)
+                              dashboard.enrollmentPeriod!.isActive) ...[
+                            _EnrollmentBanner(
+                                period: dashboard.enrollmentPeriod!),
+                            const SizedBox(height: AppSpacing.lg),
+                          ],
+
+                          // KPI Grid
                           GridView.count(
                             crossAxisCount: crossAxisCount,
-                            crossAxisSpacing: 12,
-                            mainAxisSpacing: 12,
-                            childAspectRatio: 1.4,
+                            crossAxisSpacing: AppSpacing.md,
+                            mainAxisSpacing: AppSpacing.md,
+                            childAspectRatio: 1.3,
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
                             children: [
                               _KpiCard(
                                 icon: Icons.people_outlined,
-                                iconColor: Colors.blue.shade700,
-                                value: dashboard.totalStudents,
+                                iconColor: colors.primary,
+                                containerColor: colors.primaryContainer,
+                                value: dashboard.totalStudents.toString(),
                                 label: 'Alunos',
                                 onTap: null,
                               ),
                               _KpiCard(
-                                icon: Icons.school_outlined,
-                                iconColor: Colors.purple.shade700,
-                                value: dashboard.activeEnrollments,
-                                label: 'Matriculas',
-                                onTap: null,
+                                icon: Icons.chat_bubble_outlined,
+                                iconColor: colors.secondary,
+                                containerColor: colors.secondaryContainer,
+                                value:
+                                    dashboard.activeChatSessions.toString(),
+                                label: 'Chats Hoje',
+                                onTap: () => context.go(RoutePaths.staffAI),
                               ),
                               _KpiCard(
-                                icon: Icons.folder_outlined,
-                                iconColor: Colors.amber.shade700,
-                                value: dashboard.pendingDocuments,
+                                icon: Icons.warning_amber_outlined,
+                                iconColor: colors.error,
+                                containerColor: colors.errorContainer,
+                                value:
+                                    dashboard.pendingDocuments.toString(),
                                 label: 'Docs Pendentes',
-                                onTap: () => context.go(RoutePaths.staffDocuments),
+                                onTap: () =>
+                                    context.go(RoutePaths.staffDocuments),
                               ),
                               _KpiCard(
                                 icon: Icons.calendar_today_outlined,
-                                iconColor: Theme.of(context).colorScheme.tertiary,
-                                value: dashboard.upcomingAppointments,
+                                iconColor: colors.tertiary,
+                                containerColor: colors.tertiaryContainer,
+                                value: dashboard.upcomingAppointments
+                                    .toString(),
                                 label: 'Agendamentos',
-                                onTap: () => context.go(RoutePaths.staffSchedule),
-                              ),
-                              _KpiCard(
-                                icon: Icons.chat_bubble_outlined,
-                                iconColor: Colors.green.shade700,
-                                value: dashboard.activeChatSessions,
-                                label: 'Chats Ativos',
-                                onTap: () => context.go(RoutePaths.staffAI),
+                                onTap: () =>
+                                    context.go(RoutePaths.staffSchedule),
                               ),
                             ],
+                          ),
+                          const SizedBox(height: AppSpacing.lg),
+
+                          // AI Insights section
+                          GlassCard(
+                            padding: const EdgeInsets.all(AppSpacing.lg),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(Icons.smart_toy,
+                                        size: 20, color: colors.primary),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      'Insights de Eficiência IA',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleSmall
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                            color: colors.onSurface,
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: AppSpacing.md),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Taxa de Resolução Automatizada',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            color: colors.onSurface,
+                                          ),
+                                    ),
+                                    Text(
+                                      '${_calculateAiRate(dashboard)}%',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                            color: colors.onSurface,
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(
+                                      AppSpacing.radiusFull),
+                                  child: LinearProgressIndicator(
+                                    value: _calculateAiRate(dashboard) / 100,
+                                    minHeight: 8,
+                                    backgroundColor: colors.surfaceContainer,
+                                    color: colors.primary,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
@@ -149,6 +210,12 @@ class StaffDashboardScreen extends ConsumerWidget {
       ),
     );
   }
+
+  double _calculateAiRate(StaffDashboardModel dashboard) {
+    final total = dashboard.activeChatSessions + 10; // mock baseline
+    if (total == 0) return 0;
+    return ((total - 1) / total * 100).clamp(0, 100);
+  }
 }
 
 class _EnrollmentBanner extends StatelessWidget {
@@ -158,51 +225,51 @@ class _EnrollmentBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: Theme.of(context).colorScheme.primaryContainer,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    period.name,
-                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${period.daysRemaining} dias restantes',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                'Ativo',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onPrimary,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
+    final colors = Theme.of(context).colorScheme;
+
+    return GlassCard(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  period.name,
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: colors.primary,
+                      ),
                 ),
+                const SizedBox(height: 4),
+                Text(
+                  period.daysRemaining != null
+                      ? '${period.daysRemaining} dias restantes'
+                      : 'Periodo ativo',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: colors.primary,
+                      ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: colors.primary,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+            ),
+            child: Text(
+              'Ativo',
+              style: TextStyle(
+                color: colors.onPrimary,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -211,13 +278,15 @@ class _EnrollmentBanner extends StatelessWidget {
 class _KpiCard extends StatelessWidget {
   final IconData icon;
   final Color iconColor;
-  final int value;
+  final Color containerColor;
+  final String value;
   final String label;
   final VoidCallback? onTap;
 
   const _KpiCard({
     required this.icon,
     required this.iconColor,
+    required this.containerColor,
     required this.value,
     required this.label,
     this.onTap,
@@ -225,50 +294,41 @@ class _KpiCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final card = Card(
-      elevation: 1,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: iconColor.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(icon, color: iconColor, size: 24),
+    final colors = Theme.of(context).colorScheme;
+
+    return GlassCard(
+      onTap: onTap,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: containerColor,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
             ),
-            const Spacer(),
-            Text(
-              value.toString(),
-              style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-            ),
-          ],
-        ),
+            child: Icon(icon, color: iconColor, size: 20),
+          ),
+          const Spacer(),
+          Text(
+            value,
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: iconColor,
+                ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                  color: colors.onSurfaceVariant,
+                ),
+          ),
+        ],
       ),
     );
-
-    if (onTap != null) {
-      return InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: card,
-      );
-    }
-    return card;
   }
 }

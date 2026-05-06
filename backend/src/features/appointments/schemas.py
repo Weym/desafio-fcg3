@@ -97,6 +97,7 @@ class AppointmentResponse(BaseModel):
     slot: SlotResponse
     reason: str
     status: str
+    authorization_file_url: str | None = None
     created_at: datetime
 
     model_config = {"from_attributes": True}
@@ -113,6 +114,7 @@ class AppointmentListItem(BaseModel):
     slot_start_time: str
     reason: str
     status: str
+    authorization_file_url: str | None = None
     created_at: datetime
 
     model_config = {"from_attributes": True}

@@ -15,13 +15,13 @@ void main() async {
       overrides: [
         sharedPreferencesProvider.overrideWithValue(prefs),
       ],
-      child: const DesafioFCG3App(),
+      child: const AlphaConnectApp(),
     ),
   );
 }
 
-class DesafioFCG3App extends ConsumerWidget {
-  const DesafioFCG3App({super.key});
+class AlphaConnectApp extends ConsumerWidget {
+  const AlphaConnectApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -29,7 +29,7 @@ class DesafioFCG3App extends ConsumerWidget {
     final themeMode = ref.watch(themeModeNotifierProvider);
 
     return MaterialApp.router(
-      title: 'Desafio FCG3',
+      title: 'Alpha Connect',
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       themeMode: themeMode,

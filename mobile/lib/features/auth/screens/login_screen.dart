@@ -1,7 +1,12 @@
 import 'dart:async';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../../core/models/user_model.dart';
+import '../../../core/theme/app_spacing.dart';
+import '../../../core/theme/theme_provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/auth_state.dart';
 
@@ -14,8 +19,9 @@ class LoginScreen extends ConsumerStatefulWidget {
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _emailController = TextEditingController();
-  final _codeController = TextEditingController();
   final _emailFormKey = GlobalKey<FormState>();
+  final _codeFocusNodes = List.generate(6, (_) => FocusNode());
+  final _codeControllers = List.generate(6, (_) => TextEditingController());
 
   bool _isOtpStep = false;
   bool _isSubmitting = false;
@@ -26,10 +32,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   void dispose() {
     _emailController.dispose();
-    _codeController.dispose();
+    for (final c in _codeControllers) {
+      c.dispose();
+    }
+    for (final f in _codeFocusNodes) {
+      f.dispose();
+    }
     _resendTimer?.cancel();
     super.dispose();
   }
+
+  String get _fullCode =>
+      _codeControllers.map((c) => c.text).join();
 
   void _startResendCountdown() {
     setState(() {
@@ -59,14 +73,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     setState(() => _isSubmitting = false);
 
     if (result != null) {
-      // Success — show OTP step
       setState(() => _isOtpStep = true);
       _startResendCountdown();
+      _codeFocusNodes.first.requestFocus();
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Erro ao enviar codigo. Tente novamente.'),
+            content: Text('Erro ao enviar código. Tente novamente.'),
             duration: Duration(seconds: 4),
           ),
         );
@@ -75,7 +89,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _verifyCode() async {
-    final code = _codeController.text.trim();
+    final code = _fullCode;
     if (code.length != 6) return;
 
     setState(() => _isSubmitting = true);
@@ -86,14 +100,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     setState(() => _isSubmitting = false);
 
-    if (result == AuthVerifyResult.success) {
-      // Navigation handled by GoRouter redirect in Plan 03
-      return;
-    }
+    if (result == AuthVerifyResult.success) return;
 
     if (!mounted) return;
 
-    // Show error snackbar per D-10
     final authState = ref.read(authProvider);
     String message = 'Erro desconhecido';
     if (authState is AuthError) {
@@ -112,9 +122,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       ),
     );
 
-    // If max attempts, restart countdown (new code auto-sent by backend)
     if (result == AuthVerifyResult.maxAttempts) {
-      _codeController.clear();
+      for (final c in _codeControllers) {
+        c.clear();
+      }
       _startResendCountdown();
     }
   }
@@ -129,47 +140,101 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     _startResendCountdown();
   }
 
+  /// Enter demo mode with a fake user (no backend needed).
+  void _enterDemoMode(String role) {
+    final demoUser = UserModel(
+      id: 'demo-${role}-001',
+      name: role == 'student' ? 'João Demo' : 'Admin Demo',
+      email: role == 'student' ? 'joao@universidade.edu' : 'admin@universidade.edu',
+      role: role,
+    );
+    ref.read(authProvider.notifier).setDemoUser(demoUser);
+  }
+
+  void _onCodeDigitChanged(int index, String value) {
+    if (value.length > 1) {
+      // Handle paste
+      final digits = value.replaceAll(RegExp(r'\D'), '');
+      for (int i = 0; i < 6 && i < digits.length; i++) {
+        _codeControllers[i].text = digits[i];
+      }
+      final nextIndex = (digits.length < 6) ? digits.length : 5;
+      _codeFocusNodes[nextIndex].requestFocus();
+      if (digits.length >= 6) _verifyCode();
+      return;
+    }
+
+    if (value.isNotEmpty && index < 5) {
+      _codeFocusNodes[index + 1].requestFocus();
+    }
+
+    if (_fullCode.length == 6) {
+      _verifyCode();
+    }
+  }
+
+  void _onCodeKeyEvent(int index, KeyEvent event) {
+    if (event is KeyDownEvent &&
+        event.logicalKey == LogicalKeyboardKey.backspace &&
+        _codeControllers[index].text.isEmpty &&
+        index > 0) {
+      _codeFocusNodes[index - 1].requestFocus();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 32),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // App logo/title area
-                Icon(
-                  Icons.school_rounded,
-                  size: 64,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Desafio FCG3',
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Plataforma Academica',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 48),
+    final colors = Theme.of(context).colorScheme;
 
-                // Two-step animated content
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  child: _isOtpStep ? _buildOtpStep() : _buildEmailStep(),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Scaffold(
+      backgroundColor: colors.surfaceContainerLow,
+      floatingActionButton: FloatingActionButton.small(
+        onPressed: () {
+          final next = isDark ? ThemeMode.light : ThemeMode.dark;
+          ref.read(themeModeNotifierProvider.notifier).setThemeMode(next);
+        },
+        backgroundColor: colors.surfaceContainer,
+        child: Icon(
+          isDark ? Icons.light_mode : Icons.dark_mode,
+          color: colors.primary,
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 400),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+                child: Container(
+                  padding: const EdgeInsets.all(AppSpacing.xl),
+                  decoration: BoxDecoration(
+                    color: colors.surfaceContainerLowest.withValues(alpha: 0.85),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
+                    border: Border.all(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white.withValues(alpha: 0.1)
+                          : Colors.white.withValues(alpha: 0.4),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: colors.primary.withValues(alpha: 0.08),
+                        blurRadius: 32,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: _isOtpStep ? _buildOtpStep() : _buildEmailStep(),
+                  ),
                 ),
-              ],
+              ),
             ),
           ),
         ),
@@ -178,51 +243,139 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Widget _buildEmailStep() {
+    final colors = Theme.of(context).colorScheme;
+
     return Form(
       key: _emailFormKey,
       child: Column(
         key: const ValueKey('email_step'),
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Text('Entrar', style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 8),
-          Text(
-            'Informe seu email institucional para receber o codigo de verificacao.',
-            style: Theme.of(context).textTheme.bodyMedium,
+          // Icon badge
+          Transform.rotate(
+            angle: 0.05,
+            child: Container(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              decoration: BoxDecoration(
+                color: colors.primaryContainer,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+              ),
+              child: Icon(
+                Icons.school_rounded,
+                size: 48,
+                color: colors.onPrimaryContainer,
+              ),
+            ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.md),
+          Text(
+            'ALPHA CONNECT',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: colors.primary,
+              letterSpacing: 3,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.xl),
+
+          // Heading
+          Text(
+            'Entrar',
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: colors.onSurface,
+                ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            'Informe seu email acadêmico...',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: colors.onSurfaceVariant,
+                  fontWeight: FontWeight.w500,
+                ),
+          ),
+          const SizedBox(height: AppSpacing.xl),
+
+          // Email input
           TextFormField(
             controller: _emailController,
             keyboardType: TextInputType.emailAddress,
             textInputAction: TextInputAction.done,
             autofillHints: const [AutofillHints.email],
-            decoration: const InputDecoration(
-              labelText: 'Email',
-              hintText: 'aluno@universidade.edu',
-              prefixIcon: Icon(Icons.email_outlined),
+            style: TextStyle(color: colors.onSurface),
+            decoration: InputDecoration(
+              hintText: 'Email acadêmico',
+              hintStyle: TextStyle(color: colors.onSurfaceVariant.withValues(alpha: 0.5)),
+              prefixIcon: Icon(Icons.email_outlined, color: colors.onSurfaceVariant),
             ),
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
-                return 'Email obrigatorio';
+                return 'Email obrigatório';
               }
               final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
               if (!emailRegex.hasMatch(value.trim())) {
-                return 'Email invalido';
+                return 'Email inválido';
               }
               return null;
             },
             onFieldSubmitted: (_) => _requestCode(),
           ),
-          const SizedBox(height: 24),
-          ElevatedButton(
-            onPressed: _isSubmitting ? null : _requestCode,
-            child: _isSubmitting
-                ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Text('Enviar codigo'),
+          const SizedBox(height: AppSpacing.lg),
+
+          // Submit button
+          SizedBox(
+            width: double.infinity,
+            height: 52,
+            child: ElevatedButton(
+              onPressed: _isSubmitting ? null : _requestCode,
+              child: _isSubmitting
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text('Enviar código'),
+                        const SizedBox(width: 8),
+                        Icon(Icons.arrow_forward, size: 20,
+                            color: Theme.of(context).colorScheme.onPrimary),
+                      ],
+                    ),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.xl),
+
+          // Demo mode buttons (for preview without backend)
+          Divider(color: colors.outlineVariant.withValues(alpha: 0.3)),
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            'MODO DEMONSTRAÇÃO',
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: colors.onSurfaceVariant,
+                  letterSpacing: 1.5,
+                  fontWeight: FontWeight.bold,
+                ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () => _enterDemoMode('student'),
+                  child: const Text('Aluno', style: TextStyle(fontSize: 13)),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () => _enterDemoMode('staff'),
+                  child: const Text('Gestor', style: TextStyle(fontSize: 13)),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -230,78 +383,159 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Widget _buildOtpStep() {
+    final colors = Theme.of(context).colorScheme;
+
     return Column(
       key: const ValueKey('otp_step'),
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Row(
-          children: [
-            IconButton(
-              onPressed: () => setState(() {
-                _isOtpStep = false;
-                _codeController.clear();
-                _resendTimer?.cancel();
-              }),
-              icon: const Icon(Icons.arrow_back),
+        // Icon badge
+        Transform.rotate(
+          angle: 0.05,
+          child: Container(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            decoration: BoxDecoration(
+              color: colors.primaryContainer,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
             ),
-            Expanded(
-              child: Text(
-                'Verificar codigo',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
+            child: Icon(
+              Icons.email_outlined,
+              size: 48,
+              color: colors.onPrimaryContainer,
             ),
-          ],
+          ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpacing.md),
         Text(
-          'Digite o codigo de 6 digitos enviado para ${_emailController.text.trim()}',
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
-        const SizedBox(height: 24),
-        TextFormField(
-          controller: _codeController,
-          keyboardType: TextInputType.number,
-          textInputAction: TextInputAction.done,
-          maxLength: 6,
-          inputFormatters: [
-            FilteringTextInputFormatter.digitsOnly,
-            LengthLimitingTextInputFormatter(6),
-          ],
-          decoration: const InputDecoration(
-            labelText: 'Codigo de verificacao',
-            hintText: '000000',
-            prefixIcon: Icon(Icons.lock_outlined),
-            counterText: '',
-          ),
-          style: const TextStyle(
-            fontSize: 24,
-            letterSpacing: 8,
+          'CÓDIGO DE ACESSO',
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 18,
             fontWeight: FontWeight.bold,
+            color: colors.primary,
+            letterSpacing: 3,
           ),
+        ),
+        const SizedBox(height: AppSpacing.lg),
+
+        Text(
+          'Insira o código de 6 dígitos enviado para o seu email.',
           textAlign: TextAlign.center,
-          onFieldSubmitted: (_) => _verifyCode(),
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: colors.onSurfaceVariant,
+                fontWeight: FontWeight.w500,
+              ),
         ),
-        const SizedBox(height: 24),
-        ElevatedButton(
-          onPressed: _isSubmitting ? null : _verifyCode,
-          child: _isSubmitting
-              ? const SizedBox(
-                  height: 20,
-                  width: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : const Text('Verificar'),
+        const SizedBox(height: AppSpacing.xl),
+
+        // 6-digit code inputs
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: List.generate(6, (index) {
+            return SizedBox(
+              width: 44,
+              height: 52,
+              child: KeyboardListener(
+                focusNode: FocusNode(),
+                onKeyEvent: (event) => _onCodeKeyEvent(index, event),
+                child: TextField(
+                  controller: _codeControllers[index],
+                  focusNode: _codeFocusNodes[index],
+                  keyboardType: TextInputType.number,
+                  textAlign: TextAlign.center,
+                  maxLength: 6, // allow paste
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                  ],
+                  decoration: InputDecoration(
+                    counterText: '',
+                    contentPadding: EdgeInsets.zero,
+                    filled: true,
+                    fillColor: colors.surfaceContainerHigh.withValues(alpha: 0.5),
+                    border: OutlineInputBorder(
+                      borderRadius:
+                          BorderRadius.circular(AppSpacing.radiusMd),
+                      borderSide: BorderSide(
+                        color: colors.outlineVariant.withValues(alpha: 0.3),
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius:
+                          BorderRadius.circular(AppSpacing.radiusMd),
+                      borderSide: BorderSide(
+                        color: colors.outlineVariant.withValues(alpha: 0.3),
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius:
+                          BorderRadius.circular(AppSpacing.radiusMd),
+                      borderSide: BorderSide(
+                        color: colors.primary,
+                        width: 2,
+                      ),
+                    ),
+                  ),
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: colors.onSurface,
+                  ),
+                  onChanged: (value) => _onCodeDigitChanged(index, value),
+                ),
+              ),
+            );
+          }),
         ),
-        const SizedBox(height: 16),
-        // Resend button with countdown per D-11
-        TextButton(
-          onPressed: _canResend ? _resendCode : null,
-          child: Text(
-            _canResend
-                ? 'Reenviar codigo'
-                : 'Reenviar codigo ($_resendCountdown s)',
+        const SizedBox(height: AppSpacing.lg),
+
+        // Verify button
+        SizedBox(
+          width: double.infinity,
+          height: 52,
+          child: ElevatedButton(
+            onPressed: _isSubmitting ? null : _verifyCode,
+            child: _isSubmitting
+                ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text('Verificar Código'),
+                      const SizedBox(width: 8),
+                      Icon(Icons.arrow_forward, size: 20,
+                          color: Theme.of(context).colorScheme.onPrimary),
+                    ],
+                  ),
           ),
         ),
+        const SizedBox(height: AppSpacing.md),
+
+        // Back + Resend
+        TextButton.icon(
+          onPressed: () => setState(() {
+            _isOtpStep = false;
+            for (final c in _codeControllers) {
+              c.clear();
+            }
+            _resendTimer?.cancel();
+          }),
+          icon: const Icon(Icons.arrow_back, size: 16),
+          label: const Text('Voltar'),
+        ),
+        if (!_canResend)
+          Text(
+            'Reenviar código ($_resendCountdown s)',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: colors.onSurfaceVariant,
+                ),
+          )
+        else
+          TextButton(
+            onPressed: _resendCode,
+            child: const Text('Reenviar código'),
+          ),
       ],
     );
   }

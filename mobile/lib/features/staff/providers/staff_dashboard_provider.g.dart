@@ -24,7 +24,7 @@ final staffDashboardServiceProvider = Provider<StaffDashboardService>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef StaffDashboardServiceRef = ProviderRef<StaffDashboardService>;
-String _$staffDashboardHash() => r'f70649dfdde3604963b5b20dccb3a5ba995c4b6b';
+String _$staffDashboardHash() => r'65254df01fefdeece8e05310e5b47985b79fdabc';
 
 /// See also [staffDashboard].
 @ProviderFor(staffDashboard)

@@ -1,11 +1,20 @@
-/// Centralized spacing tokens used throughout the app.
+/// Centralized spacing and radius tokens used throughout the app.
 ///
 /// All spacing values in logical pixels (dp).
-/// Defined per D-23: xs=4, sm=8, md=16, lg=24, xl=32.
 class AppSpacing {
+  // Spacing scale
   static const double xs = 4;
   static const double sm = 8;
   static const double md = 16;
   static const double lg = 24;
   static const double xl = 32;
+  static const double xxl = 48;
+
+  // Border radius scale (aligned with alpha-connect prototype)
+  static const double radiusSm = 8; // 0.5rem
+  static const double radiusMd = 12; // inputs, small cards
+  static const double radiusLg = 16; // cards, containers
+  static const double radiusXl = 24; // large panels, sheets
+  static const double radiusXxl = 32; // pill shapes (not full)
+  static const double radiusFull = 999; // full pill / circular
 }

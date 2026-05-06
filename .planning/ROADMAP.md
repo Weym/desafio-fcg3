@@ -3,17 +3,74 @@
 **Milestone:** M2 — Flutter Frontend
 **Granularity:** Standard
 **Coverage:** 17/17 requirements mapped
-**Last Updated:** 2026-05-05
+**Last Updated:** 2026-05-06
 **Previous Milestone:** M1 — Backend + AI Service + MCP Server (Phases 1-6, complete)
 
 ---
 
 ## Phases
 
-- [x] **Phase 7: Flutter Scaffold & Auth** — App boots with role-based navigation, OTP authentication, secure JWT storage (completed 2026-05-05)
-- [x] **Phase 8: Client Interface** — All 6 client screens consuming the REST API (dashboard, chat history, documents, notifications, support) (completed 2026-05-05)
-- [x] **Phase 9: Staff Interface** — All 4 staff/provider management screens (dashboard, schedule, AI data, document management) (completed 2026-05-05)
-- [x] **Phase 10: Cross-Platform Polish** — Responsiveness on all form factors, performance optimization, data sync efficiency (completed 2026-05-05)
+- [x] **Phase 7: Flutter Scaffold & Auth** — App boots with role-based navigation, OTP authentication, secure JWT storage
+ (completed 2026-05-05)
+- [x] **Phase 8: Client Interface** — All 6 client screens consuming the REST API (dashboard, chat history, documents, notifications, support)
+ (completed 2026-05-05)
+- [x] **Phase 9: Staff Interface** — All 4 staff/provider management screens (dashboard, schedule, AI data, document management)
+ (completed 2026-05-05)
+- [x] **Phase 10: Cross-Platform Polish** — Responsiveness on all form factors, performance optimization, data sync efficiency
+ (completed 2026-05-05)
+- [x] **Phase 11: Alpha Connect Visual Refactoring** — Align Flutter app visual identity with alpha-connect prototype (glassmorphism, new palette, fonts, layout restructure)
+ (completed 2026-05-06)
+- [x] **Phase 12: Frontend-Backend Integration** — Validate API contracts, Docker Compose full stack, OTP bypass for dev, E2E automated tests with real data flowing
+ (completed 2026-05-06)
+- [x] **Phase 13: Resource Allocation** — CRUD de recursos (gestor), agendamento com upload de autorização (aluno), novos tipos de recurso, flag requires_authorization
+ (completed 2026-05-06)
+- [x] **Phase 14: Human Intervention** — Tela de intervenção humana (gestor assume chats não resolvidos pelo bot, responde via WhatsApp)
+ (completed 2026-05-06)
+
+---
+
+### Phase 14: Human Intervention
+
+**Goal:** Complete human intervention system — bot escalates conversations when unable to resolve, staff sees pending sessions, assumes conversations, replies directly to students via WhatsApp, and marks sessions resolved.
+**Depends on:** Phase 13
+**Requirements:** HI-01, HI-02, HI-03, HI-04, HI-05, HI-06, HI-07, HI-08, HI-09, HI-10, HI-11, HI-12, HI-13, HI-14, HI-15, HI-16
+
+### Success Criteria
+1. Chat sessions support 4 status values (active, closed, human_needed, human_active) with assigned_staff_id tracking.
+2. Bot detects escalation keywords ("atendente", "humano", etc.) and AI responses containing "procurar a secretaria" — triggers escalation automatically.
+3. Student receives acknowledgment message on escalation; AI stops processing their messages until resolved.
+4. Staff can list pending interventions, assume a conversation, send replies (delivered via WhatsApp), and resolve sessions.
+5. Flutter staff app has "Intervenção" tab with session cards (student name, RA, status badge, elapsed time) and chat interface.
+
+**Plans:** 2 plans
+
+Plans:
+- [x] 14-01-PLAN.md — Backend: migration, escalation detection, AI skip, assign/reply/resolve endpoints
+- [x] 14-02-PLAN.md — Frontend staff: intervention screen, chat detail, navigation wiring
+
+---
+
+### Phase 13: Resource Allocation
+
+**Goal:** Complete resource allocation system — staff manages resources with authorization flags, students browse/book resources with file upload for restricted ones, expanded resource types and seed data.
+**Depends on:** Phase 12
+**Requirements:** RES-01, RES-02, RES-03, RES-04, RES-05, RES-06, RES-07, RES-08, RES-09, RES-10, RES-11, RES-12, RES-13, RES-14
+
+### Success Criteria
+1. Backend supports 6 resource types with description and requires_authorization fields.
+2. Staff can CRUD resources via API and dedicated "Recursos" screen (5th tab).
+3. Students can browse available resources filtered by type, with clear authorization badge.
+4. Booking flow enforces file upload (PDF/JPG/PNG, 5MB) for authorization-required resources.
+5. Students can view and cancel their appointments from "Meus Agendamentos" section.
+6. Seed data includes diverse resources across all 6 types.
+
+**Plans:** 3 plans
+
+Plans:
+- [x] 13-01-PLAN.md — Backend: migration, resources CRUD endpoints, upload endpoint, seed expansion
+- [x] 13-02-PLAN.md — Frontend staff: resources screen with CRUD + navigation wiring
+- [x] 13-03-PLAN.md — Frontend client: resource booking flow with upload + my appointments
+
 ---
 
 ## Phase Details
@@ -31,7 +88,7 @@
 4. Role-based navigation: student sees only Client routes (Dashboard, Chat, Documents, Notifications, Support); staff sees only Provider routes (Dashboard, Schedule, AI Data, Documents).
 5. Invalid OTP entry shows clear error; 3 failed attempts shows "new code sent" message matching backend behavior.
 
-**Plans:** 3 plans
+**Plans:** 3/3 plans complete
 
 Plans:
 - [x] 07-01-PLAN.md — Project infrastructure (dependencies, folder structure, Dio, theme, models, AuthService)
@@ -53,7 +110,7 @@ Plans:
 4. Notification Center displays alerts, appointment reminders, and status updates — with unread indicators.
 5. Support & Contact screen provides a direct channel for the client to reach administrative support.
 
-**Plans:** 5/5 plans executed
+**Plans:** 5/5 plans complete
 
 Plans:
 - [x] 08-01-PLAN.md — Data layer: models, services, and Riverpod providers for all client domains
@@ -76,7 +133,7 @@ Plans:
 3. AI Data Interaction screen shows structured information, summaries, and insights extracted from WhatsApp conversations (via chat sessions and MCP action logs endpoints).
 4. Document Management screen allows sending documents to client boards and managing pending document requests with status updates.
 
-**Plans:** 5/5 plans executed
+**Plans:** 5/5 plans complete
 
 Plans:
 - [x] 09-01-PLAN.md — Staff data layer (models, services, Riverpod providers + file_picker dep)
@@ -110,6 +167,51 @@ Plans:
 
 ---
 
+### Phase 11: Alpha Connect Visual Refactoring
+
+**Goal:** Align the Flutter app's visual identity with the alpha-connect React prototype — new color palette, typography (Plus Jakarta Sans + Inter), glassmorphism components, pill-shaped CTAs, and restructured screen layouts — while preserving all existing features, API integrations, and responsive behaviors.
+**Depends on:** Phase 10
+**Requirements:** UI-NFR-02 (visual consistency), UI-NFR-04 (dark mode support)
+
+### Success Criteria
+1. App renamed to "Alpha Connect" with matching branding (icon badge + uppercase title).
+2. Color palette matches alpha-connect prototype: primary #3B608F, secondary #6A548A, tertiary #676001 with full dark mode variants.
+3. Typography uses Plus Jakarta Sans (headings) + Inter (body) via google_fonts.
+4. Navigation uses glassmorphism bottom bar (phone) with pill-shaped active items; NavigationRail preserved for tablet/desktop.
+5. All screens restructured to match alpha-connect card layouts (glass cards, segmented filters, KPI grids, quick-action grids).
+6. Theme toggle + logout accessible from every screen via shared AppBarActions widget.
+7. Dark mode fully legible — input text, OTP digits, search bars all use explicit onSurface colors.
+8. 38 tests passing (8 existing auth + 30 new: theme tokens, GlassCard, PillButton).
+
+**Plans:** Executed as single refactoring pass (no sub-plans)
+
+Branch: `feat/alpha-connect-visual-refactoring`
+Commits:
+- [x] `69c392f` — feat(mobile): align visual identity with alpha-connect prototype
+- [x] `eb4b91f` — fix(mobile): add theme toggle + logout to all screens, fix dark mode text legibility
+
+### Phase 12: Frontend-Backend Integration
+
+**Goal:** The Flutter app connects to the real FastAPI backend — Docker Compose orchestrates the full stack locally, API contracts are validated and corrected, OTP bypass enables dev login, and E2E tests prove data flows end-to-end.
+**Depends on:** Phase 11
+**Requirements:** UI-INFRA-02, UI-NFR-03
+
+### Success Criteria
+1. `docker compose up` starts all 5 services (fastapi-app, langchain-service, mcp-server, postgres, flutter-web) with healthchecks passing.
+2. Flutter web app at `:3000` authenticates against backend at `:8000` using DEV_MASTER_OTP=000000 bypass.
+3. All Dart models parse real API responses without exceptions — contract mismatches fixed.
+4. Seed data populates on first boot; subsequent boots skip seeding (conditional seed).
+5. Flutter integration tests pass against the running stack: auth flow, documents, chat, staff dashboard.
+
+**Plans:** 3/3 plans complete
+
+Plans:
+- [x] 12-01-PLAN.md — Docker Compose full stack (flutter-web service, conditional seed, .env docs)
+- [x] 12-02-PLAN.md — API contract validation and Dart model corrections
+- [x] 12-03-PLAN.md — E2E integration tests (auth, documents, chat, staff)
+
+---
+
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
@@ -118,3 +220,7 @@ Plans:
 | 8. Client Interface | 5/5 | Complete | 2026-05-05 |
 | 9. Staff Interface | 5/5 | Complete | 2026-05-05 |
 | 10. Cross-Platform Polish | 5/5 | Complete | 2026-05-05 |
+| 11. Alpha Connect Visual Refactoring | 1/1 | Complete | 2026-05-06 |
+| 12. Frontend-Backend Integration | 3/3 | Complete | 2026-05-06 |
+| 13. Resource Allocation | 3/3 | Complete | 2026-05-06 |
+| 14. Human Intervention | 2/2 | Complete | 2026-05-06 |

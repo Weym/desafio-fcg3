@@ -24,7 +24,7 @@ final appointmentServiceProvider = Provider<AppointmentService>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef AppointmentServiceRef = ProviderRef<AppointmentService>;
-String _$appointmentsHash() => r'9e46ed64ee1af47ac59894dc74b12a17b09687d7';
+String _$appointmentsHash() => r'30429a4384535e48ea2a35052e24b93877a7cb80';
 
 /// See also [appointments].
 @ProviderFor(appointments)

@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Flutter Frontend
 status: complete
-last_updated: "2026-05-05T21:00:00.000Z"
-last_activity: 2026-05-05
+last_updated: "2026-05-06T21:00:00.000Z"
+last_activity: 2026-05-06
 progress:
-  total_phases: 4
-  completed_phases: 4
-  total_plans: 18
-  completed_plans: 18
+  total_phases: 8
+  completed_phases: 8
+  total_plans: 27
+  completed_plans: 27
   percent: 100
 ---
 
@@ -17,10 +17,10 @@ progress:
 
 ## Current Position
 
-Phase: 10 (all M2 phases complete)
-Plan: All 18 plans executed
-Status: Milestone complete — verification and hardening phase
-Last activity: 2026-05-05 - Validated full stack (DB fix, auth tests, AI/RAG E2E, Flutter tests)
+Phase: 14
+Plan: 2 of 2 complete
+Status: All phases delivered + dark mode/responsive polish applied
+Last activity: 2026-05-06 — Fixed 28 dark mode contrast issues + 15 responsive layout constraints across 20 files
 
 Progress: [██████████] 100%
 
@@ -32,16 +32,21 @@ Progress: [██████████] 100%
 | 8 | Client Interface | complete |
 | 9 | Staff Interface | complete |
 | 10 | Cross-Platform Polish | complete |
+| 11 | Alpha Connect Visual Refactoring | complete |
+| 12 | Frontend-Backend Integration | complete |
+| 13 | Resource Allocation | complete |
+| 14 | Human Intervention | complete |
 
 ## Current Focus
 
-**Milestone v2.0 (Flutter Frontend) complete.**
-All 4 phases executed (18/18 plans). Verification and hardening session completed 2026-05-05.
+**All phases delivered (7-14). 8 phases, 27 plans executed.**
+Previous milestone (M1 Backend + AI + MCP) delivered 6 phases, 47 plans.
 
-Remaining work is manual/environment verification:
-- Phase 6: WhatsApp webhook E2E (requires ngrok + WhatsApp Business API)
-- Phases 7/9/10: Visual testing on emulator/device
-- Phase 1 stack tests: require Docker CLI on host (not inside container)
+Branches:
+- `feat/resource-allocation` — Phase 13 (10 commits)
+- `feat/human-intervention` — Phase 13 + 14 (18 commits total)
+
+Next action: Merge branches to main or start next milestone.
 
 ## Accumulated Context
 
@@ -49,12 +54,24 @@ Remaining work is manual/environment verification:
 
 Recent decisions affecting current work:
 
-- [Milestone v2.0]: Phase numbering continues from M1 (Phase 7+) — no reset
-- [Milestone v2.0]: Frontend requirements derived from `requerimentos_frontend.md` with 2 user profiles (Client, Provider/Staff)
-- [Milestone v2.0]: Flutter mobile/web using existing REST API surface from M1 — no backend changes needed
-- [Phase 07]: State management: Riverpod (with riverpod_annotation + code generation)
-- [Phase 07]: Navigation: GoRouter with refreshListenable pattern (avoids GlobalKey crashes)
-- [Phase 07]: Auth interceptor uses QueuedInterceptor for proper async serialization
+- [Phase 14-polish]: Dark mode audit applied — 28 hardcoded color issues fixed across 15 screen files
+- [Phase 14-polish]: Responsive audit — 15 layout constraints fixed (bottom sheets max-width 500px, chat bubbles max 500px, desktop panels max 400px)
+- [Phase 14-polish]: All amber/green/red status colors now adapt to brightness (lighter shades in dark mode)
+- [Phase 14-polish]: Skeleton shimmer placeholders use colorScheme.surface instead of Colors.white
+- [Phase 14]: Escalation keywords checked BEFORE AI call to save AI service resources
+- [Phase 14]: Staff sees all 'human_needed' + only their own 'human_active' sessions (FIFO by escalated_at)
+- [Phase 14]: AI response escalation saves bot message before escalating — staff has full context
+- [Phase 11]: App renamed from "Desafio FCG3" to "Alpha Connect"
+- [Phase 11]: google_fonts added — Plus Jakarta Sans (headings) + Inter (body)
+- [Phase 11]: Color palette aligned to alpha-connect: primary #3B608F, secondary #6A548A, tertiary #676001
+- [Phase 11]: Explicit ColorScheme (not fromSeed) for precise color control in light + dark modes
+- [Phase 11]: GlassCard widget (BackdropFilter + soft shadow) replaces standard Material Card across all screens
+- [Phase 11]: PillButton widget (4 variants) replaces standard ElevatedButton style
+- [Phase 11]: Glassmorphism bottom nav on phone; NavigationRail preserved for tablet/desktop
+- [Phase 11]: Segmented filter controls replace FilterChip rows on Documents/Schedule screens
+- [Phase 11]: Shared AppBarActions widget ensures theme toggle + logout on every screen
+- [Phase 11]: Demo mode (setDemoUser) added for frontend preview without backend
+- [Phase 11]: Dark mode text legibility fixed with explicit onSurface color on all text inputs
 - [Phase 08]: Client data layer uses @JsonSerializable codegen + DioClient injection + @riverpod annotations for 3 domains (chat, documents, appointments)
 - [Phase 08]: url_launcher added for support screen external app actions (email, phone, WhatsApp)
 - [Phase 08]: Filter chips use toggle behavior — tapping active filter resets to null (Todos)
@@ -75,11 +92,12 @@ Recent decisions affecting current work:
 - [Phase 09]: All staff routes wired to real screens — _PlaceholderScreen removed from app_router.dart
 - [Phase 09]: StaffHomeScreen deprecated (kept for compatibility), StaffDashboardScreen is now the default /staff route
 - [Phase 10]: Shimmer uses colorScheme.surfaceContainerHighest/surface for M3 dark-mode compatibility
+- [Phase 12]: Integration tests use real seeded emails (ana.silva@usp.br, roberto@icmc.usp.br) with DEV_MASTER_OTP=000000 bypass
 
 ### Key Decisions Resolved
 
-- State management: **Riverpod** (with riverpod_annotation + code generation) — decided in Phase 7
-- Navigation architecture: **GoRouter** with refreshListenable pattern — decided in Phase 7
+- Merge `feat/resource-allocation` and `feat/human-intervention` branches into main
+- Decide next milestone scope (if any)
 
 ### Architecture Constraints (non-negotiable)
 
@@ -102,6 +120,10 @@ Recent decisions affecting current work:
 - Phase 8 added: Client Interface
 - Phase 9 added: Staff Interface
 - Phase 10 added: Cross-Platform Polish
+- Phase 11 added: Alpha Connect Visual Refactoring (2026-05-06)
+- Phase 12 added: Frontend-Backend Integration (2026-05-06)
+- Phase 13 added: Resource Allocation (2026-05-06)
+- Phase 14 added: Human Intervention (2026-05-06)
 
 ### Quick Tasks Completed
 

@@ -7,6 +7,7 @@ void showCreateSlotSheet(BuildContext context, WidgetRef ref) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
+    useSafeArea: true,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
     ),
@@ -61,6 +62,12 @@ class _CreateSlotSheetState extends ConsumerState<_CreateSlotSheet> {
     final picked = await showTimePicker(
       context: context,
       initialTime: _selectedStartTime ?? const TimeOfDay(hour: 8, minute: 0),
+      builder: (context, child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+          child: child!,
+        );
+      },
     );
     if (picked != null) {
       setState(() {
@@ -75,6 +82,12 @@ class _CreateSlotSheetState extends ConsumerState<_CreateSlotSheet> {
     final picked = await showTimePicker(
       context: context,
       initialTime: _selectedEndTime ?? const TimeOfDay(hour: 17, minute: 0),
+      builder: (context, child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+          child: child!,
+        );
+      },
     );
     if (picked != null) {
       setState(() {
@@ -126,16 +139,19 @@ class _CreateSlotSheetState extends ConsumerState<_CreateSlotSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.fromLTRB(
-        24,
-        24,
-        24,
-        MediaQuery.of(context).viewInsets.bottom + 24,
-      ),
-      child: Form(
-        key: _formKey,
-        child: Column(
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 500),
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(
+            24,
+            24,
+            24,
+            MediaQuery.of(context).viewInsets.bottom + 40,
+          ),
+          child: Form(
+            key: _formKey,
+            child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -219,6 +235,8 @@ class _CreateSlotSheetState extends ConsumerState<_CreateSlotSheet> {
                   : const Text('Criar Slot'),
             ),
           ],
+        ),
+      ),
         ),
       ),
     );

@@ -5,6 +5,8 @@ part 'action_log_model.g.dart';
 @JsonSerializable()
 class ActionLogModel {
   final String id;
+  @JsonKey(name: 'chat_session_id')
+  final String? chatSessionId;
   @JsonKey(name: 'tool_name')
   final String toolName;
   @JsonKey(name: 'input_params')
@@ -21,6 +23,7 @@ class ActionLogModel {
 
   const ActionLogModel({
     required this.id,
+    this.chatSessionId,
     required this.toolName,
     required this.inputParams,
     this.outputResult,

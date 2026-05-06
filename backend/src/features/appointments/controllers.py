@@ -10,14 +10,17 @@ Appointments (dual-auth for MCP access):
 - POST /appointments — book a slot with SELECT FOR UPDATE (APPT-02)
 - GET /appointments — list appointments with status filter (APPT-04)
 - PUT /appointments/{id}/cancel — cancel appointment (APPT-03)
+- POST /appointments/{id}/authorization — upload authorization file
 """
 
 from __future__ import annotations
 
+import os
+import uuid as uuid_mod
 from datetime import date
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, UploadFile, File
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.infrastructure.database import get_db_session
@@ -25,6 +28,11 @@ from src.shared.dependencies import (
     UserContext,
     get_current_user_or_service,
     require_staff,
+)
+from src.shared.exceptions import (
+    ForbiddenException,
+    NotFoundException,
+    ValidationException,
 )
 from src.shared.pagination import PaginationParams, paginated_response
 
@@ -183,3 +191,87 @@ async def cancel_appointment(
     )
     await db.commit()
     return result
+
+
+# ------------------------------------------------------------------
+# POST /appointments/{id}/authorization — upload authorization file
+# ------------------------------------------------------------------
+
+ALLOWED_CONTENT_TYPES = {
+    "application/pdf",
+    "image/jpeg",
+    "image/png",
+}
+MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
+
+
+@appointments_router.post("/{appointment_id}/authorization", response_model=AppointmentResponse)
+async def upload_authorization(
+    appointment_id: UUID,
+    file: UploadFile = File(..., description="Authorization file (PDF, JPG, or PNG, max 5MB)"),
+    user: UserContext = Depends(get_current_user_or_service),
+    db: AsyncSession = Depends(get_db_session),
+) -> AppointmentResponse:
+    """Upload an authorization file for an appointment.
+
+    IDOR check: student can only upload to own appointment.
+    Validates file type (PDF/JPG/PNG) and size (max 5MB).
+    Saves to uploads/authorizations/{uuid}_{filename}.
+    """
+    # Validate content type
+    if file.content_type not in ALLOWED_CONTENT_TYPES:
+        raise ValidationException(
+            message="Tipo de arquivo nao permitido. Envie PDF, JPG ou PNG.",
+            details=[
+                {
+                    "field": "file",
+                    "message": f"Content-Type '{file.content_type}' nao aceito. "
+                    "Tipos permitidos: application/pdf, image/jpeg, image/png",
+                }
+            ],
+        )
+
+    # Read file content and validate size
+    content = await file.read()
+    if len(content) > MAX_FILE_SIZE:
+        raise ValidationException(
+            message="Arquivo excede o tamanho maximo de 5MB.",
+            details=[
+                {
+                    "field": "file",
+                    "message": f"Tamanho do arquivo: {len(content)} bytes. Maximo permitido: {MAX_FILE_SIZE} bytes",
+                }
+            ],
+        )
+
+    # Load appointment and check ownership (IDOR)
+    result = await appointment_service.get_appointment_for_upload(
+        db, appointment_id=appointment_id,
+    )
+
+    if result is None:
+        raise NotFoundException("appointment", appointment_id)
+
+    # IDOR check: student can only upload to own appointment
+    if user.role != "staff" and result.student_id != user.id:
+        raise ForbiddenException(
+            "Voce nao tem permissao para enviar arquivos para este agendamento",
+        )
+
+    # Save file to disk
+    upload_dir = "uploads/authorizations"
+    os.makedirs(upload_dir, exist_ok=True)
+
+    safe_filename = f"{uuid_mod.uuid4()}_{file.filename}"
+    file_path = os.path.join(upload_dir, safe_filename)
+
+    with open(file_path, "wb") as f:
+        f.write(content)
+
+    # Update appointment with file URL
+    file_url = f"/uploads/authorizations/{safe_filename}"
+    appointment_response = await appointment_service.set_authorization_file(
+        db, appointment_id=appointment_id, file_url=file_url,
+    )
+    await db.commit()
+    return appointment_response

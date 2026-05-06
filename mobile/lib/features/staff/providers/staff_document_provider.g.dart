@@ -24,7 +24,7 @@ final staffDocumentServiceProvider = Provider<StaffDocumentService>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef StaffDocumentServiceRef = ProviderRef<StaffDocumentService>;
-String _$staffDocumentsHash() => r'07c1d1113758de79736afa71779c5d0a5a4fbcc5';
+String _$staffDocumentsHash() => r'e47b6e6cbeaa7f210bf3fa6412f707be6b1b7cb6';
 
 /// See also [staffDocuments].
 @ProviderFor(staffDocuments)

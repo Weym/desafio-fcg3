@@ -1,16 +1,20 @@
 #!/usr/bin/env python3
-"""Destructive seed script for the FCG3 development database.
+"""Conditional seed script for the FCG3 development database.
 
-WARNING: this script truncates and recreates development data for curriculum,
-users, current-period enrollments, documents, and scheduling fixtures.
+On first boot, seeds the database with development fixtures. On subsequent
+boots, detects existing data and exits cleanly (idempotent).
+
+Use --force to truncate and re-create all development data.
 
 Run with:
   docker compose exec fastapi-app python -m scripts.seed
+  docker compose exec fastapi-app python -m scripts.seed --force
   python -m scripts.seed
 """
 
 from __future__ import annotations
 
+import argparse
 import asyncio
 import sys
 from dataclasses import dataclass, field
@@ -587,21 +591,109 @@ async def seed_users_and_current_period(
                 )
             )
 
-        # Appointments (mark slot unavailable)
-        for appt in student_seed.appointments:
-            if appt.slot_index >= len(slots):
-                raise ValueError(
-                    f"Appointment slot_index={appt.slot_index} out of range "
-                    f"for {student_seed.email} (only {len(slots)} slots)"
-                )
-            slot = slots[appt.slot_index]
-            session.add(
-                Appointment(
-                    student_id=student.id,
-                    slot_id=slot.id,
-                    reason=appt.reason,
-                    status=appt.status,
-                )
+    await session.commit()
+
+
+async def seed_scheduling(session: AsyncSession) -> None:
+    resources_data = [
+        {
+            "name": "Sala de Coordenação",
+            "resource_type": "room",
+            "description": "Sala para reuniões com a coordenação do curso",
+            "capacity": 10,
+            "location": "Bloco 3, Sala 301",
+            "is_available": True,
+            "requires_authorization": False,
+        },
+        {
+            "name": "Laboratório de Redes",
+            "resource_type": "lab",
+            "description": "Laboratório equipado com switches, roteadores e ferramentas de análise de rede",
+            "capacity": 30,
+            "location": "Bloco 5, Sala 102",
+            "is_available": True,
+            "requires_authorization": False,
+        },
+        {
+            "name": "Projetor Portátil Epson",
+            "resource_type": "equipment",
+            "description": "Projetor portátil para apresentações e aulas externas",
+            "capacity": None,
+            "location": "Almoxarifado, Bloco 1",
+            "is_available": True,
+            "requires_authorization": False,
+        },
+        {
+            "name": "Auditório Principal",
+            "resource_type": "auditorium",
+            "description": "Auditório com capacidade para eventos e palestras. Requer autorização da direção.",
+            "capacity": 200,
+            "location": "Bloco Central, Térreo",
+            "is_available": True,
+            "requires_authorization": True,
+        },
+        {
+            "name": "Sala de Estudos A",
+            "resource_type": "study_room",
+            "description": "Sala silenciosa para estudo individual ou em grupo",
+            "capacity": 8,
+            "location": "Biblioteca, 2° andar",
+            "is_available": True,
+            "requires_authorization": False,
+        },
+        {
+            "name": "Sala de Estudos B",
+            "resource_type": "study_room",
+            "description": "Sala com quadro branco para trabalhos em grupo",
+            "capacity": 12,
+            "location": "Biblioteca, 2° andar",
+            "is_available": True,
+            "requires_authorization": False,
+        },
+        {
+            "name": "Quadra Poliesportiva",
+            "resource_type": "sports_court",
+            "description": "Quadra coberta para futebol, basquete e vôlei. Requer autorização do setor esportivo.",
+            "capacity": 30,
+            "location": "Centro Esportivo",
+            "is_available": True,
+            "requires_authorization": True,
+        },
+        {
+            "name": "Laboratório de IA",
+            "resource_type": "lab",
+            "description": "Laboratório com GPUs para treinamento de modelos. Requer autorização do professor responsável.",
+            "capacity": 15,
+            "location": "Bloco 5, Sala 201",
+            "is_available": True,
+            "requires_authorization": True,
+        },
+    ]
+
+    created_resources = []
+    for res_data in resources_data:
+        resource = Resource(**res_data)
+        session.add(resource)
+        await session.flush()
+        created_resources.append(resource)
+
+    # Create scheduling slots only for the first resource (coordination room)
+    base_day = date.today() + timedelta(days=1)
+    slots = [
+        (base_day, time(9, 0), time(10, 0)),
+        (base_day, time(10, 0), time(11, 0)),
+        (base_day + timedelta(days=1), time(14, 0), time(15, 0)),
+        (base_day + timedelta(days=2), time(9, 0), time(10, 0)),
+        (base_day + timedelta(days=2), time(10, 0), time(11, 0)),
+    ]
+    for slot_date, start_time, end_time in slots:
+        session.add(
+            SchedulingSlot(
+                resource_id=created_resources[0].id,
+                date=slot_date,
+                start_time=start_time,
+                end_time=end_time,
+                is_available=True,
             )
             slot.is_available = False
 
@@ -629,7 +721,32 @@ async def print_summary(session: AsyncSession) -> None:
         print(f"- {label}: {result.scalar_one()}")
 
 
+async def check_data_exists(session: AsyncSession) -> bool:
+    """Return True if students table already has data."""
+    result = await session.execute(text("SELECT COUNT(*) FROM students"))
+    count = result.scalar_one()
+    return count > 0
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="FCG3 development database seeder")
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Force re-seed: truncate existing data and recreate from scratch",
+    )
+    return parser.parse_args()
+
+
 async def main() -> None:
+    args = parse_args()
+
+    async with async_session() as session:
+        if not args.force:
+            if await check_data_exists(session):
+                print("✅ Seed data already exists, skipping. Use --force to re-seed.")
+                return
+
     print("⚠️  WARNING: This script TRUNCATES and recreates development seed data.")
     print("⚠️  Affected tables: " + ", ".join(WARNING_TABLES))
     print("🌱 Starting destructive seed...")

@@ -11,7 +11,7 @@
 ### Flutter Infrastructure & Auth
 
 - [ ] **UI-INFRA-01**: App inicia com navegação baseada em perfil — Client e Provider/Staff veem rotas dedicadas
-- [ ] **UI-INFRA-02**: Fluxo de autenticação (OTP email → JWT) integrado com backend FastAPI existente
+- [x] **UI-INFRA-02**: Fluxo de autenticação (OTP email → JWT) integrado com backend FastAPI existente
 - [ ] **UI-INFRA-03**: JWT armazenado via flutter_secure_storage com detecção de expiração/revogação e redirecionamento para login
 
 ---
@@ -40,7 +40,7 @@
 
 - [x] **UI-NFR-01**: Interface intuitiva priorizando clareza para o cliente
 - [x] **UI-NFR-02**: Aplicação Flutter adaptável a smartphones, tablets e web
-- [ ] **UI-NFR-03**: Autenticação com separação rigorosa de permissões e rotas entre Cliente e Fornecedor
+- [x] **UI-NFR-03**: Autenticação com separação rigorosa de permissões e rotas entre Cliente e Fornecedor
 - [x] **UI-NFR-04**: Sincronização eficiente dos dados do WhatsApp/IA com latência percebida < 2s para dados cacheados
 
 ---
@@ -78,9 +78,9 @@
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
 | UI-INFRA-01 | Phase 7: Flutter Scaffold & Auth | Pending |
-| UI-INFRA-02 | Phase 7: Flutter Scaffold & Auth | Pending |
+| UI-INFRA-02 | Phase 7: Flutter Scaffold & Auth | Complete |
 | UI-INFRA-03 | Phase 7: Flutter Scaffold & Auth | Pending |
-| UI-NFR-03 | Phase 7: Flutter Scaffold & Auth | Pending |
+| UI-NFR-03 | Phase 7: Flutter Scaffold & Auth | Complete |
 | UI-C01 | Phase 8: Client Interface | Complete |
 | UI-C02 | Phase 8: Client Interface | Complete |
 | UI-C03 | Phase 8: Client Interface | Complete |

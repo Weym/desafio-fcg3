@@ -11,7 +11,7 @@ EnrollmentPeriodInfo _$EnrollmentPeriodInfoFromJson(
 ) => EnrollmentPeriodInfo(
   name: json['name'] as String,
   isActive: json['is_active'] as bool,
-  daysRemaining: (json['days_remaining'] as num).toInt(),
+  daysRemaining: (json['days_remaining'] as num?)?.toInt(),
 );
 
 Map<String, dynamic> _$EnrollmentPeriodInfoToJson(

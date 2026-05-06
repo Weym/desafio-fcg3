@@ -18,10 +18,15 @@ class ChatSession(Base):
     __tablename__ = "chat_sessions"
     __table_args__ = (
         CheckConstraint(
-            "status IN ('active', 'closed')",
+            "status IN ('active', 'closed', 'human_needed', 'human_active')",
             name="ck_chat_sessions_status",
         ),
         Index("idx_chat_sessions_student", "student_id", "status"),
+        Index(
+            "idx_chat_sessions_human_status",
+            "status",
+            postgresql_where=text("status IN ('human_needed', 'human_active')"),
+        ),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
@@ -29,6 +34,8 @@ class ChatSession(Base):
     whatsapp_phone: Mapped[str] = mapped_column(String(20), nullable=False)
     status: Mapped[str] = mapped_column(String(20), nullable=False, server_default=text("'active'"))
     verification_state: Mapped[str] = mapped_column(String(20), nullable=False, server_default=text("'unverified'"))
+    assigned_staff_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("staff.id"), nullable=True)
+    escalated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
     ended_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())

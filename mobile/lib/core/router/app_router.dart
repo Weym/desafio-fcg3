@@ -14,6 +14,7 @@ import '../../features/client/screens/client_chat_detail_screen.dart';
 import '../../features/client/screens/client_documents_screen.dart';
 import '../../features/client/screens/client_notifications_screen.dart';
 import '../../features/client/screens/client_support_screen.dart';
+import '../../features/client/screens/client_resources_screen.dart';
 import '../../features/staff/screens/staff_shell.dart';
 import '../../features/staff/screens/staff_dashboard_screen.dart';
 import '../../features/staff/screens/staff_schedule_screen.dart';
@@ -21,6 +22,9 @@ import '../../features/staff/screens/staff_appointment_detail_screen.dart';
 import '../../features/staff/screens/staff_ai_screen.dart';
 import '../../features/staff/screens/staff_chat_detail_screen.dart';
 import '../../features/staff/screens/staff_documents_screen.dart';
+import '../../features/staff/screens/staff_resources_screen.dart';
+import '../../features/staff/screens/staff_intervention_screen.dart';
+import '../../features/staff/screens/staff_intervention_chat_screen.dart';
 import '../../features/client/models/appointment_model.dart';
 import 'route_names.dart';
 
@@ -140,6 +144,12 @@ GoRouter appRouter(Ref ref) {
             builder: (context, state) =>
                 const ClientSupportScreen(),
           ),
+          GoRoute(
+            path: RoutePaths.clientResources,
+            name: RouteNames.clientResources,
+            builder: (context, state) =>
+                const ClientResourcesScreen(),
+          ),
         ],
       ),
 
@@ -187,6 +197,26 @@ GoRouter appRouter(Ref ref) {
             path: RoutePaths.staffDocuments,
             name: RouteNames.staffDocuments,
             builder: (context, state) => const StaffDocumentsScreen(),
+          ),
+          GoRoute(
+            path: RoutePaths.staffResources,
+            name: RouteNames.staffResources,
+            builder: (context, state) => const StaffResourcesScreen(),
+          ),
+          GoRoute(
+            path: RoutePaths.staffIntervention,
+            name: RouteNames.staffIntervention,
+            builder: (context, state) => const StaffInterventionScreen(),
+            routes: [
+              GoRoute(
+                path: ':sessionId',
+                name: RouteNames.staffInterventionChat,
+                builder: (context, state) {
+                  final sessionId = state.pathParameters['sessionId']!;
+                  return StaffInterventionChatScreen(sessionId: sessionId);
+                },
+              ),
+            ],
           ),
         ],
       ),
