@@ -20,6 +20,7 @@
  (completed 2026-05-05)
 - [x] **Phase 11: Alpha Connect Visual Refactoring** — Align Flutter app visual identity with alpha-connect prototype (glassmorphism, new palette, fonts, layout restructure)
  (completed 2026-05-06)
+- [ ] **Phase 12: Frontend-Backend Integration** — Validate API contracts, Docker Compose full stack, OTP bypass for dev, E2E automated tests with real data flowing
 
 ---
 
