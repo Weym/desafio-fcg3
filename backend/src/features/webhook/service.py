@@ -34,8 +34,20 @@ MEDIA_RESPONSES: dict[str, str] = {
     "video": "Nao consigo processar videos. Por favor, descreva sua solicitacao em texto.",
 }
 
-# Session close keywords per D-11
-SESSION_CLOSE_KEYWORDS = {"sair", "encerrar"}
+# Session close keywords per D-11.
+# User-friendly variants added per debug session
+# `.planning/debug/whatsapp-otp-loop-no-cancel.md`: users naturally reach for
+# "cancelar"/"parar"/"stop" when they want to abandon the OTP flow; recognising
+# only "sair"/"encerrar" produced an undiscoverable infinite loop during
+# verification. Keep lookup case-insensitive via `.strip().lower()`.
+SESSION_CLOSE_KEYWORDS = {
+    "sair",
+    "encerrar",
+    "cancelar",
+    "cancel",
+    "parar",
+    "stop",
+}
 
 # Email regex for basic validation
 EMAIL_REGEX = re.compile(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")
@@ -268,7 +280,8 @@ class WebhookService:
 
         await wa_client.send_text_message(
             phone,
-            "Enviei um codigo para seu email. Informe o codigo de 6 digitos.",
+            "Enviei um codigo para seu email. Informe o codigo de 6 digitos "
+            "(ou envie 'cancelar' para sair).",
         )
 
     async def _handle_awaiting_code(
@@ -289,7 +302,8 @@ class WebhookService:
         if not re.match(r"^\d{6}$", code):
             await wa_client.send_text_message(
                 phone,
-                "Por favor, informe o codigo de 6 digitos enviado para seu email.",
+                "Por favor, informe o codigo de 6 digitos enviado para seu email "
+                "(ou envie 'cancelar' para sair).",
             )
             return
 
@@ -345,19 +359,27 @@ class WebhookService:
             remaining = settings.otp_max_attempts - code_row.attempts
 
             if code_row.attempts >= settings.otp_max_attempts:
-                # Max attempts — invalidate and send new code
+                # MAX_ATTEMPTS_REACHED is a TERMINAL state per CONVENTIONS.md
+                # ("Rate limiting: 429 for OTP attempts exhausted").
+                # Invalidate the code and CLOSE the session — do NOT auto-reissue
+                # a fresh OTP, which previously trapped the user in an infinite
+                # `awaiting_code` loop (see debug session
+                # `.planning/debug/whatsapp-otp-loop-no-cancel.md`).
                 code_row.used = True
+                session.status = "closed"
+                session.ended_at = datetime.now(timezone.utc)
                 await db.flush()
-                await otp_service.generate_and_send_code(db, student.email)
                 await wa_client.send_text_message(
                     phone,
-                    "Codigo invalido. Limite atingido. Enviei um novo codigo para seu email.",
+                    "Numero maximo de tentativas atingido. Sessao encerrada. "
+                    "Envie qualquer mensagem para recomecar.",
                 )
             else:
                 await db.flush()
                 await wa_client.send_text_message(
                     phone,
-                    f"Codigo invalido. Tente novamente. ({remaining} tentativa(s) restante(s))",
+                    f"Codigo invalido. Tente novamente. ({remaining} tentativa(s) restante(s)) "
+                    "Ou envie 'cancelar' para sair.",
                 )
             return
 
