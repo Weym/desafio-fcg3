@@ -141,6 +141,26 @@ Commits:
 - [x] `69c392f` — feat(mobile): align visual identity with alpha-connect prototype
 - [x] `eb4b91f` — fix(mobile): add theme toggle + logout to all screens, fix dark mode text legibility
 
+### Phase 12: Frontend-Backend Integration
+
+**Goal:** The Flutter app connects to the real FastAPI backend — Docker Compose orchestrates the full stack locally, API contracts are validated and corrected, OTP bypass enables dev login, and E2E tests prove data flows end-to-end.
+**Depends on:** Phase 11
+**Requirements:** UI-INFRA-02, UI-NFR-03
+
+### Success Criteria
+1. `docker compose up` starts all 5 services (fastapi-app, langchain-service, mcp-server, postgres, flutter-web) with healthchecks passing.
+2. Flutter web app at `:3000` authenticates against backend at `:8000` using DEV_MASTER_OTP=000000 bypass.
+3. All Dart models parse real API responses without exceptions — contract mismatches fixed.
+4. Seed data populates on first boot; subsequent boots skip seeding (conditional seed).
+5. Flutter integration tests pass against the running stack: auth flow, documents, chat, staff dashboard.
+
+**Plans:** 3 plans
+
+Plans:
+- [ ] 12-01-PLAN.md — Docker Compose full stack (flutter-web service, conditional seed, .env docs)
+- [ ] 12-02-PLAN.md — API contract validation and Dart model corrections
+- [ ] 12-03-PLAN.md — E2E integration tests (auth, documents, chat, staff)
+
 ---
 
 ## Progress
@@ -152,3 +172,4 @@ Commits:
 | 9. Staff Interface | 5/5 | Complete | 2026-05-05 |
 | 10. Cross-Platform Polish | 5/5 | Complete | 2026-05-05 |
 | 11. Alpha Connect Visual Refactoring | 1/1 | Complete | 2026-05-06 |
+| 12. Frontend-Backend Integration | 0/3 | Planning | — |
