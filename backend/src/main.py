@@ -1,6 +1,17 @@
+import logging
 import os
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+
+# Configure application logging at import time. Without this, the root logger
+# defaults to WARNING with no handlers, silently dropping every `logger.info`
+# call in our own modules (uvicorn only configures its own `uvicorn.*` loggers).
+# Set force=True so we win over any handlers uvicorn may have attached first.
+logging.basicConfig(
+    level=os.getenv("LOG_LEVEL", "INFO").upper(),
+    format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+    force=True,
+)
 
 import resend
 from fastapi import FastAPI, Request
