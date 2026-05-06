@@ -1,4 +1,12 @@
-"""Regression coverage for Phase 05 AI service gap closure."""
+"""Regression coverage for Phase 05 AI service gap closure.
+
+Persistence contract (see
+`.planning/debug/resolved/chat-duplicate-messages-flutter.md`):
+The AI service MUST NOT write to `chat_messages`. The backend webhook
+flow is the single owner of that table. Writing in both services
+caused every chat message to appear duplicated in the Flutter UI.
+These tests pin that contract.
+"""
 
 from __future__ import annotations
 
@@ -47,24 +55,32 @@ async def test_chat_requires_internal_service_token(
 
 
 @pytest.mark.asyncio
-async def test_chat_persists_user_before_agent_and_assistant_after_success(
+async def test_chat_invokes_agent_and_returns_response_without_persisting(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    saved_messages: list[tuple[str, str]] = []
+    """Happy path: the agent runs and its response is returned.
 
-    def fake_save_chat_message(*, pool, session_id, role, content) -> None:
-        saved_messages.append((role, content))
+    Regression guard: the AI service must NOT import or invoke
+    `save_chat_message`. Persistence is owned by the backend.
+    """
 
-    async def fake_invoke_agent(*, settings, db_pool, system_prompt, session_id, user_message) -> str:
-        assert saved_messages == [("user", "Oi")]
+    async def fake_invoke_agent(
+        *, settings, db_pool, system_prompt, session_id, user_message
+    ) -> str:
         assert db_pool is app.state.db_pool
         assert system_prompt == app.state.system_prompt
         assert session_id == "session-123"
         assert user_message == "Oi"
         return "Resposta final"
 
-    monkeypatch.setattr("ai_service.main.save_chat_message", fake_save_chat_message)
     monkeypatch.setattr("ai_service.main.invoke_agent", fake_invoke_agent)
+
+    # The AI service must not reference save_chat_message anymore. If some
+    # future change reintroduces the import, this assertion will fail.
+    assert not hasattr(main, "save_chat_message"), (
+        "ai_service.main must not import save_chat_message — persistence "
+        "is owned exclusively by the backend."
+    )
 
     app.state.db_pool = object()
     app.state.system_prompt = "prompt"
@@ -73,42 +89,34 @@ async def test_chat_persists_user_before_agent_and_assistant_after_success(
 
     assert response.response == "Resposta final"
     assert response.session_id == "session-123"
-    assert saved_messages == [
-        ("user", "Oi"),
-        ("assistant", "Resposta final"),
-    ]
 
 
 @pytest.mark.asyncio
-async def test_chat_persists_fallback_after_agent_error(
+async def test_chat_returns_fallback_after_agent_error_without_persisting(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    saved_messages: list[tuple[str, str]] = []
+    """Failure path: agent raises, endpoint returns the fallback message.
 
-    def fake_save_chat_message(*, pool, session_id, role, content) -> None:
-        saved_messages.append((role, content))
+    Regression guard: no persistence happens here either — the backend
+    saves whatever response text this endpoint returns.
+    """
 
-    async def fake_invoke_agent(*, settings, db_pool, system_prompt, session_id, user_message) -> str:
+    async def fake_invoke_agent(
+        *, settings, db_pool, system_prompt, session_id, user_message
+    ) -> str:
         raise RuntimeError("boom")
 
-    monkeypatch.setattr("ai_service.main.save_chat_message", fake_save_chat_message)
     monkeypatch.setattr("ai_service.main.invoke_agent", fake_invoke_agent)
 
     app.state.db_pool = object()
     app.state.system_prompt = "prompt"
 
-    response = await chat(ChatRequest(session_id="session-456", message="Preciso do historico"))
+    response = await chat(
+        ChatRequest(session_id="session-456", message="Preciso do historico")
+    )
 
     assert response.session_id == "session-456"
     assert response.response == (
         "Desculpe, estou com dificuldades tecnicas. "
         "Tente novamente em alguns minutos."
     )
-    assert saved_messages == [
-        ("user", "Preciso do historico"),
-        (
-            "assistant",
-            "Desculpe, estou com dificuldades tecnicas. "
-            "Tente novamente em alguns minutos.",
-        ),
-    ]
