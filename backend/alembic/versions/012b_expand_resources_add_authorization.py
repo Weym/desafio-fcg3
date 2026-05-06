@@ -1,8 +1,15 @@
 """expand resources with new types, description, requires_authorization; add authorization_file_url to appointments
 
-Revision ID: 012a
-Revises: 011a
+Revision ID: 012b
+Revises: 012a
 Create Date: 2026-05-06 10:00:00
+
+NOTE: Originally authored as revision "012a" on the feat/human-intervention
+branch. Renumbered to "012b" during merge into development because revision
+"012a" was already taken by 012_fix_pg_cron_session_autoclose_quoting.py
+(which had been merged earlier and applied to environments). The two 012s
+touch independent subsystems (pg_cron job vs. resource columns), so a linear
+chain (011a → 012a → 012b → 013a) is preferred over a merge migration.
 
 Expands the resource allocation system:
 - Adds description (Text, nullable) to resources
@@ -19,8 +26,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = "012a"
-down_revision = "011a"
+revision = "012b"
+down_revision = "012a"
 branch_labels = None
 depends_on = None
 

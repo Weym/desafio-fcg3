@@ -1,7 +1,7 @@
 """add human intervention status to chat_sessions
 
 Revision ID: 013a
-Revises: 012a
+Revises: 012b
 Create Date: 2026-05-06 12:00:00
 
 Expands chat_sessions for human intervention:
@@ -19,7 +19,7 @@ from sqlalchemy.dialects.postgresql import UUID
 
 # revision identifiers, used by Alembic.
 revision = "013a"
-down_revision = "012a"
+down_revision = "012b"
 branch_labels = None
 depends_on = None
 
