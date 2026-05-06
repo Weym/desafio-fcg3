@@ -7,6 +7,7 @@ void showCreateSlotSheet(BuildContext context, WidgetRef ref) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
+    useSafeArea: true,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
     ),
@@ -61,6 +62,12 @@ class _CreateSlotSheetState extends ConsumerState<_CreateSlotSheet> {
     final picked = await showTimePicker(
       context: context,
       initialTime: _selectedStartTime ?? const TimeOfDay(hour: 8, minute: 0),
+      builder: (context, child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+          child: child!,
+        );
+      },
     );
     if (picked != null) {
       setState(() {
@@ -75,6 +82,12 @@ class _CreateSlotSheetState extends ConsumerState<_CreateSlotSheet> {
     final picked = await showTimePicker(
       context: context,
       initialTime: _selectedEndTime ?? const TimeOfDay(hour: 17, minute: 0),
+      builder: (context, child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+          child: child!,
+        );
+      },
     );
     if (picked != null) {
       setState(() {
@@ -131,7 +144,7 @@ class _CreateSlotSheetState extends ConsumerState<_CreateSlotSheet> {
         24,
         24,
         24,
-        MediaQuery.of(context).viewInsets.bottom + 24,
+        MediaQuery.of(context).viewInsets.bottom + 40,
       ),
       child: Form(
         key: _formKey,

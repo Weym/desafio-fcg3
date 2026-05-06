@@ -24,18 +24,12 @@ class StaffDocumentsScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Documentos'),
-        actions: [
-          IconButton.filled(
-            onPressed: () => showSendDocumentSheet(context, ref),
-            icon: const Icon(Icons.add, size: 24),
-            style: IconButton.styleFrom(
-              backgroundColor: colors.primary,
-              foregroundColor: colors.onPrimary,
-            ),
-            tooltip: 'Enviar Documento',
-          ),
-          const AppBarActions(),
-        ],
+        actions: const [AppBarActions()],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => showSendDocumentSheet(context, ref),
+        tooltip: 'Enviar Documento',
+        child: const Icon(Icons.add),
       ),
       body: Column(
         children: [

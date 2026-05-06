@@ -186,20 +186,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       backgroundColor: colors.surfaceContainerLow,
       floatingActionButton: FloatingActionButton.small(
         onPressed: () {
-          final current = ref.read(themeModeNotifierProvider);
-          final next =
-              current == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
+          final next = isDark ? ThemeMode.light : ThemeMode.dark;
           ref.read(themeModeNotifierProvider.notifier).setThemeMode(next);
         },
         backgroundColor: colors.surfaceContainer,
         child: Icon(
-          ref.watch(themeModeNotifierProvider) == ThemeMode.dark
-              ? Icons.light_mode
-              : Icons.dark_mode,
+          isDark ? Icons.light_mode : Icons.dark_mode,
           color: colors.primary,
         ),
       ),

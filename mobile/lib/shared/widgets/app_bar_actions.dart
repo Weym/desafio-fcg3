@@ -12,21 +12,19 @@ class AppBarActions extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         IconButton(
           icon: Icon(
-            ref.watch(themeModeNotifierProvider) == ThemeMode.dark
-                ? Icons.light_mode
-                : Icons.dark_mode,
+            isDark ? Icons.light_mode : Icons.dark_mode,
             color: colors.primary,
           ),
           onPressed: () {
-            final current = ref.read(themeModeNotifierProvider);
-            final next =
-                current == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
+            // Toggle based on actual current brightness, not ThemeMode
+            final next = isDark ? ThemeMode.light : ThemeMode.dark;
             ref.read(themeModeNotifierProvider.notifier).setThemeMode(next);
           },
           tooltip: 'Alternar tema',

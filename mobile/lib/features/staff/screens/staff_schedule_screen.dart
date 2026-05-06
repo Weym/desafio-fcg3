@@ -24,18 +24,12 @@ class StaffScheduleScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Agenda'),
-        actions: [
-          IconButton.filled(
-            onPressed: () => showCreateSlotSheet(context, ref),
-            icon: const Icon(Icons.add, size: 24),
-            style: IconButton.styleFrom(
-              backgroundColor: colors.primary,
-              foregroundColor: colors.onPrimary,
-            ),
-            tooltip: 'Novo Slot',
-          ),
-          const AppBarActions(),
-        ],
+        actions: const [AppBarActions()],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => showCreateSlotSheet(context, ref),
+        tooltip: 'Novo Slot',
+        child: const Icon(Icons.add),
       ),
       body: Column(
         children: [

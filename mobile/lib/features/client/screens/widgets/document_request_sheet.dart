@@ -7,6 +7,7 @@ void showDocumentRequestSheet(BuildContext context, WidgetRef ref) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
+    useSafeArea: true,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
     ),
@@ -78,7 +79,7 @@ class _DocumentRequestSheetState extends ConsumerState<_DocumentRequestSheet> {
         24,
         24,
         24,
-        MediaQuery.of(context).viewInsets.bottom + 24,
+        MediaQuery.of(context).viewInsets.bottom + 40,
       ),
       child: Form(
         key: _formKey,
