@@ -105,7 +105,7 @@ services:
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
       EMBEDDING_PROVIDER: ${EMBEDDING_PROVIDER:-openai}
       EMBEDDING_MODEL: ${EMBEDDING_MODEL:-text-embedding-3-small}
-      MCP_SERVER_URL: http://mcp-server:8002/mcp
+      MCP_SERVER_URL: ${MCP_URL}
     volumes:
       - ./ai_service:/app/ai_service
     depends_on:

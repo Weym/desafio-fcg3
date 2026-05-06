@@ -109,3 +109,4 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 To resume work: read this file, then read `.planning/ROADMAP.md` to see current phase and plan status.
+| 2026-05-05 | fast | Create render.yml blueprint (fastapi web + langchain/mcp pserv + postgres) | ✅ |
