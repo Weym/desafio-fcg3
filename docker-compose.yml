@@ -163,6 +163,23 @@ services:
       start_period: 30s
     command: python -m mcp_server.main
 
+  flutter-web:
+    build: ./mobile
+    container_name: fcg3-flutter-web
+    ports:
+      - "3000:80"
+    depends_on:
+      fastapi-app:
+        condition: service_healthy
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:80/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+
 networks:
   app-network:
     driver: bridge
