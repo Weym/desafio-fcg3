@@ -1,0 +1,298 @@
+# Render Blueprint — Desafio FCG3
+# Docs: https://render.com/docs/blueprint-spec
+#
+# Topologia:
+#   - fastapi-app      : Web Service (público, porta 8000) — REST API principal
+#   - langchain-service: Private Service (porta 8001)      — agente LangChain
+#   - mcp-server       : Private Service (porta 8002)      — MCP tool calling
+#   - postgres         : Render Postgres (pgvector suportado via CREATE EXTENSION)
+#
+# Observações:
+# - Render não aceita interpolação de variáveis no YAML. DATABASE_URL/ALEMBIC_DATABASE_URL
+#   usam prefixos SQLAlchemy (asyncpg / psycopg) que precisam ser preenchidos manualmente
+#   no primeiro deploy — marcados com `sync: false` (prompt no dashboard).
+#   Use a Internal Database URL mostrada pelo Render e substitua o prefixo:
+#     postgresql://...               ->  ALEMBIC_DATABASE_URL
+#     postgresql+asyncpg://...       ->  DATABASE_URL   (fastapi-app, mcp-server)
+#     postgresql+psycopg://...       ->  DATABASE_URL_AI (langchain-service)
+# - MCP_SERVICE_TOKEN é gerado automaticamente no fastapi-app (generateValue) e
+#   referenciado pelos demais serviços via fromService/envVarKey.
+# - Segredos de provedores (WhatsApp, Resend, OpenAI, etc.) são prompted (sync: false).
+
+databases:
+  - name: fcg3-postgres
+    databaseName: fcg3
+    user: fcg3
+    plan: basic-256mb
+    postgresMajorVersion: "16"
+    ipAllowList: []  # apenas conexões privadas
+
+services:
+  # ──────────────────────────────────────────────────────────────────────────
+  # FastAPI — Web Service (público)
+  # ──────────────────────────────────────────────────────────────────────────
+  - type: web
+    name: fastapi-app
+    runtime: docker
+    plan: starter
+    rootDir: backend
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    # Produção: sem --reload
+    dockerCommand: uvicorn src.main:app --host 0.0.0.0 --port 8000
+    healthCheckPath: /health
+    autoDeployTrigger: commit
+    envVars:
+      # Postgres (componentes individuais — úteis para scripts e debug)
+      - key: POSTGRES_HOST
+        fromDatabase:
+          name: fcg3-postgres
+          property: host
+      - key: POSTGRES_PORT
+        fromDatabase:
+          name: fcg3-postgres
+          property: port
+      - key: POSTGRES_DB
+        fromDatabase:
+          name: fcg3-postgres
+          property: database
+      - key: POSTGRES_USER
+        fromDatabase:
+          name: fcg3-postgres
+          property: user
+      - key: POSTGRES_PASSWORD
+        fromDatabase:
+          name: fcg3-postgres
+          property: password
+      # URLs SQLAlchemy — preencher manualmente (prefixo asyncpg/psycopg)
+      - key: DATABASE_URL
+        sync: false
+      - key: ALEMBIC_DATABASE_URL
+        sync: false
+
+      # Token interno MCP (gerado aqui, compartilhado com demais serviços)
+      - key: MCP_SERVICE_TOKEN
+        generateValue: true
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_ALGORITHM
+        value: HS256
+      - key: JWT_ACCESS_EXPIRY_SECONDS
+        value: "3600"
+      - key: JWT_REFRESH_EXPIRY_SECONDS
+        value: "2592000"
+
+      # URL interna do serviço de IA (usada pelo webhook em background)
+      - key: AI_SERVICE_URL
+        fromService:
+          name: langchain-service
+          type: pserv
+          property: hostport
+      # URL interna do MCP Server
+      - key: MCP_SERVER_URL
+        fromService:
+          name: mcp-server
+          type: pserv
+          property: hostport
+
+      # WhatsApp
+      - key: WHATSAPP_TOKEN
+        sync: false
+      - key: WHATSAPP_PHONE_NUMBER_ID
+        sync: false
+      - key: WHATSAPP_WEBHOOK_VERIFY_TOKEN
+        sync: false
+      - key: WHATSAPP_APP_SECRET
+        sync: false
+      - key: WHATSAPP_API_VERSION
+        value: v18.0
+
+      # Resend
+      - key: RESEND_API_KEY
+        sync: false
+      - key: RESEND_FROM
+        value: onboarding@resend.dev
+
+      # OTP / Rate limit
+      - key: OTP_EXPIRY_SECONDS
+        value: "300"
+      - key: OTP_MAX_ATTEMPTS
+        value: "3"
+      - key: RATE_LIMIT_EMAIL
+        value: 5/15 minutes
+      - key: RATE_LIMIT_IP
+        value: 20/15 minutes
+
+      # LLM
+      - key: LLM_PROVIDER
+        value: openrouter
+      - key: LLM_MODEL
+        value: gpt-4o-mini
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: OPENROUTER_API_KEY
+        sync: false
+
+      # FCM (opcional)
+      - key: FCM_CREDENTIALS_PATH
+        sync: false
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # LangChain — Private Service
+  # ──────────────────────────────────────────────────────────────────────────
+  - type: pserv
+    name: langchain-service
+    runtime: docker
+    plan: starter
+    rootDir: ai_service
+    dockerfilePath: ./ai_service/Dockerfile
+    dockerContext: ./ai_service
+    autoDeployTrigger: commit
+    envVars:
+      - key: PORT
+        value: "8001"
+      - key: POSTGRES_HOST
+        fromDatabase:
+          name: fcg3-postgres
+          property: host
+      - key: POSTGRES_PORT
+        fromDatabase:
+          name: fcg3-postgres
+          property: port
+      - key: POSTGRES_DB
+        fromDatabase:
+          name: fcg3-postgres
+          property: database
+      - key: POSTGRES_USER
+        fromDatabase:
+          name: fcg3-postgres
+          property: user
+      - key: POSTGRES_PASSWORD
+        fromDatabase:
+          name: fcg3-postgres
+          property: password
+      # URL psycopg usada pelo LangChain/PGVector
+      - key: DATABASE_URL_AI
+        sync: false
+
+      # Token interno — referenciado do fastapi-app
+      - key: MCP_SERVICE_TOKEN
+        fromService:
+          name: fastapi-app
+          type: web
+          envVarKey: MCP_SERVICE_TOKEN
+
+      # URL interna do MCP Server
+      - key: MCP_SERVER_URL
+        fromService:
+          name: mcp-server
+          type: pserv
+          property: hostport
+
+      # LLM
+      - key: LLM_PROVIDER
+        value: openrouter
+      - key: LLM_MODEL
+        value: gpt-4o-mini
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: OPENROUTER_API_KEY
+        sync: false
+
+      # Embeddings
+      - key: EMBEDDING_PROVIDER
+        value: openai
+      - key: EMBEDDING_MODEL
+        value: text-embedding-3-small
+      - key: RAG_SIMILARITY_THRESHOLD
+        value: "0.45"
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # MCP Server — Private Service
+  # ──────────────────────────────────────────────────────────────────────────
+  - type: pserv
+    name: mcp-server
+    runtime: docker
+    plan: starter
+    rootDir: mcp_server
+    dockerfilePath: ./mcp_server/Dockerfile
+    dockerContext: ./mcp_server
+    autoDeployTrigger: commit
+    envVars:
+      - key: PORT
+        value: "8002"
+      - key: POSTGRES_HOST
+        fromDatabase:
+          name: fcg3-postgres
+          property: host
+      - key: POSTGRES_PORT
+        fromDatabase:
+          name: fcg3-postgres
+          property: port
+      - key: POSTGRES_DB
+        fromDatabase:
+          name: fcg3-postgres
+          property: database
+      - key: POSTGRES_USER
+        fromDatabase:
+          name: fcg3-postgres
+          property: user
+      - key: POSTGRES_PASSWORD
+        fromDatabase:
+          name: fcg3-postgres
+          property: password
+      # URLs SQLAlchemy — preencher com prefixo asyncpg
+      - key: DATABASE_URL
+        sync: false
+      - key: ALEMBIC_DATABASE_URL
+        sync: false
+
+      # Token interno — referenciado do fastapi-app
+      - key: MCP_SERVICE_TOKEN
+        fromService:
+          name: fastapi-app
+          type: web
+          envVarKey: MCP_SERVICE_TOKEN
+
+      # URL interna da API principal
+      - key: FASTAPI_URL
+        fromService:
+          name: fastapi-app
+          type: web
+          property: hostport
+
+      # Segredos compartilhados usados pelas tools MCP
+      - key: JWT_SECRET
+        fromService:
+          name: fastapi-app
+          type: web
+          envVarKey: JWT_SECRET
+      - key: WHATSAPP_TOKEN
+        sync: false
+      - key: WHATSAPP_PHONE_NUMBER_ID
+        sync: false
+      - key: WHATSAPP_WEBHOOK_VERIFY_TOKEN
+        sync: false
+      - key: WHATSAPP_APP_SECRET
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+
+      # LLM (para tools que acionam o provider)
+      - key: LLM_PROVIDER
+        value: openrouter
+      - key: LLM_MODEL
+        value: gpt-4o-mini
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: OPENROUTER_API_KEY
+        sync: false
+
+      - key: FCM_CREDENTIALS_PATH
+        sync: false
