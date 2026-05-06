@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: complete
-last_updated: "2026-05-06T14:00:00.000Z"
+last_updated: "2026-05-06T16:00:00.000Z"
 last_activity: 2026-05-06
 progress:
   total_phases: 8
@@ -19,8 +19,8 @@ progress:
 
 Phase: 14
 Plan: 2 of 2 complete
-Status: All phases delivered
-Last activity: 2026-05-06 — Phase 13 (Resource Allocation) and Phase 14 (Human Intervention) complete
+Status: All phases delivered + dark mode/responsive polish applied
+Last activity: 2026-05-06 — Fixed 28 dark mode contrast issues + 15 responsive layout constraints across 20 files
 
 Progress: [██████████] 100%
 
@@ -54,6 +54,10 @@ Next action: Merge branches to main or start next milestone.
 
 Recent decisions affecting current work:
 
+- [Phase 14-polish]: Dark mode audit applied — 28 hardcoded color issues fixed across 15 screen files
+- [Phase 14-polish]: Responsive audit — 15 layout constraints fixed (bottom sheets max-width 500px, chat bubbles max 500px, desktop panels max 400px)
+- [Phase 14-polish]: All amber/green/red status colors now adapt to brightness (lighter shades in dark mode)
+- [Phase 14-polish]: Skeleton shimmer placeholders use colorScheme.surface instead of Colors.white
 - [Phase 14]: Escalation keywords checked BEFORE AI call to save AI service resources
 - [Phase 14]: Staff sees all 'human_needed' + only their own 'human_active' sessions (FIFO by escalated_at)
 - [Phase 14]: AI response escalation saves bot message before escalating — staff has full context
