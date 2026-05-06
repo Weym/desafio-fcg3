@@ -27,6 +27,29 @@
 
 ---
 
+### Phase 13: Resource Allocation
+
+**Goal:** Complete resource allocation system — staff manages resources with authorization flags, students browse/book resources with file upload for restricted ones, expanded resource types and seed data.
+**Depends on:** Phase 12
+**Requirements:** RES-01, RES-02, RES-03, RES-04, RES-05, RES-06, RES-07, RES-08, RES-09, RES-10, RES-11, RES-12, RES-13, RES-14
+
+### Success Criteria
+1. Backend supports 6 resource types with description and requires_authorization fields.
+2. Staff can CRUD resources via API and dedicated "Recursos" screen (5th tab).
+3. Students can browse available resources filtered by type, with clear authorization badge.
+4. Booking flow enforces file upload (PDF/JPG/PNG, 5MB) for authorization-required resources.
+5. Students can view and cancel their appointments from "Meus Agendamentos" section.
+6. Seed data includes diverse resources across all 6 types.
+
+**Plans:** 3 plans
+
+Plans:
+- [ ] 13-01-PLAN.md — Backend: migration, resources CRUD endpoints, upload endpoint, seed expansion
+- [ ] 13-02-PLAN.md — Frontend staff: resources screen with CRUD + navigation wiring
+- [ ] 13-03-PLAN.md — Frontend client: resource booking flow with upload + my appointments
+
+---
+
 ## Phase Details
 
 ### Phase 7: Flutter Scaffold & Auth
@@ -176,3 +199,4 @@ Plans:
 | 10. Cross-Platform Polish | 5/5 | Complete | 2026-05-05 |
 | 11. Alpha Connect Visual Refactoring | 1/1 | Complete | 2026-05-06 |
 | 12. Frontend-Backend Integration | 3/3 | Complete | 2026-05-06 |
+| 13. Resource Allocation | 0/3 | Planning | — |
