@@ -22,7 +22,7 @@ async def _seed_pair(db_session, user):
 @pytest.mark.asyncio
 async def test_refresh_returns_new_pair_and_invalidates_old(client, seed_users, db_session):
     pair = await _seed_pair(db_session, seed_users["student"])
-    r = await client.post("/auth/refresh", json={"refresh_token": pair.refresh.token})
+    r = await client.post("/api/v1/auth/refresh", json={"refresh_token": pair.refresh.token})
     assert r.status_code == 200
     body = r.json()
     assert body["access_token"] != pair.access.token
@@ -41,10 +41,10 @@ async def test_refresh_returns_new_pair_and_invalidates_old(client, seed_users, 
 @pytest.mark.asyncio
 async def test_refresh_replay_returns_401(client, seed_users, db_session):
     pair = await _seed_pair(db_session, seed_users["student"])
-    r1 = await client.post("/auth/refresh", json={"refresh_token": pair.refresh.token})
+    r1 = await client.post("/api/v1/auth/refresh", json={"refresh_token": pair.refresh.token})
     assert r1.status_code == 200
     # Replay the SAME refresh token — D-03 rotation demands rejection
-    r2 = await client.post("/auth/refresh", json={"refresh_token": pair.refresh.token})
+    r2 = await client.post("/api/v1/auth/refresh", json={"refresh_token": pair.refresh.token})
     assert r2.status_code == 401
     assert r2.json()["error"]["code"] == "refresh_token_revoked"
 
@@ -53,7 +53,7 @@ async def test_refresh_replay_returns_401(client, seed_users, db_session):
 async def test_refresh_with_access_token_rejected(client, seed_users, db_session):
     pair = await _seed_pair(db_session, seed_users["student"])
     # Submitting the ACCESS token to /auth/refresh must fail (typ check)
-    r = await client.post("/auth/refresh", json={"refresh_token": pair.access.token})
+    r = await client.post("/api/v1/auth/refresh", json={"refresh_token": pair.access.token})
     assert r.status_code == 401
     assert r.json()["error"]["code"] == "invalid_token"
 
@@ -68,8 +68,8 @@ async def test_refresh_concurrent_race_single_winner(client, seed_users, db_sess
     """
     pair = await _seed_pair(db_session, seed_users["student"])
     r1, r2 = await asyncio.gather(
-        client.post("/auth/refresh", json={"refresh_token": pair.refresh.token}),
-        client.post("/auth/refresh", json={"refresh_token": pair.refresh.token}),
+        client.post("/api/v1/auth/refresh", json={"refresh_token": pair.refresh.token}),
+        client.post("/api/v1/auth/refresh", json={"refresh_token": pair.refresh.token}),
         return_exceptions=True,
     )
     statuses = sorted([getattr(r, "status_code", 500) for r in (r1, r2)])
