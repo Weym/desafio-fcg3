@@ -9,6 +9,7 @@ import '../../../shared/widgets/app_offline_banner.dart';
 import '../providers/chat_provider.dart';
 import '../providers/document_provider.dart';
 import '../providers/appointment_provider.dart';
+import '../providers/resource_booking_provider.dart';
 
 class ClientShell extends ConsumerStatefulWidget {
   final Widget child;
@@ -31,6 +32,7 @@ class _ClientShellState extends ConsumerState<ClientShell> {
     ref.read(chatSessionsProvider);
     ref.read(documentsProvider);
     ref.read(appointmentsProvider);
+    ref.read(availableResourcesProvider);
   }
 
   int _currentIndex(BuildContext context) {
@@ -38,7 +40,8 @@ class _ClientShellState extends ConsumerState<ClientShell> {
     if (location.startsWith(RoutePaths.clientChat)) return 1;
     if (location.startsWith(RoutePaths.clientDocuments)) return 2;
     if (location.startsWith(RoutePaths.clientNotifications)) return 3;
-    if (location.startsWith(RoutePaths.clientSupport)) return 4;
+    if (location.startsWith(RoutePaths.clientResources)) return 4;
+    if (location.startsWith(RoutePaths.clientSupport)) return 5;
     return 0;
   }
 
@@ -53,6 +56,8 @@ class _ClientShellState extends ConsumerState<ClientShell> {
       case 3:
         context.go(RoutePaths.clientNotifications);
       case 4:
+        context.go(RoutePaths.clientResources);
+      case 5:
         context.go(RoutePaths.clientSupport);
     }
   }
@@ -62,7 +67,7 @@ class _ClientShellState extends ConsumerState<ClientShell> {
     _NavItem(icon: Icons.chat_outlined, activeIcon: Icons.chat, label: 'Chat'),
     _NavItem(icon: Icons.description_outlined, activeIcon: Icons.description, label: 'Docs'),
     _NavItem(icon: Icons.notifications_outlined, activeIcon: Icons.notifications, label: 'Avisos'),
-    _NavItem(icon: Icons.support_agent_outlined, activeIcon: Icons.support_agent, label: 'Suporte'),
+    _NavItem(icon: Icons.meeting_room_outlined, activeIcon: Icons.meeting_room, label: 'Recursos'),
   ];
 
   static const _railDestinations = [
@@ -87,9 +92,9 @@ class _ClientShellState extends ConsumerState<ClientShell> {
       label: Text('Notificações'),
     ),
     NavigationRailDestination(
-      icon: Icon(Icons.support_agent_outlined),
-      selectedIcon: Icon(Icons.support_agent),
-      label: Text('Suporte'),
+      icon: Icon(Icons.meeting_room_outlined),
+      selectedIcon: Icon(Icons.meeting_room),
+      label: Text('Recursos'),
     ),
   ];
 
