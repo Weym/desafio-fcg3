@@ -7,7 +7,8 @@ import logging
 from typing import Any
 
 from langchain.agents import create_agent
-from langchain_core.messages import AIMessage, HumanMessage
+from langchain.agents.middleware import wrap_tool_call
+from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 
 from ai_service.database import load_chat_history
 from ai_service.embedding_factory import create_embeddings
@@ -23,6 +24,39 @@ FALLBACK_MESSAGE = (
 )
 
 
+@wrap_tool_call
+async def _tolerate_tool_errors(request, handler):
+    """Catch any exception raised by a tool and surface it to the LLM.
+
+    The default LangGraph ``_default_handle_tool_errors`` only catches
+    ``ToolInvocationError``; ``ToolException`` (raised by
+    ``langchain_mcp_adapters`` when the MCP server returns an error) is
+    re-raised and kills the agent loop. That causes the whole ``/chat``
+    call to fall back to the generic "Desculpe, estou com dificuldades
+    tecnicas" message even when another tool (including the RAG) could
+    have answered.
+
+    This middleware converts any tool exception into a ``ToolMessage`` so
+    the LLM can reason about the failure and either retry or pick another
+    tool. We use the async variant because every tool wired into this
+    agent (MCP tools via ``langchain-mcp-adapters`` and the RAG tool)
+    executes through the async path.
+    """
+
+    try:
+        return await handler(request)
+    except Exception as exc:
+        logger.warning(
+            "Tool '%s' raised %s; surfacing error to the LLM instead of aborting.",
+            request.tool_call.get("name", "?"),
+            type(exc).__name__,
+        )
+        return ToolMessage(
+            content=f"Tool error: {exc}",
+            tool_call_id=request.tool_call["id"],
+        )
+
+
 def create_chat_agent(settings: Any, tools: list[Any], system_prompt: str) -> Any:
     """Create a provider-agnostic LangChain ReAct agent."""
 
@@ -31,6 +65,7 @@ def create_chat_agent(settings: Any, tools: list[Any], system_prompt: str) -> An
         model=llm,
         tools=tools,
         system_prompt=system_prompt,
+        middleware=[_tolerate_tool_errors],
     )
 
 
