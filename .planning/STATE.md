@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-05-06T04:03:00.000Z"
-last_activity: 2026-05-06 -- Phase 12-01 executed (Docker Compose full stack)
+last_updated: "2026-05-06T07:37:22.948Z"
+last_activity: 2026-05-06
 progress:
   total_phases: 6
   completed_phases: 4
   total_plans: 21
-  completed_plans: 19
-  percent: 90
+  completed_plans: 20
+  percent: 95
 ---
 
 # Project State
@@ -18,9 +18,9 @@ progress:
 ## Current Position
 
 Phase: 12
-Plan: 1 of 3 complete
-Status: Executing
-Last activity: 2026-05-06 -- Phase 12-01 executed (Docker Compose full stack)
+Plan: 2 of 3 complete
+Status: Ready to execute
+Last activity: 2026-05-06
 
 Progress: [█████████░] 90%
 
@@ -42,7 +42,7 @@ Plan 12-01 complete: Docker Compose full stack with Flutter web, conditional see
 Branch: `feat/frontend-backend-integration`
 
 Next action: Execute Plan 12-02 (API contract alignment).
-Resume file: `.planning/phases/12-frontend-backend-integration/12-02-PLAN.md`
+Resume file: None
 
 ## Accumulated Context
 
@@ -81,6 +81,7 @@ Recent decisions affecting current work:
 - [Phase 09]: All staff routes wired to real screens — _PlaceholderScreen removed from app_router.dart
 - [Phase 09]: StaffHomeScreen deprecated (kept for compatibility), StaffDashboardScreen is now the default /staff route
 - [Phase 10]: Shimmer uses colorScheme.surfaceContainerHighest/surface for M3 dark-mode compatibility
+- [Phase 12]: Integration tests use real seeded emails (ana.silva@usp.br, roberto@icmc.usp.br) with DEV_MASTER_OTP=000000 bypass
 
 ### Key Decisions Pending
 
