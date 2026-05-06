@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/theme/app_spacing.dart';
 import '../models/chat_message_model.dart';
 import '../models/action_log_model.dart';
 import '../providers/chat_provider.dart';
@@ -79,15 +80,17 @@ class _MessagesTab extends ConsumerWidget {
       ),
       data: (messages) {
         if (messages.isEmpty) {
-          return const Center(
+          return Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.chat_bubble_outline, size: 64, color: Colors.grey),
-                SizedBox(height: 16),
+                Icon(Icons.chat_bubble_outline, size: 64,
+                    color: Theme.of(context).colorScheme.outlineVariant),
+                const SizedBox(height: 16),
                 Text(
                   'Nenhuma mensagem',
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                  style: TextStyle(fontSize: 16,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant),
                 ),
               ],
             ),
@@ -135,19 +138,29 @@ class _MessageBubble extends StatelessWidget {
             children: [
               Container(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
                   color: isUser
                       ? theme.colorScheme.primary
                       : theme.colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.only(
-                    topLeft: const Radius.circular(12),
-                    topRight: const Radius.circular(12),
-                    bottomLeft:
-                        isUser ? const Radius.circular(12) : Radius.zero,
-                    bottomRight:
-                        isUser ? Radius.zero : const Radius.circular(12),
+                    topLeft: const Radius.circular(AppSpacing.radiusXl),
+                    topRight: const Radius.circular(AppSpacing.radiusXl),
+                    bottomLeft: isUser
+                        ? const Radius.circular(AppSpacing.radiusXl)
+                        : Radius.zero,
+                    bottomRight: isUser
+                        ? Radius.zero
+                        : const Radius.circular(AppSpacing.radiusXl),
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: theme.colorScheme.primary
+                          .withValues(alpha: isUser ? 0.15 : 0.05),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
                 child: Text(
                   message.content,
@@ -198,15 +211,17 @@ class _ActionsTab extends ConsumerWidget {
       ),
       data: (logs) {
         if (logs.isEmpty) {
-          return const Center(
+          return Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.history_outlined, size: 64, color: Colors.grey),
-                SizedBox(height: 16),
+                Icon(Icons.history_outlined, size: 64,
+                    color: Theme.of(context).colorScheme.outlineVariant),
+                const SizedBox(height: 16),
                 Text(
-                  'Nenhuma acao registrada',
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                  'Nenhuma ação registrada',
+                  style: TextStyle(fontSize: 16,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant),
                 ),
               ],
             ),
@@ -251,7 +266,7 @@ class _ActionLogTile extends StatelessWidget {
     return ExpansionTile(
       leading: Icon(
         log.isError ? Icons.error_outline : Icons.check_circle_outline,
-        color: log.isError ? Colors.red : Colors.green,
+        color: log.isError ? theme.colorScheme.error : const Color(0xFF4CAF50),
       ),
       title: Text(log.toolName),
       subtitle: Text('${_formatDate(log.createdAt)} \u00b7 ${log.status}'),

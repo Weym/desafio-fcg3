@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/router/route_names.dart';
+import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/theme_provider.dart';
 import '../../../shared/widgets/app_skeleton_card.dart';
+import '../../../shared/widgets/glass_card.dart';
 import '../../../shared/widgets/responsive_container.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../auth/providers/auth_state.dart';
@@ -17,10 +19,9 @@ import '../models/appointment_model.dart';
 String _formatDateTime(DateTime dt) {
   final day = dt.day.toString().padLeft(2, '0');
   final month = dt.month.toString().padLeft(2, '0');
-  final year = dt.year;
   final hour = dt.hour.toString().padLeft(2, '0');
   final minute = dt.minute.toString().padLeft(2, '0');
-  return '$day/$month/$year $hour:$minute';
+  return '$day/$month $hour:$minute';
 }
 
 class ClientHomeScreen extends ConsumerWidget {
@@ -41,22 +42,32 @@ class ClientHomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
     final userName = authState is AuthAuthenticated ? authState.user.name : '';
+    final colors = Theme.of(context).colorScheme;
 
     final chatSessionsAsync = ref.watch(chatSessionsProvider);
     final documentsAsync = ref.watch(documentsProvider);
     final appointmentsAsync = ref.watch(appointmentsProvider);
 
-    final theme = Theme.of(context);
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home'),
+        title: const Text('Alpha Connect'),
+        leading: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Container(
+            decoration: BoxDecoration(
+              color: colors.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+            ),
+            child: Icon(Icons.school_rounded, color: colors.primary),
+          ),
+        ),
         actions: [
           IconButton(
             icon: Icon(
               ref.watch(themeModeNotifierProvider) == ThemeMode.dark
                   ? Icons.light_mode
                   : Icons.dark_mode,
+              color: colors.primary,
             ),
             onPressed: () {
               final current = ref.read(themeModeNotifierProvider);
@@ -68,7 +79,7 @@ class ClientHomeScreen extends ConsumerWidget {
             tooltip: 'Alternar tema',
           ),
           IconButton(
-            icon: const Icon(Icons.logout),
+            icon: Icon(Icons.logout, color: colors.error),
             onPressed: () => ref.read(authProvider.notifier).logout(),
             tooltip: 'Sair',
           ),
@@ -79,20 +90,74 @@ class ClientHomeScreen extends ConsumerWidget {
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           child: ResponsiveContainer(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: AppSpacing.lg,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Greeting
                 Text(
-                  'Ola, $userName!',
-                  style: theme.textTheme.headlineSmall,
+                  'Olá, $userName!',
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: colors.onSurface,
+                      ),
                 ),
-                const SizedBox(height: 24),
-                _buildChatCard(context, chatSessionsAsync),
-                const SizedBox(height: 12),
-                _buildAppointmentCard(context, appointmentsAsync),
-                const SizedBox(height: 12),
-                _buildDocumentCard(context, documentsAsync),
+                const SizedBox(height: 4),
+                Text(
+                  'Pronto para mais um dia de aprendizado?',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: colors.onSurfaceVariant,
+                        fontWeight: FontWeight.w500,
+                      ),
+                ),
+                const SizedBox(height: AppSpacing.xl),
+
+                // Summary cards grid
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final isWide = constraints.maxWidth > 500;
+                    if (isWide) {
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: _buildChatSummaryCard(
+                                context, chatSessionsAsync, colors),
+                          ),
+                          const SizedBox(width: AppSpacing.md),
+                          Expanded(
+                            child: _buildAppointmentSummaryCard(
+                                context, appointmentsAsync, colors),
+                          ),
+                        ],
+                      );
+                    }
+                    return Column(
+                      children: [
+                        _buildChatSummaryCard(
+                            context, chatSessionsAsync, colors),
+                        const SizedBox(height: AppSpacing.md),
+                        _buildAppointmentSummaryCard(
+                            context, appointmentsAsync, colors),
+                      ],
+                    );
+                  },
+                ),
+                const SizedBox(height: AppSpacing.xl),
+
+                // Quick Actions
+                Text(
+                  'Ações Rápidas',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: colors.onSurface,
+                      ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                _buildQuickActions(context, documentsAsync),
               ],
             ),
           ),
@@ -101,185 +166,267 @@ class ClientHomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildChatCard(
+  Widget _buildChatSummaryCard(
     BuildContext context,
     AsyncValue<List<ChatSessionModel>> asyncValue,
+    ColorScheme colors,
   ) {
     return asyncValue.when(
-      loading: () => const AppSkeletonCard(height: 80),
-      error: (error, stack) => _DashboardCard(
+      loading: () => const AppSkeletonCard(height: 140),
+      error: (_, __) => _SummaryGlassCard(
         icon: Icons.smart_toy_outlined,
-        iconColor: Theme.of(context).colorScheme.primary,
-        title: 'Ultima atividade do bot',
-        subtitle: 'Erro ao carregar',
+        iconBgColor: colors.primaryContainer,
+        iconColor: colors.onPrimaryContainer,
+        title: 'Chatbot Alpha',
+        subtitle: 'Assistente Virtual',
+        bottomLabel: 'Última interação:',
+        bottomValue: 'Erro ao carregar',
         onTap: () => context.go(RoutePaths.clientChat),
-        trailing: const Icon(Icons.refresh, size: 20),
       ),
       data: (sessions) {
-        String subtitle;
+        String lastTime;
         if (sessions.isEmpty) {
-          subtitle = 'Nenhuma atividade';
+          lastTime = 'Nenhuma';
         } else {
-          final latest = sessions.first;
-          subtitle = _formatDateTime(latest.startedAt);
+          lastTime = _formatDateTime(sessions.first.startedAt);
         }
-        return _DashboardCard(
+        return _SummaryGlassCard(
           icon: Icons.smart_toy_outlined,
-          iconColor: Theme.of(context).colorScheme.primary,
-          title: 'Ultima atividade do bot',
-          subtitle: subtitle,
+          iconBgColor: colors.primaryContainer,
+          iconColor: colors.onPrimaryContainer,
+          title: 'Chatbot Alpha',
+          subtitle: 'Assistente Virtual',
+          bottomLabel: 'Última interação:',
+          bottomValue: lastTime,
           onTap: () => context.go(RoutePaths.clientChat),
         );
       },
     );
   }
 
-  Widget _buildAppointmentCard(
+  Widget _buildAppointmentSummaryCard(
     BuildContext context,
     AsyncValue<List<AppointmentModel>> asyncValue,
+    ColorScheme colors,
   ) {
     return asyncValue.when(
-      loading: () => const AppSkeletonCard(height: 80),
-      error: (error, stack) => _DashboardCard(
-        icon: Icons.calendar_today_outlined,
-        iconColor: Theme.of(context).colorScheme.tertiary,
-        title: 'Proximo agendamento',
-        subtitle: 'Erro ao carregar',
+      loading: () => const AppSkeletonCard(height: 140),
+      error: (_, __) => _SummaryGlassCard(
+        icon: Icons.calendar_today,
+        iconBgColor: colors.secondaryContainer,
+        iconColor: colors.onSecondaryContainer,
+        title: 'Agendamentos',
+        subtitle: 'Próximos Eventos',
+        bottomLabel: 'Próximo:',
+        bottomValue: 'Erro ao carregar',
         onTap: () => context.go(RoutePaths.clientNotifications),
-        trailing: const Icon(Icons.refresh, size: 20),
       ),
       data: (appointments) {
         final upcoming = appointments.where((a) => a.isUpcoming).toList();
-        String subtitle;
+        String nextTime;
         if (upcoming.isEmpty) {
-          subtitle = 'Sem agendamentos';
+          nextTime = 'Sem agendamentos';
         } else {
           final next = upcoming.first;
-          subtitle = '${next.date ?? ''} ${next.startTime ?? ''}'.trim();
-          if (subtitle.isEmpty) subtitle = 'Agendado';
+          nextTime = '${next.date ?? ''} ${next.startTime ?? ''}'.trim();
+          if (nextTime.isEmpty) nextTime = 'Agendado';
         }
-        return _DashboardCard(
-          icon: Icons.calendar_today_outlined,
-          iconColor: Theme.of(context).colorScheme.tertiary,
-          title: 'Proximo agendamento',
-          subtitle: subtitle,
+        return _SummaryGlassCard(
+          icon: Icons.calendar_today,
+          iconBgColor: colors.secondaryContainer,
+          iconColor: colors.onSecondaryContainer,
+          title: 'Agendamentos',
+          subtitle: 'Próximos Eventos',
+          bottomLabel: 'Próximo:',
+          bottomValue: nextTime,
           onTap: () => context.go(RoutePaths.clientNotifications),
         );
       },
     );
   }
 
-  Widget _buildDocumentCard(
+  Widget _buildQuickActions(
     BuildContext context,
-    AsyncValue<List<DocumentModel>> asyncValue,
+    AsyncValue<List<DocumentModel>> documentsAsync,
   ) {
-    return asyncValue.when(
-      loading: () => const AppSkeletonCard(height: 80),
-      error: (error, stack) => _DashboardCard(
+    final colors = Theme.of(context).colorScheme;
+
+    final actions = [
+      _QuickAction(
+        label: 'Solicitar documento',
         icon: Icons.description_outlined,
-        iconColor: Theme.of(context).colorScheme.secondary,
-        title: 'Status de documentos',
-        subtitle: 'Erro ao carregar',
+        color: colors.primary,
         onTap: () => context.go(RoutePaths.clientDocuments),
-        trailing: const Icon(Icons.refresh, size: 20),
       ),
-      data: (docs) {
-        final pendingCount = docs.where((d) => d.isPending).length;
-        final readyCount = docs.where((d) => d.status == 'ready').length;
-        String subtitle;
-        if (docs.isEmpty) {
-          subtitle = 'Nenhum documento';
-        } else {
-          final parts = <String>[];
-          if (pendingCount > 0) parts.add('$pendingCount pendentes');
-          if (readyCount > 0) parts.add('$readyCount prontos');
-          subtitle = parts.isEmpty ? 'Todos entregues' : parts.join(' · ');
-        }
-        return _DashboardCard(
-          icon: Icons.description_outlined,
-          iconColor: Theme.of(context).colorScheme.secondary,
-          title: 'Status de documentos',
-          subtitle: subtitle,
-          onTap: () => context.go(RoutePaths.clientDocuments),
+      _QuickAction(
+        label: 'Conversar com Mentor',
+        icon: Icons.chat_outlined,
+        color: colors.secondary,
+        onTap: () => context.go(RoutePaths.clientChat),
+      ),
+      _QuickAction(
+        label: 'Notificações',
+        icon: Icons.notifications_outlined,
+        color: colors.tertiary,
+        onTap: () => context.go(RoutePaths.clientNotifications),
+      ),
+      _QuickAction(
+        label: 'Suporte',
+        icon: Icons.support_agent_outlined,
+        color: colors.error,
+        onTap: () => context.go(RoutePaths.clientSupport),
+      ),
+    ];
+
+    return GridView.count(
+      crossAxisCount: 2,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      mainAxisSpacing: AppSpacing.sm,
+      crossAxisSpacing: AppSpacing.sm,
+      childAspectRatio: 2.2,
+      children: actions.map((action) {
+        return GlassCard(
+          onTap: action.onTap,
+          padding: const EdgeInsets.all(AppSpacing.md),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: action.color.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                ),
+                child: Icon(action.icon, size: 20, color: action.color),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Text(
+                  action.label,
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: colors.onSurface,
+                      ),
+                ),
+              ),
+            ],
+          ),
         );
-      },
+      }).toList(),
     );
   }
 }
 
-class _DashboardCard extends StatelessWidget {
+class _SummaryGlassCard extends StatelessWidget {
   final IconData icon;
+  final Color iconBgColor;
   final Color iconColor;
   final String title;
   final String subtitle;
-  final VoidCallback onTap;
-  final Widget? trailing;
+  final String bottomLabel;
+  final String bottomValue;
+  final VoidCallback? onTap;
 
-  const _DashboardCard({
+  const _SummaryGlassCard({
     required this.icon,
+    required this.iconBgColor,
     required this.iconColor,
     required this.title,
     required this.subtitle,
-    required this.onTap,
-    this.trailing,
+    required this.bottomLabel,
+    required this.bottomValue,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 1,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
+    final colors = Theme.of(context).colorScheme;
+
+    return GlassCard(
+      onTap: onTap,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
               Container(
-                width: 48,
-                height: 48,
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: iconColor.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(12),
+                  color: iconBgColor,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
                 ),
-                child: Icon(icon, color: iconColor, size: 24),
+                child: Icon(icon, size: 24, color: iconColor),
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      subtitle,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurfaceVariant,
-                          ),
-                    ),
-                  ],
-                ),
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: colors.onSurface,
+                        ),
+                  ),
+                  Text(
+                    subtitle,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: colors.onSurfaceVariant,
+                        ),
+                  ),
+                ],
               ),
-              ?trailing,
-              if (trailing == null)
-                Icon(
-                  Icons.chevron_right,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
             ],
           ),
-        ),
+          const SizedBox(height: AppSpacing.md),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 8,
+            ),
+            decoration: BoxDecoration(
+              color: colors.surfaceContainer,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  bottomLabel,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: colors.onSurfaceVariant,
+                      ),
+                ),
+                Flexible(
+                  child: Text(
+                    bottomValue,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: colors.primary,
+                        ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
+}
+
+class _QuickAction {
+  final String label;
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _QuickAction({
+    required this.label,
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
 }
