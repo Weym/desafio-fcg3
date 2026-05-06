@@ -15,8 +15,8 @@ async def test_response_bodies_identical_for_registered_and_unregistered(
     client, db_session, mock_resend, seed_users, reset_limiter,
 ):
     """Response body is byte-identical for registered and unregistered emails."""
-    resp_registered = await client.post("/auth/request-code", json={"email": "student@test.edu"})
-    resp_unregistered = await client.post("/auth/request-code", json={"email": "nonexistent@test.edu"})
+    resp_registered = await client.post("/api/v1/auth/request-code", json={"email": "student@test.edu"})
+    resp_unregistered = await client.post("/api/v1/auth/request-code", json={"email": "nonexistent@test.edu"})
 
     assert resp_registered.status_code == 200
     assert resp_unregistered.status_code == 200
@@ -44,9 +44,9 @@ async def test_code_path_parity_for_registered_and_unregistered(
     from src.features.auth.models import VerificationCode
 
     # Registered email
-    resp_reg = await client.post("/auth/request-code", json={"email": "student@test.edu"})
+    resp_reg = await client.post("/api/v1/auth/request-code", json={"email": "student@test.edu"})
     # Unregistered email
-    resp_unreg = await client.post("/auth/request-code", json={"email": "ghost@test.edu"})
+    resp_unreg = await client.post("/api/v1/auth/request-code", json={"email": "ghost@test.edu"})
 
     # Both return same status and body
     assert resp_reg.status_code == resp_unreg.status_code == 200
@@ -75,11 +75,11 @@ async def test_code_path_parity_for_registered_and_unregistered(
 async def test_resend_only_called_for_registered_email(client, db_session, mock_resend, seed_users, reset_limiter):
     """mock_resend.send_async is called ONLY for the registered email, never for unregistered."""
     # Request for registered email
-    await client.post("/auth/request-code", json={"email": "student@test.edu"})
+    await client.post("/api/v1/auth/request-code", json={"email": "student@test.edu"})
     assert mock_resend.call_count == 1
 
     # Request for unregistered email — resend should NOT be called again
-    await client.post("/auth/request-code", json={"email": "ghost@test.edu"})
+    await client.post("/api/v1/auth/request-code", json={"email": "ghost@test.edu"})
     assert mock_resend.call_count == 1  # Still 1 — no call for unregistered
 
     # Verify the one call was for the registered email

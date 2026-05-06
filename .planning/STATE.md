@@ -1,9 +1,9 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
+milestone: v2.0
+milestone_name: Flutter Frontend
 status: complete
-last_updated: "2026-05-06T16:00:00.000Z"
+last_updated: "2026-05-06T21:00:00.000Z"
 last_activity: 2026-05-06
 progress:
   total_phases: 8
@@ -94,7 +94,7 @@ Recent decisions affecting current work:
 - [Phase 10]: Shimmer uses colorScheme.surfaceContainerHighest/surface for M3 dark-mode compatibility
 - [Phase 12]: Integration tests use real seeded emails (ana.silva@usp.br, roberto@icmc.usp.br) with DEV_MASTER_OTP=000000 bypass
 
-### Key Decisions Pending
+### Key Decisions Resolved
 
 - Merge `feat/resource-allocation` and `feat/human-intervention` branches into main
 - Decide next milestone scope (if any)
@@ -132,7 +132,20 @@ Recent decisions affecting current work:
 | 260505-jcm | Validar e corrigir base URL de autenticação do frontend e adicionar CORS no backend para Flutter web | 2026-05-05 | 4e1ca3d | [260505-jcm-validar-e-corrigir-base-url-de-autentica](./quick/260505-jcm-validar-e-corrigir-base-url-de-autentica/) |
 | 260505-jur | Corrigir crash no login OTP alinhando frontend ao TokenPair do backend | 2026-05-05 | 5fee628 | [260505-jur-corrigir-crash-no-login-otp-alinhando-o-](./quick/260505-jur-corrigir-crash-no-login-otp-alinhando-o-/) |
 
+### Hardening Session (2026-05-05)
+
+| Branch | Fix | Validated |
+|--------|-----|-----------|
+| `fix/db-credential-mismatch` | pg_hba custom + compose hba_file flag + mcp_server POSTGRES_* fallback | alembic upgrade head + seed: both pass |
+| `fix/auth-tests-url-prefix` | Add /api/v1 prefix to 7 auth integration test files (38 URLs) | 37/37 integration tests pass |
+
+Additional validations performed (no code fix needed):
+- AI/RAG ingest: 6 docs, 47 chunks via OpenRouter embeddings — success
+- AI/RAG chat E2E: LLM responds with correct knowledge base context — success
+- Flutter tests: 8/8 pass via Windows Flutter SDK
+- Phase 7 runtime bugs (CR-01/02/03): already fixed in codebase — confirmed
+
 ## Session Continuity
 
 To resume work: read this file, then read `.planning/ROADMAP.md` to see current phase and plan status.
-| 2026-05-05 | fast | Create render.yml blueprint (fastapi web + langchain/mcp pserv + postgres) | ✅ |
+All M2 code work is complete. Remaining items are manual verification (WhatsApp webhook, device testing).

@@ -29,14 +29,14 @@ async def test_happy_path_request_and_verify(client, db_session, mock_resend, se
     student = seed_users["student"]
 
     # 1. Request code
-    resp1 = await client.post("/auth/request-code", json={"email": "student@test.edu"})
+    resp1 = await client.post("/api/v1/auth/request-code", json={"email": "student@test.edu"})
     assert resp1.status_code == 200
 
     # 2. Extract code from mock
     code = _extract_code_from_mock(mock_resend)
 
     # 3. Verify code
-    resp2 = await client.post("/auth/verify-code", json={"email": "student@test.edu", "code": code})
+    resp2 = await client.post("/api/v1/auth/verify-code", json={"email": "student@test.edu", "code": code})
     assert resp2.status_code == 200
     body = resp2.json()
     assert body["token_type"] == "bearer"
@@ -85,17 +85,17 @@ async def test_happy_path_request_and_verify(client, db_session, mock_resend, se
 async def test_wrong_code_three_times_triggers_auto_resend(client, db_session, mock_resend, seed_users, reset_limiter):
     """AUTH-03: After 3 wrong attempts, row is invalidated and a new code is sent."""
     # 1. Request code
-    await client.post("/auth/request-code", json={"email": "student@test.edu"})
+    await client.post("/api/v1/auth/request-code", json={"email": "student@test.edu"})
     assert mock_resend.call_count == 1
 
     # 2. Submit wrong code 3 times
     for i in range(2):
-        resp = await client.post("/auth/verify-code", json={"email": "student@test.edu", "code": "000000"})
+        resp = await client.post("/api/v1/auth/verify-code", json={"email": "student@test.edu", "code": "000000"})
         assert resp.status_code == 401
         assert resp.json()["error"]["code"] == "INVALID_CODE"
 
     # 3rd attempt — triggers MAX_ATTEMPTS_REACHED + auto-resend
-    resp3 = await client.post("/auth/verify-code", json={"email": "student@test.edu", "code": "000000"})
+    resp3 = await client.post("/api/v1/auth/verify-code", json={"email": "student@test.edu", "code": "000000"})
     assert resp3.status_code == 401
     assert resp3.json()["error"]["code"] == "MAX_ATTEMPTS_REACHED"
     assert "new code" in resp3.json()["error"]["message"].lower()
@@ -123,7 +123,7 @@ async def test_wrong_code_three_times_triggers_auto_resend(client, db_session, m
 async def test_expired_code_returns_invalid_without_incrementing_attempts(client, db_session, mock_resend, seed_users, reset_limiter):
     """Expired codes return 401 INVALID_CODE without incrementing attempts."""
     # 1. Request code
-    await client.post("/auth/request-code", json={"email": "student@test.edu"})
+    await client.post("/api/v1/auth/request-code", json={"email": "student@test.edu"})
 
     # 2. Expire the code row manually
     q = await db_session.execute(
@@ -137,7 +137,7 @@ async def test_expired_code_returns_invalid_without_incrementing_attempts(client
     await db_session.flush()
 
     # 3. Try to verify — should fail as expired
-    resp = await client.post("/auth/verify-code", json={"email": "student@test.edu", "code": "123456"})
+    resp = await client.post("/api/v1/auth/verify-code", json={"email": "student@test.edu", "code": "123456"})
     assert resp.status_code == 401
     assert resp.json()["error"]["code"] == "INVALID_CODE"
 
@@ -151,10 +151,10 @@ async def test_staff_login_returns_role_staff(client, db_session, mock_resend, s
     """Staff email verification returns a token with role='staff'."""
     settings = get_settings()
 
-    await client.post("/auth/request-code", json={"email": "staff@test.edu"})
+    await client.post("/api/v1/auth/request-code", json={"email": "staff@test.edu"})
     code = _extract_code_from_mock(mock_resend)
 
-    resp = await client.post("/auth/verify-code", json={"email": "staff@test.edu", "code": code})
+    resp = await client.post("/api/v1/auth/verify-code", json={"email": "staff@test.edu", "code": code})
     assert resp.status_code == 200
 
     claims = jwt.decode(resp.json()["access_token"], settings.jwt_secret, algorithms=["HS256"])

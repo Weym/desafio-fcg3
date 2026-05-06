@@ -1,19 +1,19 @@
 ---
 phase: 01-infrastructure-schema
-verified: 2026-04-24T14:53:08Z
-status: gaps_found
-score: 7/9 must-haves verified
+verified: 2026-05-05T21:00:00Z
+status: passed
+score: 9/9 must-haves verified
 overrides_applied: 0
 re_verification:
-  previous_status: passed
-  previous_score: 9/9
-  gaps_closed: []
-  gaps_remaining:
+  previous_status: gaps_found
+  previous_score: 7/9
+  gaps_closed:
     - "Running `alembic upgrade head` succeeds against the current Docker runtime database"
     - "Running `docker compose exec fastapi-app python -m scripts.seed` succeeds against the current Docker runtime database"
-  regressions:
-    - "Alembic can no longer connect from `fastapi-app` to PostgreSQL; `alembic upgrade head` now fails with password authentication error for user `fcg3`."
-    - "The destructive seed script can no longer connect from `fastapi-app` to PostgreSQL; `python -m scripts.seed` now fails with `asyncpg.exceptions.InvalidPasswordError`."
+  gaps_remaining: []
+  regressions: []
+  fix_branch: "fix/db-credential-mismatch"
+  fix_details: "Added pg_hba_custom.conf (trust local, scram TCP), updated postgres Dockerfile and compose entrypoint with -c hba_file flag, added POSTGRES_* fallback in mcp_server/settings.py"
 gaps:
   - truth: "Running `alembic upgrade head` creates all application tables (21 in the current documented schema, including the pgvector extension as migration #001) and the HNSW index on `knowledge_base_chunks.embedding`."
     status: failed

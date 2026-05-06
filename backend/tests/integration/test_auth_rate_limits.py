@@ -12,11 +12,11 @@ async def test_email_rate_limit_blocks_6th_request(client, db_session, mock_rese
     email = "student@test.edu"
 
     for i in range(5):
-        resp = await client.post("/auth/request-code", json={"email": email})
+        resp = await client.post("/api/v1/auth/request-code", json={"email": email})
         assert resp.status_code == 200, f"Request {i+1} should succeed"
 
     # 6th request — should be rate limited
-    resp6 = await client.post("/auth/request-code", json={"email": email})
+    resp6 = await client.post("/api/v1/auth/request-code", json={"email": email})
     assert resp6.status_code == 429
     body = resp6.json()
     assert body["error"]["code"] == "MAX_ATTEMPTS_REACHED"
@@ -27,11 +27,11 @@ async def test_ip_rate_limit_blocks_21st_request(client, db_session, mock_resend
     """D-14: 20 consecutive POST /auth/request-code from same IP but different emails -> 21st returns 429."""
     for i in range(20):
         email = f"user{i}@test.edu"
-        resp = await client.post("/auth/request-code", json={"email": email})
+        resp = await client.post("/api/v1/auth/request-code", json={"email": email})
         assert resp.status_code == 200, f"Request {i+1} should succeed"
 
     # 21st request — should be rate limited by IP
-    resp21 = await client.post("/auth/request-code", json={"email": "user_overflow@test.edu"})
+    resp21 = await client.post("/api/v1/auth/request-code", json={"email": "user_overflow@test.edu"})
     assert resp21.status_code == 429
     body = resp21.json()
     assert body["error"]["code"] == "MAX_ATTEMPTS_REACHED"
@@ -42,5 +42,5 @@ async def test_reset_limiter_clears_counters(client, db_session, mock_resend, se
     """Verify reset_limiter fixture clears rate limit counters between tests."""
     # This test runs after the above; if reset_limiter didn't clear counters,
     # even the first request would be blocked. Verify it works.
-    resp = await client.post("/auth/request-code", json={"email": "student@test.edu"})
+    resp = await client.post("/api/v1/auth/request-code", json={"email": "student@test.edu"})
     assert resp.status_code == 200

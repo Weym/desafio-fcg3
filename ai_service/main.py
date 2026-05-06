@@ -13,7 +13,7 @@ from pydantic import BaseModel
 
 from ai_service.agent import invoke_agent
 from ai_service.config import settings
-from ai_service.database import check_db_health, create_pool, save_chat_message
+from ai_service.database import check_db_health, create_pool
 
 logger = logging.getLogger(__name__)
 
@@ -107,29 +107,26 @@ async def chat(
     request: ChatRequest,
     _: None = Depends(require_service_token),
 ) -> ChatResponse:
-    """Process a student message through the AI agent."""
+    """Process a student message through the AI agent.
+
+    Persistence note: This endpoint does NOT write to `chat_messages`.
+    The backend (backend/src/features/webhook) is the single owner of that
+    table — it persists the user message (with wamid-based dedup) before
+    dispatching the AI call, and persists the assistant reply after
+    receiving this endpoint's response. Writing here too caused every
+    message to appear duplicated in the Flutter chat UI (see
+    `.planning/debug/resolved/chat-duplicate-messages-flutter.md`).
+    The agent still sees the current user message via `agent.invoke_agent`,
+    which appends it to the in-memory history before the agent runs.
+    """
 
     try:
-        save_chat_message(
-            pool=app.state.db_pool,
-            session_id=request.session_id,
-            role="user",
-            content=request.message,
-        )
-
         response_text = await invoke_agent(
             settings=settings,
             db_pool=app.state.db_pool,
             system_prompt=app.state.system_prompt,
             session_id=request.session_id,
             user_message=request.message,
-        )
-
-        save_chat_message(
-            pool=app.state.db_pool,
-            session_id=request.session_id,
-            role="assistant",
-            content=response_text,
         )
 
         return ChatResponse(
@@ -142,20 +139,6 @@ async def chat(
             "Desculpe, estou com dificuldades tecnicas. "
             "Tente novamente em alguns minutos."
         )
-
-        try:
-            save_chat_message(
-                pool=app.state.db_pool,
-                session_id=request.session_id,
-                role="assistant",
-                content=fallback,
-            )
-        except Exception:
-            logger.exception(
-                "Failed to persist fallback response for session %s",
-                request.session_id,
-            )
-
         return ChatResponse(
             response=fallback,
             session_id=request.session_id,

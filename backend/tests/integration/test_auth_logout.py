@@ -25,7 +25,7 @@ async def test_logout_revokes_only_current_jti(client, seed_users, db_session):
     # Second login creates a second session pair
     pair2 = await _login_and_get_tokens(client, seed_users, db_session, "student")
 
-    r = await client.post("/auth/logout",
+    r = await client.post("/api/v1/auth/logout",
                           headers={"Authorization": f"Bearer {pair.access.token}"})
     assert r.status_code == 200
 
@@ -44,11 +44,11 @@ async def test_logout_revokes_only_current_jti(client, seed_users, db_session):
 @pytest.mark.asyncio
 async def test_logout_then_me_returns_401(client, seed_users, db_session):
     pair = await _login_and_get_tokens(client, seed_users, db_session, "staff")
-    r = await client.post("/auth/logout",
+    r = await client.post("/api/v1/auth/logout",
                           headers={"Authorization": f"Bearer {pair.access.token}"})
     assert r.status_code == 200
     # Subsequent /auth/me with same token -> 401 token_revoked
-    r2 = await client.get("/auth/me",
+    r2 = await client.get("/api/v1/auth/me",
                           headers={"Authorization": f"Bearer {pair.access.token}"})
     assert r2.status_code == 401
     assert r2.json()["error"]["code"] == "token_revoked"
@@ -56,5 +56,5 @@ async def test_logout_then_me_returns_401(client, seed_users, db_session):
 
 @pytest.mark.asyncio
 async def test_logout_without_token_rejected(client):
-    r = await client.post("/auth/logout")
+    r = await client.post("/api/v1/auth/logout")
     assert r.status_code == 401

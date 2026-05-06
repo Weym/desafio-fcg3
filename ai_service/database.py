@@ -51,20 +51,6 @@ def load_chat_history(pool: Any, session_id: str, k: int = 20) -> list[Any]:
     return messages
 
 
-def save_chat_message(pool: Any, session_id: str, role: str, content: str) -> None:
-    """Persist a chat message for a session."""
-
-    query = (
-        "INSERT INTO chat_messages (id, chat_session_id, role, content) "
-        "VALUES (gen_random_uuid(), %s, %s, %s)"
-    )
-
-    with pool.connection() as connection:
-        with connection.cursor() as cursor:
-            cursor.execute(query, (session_id, role, content))
-        connection.commit()
-
-
 def check_db_health(pool: Any) -> bool:
     """Return True when the database is reachable."""
 

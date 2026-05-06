@@ -16,7 +16,7 @@ async def _make_token(db_session, user, role):
 async def test_me_returns_profile_from_token_claims(client, seed_users, db_session):
     student = seed_users["student"]
     tok = await _make_token(db_session, student, "student")
-    r = await client.get("/auth/me", headers={"Authorization": f"Bearer {tok.token}"})
+    r = await client.get("/api/v1/auth/me", headers={"Authorization": f"Bearer {tok.token}"})
     assert r.status_code == 200
     body = r.json()
     assert body["id"] == str(student.id)
@@ -27,7 +27,7 @@ async def test_me_returns_profile_from_token_claims(client, seed_users, db_sessi
 
 @pytest.mark.asyncio
 async def test_me_returns_401_without_auth(client):
-    r = await client.get("/auth/me")
+    r = await client.get("/api/v1/auth/me")
     assert r.status_code == 401
     assert r.json()["error"]["code"] == "missing_token"
 
@@ -40,6 +40,6 @@ async def test_me_rejects_refresh_token(client, seed_users, db_session):
                                 user_type="student", platform="app",
                                 parent_jti=None, used=False, expires_at=refresh_tok.expires_at))
     await db_session.commit()
-    r = await client.get("/auth/me", headers={"Authorization": f"Bearer {refresh_tok.token}"})
+    r = await client.get("/api/v1/auth/me", headers={"Authorization": f"Bearer {refresh_tok.token}"})
     assert r.status_code == 401
     assert r.json()["error"]["code"] == "invalid_token"

@@ -45,15 +45,21 @@ def upgrade() -> None:
         conn.execute(sa.text("CREATE EXTENSION IF NOT EXISTS pg_cron"))
         # Schedule session auto-close job per D-12
         # Runs every hour, closes sessions inactive for 24+ hours
+        #
+        # Quoting note: the inner SQL is dollar-quoted with $$...$$, which makes
+        # everything between the $$ delimiters a literal string — including
+        # single quotes. Therefore single quotes inside must NOT be SQL-escaped
+        # as '' (doubled), or they end up literally doubled in the stored
+        # cron.job.command, producing a syntax error at every run.
         conn.execute(
             sa.text(
                 "SELECT cron.schedule("
                 "'close-inactive-chat-sessions', "
                 "'0 * * * *', "
                 "$$UPDATE chat_sessions "
-                "SET status = ''closed'', ended_at = NOW() "
-                "WHERE updated_at < NOW() - INTERVAL ''24 hours'' "
-                "AND status = ''active''$$"
+                "SET status = 'closed', ended_at = NOW() "
+                "WHERE updated_at < NOW() - INTERVAL '24 hours' "
+                "AND status = 'active'$$"
                 ")"
             )
         )
