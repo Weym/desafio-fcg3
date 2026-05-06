@@ -22,6 +22,8 @@
  (completed 2026-05-06)
 - [x] **Phase 12: Frontend-Backend Integration** — Validate API contracts, Docker Compose full stack, OTP bypass for dev, E2E automated tests with real data flowing
  (completed 2026-05-06)
+- [ ] **Phase 13: Resource Allocation** — CRUD de recursos (gestor), agendamento com upload de autorização (aluno), novos tipos de recurso, flag requires_authorization
+- [ ] **Phase 14: Human Intervention** — Tela de intervenção humana (gestor assume chats não resolvidos pelo bot, responde via WhatsApp)
 
 ---
 
