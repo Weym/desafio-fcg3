@@ -10,6 +10,7 @@ import '../providers/staff_dashboard_provider.dart';
 import '../providers/staff_schedule_provider.dart';
 import '../providers/staff_document_provider.dart';
 import '../providers/staff_chat_provider.dart';
+import '../providers/staff_resource_provider.dart';
 
 class StaffShell extends ConsumerStatefulWidget {
   final Widget child;
@@ -33,6 +34,7 @@ class _StaffShellState extends ConsumerState<StaffShell> {
     ref.read(staffAppointmentsProvider);
     ref.read(staffDocumentsProvider);
     ref.read(staffChatSessionsProvider);
+    ref.read(staffResourcesProvider);
   }
 
   int _currentIndex(BuildContext context) {
@@ -40,6 +42,7 @@ class _StaffShellState extends ConsumerState<StaffShell> {
     if (location.startsWith(RoutePaths.staffSchedule)) return 1;
     if (location.startsWith(RoutePaths.staffAI)) return 2;
     if (location.startsWith(RoutePaths.staffDocuments)) return 3;
+    if (location.startsWith(RoutePaths.staffResources)) return 4;
     return 0;
   }
 
@@ -53,6 +56,8 @@ class _StaffShellState extends ConsumerState<StaffShell> {
         context.go(RoutePaths.staffAI);
       case 3:
         context.go(RoutePaths.staffDocuments);
+      case 4:
+        context.go(RoutePaths.staffResources);
     }
   }
 
@@ -61,6 +66,7 @@ class _StaffShellState extends ConsumerState<StaffShell> {
     _NavItem(icon: Icons.calendar_today_outlined, activeIcon: Icons.calendar_today, label: 'Agenda'),
     _NavItem(icon: Icons.psychology_outlined, activeIcon: Icons.psychology, label: 'Insights'),
     _NavItem(icon: Icons.folder_outlined, activeIcon: Icons.folder, label: 'Docs'),
+    _NavItem(icon: Icons.meeting_room_outlined, activeIcon: Icons.meeting_room, label: 'Recursos'),
   ];
 
   static const _railDestinations = [
@@ -83,6 +89,11 @@ class _StaffShellState extends ConsumerState<StaffShell> {
       icon: Icon(Icons.folder_outlined),
       selectedIcon: Icon(Icons.folder),
       label: Text('Documentos'),
+    ),
+    NavigationRailDestination(
+      icon: Icon(Icons.meeting_room_outlined),
+      selectedIcon: Icon(Icons.meeting_room),
+      label: Text('Recursos'),
     ),
   ];
 
