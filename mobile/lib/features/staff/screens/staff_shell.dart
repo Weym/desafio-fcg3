@@ -11,6 +11,7 @@ import '../providers/staff_schedule_provider.dart';
 import '../providers/staff_document_provider.dart';
 import '../providers/staff_chat_provider.dart';
 import '../providers/staff_resource_provider.dart';
+import '../providers/staff_intervention_provider.dart';
 
 class StaffShell extends ConsumerStatefulWidget {
   final Widget child;
@@ -35,12 +36,13 @@ class _StaffShellState extends ConsumerState<StaffShell> {
     ref.read(staffDocumentsProvider);
     ref.read(staffChatSessionsProvider);
     ref.read(staffResourcesProvider);
+    ref.read(interventionSessionsProvider);
   }
 
   int _currentIndex(BuildContext context) {
     final location = GoRouterState.of(context).matchedLocation;
     if (location.startsWith(RoutePaths.staffSchedule)) return 1;
-    if (location.startsWith(RoutePaths.staffAI)) return 2;
+    if (location.startsWith(RoutePaths.staffIntervention)) return 2;
     if (location.startsWith(RoutePaths.staffDocuments)) return 3;
     if (location.startsWith(RoutePaths.staffResources)) return 4;
     return 0;
@@ -53,7 +55,7 @@ class _StaffShellState extends ConsumerState<StaffShell> {
       case 1:
         context.go(RoutePaths.staffSchedule);
       case 2:
-        context.go(RoutePaths.staffAI);
+        context.go(RoutePaths.staffIntervention);
       case 3:
         context.go(RoutePaths.staffDocuments);
       case 4:
@@ -64,7 +66,7 @@ class _StaffShellState extends ConsumerState<StaffShell> {
   static const _destinations = <_NavItem>[
     _NavItem(icon: Icons.dashboard_outlined, activeIcon: Icons.dashboard, label: 'Painel'),
     _NavItem(icon: Icons.calendar_today_outlined, activeIcon: Icons.calendar_today, label: 'Agenda'),
-    _NavItem(icon: Icons.psychology_outlined, activeIcon: Icons.psychology, label: 'Insights'),
+    _NavItem(icon: Icons.support_agent_outlined, activeIcon: Icons.support_agent, label: 'Intervenção'),
     _NavItem(icon: Icons.folder_outlined, activeIcon: Icons.folder, label: 'Docs'),
     _NavItem(icon: Icons.meeting_room_outlined, activeIcon: Icons.meeting_room, label: 'Recursos'),
   ];
@@ -81,9 +83,9 @@ class _StaffShellState extends ConsumerState<StaffShell> {
       label: Text('Agenda'),
     ),
     NavigationRailDestination(
-      icon: Icon(Icons.psychology_outlined),
-      selectedIcon: Icon(Icons.psychology),
-      label: Text('Insights'),
+      icon: Icon(Icons.support_agent_outlined),
+      selectedIcon: Icon(Icons.support_agent),
+      label: Text('Intervenção'),
     ),
     NavigationRailDestination(
       icon: Icon(Icons.folder_outlined),

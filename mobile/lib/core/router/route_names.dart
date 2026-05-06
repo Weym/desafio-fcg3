@@ -22,10 +22,12 @@ class RouteNames {
 
   // Staff tabs (continued)
   static const String staffResources = 'staff-resources';
+  static const String staffIntervention = 'staff-intervention';
 
   // Staff detail
   static const String staffAppointmentDetail = 'staff-appointment-detail';
   static const String staffChatDetail = 'staff-chat-detail';
+  static const String staffInterventionChat = 'staff-intervention-chat';
 }
 
 class RoutePaths {
@@ -49,8 +51,10 @@ class RoutePaths {
 
   // Staff tabs (continued)
   static const String staffResources = '/staff/resources';
+  static const String staffIntervention = '/staff/intervention';
 
   // Staff detail
   static const String staffAppointmentDetail = '/staff/schedule/:appointmentId';
   static const String staffChatDetail = '/staff/ai/:sessionId';
+  static const String staffInterventionChat = '/staff/intervention/:sessionId';
 }
