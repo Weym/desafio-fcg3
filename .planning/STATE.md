@@ -1,9 +1,9 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
-status: executing
-last_updated: "2026-05-05T17:31:00.000Z"
+milestone: v2.0
+milestone_name: Flutter Frontend
+status: complete
+last_updated: "2026-05-05T21:00:00.000Z"
 last_activity: 2026-05-05
 progress:
   total_phases: 4
@@ -17,30 +17,31 @@ progress:
 
 ## Current Position
 
-Phase: 10
-Plan: Not started
-Status: Ready to execute
-Last activity: 2026-05-05 - Completed quick task 260505-jur: Corrigir crash no login OTP alinhando frontend ao TokenPair do backend
+Phase: 10 (all M2 phases complete)
+Plan: All 18 plans executed
+Status: Milestone complete — verification and hardening phase
+Last activity: 2026-05-05 - Validated full stack (DB fix, auth tests, AI/RAG E2E, Flutter tests)
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [██████████] 100%
 
 ## Phase Status
 
 | Phase | Name | Status |
 |-------|------|--------|
-| 7 | Flutter Scaffold & Auth | not_started |
-| 8 | Client Interface | not_started |
-| 9 | Staff Interface | not_started |
-| 10 | Cross-Platform Polish | not_started |
+| 7 | Flutter Scaffold & Auth | complete |
+| 8 | Client Interface | complete |
+| 9 | Staff Interface | complete |
+| 10 | Cross-Platform Polish | complete |
 
 ## Current Focus
 
-**Milestone v2.0 (Flutter Frontend) initialized.**
-4 phases planned (Phases 7-10), 17 requirements mapped.
-Previous milestone (M1 Backend + AI + MCP) delivered 6 phases, 47 plans.
+**Milestone v2.0 (Flutter Frontend) complete.**
+All 4 phases executed (18/18 plans). Verification and hardening session completed 2026-05-05.
 
-Next action: `/gsd-discuss-phase 7` or `/gsd-plan-phase 7`
-Resume file: None
+Remaining work is manual/environment verification:
+- Phase 6: WhatsApp webhook E2E (requires ngrok + WhatsApp Business API)
+- Phases 7/9/10: Visual testing on emulator/device
+- Phase 1 stack tests: require Docker CLI on host (not inside container)
 
 ## Accumulated Context
 
@@ -51,6 +52,9 @@ Recent decisions affecting current work:
 - [Milestone v2.0]: Phase numbering continues from M1 (Phase 7+) — no reset
 - [Milestone v2.0]: Frontend requirements derived from `requerimentos_frontend.md` with 2 user profiles (Client, Provider/Staff)
 - [Milestone v2.0]: Flutter mobile/web using existing REST API surface from M1 — no backend changes needed
+- [Phase 07]: State management: Riverpod (with riverpod_annotation + code generation)
+- [Phase 07]: Navigation: GoRouter with refreshListenable pattern (avoids GlobalKey crashes)
+- [Phase 07]: Auth interceptor uses QueuedInterceptor for proper async serialization
 - [Phase 08]: Client data layer uses @JsonSerializable codegen + DioClient injection + @riverpod annotations for 3 domains (chat, documents, appointments)
 - [Phase 08]: url_launcher added for support screen external app actions (email, phone, WhatsApp)
 - [Phase 08]: Filter chips use toggle behavior — tapping active filter resets to null (Todos)
@@ -72,10 +76,10 @@ Recent decisions affecting current work:
 - [Phase 09]: StaffHomeScreen deprecated (kept for compatibility), StaffDashboardScreen is now the default /staff route
 - [Phase 10]: Shimmer uses colorScheme.surfaceContainerHighest/surface for M3 dark-mode compatibility
 
-### Key Decisions Pending
+### Key Decisions Resolved
 
-- State management approach (Provider, Riverpod, or Bloc) — to be decided in Phase 7 discuss/plan
-- Navigation architecture (GoRouter, auto_route, or Navigator 2.0) — to be decided in Phase 7
+- State management: **Riverpod** (with riverpod_annotation + code generation) — decided in Phase 7
+- Navigation architecture: **GoRouter** with refreshListenable pattern — decided in Phase 7
 
 ### Architecture Constraints (non-negotiable)
 
@@ -106,6 +110,20 @@ Recent decisions affecting current work:
 | 260505-jcm | Validar e corrigir base URL de autenticação do frontend e adicionar CORS no backend para Flutter web | 2026-05-05 | 4e1ca3d | [260505-jcm-validar-e-corrigir-base-url-de-autentica](./quick/260505-jcm-validar-e-corrigir-base-url-de-autentica/) |
 | 260505-jur | Corrigir crash no login OTP alinhando frontend ao TokenPair do backend | 2026-05-05 | 5fee628 | [260505-jur-corrigir-crash-no-login-otp-alinhando-o-](./quick/260505-jur-corrigir-crash-no-login-otp-alinhando-o-/) |
 
+### Hardening Session (2026-05-05)
+
+| Branch | Fix | Validated |
+|--------|-----|-----------|
+| `fix/db-credential-mismatch` | pg_hba custom + compose hba_file flag + mcp_server POSTGRES_* fallback | alembic upgrade head + seed: both pass |
+| `fix/auth-tests-url-prefix` | Add /api/v1 prefix to 7 auth integration test files (38 URLs) | 37/37 integration tests pass |
+
+Additional validations performed (no code fix needed):
+- AI/RAG ingest: 6 docs, 47 chunks via OpenRouter embeddings — success
+- AI/RAG chat E2E: LLM responds with correct knowledge base context — success
+- Flutter tests: 8/8 pass via Windows Flutter SDK
+- Phase 7 runtime bugs (CR-01/02/03): already fixed in codebase — confirmed
+
 ## Session Continuity
 
 To resume work: read this file, then read `.planning/ROADMAP.md` to see current phase and plan status.
+All M2 code work is complete. Remaining items are manual verification (WhatsApp webhook, device testing).

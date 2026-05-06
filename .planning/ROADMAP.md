@@ -3,18 +3,17 @@
 **Milestone:** M2 — Flutter Frontend
 **Granularity:** Standard
 **Coverage:** 17/17 requirements mapped
-**Last Updated:** 2026-05-04
+**Last Updated:** 2026-05-05
 **Previous Milestone:** M1 — Backend + AI Service + MCP Server (Phases 1-6, complete)
 
 ---
 
 ## Phases
 
-- [ ] **Phase 7: Flutter Scaffold & Auth** — App boots with role-based navigation, OTP authentication, secure JWT storage
-- [ ] **Phase 8: Client Interface** — All 6 client screens consuming the REST API (dashboard, chat history, documents, notifications, support)
-- [ ] **Phase 9: Staff Interface** — All 4 staff/provider management screens (dashboard, schedule, AI data, document management)
-- [x] **Phase 10: Cross-Platform Polish** — Responsiveness on all form factors, performance optimization, data sync efficiency (completed 2026-05-05)
-
+- [x] **Phase 7: Flutter Scaffold & Auth** — App boots with role-based navigation, OTP authentication, secure JWT storage (completed 2026-05-05)
+- [x] **Phase 8: Client Interface** — All 6 client screens consuming the REST API (dashboard, chat history, documents, notifications, support) (completed 2026-05-05)
+- [x] **Phase 9: Staff Interface** — All 4 staff/provider management screens (dashboard, schedule, AI data, document management) (completed 2026-05-05)
+- [x] **Phase 10: Cross-Platform Polish** — Responsiveness on all form factors, performance optimization, data sync efficiency (completed 2026-05-05)
 ---
 
 ## Phase Details
@@ -54,7 +53,7 @@ Plans:
 4. Notification Center displays alerts, appointment reminders, and status updates — with unread indicators.
 5. Support & Contact screen provides a direct channel for the client to reach administrative support.
 
-**Plans:** 4/5 plans executed
+**Plans:** 5/5 plans executed
 
 Plans:
 - [x] 08-01-PLAN.md — Data layer: models, services, and Riverpod providers for all client domains
@@ -77,7 +76,7 @@ Plans:
 3. AI Data Interaction screen shows structured information, summaries, and insights extracted from WhatsApp conversations (via chat sessions and MCP action logs endpoints).
 4. Document Management screen allows sending documents to client boards and managing pending document requests with status updates.
 
-**Plans:** 3/5 plans executed
+**Plans:** 5/5 plans executed
 
 Plans:
 - [x] 09-01-PLAN.md — Staff data layer (models, services, Riverpod providers + file_picker dep)
@@ -115,7 +114,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 7. Flutter Scaffold & Auth | 0/3 | Planned | - |
-| 8. Client Interface | 4/5 | In Progress|  |
-| 9. Staff Interface | 3/5 | In Progress|  |
-| 10. Cross-Platform Polish | 5/5 | Complete    | 2026-05-05 |
+| 7. Flutter Scaffold & Auth | 3/3 | Complete | 2026-05-05 |
+| 8. Client Interface | 5/5 | Complete | 2026-05-05 |
+| 9. Staff Interface | 5/5 | Complete | 2026-05-05 |
+| 10. Cross-Platform Polish | 5/5 | Complete | 2026-05-05 |
