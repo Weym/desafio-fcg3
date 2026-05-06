@@ -70,7 +70,12 @@ async def process_verified_message(
     async with lock:
         agent_response: str | None = None
 
-        # Call AI service with one retry on failure (D-06)
+        # Call AI service with one retry on failure (D-06).
+        # The AI service `/chat` endpoint requires the shared internal
+        # service token (see ai_service/main.py::require_service_token) —
+        # omitting this header causes a 401 on every request, which
+        # would route every verified student straight to the fallback
+        # "Desculpe, estou com dificuldades tecnicas..." message.
         for attempt in range(2):
             try:
                 async with httpx.AsyncClient(
@@ -81,6 +86,9 @@ async def process_verified_message(
                         json={
                             "session_id": str(session_id),
                             "message": message_text,
+                        },
+                        headers={
+                            "X-Service-Token": settings.mcp_service_token,
                         },
                     )
                     if response.status_code == 200:
