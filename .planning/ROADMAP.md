@@ -5,6 +5,7 @@
 **Coverage:** 17/17 requirements mapped
 **Last Updated:** 2026-05-07
 **Previous Milestone:** M1 — Backend + AI Service + MCP Server (Phases 1-6, complete)
+**Status:** In Progress — 8/11 phases complete (73%)
 
 ---
 
@@ -273,6 +274,6 @@ Plans:
 | 12. Frontend-Backend Integration | 3/3 | Complete | 2026-05-06 |
 | 13. Resource Allocation | 3/3 | Complete | 2026-05-06 |
 | 14. Human Intervention | 2/2 | Complete | 2026-05-06 |
-| 15. Requirements Traceability Sync | 0/1 | Planned | — |
-| 16. Auth & Router Tech Debt | 0/1 | Planned | — |
-| 17. Loading State Polish | 0/1 | Planned | — |
+| 15. Requirements Traceability Sync | 0/0 | Planned | — |
+| 16. Auth & Router Tech Debt | 0/0 | Planned | — |
+| 17. Loading State Polish | 0/0 | Planned | — |
