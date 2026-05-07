@@ -266,6 +266,8 @@ class _ResourceCard extends StatelessWidget {
                         const SizedBox(width: 4),
                         Text(
                           'Requer Autorização',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
@@ -478,6 +480,8 @@ class _AppointmentCard extends StatelessWidget {
                   onTap: onCancel,
                   child: Text(
                     'Cancelar',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
@@ -533,6 +537,8 @@ class _StatusBadge extends StatelessWidget {
       ),
       child: Text(
         label,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
         style: TextStyle(
           fontSize: 10,
           fontWeight: FontWeight.bold,

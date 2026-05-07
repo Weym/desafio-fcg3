@@ -441,6 +441,8 @@ class _MessageBubble extends StatelessWidget {
                     const SizedBox(width: 4),
                     Text(
                       _formatTime(message.createdAt),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
@@ -531,6 +533,8 @@ class _SessionCard extends StatelessWidget {
                     ),
                     Text(
                       _formatDate(session.startedAt),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 10,
                         color: colors.outline,
@@ -581,6 +585,8 @@ class _SessionCard extends StatelessWidget {
                         ),
                       Text(
                         isActive ? 'Ativa' : 'Encerrada',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.bold,

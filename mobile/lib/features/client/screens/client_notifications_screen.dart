@@ -165,6 +165,8 @@ class _NotificationCard extends StatelessWidget {
                       ),
                       child: Text(
                         _categoryLabel(notification),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
@@ -176,6 +178,8 @@ class _NotificationCard extends StatelessWidget {
                     const SizedBox(width: 8),
                     Text(
                       _formatRelativeTime(notification.timestamp),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: colors.outline,
                             fontSize: 12,

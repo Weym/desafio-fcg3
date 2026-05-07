@@ -274,6 +274,8 @@ class _AppointmentCard extends StatelessWidget {
             ),
             child: Text(
               _statusLabel(appointment.status),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.bold,

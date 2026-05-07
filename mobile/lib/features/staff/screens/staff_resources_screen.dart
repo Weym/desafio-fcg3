@@ -363,6 +363,8 @@ class _ResourceCard extends StatelessWidget {
                     ),
                     child: Text(
                       'Requer Autorização',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
