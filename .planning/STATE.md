@@ -1,10 +1,10 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
+milestone: v2.0
+milestone_name: Flutter Frontend
 status: complete
-last_updated: "2026-05-07T23:00:00.000Z"
-last_activity: 2026-05-07 -- Phase 16 execution complete (verification only)
+last_updated: "2026-05-07T23:20:00.000Z"
+last_activity: 2026-05-07 -- Milestone v2.0 archived
 progress:
   total_phases: 11
   completed_phases: 11
@@ -17,101 +17,26 @@ progress:
 
 ## Current Position
 
-Phase: 17 (last completed)
-Plan: 1 of 1 complete
-Status: Milestone complete
-Last activity: 2026-05-07 -- Phase 16 execution complete (verification only)
+Milestone: v2.0 (Flutter Frontend) — SHIPPED 2026-05-07
+All phases complete. No active work.
 
-Progress: [██████████] 100% (11/11 phases)
+Progress: [██████████] 100% (11/11 phases, 30/30 plans)
 
-## Phase Status
+## Project Reference
 
-| Phase | Name | Status |
-|-------|------|--------|
-| 7 | Flutter Scaffold & Auth | complete |
-| 8 | Client Interface | complete |
-| 9 | Staff Interface | complete |
-| 10 | Cross-Platform Polish | complete |
-| 11 | Alpha Connect Visual Refactoring | complete |
-| 12 | Frontend-Backend Integration | complete |
-| 13 | Resource Allocation | complete |
-| 14 | Human Intervention | complete |
-| 15 | Requirements Traceability Sync | complete |
-| 16 | Auth & Router Tech Debt | complete |
-| 17 | Loading State Polish | complete |
+See: .planning/PROJECT.md (updated 2026-05-07)
 
-## Current Focus
+**Core value:** Aluno envia mensagem no WhatsApp e recebe resposta precisa sobre sua situação acadêmica — com ações concretas executadas em tempo real.
+**Current focus:** Project delivered. No active milestone.
 
-**Phases 7-15 delivered (9 phases, 28 plans executed).**
-Previous milestone (M1 Backend + AI + MCP) delivered 6 phases, 47 plans.
+## Milestones Shipped
 
-Remaining phases (tech debt):
+| Milestone | Phases | Plans | Shipped |
+|-----------|--------|-------|---------|
+| v1.0 Backend + AI + MCP | 1-6 | 47 | 2026-05-04 |
+| v2.0 Flutter Frontend | 7-17 | 30 | 2026-05-07 |
 
-- Phase 16: Auth & Router tech debt — async void, GlobalKey, debug logging
-- Phase 17: Loading state polish — skeleton widgets in chat/AI screens
-
-Validation coverage: 10/16 phases have VALIDATION.md (01-09, 14)
-Phases missing validation: 10, 12, 13, 15, 16, 17
-
-Branches:
-
-- `feat/resource-allocation` — Phase 13 (10 commits)
-- `feat/human-intervention` — Phase 13 + 14 (18 commits total)
-
-Next action: Execute phases 15-17 or merge branches to main.
-
-## Accumulated Context
-
-### Decisions
-
-Recent decisions affecting current work:
-
-- [Phase 14-polish]: Dark mode audit applied — 28 hardcoded color issues fixed across 15 screen files
-- [Phase 14-polish]: Responsive audit — 15 layout constraints fixed (bottom sheets max-width 500px, chat bubbles max 500px, desktop panels max 400px)
-- [Phase 14-polish]: All amber/green/red status colors now adapt to brightness (lighter shades in dark mode)
-- [Phase 14-polish]: Skeleton shimmer placeholders use colorScheme.surface instead of Colors.white
-- [Phase 14]: Escalation keywords checked BEFORE AI call to save AI service resources
-- [Phase 14]: Staff sees all 'human_needed' + only their own 'human_active' sessions (FIFO by escalated_at)
-- [Phase 14]: AI response escalation saves bot message before escalating — staff has full context
-- [Phase 11]: App renamed from "Desafio FCG3" to "Alpha Connect"
-- [Phase 11]: google_fonts added — Plus Jakarta Sans (headings) + Inter (body)
-- [Phase 11]: Color palette aligned to alpha-connect: primary #3B608F, secondary #6A548A, tertiary #676001
-- [Phase 11]: Explicit ColorScheme (not fromSeed) for precise color control in light + dark modes
-- [Phase 11]: GlassCard widget (BackdropFilter + soft shadow) replaces standard Material Card across all screens
-- [Phase 11]: PillButton widget (4 variants) replaces standard ElevatedButton style
-- [Phase 11]: Glassmorphism bottom nav on phone; NavigationRail preserved for tablet/desktop
-- [Phase 11]: Segmented filter controls replace FilterChip rows on Documents/Schedule screens
-- [Phase 11]: Shared AppBarActions widget ensures theme toggle + logout on every screen
-- [Phase 11]: Demo mode (setDemoUser) added for frontend preview without backend
-- [Phase 11]: Dark mode text legibility fixed with explicit onSurface color on all text inputs
-- [Phase 08]: Client data layer uses @JsonSerializable codegen + DioClient injection + @riverpod annotations for 3 domains (chat, documents, appointments)
-- [Phase 08]: url_launcher added for support screen external app actions (email, phone, WhatsApp)
-- [Phase 08]: Filter chips use toggle behavior — tapping active filter resets to null (Todos)
-- [Phase 08]: Used initialValue instead of deprecated value on DropdownButtonFormField (Flutter 3.41.6)
-- [Phase 08]: Chat detail uses ConsumerStatefulWidget with SingleTickerProviderStateMixin for TabController lifecycle
-- [Phase 08]: Replaced Documents and Chat placeholders in app_router.dart with real screens
-- [Phase 08]: All 5 client tabs wired to real screens; _PlaceholderScreen retained only for staff routes (Phase 9)
-- [Phase 08]: Derived notifications aggregate from documents (7d window) and appointments (48h window) — no backend endpoint needed
-- [Phase 09]: Reuse client models cross-feature for staff services — no duplication of AppointmentModel, DocumentModel, etc.
-- [Phase 09]: Staff-specific models only for staff-unique API responses (dashboard KPIs, scheduling slots, student summary)
-- [Phase 09]: Dashboard screen kept separate from staff_home_screen.dart; Plan 05 handles router swap
-- [Phase 09]: Confirmation dialogs use barrierDismissible: false for deliberate staff actions (threat T-09-04)
-- [Phase 09]: Staff chat detail reuses same layout pattern as ClientChatDetailScreen with staff-specific providers
-- [Phase 09]: Statistics tab shows numeric counters only (no charts) per D-12 to avoid extra dependencies
-- [Phase 09]: Backend upload uses local filesystem (uploads/documents/) with UUID prefix for MVP
-- [Phase 09]: Bulk send (D-18) deferred as TODO — individual send fully functional
-- [Phase 09]: Autocomplete uses direct service call in optionsBuilder for simplicity in bottom sheet context
-- [Phase 09]: All staff routes wired to real screens — _PlaceholderScreen removed from app_router.dart
-- [Phase 09]: StaffHomeScreen deprecated (kept for compatibility), StaffDashboardScreen is now the default /staff route
-- [Phase 10]: Shimmer uses colorScheme.surfaceContainerHighest/surface for M3 dark-mode compatibility
-- [Phase 12]: Integration tests use real seeded emails (ana.silva@usp.br, roberto@icmc.usp.br) with DEV_MASTER_OTP=000000 bypass
-
-### Key Decisions Resolved
-
-- Merge `feat/resource-allocation` and `feat/human-intervention` branches into main
-- Decide next milestone scope (if any)
-
-### Architecture Constraints (non-negotiable)
+## Architecture Constraints (non-negotiable)
 
 - `student_id` is NEVER exposed to the LangChain agent — always injected by MCP Server
 - `MCP_SERVICE_TOKEN` only in environment variables, never in source code
@@ -120,47 +45,7 @@ Recent decisions affecting current work:
 - All API calls use `Authorization: Bearer {token}` header
 - Two separate PostgreSQL drivers: `asyncpg` for FastAPI + MCP; `psycopg3` for LangChain service
 
-### Roadmap Evolution
-
-| # | Description | Date | Commit | Directory |
-|---|-------------|------|--------|-----------|
-| 260427-h6x | adicionar opcao de escolher provedor e modelo do embedding via env | 2026-04-27 | 0aceac2 | [260427-h6x-adicionar-opcao-de-escolher-provedor-e-m](./quick/260427-h6x-adicionar-opcao-de-escolher-provedor-e-m/) |
-| 260504-i90 | Expandir a base de conhecimento do RAG | 2026-05-04 | e470f57 | [260504-i90-expandir-a-base-de-conhecimento-do-rag](./quick/260504-i90-expandir-a-base-de-conhecimento-do-rag/) |
-
-- Milestone v2.0 started: Flutter Frontend (Phases 7-10)
-- Phase 7 added: Flutter Scaffold & Auth
-- Phase 8 added: Client Interface
-- Phase 9 added: Staff Interface
-- Phase 10 added: Cross-Platform Polish
-- Phase 11 added: Alpha Connect Visual Refactoring (2026-05-06)
-- Phase 12 added: Frontend-Backend Integration (2026-05-06)
-- Phase 13 added: Resource Allocation (2026-05-06)
-- Phase 14 added: Human Intervention (2026-05-06)
-
-### Quick Tasks Completed
-
-| # | Description | Date | Commit | Directory |
-|---|-------------|------|--------|-----------|
-| 260505-jcm | Validar e corrigir base URL de autenticação do frontend e adicionar CORS no backend para Flutter web | 2026-05-05 | 4e1ca3d | [260505-jcm-validar-e-corrigir-base-url-de-autentica](./quick/260505-jcm-validar-e-corrigir-base-url-de-autentica/) |
-| 260505-jur | Corrigir crash no login OTP alinhando frontend ao TokenPair do backend | 2026-05-05 | 5fee628 | [260505-jur-corrigir-crash-no-login-otp-alinhando-o-](./quick/260505-jur-corrigir-crash-no-login-otp-alinhando-o-/) |
-
-### Hardening Session (2026-05-05)
-
-| Branch | Fix | Validated |
-|--------|-----|-----------|
-| `fix/db-credential-mismatch` | pg_hba custom + compose hba_file flag + mcp_server POSTGRES_* fallback | alembic upgrade head + seed: both pass |
-| `fix/auth-tests-url-prefix` | Add /api/v1 prefix to 7 auth integration test files (38 URLs) | 37/37 integration tests pass |
-
-Additional validations performed (no code fix needed):
-
-- AI/RAG ingest: 6 docs, 47 chunks via OpenRouter embeddings — success
-- AI/RAG chat E2E: LLM responds with correct knowledge base context — success
-- Flutter tests: 8/8 pass via Windows Flutter SDK
-- Phase 7 runtime bugs (CR-01/02/03): already fixed in codebase — confirmed
-
 ## Session Continuity
 
-To resume work: read this file, then read `.planning/ROADMAP.md` to see current phase and plan status.
-Phases 7-15 code complete. Phases 16-17 are tech debt remaining.
-| 2026-05-06 | fast | fix flutter-web docker build: add mobile/.dockerignore | done |
-| 2026-05-07 | audit | validation coverage audit — 10/16 phases validated | done |
+To resume work: read this file, then `.planning/ROADMAP.md` for milestone history.
+Both milestones (v1.0 + v2.0) are complete. If starting a new milestone, run `/gsd-new-milestone`.

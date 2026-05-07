@@ -2,68 +2,64 @@
 
 ## What This Is
 
-Plataforma para alunos do curso de Ciência da Computação interagirem com serviços acadêmicos via API REST e WhatsApp. O backend em FastAPI centraliza dados e lógica de negócio; um agente LangChain com RAG processa mensagens do WhatsApp e executa ações via MCP Server; um MCP Server atua como proxy entre o agente e a API, injetando contexto de segurança.
+Plataforma completa para alunos do curso de Ciência da Computação interagirem com serviços acadêmicos via API REST, WhatsApp e app mobile Flutter. O backend em FastAPI centraliza dados e lógica de negócio; um agente LangChain com RAG processa mensagens do WhatsApp e executa ações via MCP Server; o app Flutter ("Alpha Connect") oferece interface visual para alunos e staff com autenticação OTP, glassmorphism UI, e funcionalidades de gestão acadêmica.
 
 ## Core Value
 
-Aluno envia mensagem no WhatsApp e recebe resposta precisa sobre sua situação acadêmica (notas, matrículas, documentos) — com ações concretas executadas em tempo real.
+Aluno envia mensagem no WhatsApp e recebe resposta precisa sobre sua situação acadêmica (notas, matrículas, documentos) — com ações concretas executadas em tempo real. Alternativamente, acessa o app mobile para visualizar e gerenciar sua situação acadêmica diretamente.
 
 ## Requirements
 
 ### Validated
 
-- ✓ Estrutura de diretórios e scaffolding do backend (FastAPI + VSA) — existing
-- ✓ Estrutura Flutter mobile (scaffolded) — existing
-- ✓ Documentação de arquitetura, API, banco e chatbot em `docs/` — existing
-- ✓ Docker Compose presente (vazio, pendente de implementação) — existing
-- ✓ Docker Compose com 4 serviços, healthchecks e hot reload local — validated in Phase 1
-- ✓ Alembic configurado com migrations para o schema da aplicação + pgvector/HNSW — validated in Phase 1
-- ✓ Variáveis de ambiente documentadas em `.env.example` — validated in Phase 1
-- ✓ Seed destrutivo de desenvolvimento com currículo, alunos, staff e fixtures acadêmicos — validated in Phase 1
-- ✓ Auth: OTP por email via Resend + JWT com campo `role` (student | staff) — validated in Phase 2
-- ✓ Middleware: JWT, Service Token (MCP), rate limiting no endpoint de auth — validated in Phase 2
-- ✓ Matrículas: consultar, solicitar, confirmar, cancelar (com validação de período e pré-requisitos) — validated in Phase 3
-- ✓ Notas e histórico: consulta de notas por disciplina/período, CRA calculado — validated in Phase 3
-- ✓ Documentos: listagem, solicitação, detalhe e atualização de status — validated in Phase 3
-- ✓ Agendamentos: consultar, solicitar e cancelar horários com SELECT FOR UPDATE — validated in Phase 3
-- ✓ Cursos & Currículo: listagem, detalhe, árvore recursiva de pré-requisitos — validated in Phase 3
-- ✓ Alunos: CRUD, resumo acadêmico com CRA, cursos disponíveis com filtro de pré-requisitos — validated in Phase 3
-- ✓ Staff Dashboard: KPIs agregados de todos os domínios — validated in Phase 3
-- ✓ AI Service: agente ReAct em LangChain com MCP tools, resposta em português e regressões de chat/runtime — validated in Phase 5
-- ✓ AI Service: pipeline RAG com threshold configurável via `RAG_SIMILARITY_THRESHOLD` (default 0.45, calibrado para embeddings proxied via OpenRouter) e ingest da knowledge base em `ai_service/ingest.py` — validated in Phase 5
-- ✓ AI Service: provider agnóstico via `LLM_PROVIDER` (`openai`/`gemini`) — validated in Phase 5
+**v1.0 — Backend + AI + MCP:**
+- ✓ Docker Compose com 4 serviços, healthchecks e hot reload local — v1.0
+- ✓ Alembic configurado com migrations para schema + pgvector/HNSW — v1.0
+- ✓ Auth: OTP por email via Resend + JWT com campo role (student | staff) — v1.0
+- ✓ Middleware: JWT, Service Token (MCP), rate limiting — v1.0
+- ✓ 7 feature slices, 35 REST endpoints, IDOR protection — v1.0
+- ✓ MCP Server: 16 tools, student_id injection, action logging — v1.0
+- ✓ AI Service: ReAct agent, RAG pipeline, provider-agnostic LLM — v1.0
+- ✓ WhatsApp webhook, end-to-end chatbot flow — v1.0
+
+**v2.0 — Flutter Frontend:**
+- ✓ Flutter scaffold com navegação baseada em perfil (Client/Staff) — v2.0
+- ✓ OTP auth integrado com backend FastAPI — v2.0
+- ✓ JWT em flutter_secure_storage com detecção de expiração — v2.0
+- ✓ 6 telas Client (Dashboard, Chat, Documents, Notifications, Support, Resources) — v2.0
+- ✓ 5 telas Staff (Dashboard KPIs, Schedule, AI Data, Documents, Resources, Intervention) — v2.0
+- ✓ Cross-platform (phone, tablet, web) com dark mode — v2.0
+- ✓ Alpha Connect visual identity (glassmorphism, Plus Jakarta Sans + Inter) — v2.0
+- ✓ Docker Compose full-stack 5 services — v2.0
+- ✓ Resource allocation com upload de autorização — v2.0
+- ✓ Human intervention (escalação bot → staff assume via WhatsApp) — v2.0
+- ✓ 244 Flutter tests + E2E integration tests — v2.0
 
 ### Active
 
-**Infraestrutura:**
-
-**Backend (FastAPI):**
-- [ ] Webhook WhatsApp: validação HMAC-SHA256, save de mensagem, despacho assíncrono
+- [ ] Webhook WhatsApp: validação HMAC-SHA256 end-to-end (parcial)
+- [ ] Push notifications via FCM (registro de token, envio por tipo de evento)
 - [ ] Testes: cobertura dos fluxos críticos (matrícula, webhook, middleware IDOR)
-
-**MCP Server:**
-- [x] 16 ferramentas documentadas em `docs/mcp.md` implementadas — validated in Phase 4
-- [x] Injeção de `student_id` a partir do contexto de sessão (prevenção de IDOR) — validated in Phase 4
-- [x] Log de cada chamada de tool em `mcp_action_logs` (params, resultado, latência, retry) — validated in Phase 4
-- [x] Validação de `X-Service-Token` em todas as chamadas internas — validated in Phase 4
 
 ### Out of Scope
 
-- Push notifications FCM — adiar para ciclo seguinte
 - Whisper API (transcrição de áudio) — pós-MVP
 - GPT-4o Vision (análise de imagens) — pós-MVP
 - Redis cache para sessões de conversa — pós-MVP
-- pg_cron para limpeza automática de verification_codes — pós-MVP
-- Sentry / monitoramento de erros externo — pós-MVP
+- pg_cron para limpeza automática — pós-MVP
+- Sentry / monitoramento externo — pós-MVP
+- Offline-first / local caching strategy — pós-MVP
 
 ## Context
 
-- Monorepo: `backend/` (FastAPI), `mobile/` (Flutter), `mcp_server/` e `ai_service/` implementados no workspace atual
-- Banco: PostgreSQL 16 + PGVector. Schema completo documentado em `docs/database.md` (17 tabelas, HNSW index)
-- Embedding model: `text-embedding-3-small` (OpenAI, 1536 dimensões) — fixo no schema
-- LLM provider: a definir por terceiro — arquitetura deve suportar troca por variável de ambiente
-- WhatsApp: webhook valida `X-Hub-Signature-256`, responde em `< 5s` via `asyncio.create_task`
-- Documentação de referência em `docs/`: `architecture.md`, `api.md`, `database.md`, `chatbot.md`, `mcp.md`, `app.md`
+- **Monorepo:** `backend/` (FastAPI), `mobile/` (Flutter), `mcp_server/`, `ai_service/`
+- **Banco:** PostgreSQL 16 + PGVector (17 tabelas, HNSW index, 1536-dim embeddings)
+- **Flutter:** 3.41.6, Dart ^3.11.4, Riverpod + GoRouter + Dio
+- **Backend:** Python 3.12, FastAPI, SQLAlchemy + Alembic, 35+ endpoints
+- **AI:** LangChain ReAct, MCP 16 tools, RAG with configurable threshold
+- **Docker:** 5 services (fastapi:8000, langchain:8001, mcp:8002, postgres:5432, flutter-web:3000)
+- **LOC:** ~19,238 Dart + ~16,669 Python = ~35,907 total
+- **Tests:** 244 Flutter unit tests + E2E integration tests
 
 ## Constraints
 
@@ -78,56 +74,29 @@ Aluno envia mensagem no WhatsApp e recebe resposta precisa sobre sua situação 
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Python / FastAPI (não TypeScript) | README estava desatualizado; toda a documentação técnica em `docs/` especifica Python | ✓ Python/FastAPI |
-| SQLAlchemy + Alembic | ORM maduro com controle total do SQL, integra nativamente com Alembic para migrations | ✓ Validated in Phase 1 |
-| JWT com campo `role` (student \| staff) | Um único fluxo de auth, diferenciação por payload | ✓ Validated in Phase 2 |
-| asyncio.create_task para background processing | Atende o limite de 5s do WhatsApp no MVP; sem overhead de task queue externo | ⚠️ Revisit (sem visibility de falhas) |
-| LLM provider agnóstico | Decisão de provider é de terceiro; embedding fixo em OpenAI `text-embedding-3-small` | — Pending |
-| Resend para envio de OTP | SDK Python, tier gratuito 3k emails/mês, API simples | ✓ Validated in Phase 2 |
-| `student_id` injetado pelo MCP (nunca exposto ao agente) | Prevenção de IDOR — o agente não pode forjar student_id | ✓ Validated in Phase 4 |
-| Agendamentos incluídos neste ciclo | Requisito confirmado pelo usuário | ✓ Validated in Phase 3 |
-
-## Current Milestone: v2.0 Flutter Frontend
-
-**Goal:** Deliver the Flutter mobile/web application with role-based navigation (Client and Provider/Staff), consuming the FastAPI REST API built in M1.
-
-**Target features:**
-- Flutter scaffold with role-based navigation and OTP authentication
-- 6 client screens: Dashboard, Chat History, Document Requests, Document Board, Notifications, Support
-- 4 staff/provider screens: Management Dashboard, Schedule Control, AI Data Interaction, Document Management
-- Cross-platform responsiveness (smartphones, tablets, web) and performance polish
+| Python / FastAPI (não TypeScript) | Documentação técnica especifica Python | ✓ Validated v1.0 |
+| SQLAlchemy + Alembic | ORM maduro, controle total SQL | ✓ Validated v1.0 |
+| JWT com campo role (student \| staff) | Um único fluxo de auth | ✓ Validated v1.0 |
+| asyncio.create_task para background processing | Atende limite 5s WhatsApp | ✓ Validated v1.0 |
+| Resend para envio de OTP | SDK Python, tier gratuito 3k emails/mês | ✓ Validated v1.0 |
+| student_id injetado pelo MCP (IDOR prevention) | Agente não pode forjar student_id | ✓ Validated v1.0 |
+| Riverpod + GoRouter (não Bloc) | Simplicity, code generation, type safety | ✓ Validated v2.0 |
+| QueuedInterceptor para auth token | Serializa concurrent 401 handling | ✓ Validated v2.0 |
+| Glassmorphism UI (Alpha Connect) | Visual identity alignment com prototype React | ✓ Validated v2.0 |
+| Docker multi-stage Flutter web build | Uniform dev experience, single compose up | ✓ Validated v2.0 |
+| DEV_MASTER_OTP bypass | Dev/testing sem dependência Resend | ✓ Validated v2.0 |
+| Derived notifications (no backend endpoint) | Aggregates from documents + appointments | ✓ Validated v2.0 |
 
 ## Current State
 
-- M1 (v1.0) complete: Backend + AI Service + MCP Server — 6 phases, 47 plans executed
-  - Phase 1: Docker stack (4 services), Alembic schema, seed data
-  - Phase 2: OTP/email auth (Resend), JWT with roles, middleware
-  - Phase 3: 7 feature slices, 35 REST endpoints, IDOR protection
-  - Phase 4: MCP Server, 16 tools, student_id injection, action logging
-  - Phase 5: LangChain ReAct agent, RAG pipeline, provider-agnostic LLM
-  - Phase 6: WhatsApp webhook, end-to-end chatbot flow, chat visibility
-- M2 (v2.0) complete: Flutter Frontend — 4 phases, 16 plans executed
-  - Phase 7: Flutter scaffold, OTP auth, role-based navigation, GoRouter + Riverpod
-  - Phase 8: 6 client screens (Dashboard, Chat, Documents, Notifications, Support)
-  - Phase 9: 4 staff screens (Dashboard KPIs, Schedule, AI Data, Document Management)
-  - Phase 10: Cross-platform polish — dark mode, responsive layouts, shared UX widgets, TTL cache, accessibility
+**Both milestones delivered:**
+- v1.0 (Backend + AI + MCP): 6 phases, 47 plans — shipped 2026-05-04
+- v2.0 (Flutter Frontend): 11 phases, 30 plans — shipped 2026-05-07
 
-## Evolution
+**Total:** 17 phases, 77 plans, ~557 commits across 30 days.
 
-Este documento evolui a cada transição de fase e marco de milestone.
-
-**Após cada transição de fase** (via `/gsd-transition`):
-1. Requirements invalidados? → Mover para Out of Scope com razão
-2. Requirements validados? → Mover para Validated com referência da fase
-3. Novos requirements emergiram? → Adicionar em Active
-4. Decisões a registrar? → Adicionar em Key Decisions
-5. "What This Is" ainda preciso? → Atualizar se driftar
-
-**Após cada milestone** (via `/gsd-complete-milestone`):
-1. Revisão completa de todas as seções
-2. Core Value check — ainda é a prioridade certa?
-3. Auditar Out of Scope — razões ainda válidas?
-4. Atualizar Context com estado atual
+Project is feature-complete for the desafio scope. No active milestone.
 
 ---
-*Last updated: 2026-05-05 — Phase 10 (Cross-Platform Polish) complete, M2 Flutter Frontend milestone delivered*
+
+_Last updated: 2026-05-07 after v2.0 milestone_
