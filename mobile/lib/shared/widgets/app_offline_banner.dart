@@ -52,10 +52,14 @@ class _AppOfflineBannerState extends State<AppOfflineBanner> {
         children: [
           Icon(Icons.wifi_off, size: 14, color: theme.colorScheme.onErrorContainer),
           const SizedBox(width: 8),
-          Text(
-            'Sem conexao',
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: theme.colorScheme.onErrorContainer,
+          Flexible(
+            child: Text(
+              'Sem conexao',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.colorScheme.onErrorContainer,
+              ),
             ),
           ),
         ],
