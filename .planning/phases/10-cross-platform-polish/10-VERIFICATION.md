@@ -1,8 +1,9 @@
 ---
 phase: 10-cross-platform-polish
-verified: 2026-05-07T20:45:00Z
-status: human_needed
-score: 4/4 must-haves verified (automated); 1/1 gap-closure plan 10-06 verified (automated); UI-NFR-02 full closure pending device retest
+verified: 2026-05-07T18:55:00Z
+status: passed
+score: 4/4 must-haves verified (automated) + 1/1 gap-closure plan 10-06 verified (automated) + UAT Test 4 accepted by user after device retest
+user_acceptance: "Residual minor overflow at OS max font scale accepted as tolerable (2026-05-07) — no further fix required"
 overrides_applied: 0
 re_verification:
   previous_status: human_needed
@@ -16,8 +17,9 @@ re_verification:
     - "Client home _SummaryGlassCard header Column wrapped in Expanded with maxLines:1+ellipsis on title/subtitle; bottomLabel wrapped in Flexible; Quick Actions label hardened with maxLines:2+ellipsis (root cause B.3)"
     - "AppOfflineBanner 'Sem conexao' Text wrapped in Flexible + maxLines:1 + ellipsis (root cause B.4)"
     - "14 chip/badge Text sites across 8 feature screens defensively patched with maxLines:1 + TextOverflow.ellipsis"
-  gaps_remaining:
-    - "UI-NFR-02 UAT Test 4 retest at OS max font scale on device/emulator — code landed but visual confirmation is inherently human (browser zoom is NOT equivalent per plan 10-06 verification block line 595)"
+  gaps_remaining: []
+  gaps_accepted:
+    - "UI-NFR-02 — residual minor overflow at OS max font scale after 1.3x textScaler clamp + defensive wraps. User retested on device (2026-05-07) and accepted current state as tolerable; no further remediation planned."
   regressions: []
 human_verification:
   - test: "Render screens on phone (360dp), tablet (768dp), and web (1280dp+)"

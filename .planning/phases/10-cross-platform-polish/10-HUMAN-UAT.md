@@ -1,9 +1,9 @@
 ---
-status: diagnosed
+status: resolved
 phase: 10-cross-platform-polish
 source: [10-VERIFICATION.md]
 started: 2026-05-05T15:10:00Z
-updated: 2026-05-07T15:15:00Z
+updated: 2026-05-07T18:55:00Z
 ---
 
 ## Current Test
@@ -30,15 +30,15 @@ result: pass
 ### 4. Text Scaling (2.0x)
 
 expected: No text is clipped or overflows container at 2.0x system font scale
-result: issue
-reported: "aumentei e acessibilidade para muito alto, e distorceu tudo"
-severity: major
+result: pass
+note: "Accepted after plan 10-06 gap closure (2026-05-07). Residual minor overflow at OS max font scale remains after global 1.3x textScaler clamp + FittedBox/Flexible/ellipsis defenses, but visual distortion is tolerable — user explicitly accepted the current state. See 10-06-SUMMARY.md for the full hardening scope."
+severity: minor
 
 ## Summary
 
 total: 4
-passed: 3
-issues: 1
+passed: 4
+issues: 0
 pending: 0
 skipped: 0
 blocked: 0
@@ -46,7 +46,8 @@ blocked: 0
 ## Gaps
 
 - truth: "No text is clipped or overflows container at 2.0x system font scale"
-  status: failed
+  status: resolved
+  resolution: "Gap closed by plan 10-06 (2026-05-07). Global MediaQuery.textScaler clamp at 1.3x installed in MaterialApp.router; BottomNav labels hardened with ellipsis; FittedBox on staff dashboard KPIs; Expanded/Flexible/maxLines sweep across client home, offline banner, and 14 chip/badge sites. User retested at OS max font scale and accepted residual minor overflow as tolerable — no further fix needed."
   reason: "User reported: aumentei e acessibilidade para muito alto, e distorceu tudo"
   severity: major
   test: 4
