@@ -5,7 +5,7 @@
 **Coverage:** 17/17 requirements mapped
 **Last Updated:** 2026-05-07
 **Previous Milestone:** M1 — Backend + AI Service + MCP Server (Phases 1-6, complete)
-**Status:** In Progress — 8/11 phases complete (73%)
+**Status:** In Progress — 9/11 phases complete (82%)
 
 ---
 
@@ -27,7 +27,8 @@
  (completed 2026-05-06)
 - [x] **Phase 14: Human Intervention** — Tela de intervenção humana (gestor assume chats não resolvidos pelo bot, responde via WhatsApp)
  (completed 2026-05-06)
-- [ ] **Phase 15: Requirements Traceability Sync** — Fix checkboxes, add 30 untracked requirements (RES-01..14, HI-01..16) to traceability table, update coverage
+- [x] **Phase 15: Requirements Traceability Sync** — Fix checkboxes, add 30 untracked requirements (RES-01..14, HI-01..16) to traceability table, update coverage
+ (completed 2026-05-07)
 - [ ] **Phase 16: Auth & Router Tech Debt** — Fix async void interceptor patterns, GlobalKey router issue, guard debug logging
 - [ ] **Phase 17: Loading State Polish** — Replace remaining CircularProgressIndicator with skeleton widgets in chat/AI screens
 
@@ -232,7 +233,7 @@ Plans:
 **Plans:** 1 plan
 
 Plans:
-- [ ] 15-01-PLAN.md — Verify traceability completeness and mark phase done
+- [x] 15-01-PLAN.md — Verify traceability completeness and mark phase done
 
 ---
 
@@ -279,6 +280,6 @@ Plans:
 | 12. Frontend-Backend Integration | 3/3 | Complete | 2026-05-06 |
 | 13. Resource Allocation | 3/3 | Complete | 2026-05-06 |
 | 14. Human Intervention | 2/2 | Complete | 2026-05-06 |
-| 15. Requirements Traceability Sync | 0/1 | Ready | — |
+| 15. Requirements Traceability Sync | 1/1 | Complete | 2026-05-07 |
 | 16. Auth & Router Tech Debt | 0/0 | Planned | — |
 | 17. Loading State Polish | 0/0 | Planned | — |
