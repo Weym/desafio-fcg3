@@ -146,15 +146,19 @@ class StaffDashboardScreen extends ConsumerWidget {
                                     Icon(Icons.smart_toy,
                                         size: 20, color: colors.primary),
                                     const SizedBox(width: 8),
-                                    Text(
-                                      'Insights de Eficiência IA',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleSmall
-                                          ?.copyWith(
-                                            fontWeight: FontWeight.bold,
-                                            color: colors.onSurface,
-                                          ),
+                                    Expanded(
+                                      child: Text(
+                                        'Insights de Eficiência IA',
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleSmall
+                                            ?.copyWith(
+                                              fontWeight: FontWeight.bold,
+                                              color: colors.onSurface,
+                                            ),
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -311,21 +315,29 @@ class _KpiCard extends StatelessWidget {
             child: Icon(icon, color: iconColor, size: 20),
           ),
           const Spacer(),
-          Text(
-            value,
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: iconColor,
-                ),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              value,
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: iconColor,
+                  ),
+            ),
           ),
           const SizedBox(height: 2),
-          Text(
-            label,
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.5,
-                  color: colors.onSurfaceVariant,
-                ),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              label,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5,
+                    color: colors.onSurfaceVariant,
+                  ),
+            ),
           ),
         ],
       ),
