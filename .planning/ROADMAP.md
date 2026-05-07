@@ -266,6 +266,11 @@ Plans:
 3. Skeleton widgets match existing patterns from shared UX widgets (Phase 10).
 4. Loading states render correctly on phone, tablet, and web breakpoints.
 
+**Plans:** 1 plan
+
+Plans:
+- [ ] 17-01-PLAN.md — Create AppSkeletonChat widget + replace spinners in chat detail screens
+
 ---
 
 ## Progress
