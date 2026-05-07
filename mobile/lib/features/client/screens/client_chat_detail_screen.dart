@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/app_bar_actions.dart';
+import '../../../shared/widgets/app_skeleton_chat.dart';
+import '../../../shared/widgets/app_skeleton_list.dart';
 import '../models/chat_message_model.dart';
 import '../models/action_log_model.dart';
 import '../providers/chat_provider.dart';
@@ -69,7 +71,7 @@ class _MessagesTab extends ConsumerWidget {
     final messagesAsync = ref.watch(chatMessagesProvider(sessionId));
 
     return messagesAsync.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => const AppSkeletonChat(),
       error: (error, stack) => Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -200,7 +202,7 @@ class _ActionsTab extends ConsumerWidget {
     final actionsAsync = ref.watch(actionLogsProvider(sessionId));
 
     return actionsAsync.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => const AppSkeletonList(itemCount: 3, itemHeight: 56),
       error: (error, stack) => Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
