@@ -1,3 +1,12 @@
+# --- Python 3.10 compat: backport `Self` into typing for 3.11+ code ---
+import sys as _sys
+if _sys.version_info < (3, 11):
+    import typing as _typing
+    if not hasattr(_typing, "Self"):
+        from typing_extensions import Self as _Self
+        _typing.Self = _Self
+# -----------------------------------------------------------------
+
 # --- env preload (MUST precede any backend.* import) ---
 # backend/src/infrastructure/config.py declares Settings with required fields
 # that Pydantic Settings instantiates at import time. Without preloading,
