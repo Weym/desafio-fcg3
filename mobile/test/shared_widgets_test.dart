@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:frontend/shared/widgets/app_empty_state.dart';
 import 'package:frontend/shared/widgets/app_error_state.dart';
 import 'package:frontend/shared/widgets/app_skeleton_card.dart';
+import 'package:frontend/shared/widgets/app_skeleton_chat.dart';
 import 'package:frontend/shared/widgets/app_skeleton_list.dart';
 import 'package:frontend/shared/widgets/responsive_container.dart';
 import 'package:shimmer/shimmer.dart';
@@ -241,6 +242,46 @@ void main() {
           tester.renderObject(find.byKey(const Key('child'))) as RenderBox;
       // Child should not exceed maxWidth.
       expect(childBox.size.width, lessThanOrEqualTo(720));
+    });
+  });
+
+  group('AppSkeletonChat', () {
+    testWidgets('wraps content in a Shimmer', (tester) async {
+      await tester.pumpWidget(_wrap(const AppSkeletonChat()));
+      expect(find.byType(Shimmer), findsOneWidget);
+    });
+
+    testWidgets('renders default 7 skeleton bars', (tester) async {
+      await tester.pumpWidget(_wrap(const AppSkeletonChat()));
+      final aligns = find.descendant(
+        of: find.byType(Shimmer),
+        matching: find.byType(Align),
+      );
+      expect(aligns, findsNWidgets(7));
+    });
+
+    testWidgets('renders custom itemCount', (tester) async {
+      await tester.pumpWidget(_wrap(const AppSkeletonChat(itemCount: 4)));
+      final aligns = find.descendant(
+        of: find.byType(Shimmer),
+        matching: find.byType(Align),
+      );
+      expect(aligns, findsNWidgets(4));
+    });
+
+    testWidgets('alternates left and right alignment', (tester) async {
+      await tester.pumpWidget(_wrap(const AppSkeletonChat(itemCount: 4)));
+      final aligns = tester.widgetList<Align>(
+        find.descendant(
+          of: find.byType(Shimmer),
+          matching: find.byType(Align),
+        ),
+      ).toList();
+      // Even indices (0, 2) = centerLeft, odd (1, 3) = centerRight
+      expect(aligns[0].alignment, Alignment.centerLeft);
+      expect(aligns[1].alignment, Alignment.centerRight);
+      expect(aligns[2].alignment, Alignment.centerLeft);
+      expect(aligns[3].alignment, Alignment.centerRight);
     });
   });
 }
