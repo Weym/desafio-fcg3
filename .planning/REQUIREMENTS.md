@@ -1,8 +1,9 @@
 # Requirements — Desafio FCG3
 
-**Version:** 2.0
+**Version:** 2.1
 **Milestone:** M2 — Flutter Frontend
-**Date:** 2026-05-04
+**Date:** 2026-05-07
+**Coverage:** 47/47 requirements mapped
 
 ---
 
@@ -10,9 +11,9 @@
 
 ### Flutter Infrastructure & Auth
 
-- [ ] **UI-INFRA-01**: App inicia com navegação baseada em perfil — Client e Provider/Staff veem rotas dedicadas
+- [x] **UI-INFRA-01**: App inicia com navegação baseada em perfil — Client e Provider/Staff veem rotas dedicadas
 - [x] **UI-INFRA-02**: Fluxo de autenticação (OTP email → JWT) integrado com backend FastAPI existente
-- [ ] **UI-INFRA-03**: JWT armazenado via flutter_secure_storage com detecção de expiração/revogação e redirecionamento para login
+- [x] **UI-INFRA-03**: JWT armazenado via flutter_secure_storage com detecção de expiração/revogação e redirecionamento para login
 
 ---
 
@@ -45,6 +46,46 @@
 
 ---
 
+### Resource Allocation (Phase 13)
+
+- [x] **RES-01**: Backend suporta 6 tipos de recurso (room, lab, equipment, auditorium, study_room, sports_court) com campo description
+- [x] **RES-02**: Recursos possuem flag requires_authorization (boolean)
+- [x] **RES-03**: Staff CRUD de recursos via API REST (create, read, update, soft-delete)
+- [x] **RES-04**: Upload de autorização para agendamentos (PDF/JPG/PNG, limite 5MB)
+- [x] **RES-05**: Seed data com recursos diversos de todos os 6 tipos
+- [x] **RES-06**: Staff visualiza lista de todos os recursos na tela dedicada "Recursos"
+- [x] **RES-07**: Staff cria novo recurso com nome, tipo, capacidade, localização, descrição e flag de autorização
+- [x] **RES-08**: Staff edita propriedades de recursos existentes
+- [x] **RES-09**: Staff desativa (soft-delete) recurso
+- [x] **RES-10**: Aluno visualiza recursos disponíveis com filtro por tipo
+- [x] **RES-11**: Badge visual indicando recurso que exige autorização
+- [x] **RES-12**: Aluno seleciona recurso, horário e agenda (upload obrigatório quando requer autorização)
+- [x] **RES-13**: Aluno visualiza seus agendamentos
+- [x] **RES-14**: Aluno cancela agendamentos futuros
+
+---
+
+### Human Intervention (Phase 14)
+
+- [x] **HI-01**: chat_sessions.status suporta 4 valores (active, closed, human_needed, human_active)
+- [x] **HI-02**: chat_sessions possui assigned_staff_id FK para staff
+- [x] **HI-03**: Escalação automática por keywords ("atendente", "humano") ou resposta contendo "procurar a secretaria"
+- [x] **HI-04**: Aluno recebe mensagem de confirmação ao escalar para humano
+- [x] **HI-05**: Webhook não processa AI quando sessão está em human_needed/human_active
+- [x] **HI-06**: Staff assume sessão via POST /chat-sessions/{id}/assign
+- [x] **HI-07**: Staff envia mensagem via POST /chat-sessions/{id}/reply (salva no DB + envia WhatsApp)
+- [x] **HI-08**: Staff resolve sessão via PUT /chat-sessions/{id}/resolve
+- [x] **HI-09**: Validação: sessão deve estar em human_active com assigned_staff_id == current_user
+- [x] **HI-10**: Mensagem do aluno durante human_active é salva mas não aciona AI
+- [x] **HI-11**: Tab "Intervenção" no staff shell com contagem de sessões pendentes
+- [x] **HI-12**: Lista de sessões human_needed e human_active na tela de intervenção
+- [x] **HI-13**: Cards mostram nome do aluno, RA, última mensagem antes de escalar, status badge, tempo decorrido
+- [x] **HI-14**: Botão "Assumir Conversa" chama POST /assign e abre chat detail
+- [x] **HI-15**: Chat detail com histórico completo + campo de resposta (POST /reply)
+- [x] **HI-16**: Botão "Resolver" chama PUT /resolve e retorna à lista
+
+---
+
 ## v1 Requirements (Previous Milestone — M1 Backend + AI + MCP)
 
 > M1 requirements are preserved in git history. See `REQUIREMENTS.md` at any commit before 2026-05-04.
@@ -73,13 +114,13 @@
 
 ## Traceability
 
-*Mapeamento de requisitos para fases do roadmap — gerado em 2026-05-04.*
+*Mapeamento de requisitos para fases do roadmap — atualizado em 2026-05-07.*
 
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
-| UI-INFRA-01 | Phase 7: Flutter Scaffold & Auth | Pending |
+| UI-INFRA-01 | Phase 7: Flutter Scaffold & Auth | Complete |
 | UI-INFRA-02 | Phase 7: Flutter Scaffold & Auth | Complete |
-| UI-INFRA-03 | Phase 7: Flutter Scaffold & Auth | Pending |
+| UI-INFRA-03 | Phase 7: Flutter Scaffold & Auth | Complete |
 | UI-NFR-03 | Phase 7: Flutter Scaffold & Auth | Complete |
 | UI-C01 | Phase 8: Client Interface | Complete |
 | UI-C02 | Phase 8: Client Interface | Complete |
@@ -94,3 +135,33 @@
 | UI-F04 | Phase 9: Staff Interface | Complete |
 | UI-NFR-02 | Phase 10: Cross-Platform Polish | Complete |
 | UI-NFR-04 | Phase 10: Cross-Platform Polish | Complete |
+| RES-01 | Phase 13: Resource Allocation | Complete |
+| RES-02 | Phase 13: Resource Allocation | Complete |
+| RES-03 | Phase 13: Resource Allocation | Complete |
+| RES-04 | Phase 13: Resource Allocation | Complete |
+| RES-05 | Phase 13: Resource Allocation | Complete |
+| RES-06 | Phase 13: Resource Allocation | Complete |
+| RES-07 | Phase 13: Resource Allocation | Complete |
+| RES-08 | Phase 13: Resource Allocation | Complete |
+| RES-09 | Phase 13: Resource Allocation | Complete |
+| RES-10 | Phase 13: Resource Allocation | Complete |
+| RES-11 | Phase 13: Resource Allocation | Complete |
+| RES-12 | Phase 13: Resource Allocation | Complete |
+| RES-13 | Phase 13: Resource Allocation | Complete |
+| RES-14 | Phase 13: Resource Allocation | Complete |
+| HI-01 | Phase 14: Human Intervention | Complete |
+| HI-02 | Phase 14: Human Intervention | Complete |
+| HI-03 | Phase 14: Human Intervention | Complete |
+| HI-04 | Phase 14: Human Intervention | Complete |
+| HI-05 | Phase 14: Human Intervention | Complete |
+| HI-06 | Phase 14: Human Intervention | Complete |
+| HI-07 | Phase 14: Human Intervention | Complete |
+| HI-08 | Phase 14: Human Intervention | Complete |
+| HI-09 | Phase 14: Human Intervention | Complete |
+| HI-10 | Phase 14: Human Intervention | Complete |
+| HI-11 | Phase 14: Human Intervention | Complete |
+| HI-12 | Phase 14: Human Intervention | Complete |
+| HI-13 | Phase 14: Human Intervention | Complete |
+| HI-14 | Phase 14: Human Intervention | Complete |
+| HI-15 | Phase 14: Human Intervention | Complete |
+| HI-16 | Phase 14: Human Intervention | Complete |

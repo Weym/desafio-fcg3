@@ -3,7 +3,7 @@
 **Milestone:** M2 — Flutter Frontend
 **Granularity:** Standard
 **Coverage:** 17/17 requirements mapped
-**Last Updated:** 2026-05-06
+**Last Updated:** 2026-05-07
 **Previous Milestone:** M1 — Backend + AI Service + MCP Server (Phases 1-6, complete)
 
 ---
@@ -26,6 +26,9 @@
  (completed 2026-05-06)
 - [x] **Phase 14: Human Intervention** — Tela de intervenção humana (gestor assume chats não resolvidos pelo bot, responde via WhatsApp)
  (completed 2026-05-06)
+- [ ] **Phase 15: Requirements Traceability Sync** — Fix checkboxes, add 30 untracked requirements (RES-01..14, HI-01..16) to traceability table, update coverage
+- [ ] **Phase 16: Auth & Router Tech Debt** — Fix async void interceptor patterns, GlobalKey router issue, guard debug logging
+- [ ] **Phase 17: Loading State Polish** — Replace remaining CircularProgressIndicator with skeleton widgets in chat/AI screens
 
 ---
 
@@ -212,6 +215,52 @@ Plans:
 
 ---
 
+### Phase 15: Requirements Traceability Sync
+
+**Goal:** Close process debt — fix incorrect checkboxes, add 30 untracked requirements from Phases 13-14 to the REQUIREMENTS.md traceability table, and update coverage count so the milestone audit can pass.
+**Depends on:** Phase 14
+**Requirements:** UI-INFRA-01, UI-INFRA-03, RES-01..14, HI-01..16
+**Gap Closure:** Closes process debt from M2 audit
+
+### Success Criteria
+1. UI-INFRA-01 and UI-INFRA-03 checkboxes marked `[x]` (verified as satisfied by audit).
+2. RES-01 through RES-14 appear in traceability table mapped to Phase 13, status Complete.
+3. HI-01 through HI-16 appear in traceability table mapped to Phase 14, status Complete.
+4. Coverage count updated to reflect 47/47 requirements mapped.
+
+---
+
+### Phase 16: Auth & Router Tech Debt
+
+**Goal:** Fix reliability issues in Flutter auth interceptor and router that could cause runtime failures — async void patterns that silently drop token attachment and refresh, GlobalKey misuse causing crashes on auth transitions, and debug logging leaking to release builds.
+**Depends on:** Phase 15
+**Requirements:** UI-INFRA-03 (JWT reliability), UI-NFR-03 (auth robustness)
+**Gap Closure:** Closes code tech debt from M2 audit (CR-01, CR-02, CR-03, debugLogDiagnostics)
+
+### Success Criteria
+1. `auth_interceptor.dart` `onRequest` properly awaits token attachment (no fire-and-forget).
+2. `auth_interceptor.dart` `onError` properly awaits refresh logic (401 triggers refresh).
+3. `app_router.dart` no longer uses module-level GlobalKey that triggers rebuild crashes.
+4. `debugLogDiagnostics` guarded behind `kDebugMode` — no debug logging in release.
+5. All 38+ existing Flutter tests continue passing after changes.
+
+---
+
+### Phase 17: Loading State Polish
+
+**Goal:** Replace remaining CircularProgressIndicator widgets in chat/AI detail screens with skeleton shimmer loading states matching the project's shared UX pattern established in Phase 10.
+**Depends on:** Phase 16
+**Requirements:** UI-NFR-01 (intuitive interface), UI-NFR-02 (cross-platform polish)
+**Gap Closure:** Closes UI tech debt from M2 audit
+
+### Success Criteria
+1. Chat detail screen uses SkeletonLoader during data fetch (no CircularProgressIndicator).
+2. AI data detail screen uses SkeletonLoader during data fetch (no CircularProgressIndicator).
+3. Skeleton widgets match existing patterns from shared UX widgets (Phase 10).
+4. Loading states render correctly on phone, tablet, and web breakpoints.
+
+---
+
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
@@ -224,3 +273,6 @@ Plans:
 | 12. Frontend-Backend Integration | 3/3 | Complete | 2026-05-06 |
 | 13. Resource Allocation | 3/3 | Complete | 2026-05-06 |
 | 14. Human Intervention | 2/2 | Complete | 2026-05-06 |
+| 15. Requirements Traceability Sync | 0/1 | Planned | — |
+| 16. Auth & Router Tech Debt | 0/1 | Planned | — |
+| 17. Loading State Polish | 0/1 | Planned | — |
