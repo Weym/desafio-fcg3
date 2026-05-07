@@ -240,6 +240,9 @@ class _GlassBottomNav extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                         item.label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w700,
