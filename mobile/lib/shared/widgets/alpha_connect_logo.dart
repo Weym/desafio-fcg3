@@ -81,10 +81,14 @@ class AlphaConnectLogo extends StatelessWidget {
   }
 }
 
-/// CustomPainter that draws the stylized α (alpha) mark as a filled vector path.
+/// CustomPainter that draws the stylized α (alpha) mark using stroke-based geometry.
 ///
-/// The mark consists of a thick "C" body with an internal counter (eye/hole)
-/// and a descending "x" tail on the right side — matching the Alpha Connect branding.
+/// The mark consists of:
+/// 1. A thick arc (nearly-closed circle) forming the O-body with a gap on the upper-right
+/// 2. A vertically elongated oval counter/eye inside the O-body
+/// 3. Two tail strokes from the gap: upper goes up-right, lower goes down-right (X-tail)
+///
+/// Matches the Alpha Connect reference branding exactly — perfectly upright, no rotation.
 class _AlphaMarkPainter extends CustomPainter {
   _AlphaMarkPainter({required this.color});
 
@@ -92,120 +96,66 @@ class _AlphaMarkPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.fill; // FILLED, not stroke — matching the branding
-
     final w = size.width;
     final h = size.height;
 
-    // Draw the α (alpha) symbol — a FILLED shape:
-    // - Large "C" shape with internal counter (eye/hole)
-    // - Right side extends into a descending "x" tail
-    // The mark is solid/filled, thick, with a distinctive eye in the center.
+    final strokePaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = w * 0.13
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
 
-    // Outer path of the α body (the thick "C" with tail)
-    final outerPath = Path();
+    // 1. The O-body: thick arc (nearly full circle) with gap on upper-right.
+    // Center the O slightly left to leave room for the X-tail.
+    final oCenter = Offset(w * 0.37, h * 0.50);
+    final oRadius = w * 0.30;
+    final oRect = Rect.fromCircle(center: oCenter, radius: oRadius);
 
-    // Start from top-right of the mark, sweep counter-clockwise
-    outerPath.moveTo(w * 0.72, h * 0.08);
+    // Arc from ~50° (below gap) sweeping 300° counter-clockwise back to ~350° (above gap).
+    // Gap is on the upper-right from about -10° to +50° (350° to 50°).
+    // startAngle: 50° = 0.873 rad, sweepAngle: 300° = 5.236 rad
+    final oPath = Path();
+    oPath.addArc(oRect, 0.87, 5.24);
+    canvas.drawPath(oPath, strokePaint);
 
-    // Top curve going left
-    outerPath.cubicTo(
-      w * 0.50, h * 0.0,
-      w * 0.22, h * 0.05,
-      w * 0.12, h * 0.25,
+    // 2. Inner counter (the vertically elongated oval "eye").
+    // Drawn with a thinner stroke to create the elongated hole visible in the reference.
+    final eyePaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = w * 0.11
+      ..strokeCap = StrokeCap.round;
+
+    final eyeCenter = Offset(w * 0.37, h * 0.50);
+    final eyeRect = Rect.fromCenter(
+      center: eyeCenter,
+      width: w * 0.22,
+      height: h * 0.42,
     );
+    final eyePath = Path();
+    eyePath.addOval(eyeRect);
+    canvas.drawPath(eyePath, eyePaint);
 
-    // Left side going down
-    outerPath.cubicTo(
-      w * 0.02, h * 0.45,
-      w * 0.02, h * 0.60,
-      w * 0.12, h * 0.78,
+    // 3. Upper tail stroke: from upper-right of O gap, curving up-right.
+    final upperTail = Path();
+    upperTail.moveTo(w * 0.61, h * 0.26);
+    upperTail.cubicTo(
+      w * 0.70, h * 0.18,
+      w * 0.80, h * 0.10,
+      w * 0.92, h * 0.04,
     );
+    canvas.drawPath(upperTail, strokePaint);
 
-    // Bottom curve going right
-    outerPath.cubicTo(
-      w * 0.22, h * 0.95,
-      w * 0.48, h * 0.98,
-      w * 0.65, h * 0.85,
+    // 4. Lower tail stroke: from lower-right of O gap, curving down-right.
+    final lowerTail = Path();
+    lowerTail.moveTo(w * 0.61, h * 0.74);
+    lowerTail.cubicTo(
+      w * 0.70, h * 0.82,
+      w * 0.80, h * 0.90,
+      w * 0.92, h * 0.97,
     );
-
-    // Inner right — where it narrows before the tail
-    outerPath.cubicTo(
-      w * 0.72, h * 0.78,
-      w * 0.70, h * 0.65,
-      w * 0.62, h * 0.55,
-    );
-
-    // The tail going down-right (the "x" extension)
-    outerPath.cubicTo(
-      w * 0.72, h * 0.62,
-      w * 0.82, h * 0.72,
-      w * 0.92, h * 0.88,
-    );
-
-    // Tail tip
-    outerPath.cubicTo(
-      w * 0.96, h * 0.94,
-      w * 0.98, h * 0.98,
-      w * 0.95, h * 1.0,
-    );
-
-    // Return stroke of tail (inner edge)
-    outerPath.cubicTo(
-      w * 0.88, h * 0.95,
-      w * 0.80, h * 0.82,
-      w * 0.72, h * 0.72,
-    );
-
-    // Inner right going back up
-    outerPath.cubicTo(
-      w * 0.78, h * 0.55,
-      w * 0.82, h * 0.35,
-      w * 0.78, h * 0.20,
-    );
-
-    // Close back to start
-    outerPath.cubicTo(
-      w * 0.76, h * 0.12,
-      w * 0.74, h * 0.10,
-      w * 0.72, h * 0.08,
-    );
-
-    outerPath.close();
-
-    // Inner counter (the "eye" hole in the α)
-    // This creates the negative space in the middle
-    final innerPath = Path();
-    innerPath.moveTo(w * 0.45, h * 0.30);
-    innerPath.cubicTo(
-      w * 0.35, h * 0.32,
-      w * 0.28, h * 0.42,
-      w * 0.28, h * 0.52,
-    );
-    innerPath.cubicTo(
-      w * 0.28, h * 0.62,
-      w * 0.35, h * 0.72,
-      w * 0.45, h * 0.74,
-    );
-    innerPath.cubicTo(
-      w * 0.55, h * 0.72,
-      w * 0.60, h * 0.62,
-      w * 0.60, h * 0.52,
-    );
-    innerPath.cubicTo(
-      w * 0.60, h * 0.42,
-      w * 0.55, h * 0.32,
-      w * 0.45, h * 0.30,
-    );
-    innerPath.close();
-
-    // Combine: outer minus inner (creates the eye hole)
-    final combinedPath =
-        Path.combine(PathOperation.difference, outerPath, innerPath);
-
-    canvas.drawPath(combinedPath, paint);
+    canvas.drawPath(lowerTail, strokePaint);
   }
 
   @override
