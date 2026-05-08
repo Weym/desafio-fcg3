@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alpha Connect - Plataforma Acadêmica com IA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* CONFIGURAÇÕES BASE - ESTILO VISUAL FLAIR */
+        :root {
+            --primary: #1B1B4B;
+            --primary-dark: #10103A;
+            --secondary: #2D2D6B;
+            --accent: #D4A843;
+            --accent-light: #F5E6B8;
+            --surface: #F8F6F1;
+            --surface-alt: #FDF8E8;
+            --on-surface: #1B1B4B;
+            --on-surface-variant: #4A4A6A;
+            --glass: rgba(253, 248, 232, 0.85);
+            --border: rgba(27, 27, 75, 0.1);
+            --navy-bar: #1B2254;
+        }
+
+        * { box-sizing: border-box; }
+        
+        body {
+            background-color: #1B1B4B;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Inter', sans-serif;
+            color: var(--on-surface);
+            overflow: hidden;
+        }
+
+        /* NAVEGAÇÃO E PROGRESSO */
+        .nav-controls {
+            position: fixed;
+            bottom: 30px;
+            right: 40px;
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+            opacity: 0.3;
+            transition: opacity 0.3s;
+        }
+        .nav-controls:hover { opacity: 1; }
+        .nav-btn {
+            background: var(--primary);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fff;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        .nav-btn:hover { background: var(--accent); border-color: var(--accent); color: var(--primary); }
+
+        .progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(to right, var(--accent), var(--primary));
+            z-index: 101;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 30px;
+            left: 40px;
+            font-family: 'Plus Jakarta Sans';
+            font-weight: 700;
+            font-size: 18px;
+            color: rgba(255,255,255,0.5);
+            z-index: 100;
+        }
+
+        /* CONTAINER DE SLIDES */
+        .slides-wrapper {
+            position: relative;
+            width: 1280px;
+            height: 720px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .slide-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--surface);
+            border-radius: 12px;
+            box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 80px;
+            border: none;
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(0.95) translateY(30px);
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), 
+                        transform 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+                        visibility 0.8s;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .slide-container.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1) translateY(0);
+            z-index: 2;
+        }
+
+        /* FRAMING VARIANTS */
+        /* Top-aligned: content starts from top */
+        .frame-top { justify-content: flex-start; padding-top: 60px; }
+        
+        /* Bottom-heavy: navy block at bottom, content pushed up */
+        .frame-bottom-bar { padding-bottom: 0; }
+        .frame-bottom-bar .bottom-bar {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 100px;
+            background: var(--navy-bar);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 80px;
+        }
+        .frame-bottom-bar .bottom-bar p { color: rgba(255,255,255,0.7); font-size: 18px; margin: 0; }
+        
+        /* Full navy background */
+        .frame-navy { background: var(--navy-bar); }
+        .frame-navy h1, .frame-navy h2, .frame-navy h3 { color: #FFFFFF; }
+        .frame-navy p, .frame-navy li { color: rgba(255,255,255,0.75); }
+        .frame-navy .accent { color: var(--accent); }
+        .frame-navy::after { display: none; }
+        .frame-navy::before { background: repeating-linear-gradient(45deg, transparent, transparent 6px, rgba(212, 168, 67, 0.1) 6px, rgba(212, 168, 67, 0.1) 8px); }
+        
+        /* Split: left panel navy, right panel cream - no padding */
+        .frame-split { padding: 0; flex-direction: row; }
+        .frame-split::after { display: none; }
+        .frame-split::before { bottom: 40px; right: 40px; left: auto; }
+        .frame-split .split-left {
+            width: 45%;
+            height: 100%;
+            background: var(--navy-bar);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 60px;
+        }
+        .frame-split .split-left h2 { color: #FFFFFF; font-size: 44px; text-transform: uppercase; letter-spacing: -1px; line-height: 1.1; }
+        .frame-split .split-left p { color: rgba(255,255,255,0.7); font-size: 19px; margin-top: 20px; }
+        .frame-split .split-right {
+            width: 55%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 60px;
+        }
+
+        /* Asymmetric padding - wide left margin */
+        .frame-asymmetric { padding: 60px 80px 60px 140px; }
+
+        /* Compact top with accent stripe */
+        .frame-stripe-top { padding-top: 100px; }
+        .frame-stripe-top::after {
+            height: 60px;
+            background: var(--navy-bar);
+            border-radius: 12px 12px 0 0;
+        }
+
+        /* Full-bleed content area */
+        .frame-flush { padding: 0; }
+
+        /* DECORATIVE CHEVRON PATTERN */
+        .slide-container::before {
+            content: '';
+            position: absolute;
+            bottom: 60px;
+            left: 60px;
+            width: 120px;
+            height: 120px;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 6px,
+                rgba(212, 168, 67, 0.15) 6px,
+                rgba(212, 168, 67, 0.15) 8px
+            );
+            z-index: 0;
+            border-radius: 8px;
+        }
+
+        .slide-container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: var(--navy-bar);
+            border-radius: 12px 12px 0 0;
+            z-index: 0;
+        }
+
+        .slide-container > * { position: relative; z-index: 1; }
+
+        /* TIPOGRAFIA */
+        h1, h2, h3 { font-family: 'Plus Jakarta Sans', sans-serif; color: var(--primary); margin: 0; font-weight: 800; text-transform: uppercase; }
+        p, li { color: var(--on-surface-variant); font-size: 20px; line-height: 1.6; }
+        .accent { color: var(--accent); }
+
+        h1 { font-size: 80px; line-height: 1.05; text-align: center; letter-spacing: -2px; }
+        .slide-title {
+            font-size: 44px;
+            font-weight: 800;
+            margin-bottom: 40px;
+            text-align: left;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+        }
+        .slide-title::before {
+            content: '';
+            display: block;
+            width: 6px;
+            height: 48px;
+            background: var(--accent);
+            border-radius: 3px;
+        }
+
+        .content-area {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            justify-content: center;
+            width: 100%;
+        }
+
+        /* LAYOUTS ESPECÍFICOS */
+        .title-layout { text-align: center; }
+        .subtitle { font-size: 28px; color: var(--on-surface-variant); margin-top: 10px; font-weight: 500; opacity: 0.9; text-transform: none; }
+
+        .two-column { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; width: 100%; }
+        
+        .tiled-box {
+            background: var(--surface-alt);
+            border-radius: 16px;
+            padding: 40px;
+            border: 1px solid var(--border);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+        .tiled-box:hover {
+            border-color: var(--accent);
+            transform: translateY(-5px);
+        }
+        .tiled-box h3 { color: var(--accent); font-size: 24px; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .image-wrapper { 
+            border-radius: 16px; 
+            overflow: hidden; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            height: 100%;
+            width: 100%;
+            border: 1px solid var(--border);
+        }
+        .image-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+        .contain-img img { object-fit: contain; background: var(--surface-alt); }
+
+        .icon-tile-container { display: flex; gap: 30px; width: 100%; }
+        .icon-tile {
+            flex: 1;
+            background: var(--surface-alt);
+            padding: 50px 40px;
+            border-radius: 16px;
+            text-align: center;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+        .icon-tile:hover {
+            background: rgba(212, 168, 67, 0.08);
+            border-color: var(--accent);
+        }
+        .icon-tile i { font-size: 60px; color: var(--accent); margin-bottom: 30px; }
+
+        /* TABELA */
+        .table-layout table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 20px; overflow: hidden; border-radius: 12px; border: 1px solid var(--border); }
+        .table-layout th { background: var(--navy-bar); color: #FFFFFF; padding: 24px; text-align: left; font-size: 20px; font-family: 'Plus Jakarta Sans'; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .table-layout td { padding: 20px 24px; border-bottom: 1px solid var(--border); color: var(--on-surface); font-size: 18px; }
+        .table-layout tr:last-child td { border-bottom: none; }
+        .table-layout tr:nth-child(even) { background: var(--surface-alt); }
+
+        /* TIMELINE */
+        .timeline-layout { display: flex; justify-content: space-between; position: relative; width: 100%; padding: 60px 0; }
+        .timeline-line { position: absolute; top: 50%; left: 0; width: 100%; height: 3px; background: linear-gradient(to right, var(--accent), var(--primary)); opacity: 0.3; z-index: 0; }
+        .timeline-item { width: 30%; position: relative; z-index: 1; text-align: center; }
+        .timeline-dot { width: 28px; height: 28px; background: var(--accent); border-radius: 50%; margin: 0 auto 25px; border: 6px solid var(--surface); box-shadow: 0 0 0 3px var(--accent); }
+        .timeline-item h3 { font-size: 22px; color: var(--primary); margin-bottom: 15px; }
+
+        /* BLEED IMAGE */
+        .bleed-image-layout { padding: 0; display: grid; grid-template-columns: 1fr 1fr; align-items: stretch; }
+        .bleed-image-layout::after { display: none; }
+        .bleed-image-layout::before { bottom: 40px; left: 40px; }
+        .bleed-text { padding: 80px; display: flex; flex-direction: column; justify-content: center; height: 100%; background: var(--surface); }
+        .bleed-img-side { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.9) contrast(1.05); }
+
+        /* HIGHLIGHT NUMBER */
+        .number-layout { display: flex; align-items: center; gap: 60px; }
+        .big-number { font-size: 220px; font-weight: 800; color: var(--accent); line-height: 1; font-family: 'Plus Jakarta Sans'; letter-spacing: -10px; }
+        .number-label { font-size: 36px; color: var(--primary); font-weight: 700; line-height: 1.2; text-transform: uppercase; }
+
+        /* SEÇÃO TÍTULO */
+        .section-title-layout { text-align: center; }
+        .section-title-layout hr { width: 120px; height: 4px; background: var(--accent); border: none; margin: 30px auto; border-radius: 2px; }
+        .section-title-layout h2 { font-size: 64px; letter-spacing: -2px; }
+
+        .bullet-list { list-style: none; padding: 0; }
+        .bullet-list li { margin-bottom: 20px; position: relative; padding-left: 40px; font-size: 21px; }
+        .bullet-list li::before { content: '\f058'; font-family: 'Font Awesome 6 Free'; font-weight: 900; position: absolute; left: 0; color: var(--accent); }
+
+        /* NUMBERED GRID - inspired by flair architecture slide */
+        .numbered-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; width: 100%; }
+        .numbered-card {
+            background: linear-gradient(135deg, var(--surface-alt) 0%, rgba(212,168,67,0.08) 100%);
+            border-radius: 16px;
+            padding: 36px;
+            border: 1px solid var(--border);
+            position: relative;
+        }
+        .numbered-card .card-number {
+            font-family: 'Plus Jakarta Sans';
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--accent);
+            line-height: 1;
+            margin-bottom: 12px;
+        }
+        .numbered-card h3 { font-size: 20px; margin-bottom: 10px; letter-spacing: 0.5px; }
+        .numbered-card p { font-size: 17px; margin: 0; }
+
+        /* LEFT-HEAVY LAYOUT - big title left, features right */
+        .left-heavy { display: grid; grid-template-columns: 2fr 3fr; gap: 60px; width: 100%; align-items: start; }
+        .left-heavy-title { font-size: 42px; font-weight: 800; color: var(--primary); text-transform: uppercase; line-height: 1.1; letter-spacing: -1px; }
+        .left-heavy-subtitle { font-size: 20px; color: var(--on-surface-variant); margin-top: 24px; line-height: 1.5; text-transform: none; font-weight: 400; }
+
+        /* FEATURE ROW - icon + title + description horizontal */
+        .feature-rows { display: flex; flex-direction: column; gap: 28px; }
+        .feature-row {
+            display: flex; align-items: flex-start; gap: 20px;
+            padding: 20px 24px;
+            background: var(--surface-alt);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        .feature-row i { font-size: 28px; color: var(--accent); margin-top: 4px; flex-shrink: 0; }
+        .feature-row h4 { font-family: 'Plus Jakarta Sans'; font-size: 18px; font-weight: 700; color: var(--primary); text-transform: uppercase; margin: 0 0 6px; }
+        .feature-row p { font-size: 17px; margin: 0; }
+
+        /* STAT CARDS - horizontal row of metric boxes */
+        .stat-row { display: flex; gap: 24px; width: 100%; }
+        .stat-card {
+            flex: 1;
+            text-align: center;
+            padding: 40px 24px;
+            background: var(--navy-bar);
+            border-radius: 16px;
+        }
+        .stat-card .stat-value { font-family: 'Plus Jakarta Sans'; font-size: 56px; font-weight: 800; color: var(--accent); line-height: 1; }
+        .stat-card .stat-label { font-size: 16px; color: rgba(255,255,255,0.8); margin-top: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+
+        /* FLOW DIAGRAM - step-by-step horizontal */
+        .flow-steps { display: flex; align-items: center; gap: 0; width: 100%; justify-content: center; }
+        .flow-step {
+            text-align: center;
+            padding: 24px 20px;
+            flex: 1;
+            max-width: 200px;
+        }
+        .flow-step i { font-size: 36px; color: var(--accent); margin-bottom: 12px; }
+        .flow-step h4 { font-family: 'Plus Jakarta Sans'; font-size: 16px; font-weight: 700; color: var(--primary); text-transform: uppercase; margin: 0 0 8px; }
+        .flow-step p { font-size: 14px; margin: 0; line-height: 1.4; }
+        .flow-arrow { font-size: 28px; color: var(--accent); flex-shrink: 0; margin: 0 4px; }
+        .highlight-block {
+            background: var(--navy-bar);
+            border-radius: 16px;
+            padding: 40px 48px;
+            margin-top: 32px;
+            border-left: 6px solid var(--accent);
+        }
+        .highlight-block p { color: rgba(255,255,255,0.9); font-size: 20px; margin: 0; }
+        .highlight-block .accent { color: var(--accent); }
+    </style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+<div class="slide-counter" id="slideCounter">1 / 17</div>
+
+<div class="nav-controls">
+    <button class="nav-btn" onclick="prevSlide()" title="Anterior (Seta Esquerda)"><i class="fas fa-chevron-left"></i></button>
+    <button class="nav-btn" onclick="nextSlide()" title="Próximo (Seta Direita / Espaço)"><i class="fas fa-chevron-right"></i></button>
+</div>
+
+<div class="slides-wrapper">
+    <div class="slide-container frame-navy active" id="slide1">
+        <div class="title-layout">
+            <h1 class="accent">Alpha Connect</h1>
+            <p class="subtitle" style="color: rgba(255,255,255,0.7);">Plataforma Acadêmica com IA</p>
+            <p style="margin-top: 40px; font-size: 20px; color: rgba(255,255,255,0.6); font-weight: 500; letter-spacing: 1px;">
+                Henry Gabriel &bull; Ricardo Rossi &bull; Caroline Cabral<br>
+                Gabriel Rezende &bull; Weydson Marinho &bull; Felipe Mello
+            </p>
+            <p style="margin-top: 40px; font-size: 24px; color: rgba(255,255,255,0.5);">Unindo IA, Mobilidade e Agilidade</p>
+        </div>
+    </div>
+
+    <div class="slide-container frame-bottom-bar" id="slide2">
+        <div class="section-title-layout">
+            <h2>Visão e Estratégia</h2>
+            <hr>
+            <p>Convertendo fluxos complexos em interações naturais</p>
+        </div>
+        <div class="bottom-bar">
+            <p>SEÇÃO 01 &mdash; PROBLEMA E OPORTUNIDADE</p>
+        </div>
+    </div>
+
+    <div class="slide-container frame-split" id="slide3">
+        <div class="split-left">
+            <h2>O Caos da Comunicação Fragmentada</h2>
+            <p>Portais densos, processos manuais e dados dispersos impedem a experiência acadêmica fluida.</p>
+        </div>
+        <div class="split-right">
+            <div class="numbered-grid">
+                <div class="numbered-card">
+                    <div class="card-number">01</div>
+                    <h3>Fragmentação de Canais</h3>
+                    <p>Informações dispersas entre portais, e-mails e atendimento presencial.</p>
+                </div>
+                <div class="numbered-card">
+                    <div class="card-number">02</div>
+                    <h3>Gestão Manual</h3>
+                    <p>Processos humanos causam erros e atrasos operacionais constantes.</p>
+                </div>
+                <div class="numbered-card">
+                    <div class="card-number">03</div>
+                    <h3>Silêncio de Dados</h3>
+                    <p>Impossibilidade de extrair métricas para decisão estratégica.</p>
+                </div>
+                <div class="numbered-card">
+                    <div class="card-number">04</div>
+                    <h3>Experiência Passiva</h3>
+                    <p>Aluno não recebe proatividade — precisa ir atrás de tudo.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-container frame-top frame-asymmetric" id="slide4">
+        <h2 class="slide-title">WhatsApp como Interface Principal</h2>
+        <div class="content-area">
+            <div class="feature-rows">
+                <div class="feature-row">
+                    <i class="fa-solid fa-brain"></i>
+                    <div>
+                        <h4>Consultas Semânticas</h4>
+                        <p>IA que entende o contexto do curso e a situação individual do aluno.</p>
+                    </div>
+                </div>
+                <div class="feature-row">
+                    <i class="fa-solid fa-bolt"></i>
+                    <div>
+                        <h4>Ações Diretas</h4>
+                        <p>Solicitação de documentos, matrículas e agendamentos em segundos.</p>
+                    </div>
+                </div>
+                <div class="feature-row">
+                    <i class="fa-solid fa-book-open"></i>
+                    <div>
+                        <h4>Base de Conhecimento RAG</h4>
+                        <p>Respostas fundamentadas em documentos oficiais do projeto pedagógico.</p>
+                    </div>
+                </div>
+                <div class="feature-row">
+                    <i class="fa-solid fa-headset"></i>
+                    <div>
+                        <h4>Escalonamento Humano</h4>
+                        <p>Detecção automática de intenção e transferência para atendente real quando necessário.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-container" id="slide5">
+        <div class="content-area">
+            <div class="left-heavy">
+                <div>
+                    <h2 class="left-heavy-title">Interfaces para Cada Perfil</h2>
+                    <p class="left-heavy-subtitle">Duas experiências que otimizam a interação, focando na usabilidade e na eficiência operacional.</p>
+                </div>
+                <div class="two-column" style="gap: 24px;">
+                    <div class="tiled-box" style="text-align: center;">
+                        <i class="fa-solid fa-user-graduate" style="font-size: 48px; color: var(--accent); margin-bottom: 20px;"></i>
+                        <h3>Perfil Cliente</h3>
+                        <p style="font-size: 17px;">Dashboard de progresso, reserva de recursos (salas e labs) e solicitação de documentos.</p>
+                    </div>
+                    <div class="tiled-box" style="text-align: center;">
+                        <i class="fa-solid fa-briefcase" style="font-size: 48px; color: var(--accent); margin-bottom: 20px;"></i>
+                        <h3>Perfil Gestor</h3>
+                        <p style="font-size: 17px;">Atendimento via WhatsApp com escalonamento humano, gestão de agenda e controle de documentos.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-container frame-navy" id="slide6">
+        <div class="section-title-layout">
+            <h2>Infraestrutura e Segurança</h2>
+            <hr>
+            <p>Orquestração distribuída com foco em segurança e escala</p>
+        </div>
+    </div>
+
+    <div class="slide-container frame-top frame-asymmetric" id="slide7">
+        <h2 class="slide-title">Arquitetura do Backend</h2>
+        <div class="content-area">
+            <div class="two-column" style="gap: 40px;">
+                <ul class="bullet-list">
+                    <li><strong>Backend:</strong> FastAPI com processamento assíncrono.</li>
+                    <li><strong>AI Core:</strong> LangChain + Agentes ReAct customizados.</li>
+                    <li><strong>Contexto:</strong> PGVector para busca semântica de alta precisão.</li>
+                    <li><strong>Segurança:</strong> MCP (Model Context Protocol) isolando dados sensíveis.</li>
+                </ul>
+                <div class="numbered-grid" style="gap: 16px;">
+                    <div class="numbered-card" style="padding: 24px; text-align: center;">
+                        <p style="font-size: 15px; margin: 0;"><strong>:8000</strong></p>
+                        <p style="font-size: 13px; margin: 4px 0 0;">FastAPI</p>
+                    </div>
+                    <div class="numbered-card" style="padding: 24px; text-align: center;">
+                        <p style="font-size: 15px; margin: 0;"><strong>:8001</strong></p>
+                        <p style="font-size: 13px; margin: 4px 0 0;">LangChain</p>
+                    </div>
+                    <div class="numbered-card" style="padding: 24px; text-align: center;">
+                        <p style="font-size: 15px; margin: 0;"><strong>:8002</strong></p>
+                        <p style="font-size: 13px; margin: 4px 0 0;">MCP Server</p>
+                    </div>
+                    <div class="numbered-card" style="padding: 24px; text-align: center;">
+                        <p style="font-size: 15px; margin: 0;"><strong>:5432</strong></p>
+                        <p style="font-size: 13px; margin: 4px 0 0;">PostgreSQL</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-container frame-bottom-bar" id="slide7b">
+        <h2 class="slide-title">Fluxo Real: Consulta via WhatsApp</h2>
+        <div class="content-area" style="align-items: center;">
+            <div class="flow-steps">
+                <div class="flow-step">
+                    <i class="fa-brands fa-whatsapp"></i>
+                    <h4>Aluno</h4>
+                    <p>"Quero meu histórico escolar"</p>
+                </div>
+                <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                <div class="flow-step">
+                    <i class="fa-solid fa-server"></i>
+                    <h4>Webhook</h4>
+                    <p>FastAPI valida e despacha async</p>
+                </div>
+                <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                <div class="flow-step">
+                    <i class="fa-solid fa-robot"></i>
+                    <h4>Agente ReAct</h4>
+                    <p>LangChain interpreta intenção + RAG</p>
+                </div>
+                <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                <div class="flow-step">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <h4>MCP Server</h4>
+                    <p>Injeta student_id e chama API</p>
+                </div>
+                <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                <div class="flow-step">
+                    <i class="fa-solid fa-check-circle"></i>
+                    <h4>Resposta</h4>
+                    <p>Documento solicitado com sucesso</p>
+                </div>
+            </div>
+        </div>
+        <div class="bottom-bar">
+            <p>TEMPO TOTAL &lt; 5 SEGUNDOS</p>
+        </div>
+    </div>
+
+    <div class="slide-container frame-split" id="slide8">
+        <div class="split-left">
+            <h2>Stack Tecnológica</h2>
+            <p>Stack projetada para performance, segurança e manutenibilidade.</p>
+        </div>
+        <div class="split-right">
+            <div class="numbered-grid">
+                <div class="numbered-card">
+                    <div class="card-number">01</div>
+                    <h3>Flutter & Riverpod</h3>
+                    <p>App único para Mobile, Tablet e Web com navegação eficiente.</p>
+                </div>
+                <div class="numbered-card">
+                    <div class="card-number">02</div>
+                    <h3>FastAPI & MCP</h3>
+                    <p>Servidor assíncrono de alta performance integrado a um Servidor MCP.</p>
+                </div>
+                <div class="numbered-card">
+                    <div class="card-number">03</div>
+                    <h3>LangChain & RAG</h3>
+                    <p>Processamento avançado via Agente ReAct para consultas contextuais precisas.</p>
+                </div>
+                <div class="numbered-card">
+                    <div class="card-number">04</div>
+                    <h3>Docker & PostgreSQL</h3>
+                    <p>Banco vetorial PGVector em contêineres para total portabilidade.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-container" id="slide9">
+        <h2 class="slide-title">Segurança e o Protocolo MCP</h2>
+        <div class="content-area" style="align-items: center;">
+            <p style="font-size: 22px; margin-bottom: 30px; text-align: center;">O <strong>Model Context Protocol</strong> como camada de segurança entre o agente e a API:</p>
+            <div class="numbered-grid" style="max-width: 900px;">
+                <div class="numbered-card">
+                    <div class="card-number"><i class="fa-solid fa-shield-halved" style="font-size: 32px;"></i></div>
+                    <h3>Isolamento Total</h3>
+                    <p>Abstração completa entre LLM e Banco de Dados.</p>
+                </div>
+                <div class="numbered-card">
+                    <div class="card-number"><i class="fa-solid fa-key" style="font-size: 32px;"></i></div>
+                    <h3>Prevenção IDOR</h3>
+                    <p>student_id nunca exposto ao LLM — injetado por sessão pelo MCP.</p>
+                </div>
+                <div class="numbered-card">
+                    <div class="card-number"><i class="fa-solid fa-clipboard-check" style="font-size: 32px;"></i></div>
+                    <h3>Auditabilidade</h3>
+                    <p>Registro completo de todas as chamadas de ferramentas.</p>
+                </div>
+                <div class="numbered-card">
+                    <div class="card-number"><i class="fa-solid fa-lock" style="font-size: 32px;"></i></div>
+                    <h3>Service Token Auth</h3>
+                    <p>Comunicação interna autenticada via token exclusivo por ambiente.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RAG Pipeline -->
+    <div class="slide-container frame-split" id="slide9b">
+        <div class="split-left">
+            <h2>Pipeline RAG: Base de Conhecimento</h2>
+            <p>Documentos acadêmicos reais transformados em contexto vetorial para respostas precisas.</p>
+        </div>
+        <div class="split-right">
+            <div class="feature-rows">
+                <div class="feature-row">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <div>
+                        <h4>6 Categorias de Fonte</h4>
+                        <p>Regras de matrícula, regulamento, FAQ, currículo, documentos e agendamento.</p>
+                    </div>
+                </div>
+                <div class="feature-row">
+                    <i class="fa-solid fa-scissors"></i>
+                    <div>
+                        <h4>Chunking Otimizado</h4>
+                        <p>RecursiveCharacterTextSplitter com tokenizer cl100k_base — 500 tokens/chunk, 50 overlap.</p>
+                    </div>
+                </div>
+                <div class="feature-row">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <div>
+                        <h4>Busca HNSW Sub-linear</h4>
+                        <p>Índice vetorial com cosine_ops (m=16, ef=64) direto no PostgreSQL — sem serviço externo.</p>
+                    </div>
+                </div>
+                <div class="feature-row">
+                    <i class="fa-solid fa-rotate"></i>
+                    <div>
+                        <h4>Ingest Idempotente</h4>
+                        <p>DELETE + INSERT por source com audit trail — re-execução segura sem duplicatas.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Agente ReAct -->
+    <div class="slide-container frame-top frame-asymmetric" id="slide9c">
+        <h2 class="slide-title">Agente LangChain: Design de Produção</h2>
+        <div class="content-area">
+            <div class="numbered-grid">
+                <div class="numbered-card">
+                    <div class="card-number">01</div>
+                    <h3>Provider-Agnóstico</h3>
+                    <p>Factory pattern suporta OpenAI, Gemini e OpenRouter — troca por env var, sem alterar código.</p>
+                </div>
+                <div class="numbered-card">
+                    <div class="card-number">02</div>
+                    <h3>Stateless by Design</h3>
+                    <p>Agente reconstruído por request. Histórico (k=20) carregado do PostgreSQL via session header.</p>
+                </div>
+                <div class="numbered-card">
+                    <div class="card-number">03</div>
+                    <h3>Guardrails de Execução</h3>
+                    <p>MAX_ITERATIONS=10 contra loops + timeout de 45s com fallback gracioso para a secretaria.</p>
+                </div>
+                <div class="numbered-card">
+                    <div class="card-number">04</div>
+                    <h3>Tools Dinâmicas via MCP</h3>
+                    <p>langchain-mcp-adapters instancia client por sessão — tools carregadas em runtime do servidor.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modelo de Dados -->
+    <div class="slide-container frame-navy" id="slide9d">
+        <h2 class="slide-title" style="color: #fff;">Modelo Relacional: 21 Tabelas</h2>
+        <div class="content-area">
+            <div class="stat-row" style="margin-bottom: 36px;">
+                <div class="stat-card" style="background: rgba(255,255,255,0.08);">
+                    <div class="stat-value" style="font-size: 40px;">draft → confirmed</div>
+                    <div class="stat-label">State Machine de Matrícula</div>
+                </div>
+            </div>
+            <div class="numbered-grid">
+                <div class="numbered-card" style="background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1);">
+                    <div class="card-number" style="font-size: 28px;"><i class="fa-solid fa-sitemap" style="font-size: 24px;"></i></div>
+                    <h3 style="color: #fff;">Pré-requisitos Recursivos</h3>
+                    <p style="color: rgba(255,255,255,0.7);">Grafo N-níveis de dependências entre disciplinas consultável por endpoint.</p>
+                </div>
+                <div class="numbered-card" style="background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1);">
+                    <div class="card-number" style="font-size: 28px;"><i class="fa-solid fa-link" style="font-size: 24px;"></i></div>
+                    <h3 style="color: #fff;">Integridade Referencial</h3>
+                    <p style="color: rgba(255,255,255,0.7);">Notas vinculadas a matrículas confirmadas — FK garante consistência de domínio.</p>
+                </div>
+                <div class="numbered-card" style="background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1);">
+                    <div class="card-number" style="font-size: 28px;"><i class="fa-solid fa-fingerprint" style="font-size: 24px;"></i></div>
+                    <h3 style="color: #fff;">JWT Revogação via JTI</h3>
+                    <p style="color: rgba(255,255,255,0.7);">Lookup O(1) por UUID — invalidação eficiente sem armazenar tokens completos.</p>
+                </div>
+                <div class="numbered-card" style="background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1);">
+                    <div class="card-number" style="font-size: 28px;"><i class="fa-solid fa-timeline" style="font-size: 24px;"></i></div>
+                    <h3 style="color: #fff;">Rastreabilidade Completa</h3>
+                    <p style="color: rgba(255,255,255,0.7);">chat_sessions → messages + mcp_action_logs — cada decisão do agente auditável.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MCP Tool Design -->
+    <div class="slide-container frame-split" id="slide9e">
+        <div class="split-left">
+            <h2>MCP Tools: Confirmação e Observabilidade</h2>
+            <p>16 ferramentas com gates de segurança e logging estruturado de cada decisão do agente.</p>
+        </div>
+        <div class="split-right">
+            <div class="feature-rows">
+                <div class="feature-row">
+                    <i class="fa-solid fa-hand"></i>
+                    <div>
+                        <h4>7 Tools com Confirmação</h4>
+                        <p>Agente pergunta antes de criar matrícula, trancar disciplina ou solicitar documento.</p>
+                    </div>
+                </div>
+                <div class="feature-row">
+                    <i class="fa-solid fa-brain"></i>
+                    <div>
+                        <h4>Chain-of-Thought Capturado</h4>
+                        <p>Campo <code style="color: var(--accent);">reasoning</code> grava o raciocínio do agente antes de cada tool call.</p>
+                    </div>
+                </div>
+                <div class="feature-row">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    <div>
+                        <h4>Retry Discriminado</h4>
+                        <p>Erro 5xx → 1 retry imediato. Erro 4xx → sem retry (falha lógica). Status: success | error | retry_success.</p>
+                    </div>
+                </div>
+                <div class="feature-row">
+                    <i class="fa-solid fa-stopwatch"></i>
+                    <div>
+                        <h4>Latência Medida</h4>
+                        <p>latency_ms end-to-end por tool call. Staff audita logs em tempo real via endpoint.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-container frame-bottom-bar" id="slide10">
+        <h2 class="slide-title">Jornada de Evolução</h2>
+        <div class="content-area">
+            <div class="timeline-layout">
+                <div class="timeline-line"></div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <h3>Fase 1: Fundação</h3>
+                    <p>Infra Docker, Backend Base e IA RAG via WhatsApp.</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <h3>Fase 2: Expansão</h3>
+                    <p>App Flutter (Client/Staff) e ferramentas de automação.</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot" style="background: var(--surface); border-color: var(--on-surface-variant);"></div>
+                    <h3>Fase 3: Escala</h3>
+                    <p>Push notifications, otimização de custos LLM e analytics avançados.</p>
+                </div>
+            </div>
+        </div>
+        <div class="bottom-bar">
+            <p>ROADMAP &mdash; 2026</p>
+        </div>
+    </div>
+
+    <div class="slide-container frame-navy" id="slide11">
+        <h2 class="slide-title" style="color: #fff;">Entregas e Métricas</h2>
+        <div class="content-area">
+            <div class="stat-row">
+                <div class="stat-card" style="background: rgba(255,255,255,0.08);">
+                    <div class="stat-value">16</div>
+                    <div class="stat-label">Tools MCP</div>
+                </div>
+                <div class="stat-card" style="background: rgba(255,255,255,0.08);">
+                    <div class="stat-value">5</div>
+                    <div class="stat-label">Contêineres</div>
+                </div>
+                <div class="stat-card" style="background: rgba(255,255,255,0.08);">
+                    <div class="stat-value">&lt;5s</div>
+                    <div class="stat-label">Resposta Webhook</div>
+                </div>
+                <div class="stat-card" style="background: rgba(255,255,255,0.08);">
+                    <div class="stat-value">2</div>
+                    <div class="stat-label">Perfis Ativos</div>
+                </div>
+            </div>
+            <div class="highlight-block" style="background: rgba(255,255,255,0.05); border-left-color: var(--accent);">
+                <p>Agente LangChain opera via WhatsApp com escalonamento automático para <span class="accent">atendimento humano</span> quando necessário.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-container frame-navy" id="slide12">
+        <div class="title-layout">
+            <h2 style="font-size: 72px; letter-spacing: -4px; color: #fff;">Obrigado.</h2>
+            <p class="subtitle" style="color: rgba(255,255,255,0.7); margin-top: 20px;">Alpha Connect: A Evolução da Experiência Acadêmica</p>
+            <div style="margin-top: 60px; display: flex; gap: 40px; justify-content: center; align-items: center;">
+                <div style="text-align: center;">
+                    <i class="fa-solid fa-comments" style="font-size: 32px; color: var(--accent); margin-bottom: 10px;"></i>
+                    <p style="font-size: 18px; color: rgba(255,255,255,0.6); margin: 0;">Perguntas?</p>
+                </div>
+                <div style="text-align: center;">
+                    <i class="fa-brands fa-github" style="font-size: 32px; color: var(--accent); margin-bottom: 10px;"></i>
+                    <p style="font-size: 18px; color: rgba(255,255,255,0.6); margin: 0;">Repositório</p>
+                </div>
+                <div style="text-align: center;">
+                    <i class="fa-solid fa-play" style="font-size: 32px; color: var(--accent); margin-bottom: 10px;"></i>
+                    <p style="font-size: 18px; color: rgba(255,255,255,0.6); margin: 0;">Demo ao vivo</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentSlideIndex = 0;
+    const slides = document.querySelectorAll('.slide-container');
+    const progressBar = document.getElementById('progressBar');
+    const slideCounter = document.getElementById('slideCounter');
+
+    function updateSlides() {
+        slides.forEach((slide, index) => {
+            if (index === currentSlideIndex) {
+                slide.classList.add('active');
+            } else {
+                slide.classList.remove('active');
+            }
+        });
+
+        // Atualiza progresso
+        const progress = ((currentSlideIndex + 1) / slides.length) * 100;
+        progressBar.style.width = progress + '%';
+        
+        // Atualiza contador
+        slideCounter.innerText = `${currentSlideIndex + 1} / ${slides.length}`;
+    }
+
+    function nextSlide() {
+        if (currentSlideIndex < slides.length - 1) {
+            currentSlideIndex++;
+            updateSlides();
+        }
+    }
+
+    function prevSlide() {
+        if (currentSlideIndex > 0) {
+            currentSlideIndex--;
+            updateSlides();
+        }
+    }
+
+    // Atalhos de teclado
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+            nextSlide();
+        } else if (e.key === 'ArrowLeft' || e.key === 'Backspace') {
+            prevSlide();
+        }
+    });
+
+    // Navegação por clique (lado direito avança, esquerdo volta)
+    document.addEventListener('mousedown', (e) => {
+        // Ignora se clicar em botões de navegação
+        if (e.target.closest('.nav-btn')) return;
+        
+        if (e.clientX > window.innerWidth / 2) {
+            nextSlide();
+        } else {
+            prevSlide();
+        }
+    });
+
+    // Inicializa
+    updateSlides();
+</script>
+
+</body>
+</html>

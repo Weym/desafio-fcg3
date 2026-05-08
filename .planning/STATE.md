@@ -1,26 +1,26 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.0
-milestone_name: Flutter Frontend
-status: complete
-last_updated: "2026-05-06T21:00:00.000Z"
-last_activity: 2026-05-06
+milestone: v1.0
+milestone_name: milestone
+status: executing
+last_updated: "2026-05-08T18:48:48.510Z"
+last_activity: 2026-05-08 -- Phase 15.1 execution started
 progress:
-  total_phases: 8
-  completed_phases: 8
-  total_plans: 27
+  total_phases: 10
+  completed_phases: 5
+  total_plans: 31
   completed_plans: 27
-  percent: 100
+  percent: 87
 ---
 
 # Project State
 
 ## Current Position
 
-Phase: 14
-Plan: 2 of 2 complete
-Status: All phases delivered + dark mode/responsive polish applied
-Last activity: 2026-05-08 — Rebrand: renamed SIAC→Alpha Connect, added logo asset, verified light/dark mode
+Phase: 15.1 (fix-logo-ugly-not-as-agreed-and-tilted) — EXECUTING
+Plan: 1 of 1
+Status: Executing Phase 15.1
+Last activity: 2026-05-08 -- Phase 15.1 execution started
 
 Progress: [██████████] 100%
 
@@ -36,13 +36,15 @@ Progress: [██████████] 100%
 | 12 | Frontend-Backend Integration | complete |
 | 13 | Resource Allocation | complete |
 | 14 | Human Intervention | complete |
+| 15 | Cyber-Academic Visual Redesign | complete |
 
 ## Current Focus
 
-**All phases delivered (7-14). 8 phases, 27 plans executed.**
+**All phases delivered (7-15). 9 phases, 31 plans executed.**
 Previous milestone (M1 Backend + AI + MCP) delivered 6 phases, 47 plans.
 
 Branches:
+
 - `feat/resource-allocation` — Phase 13 (10 commits)
 - `feat/human-intervention` — Phase 13 + 14 (18 commits total)
 
@@ -54,6 +56,11 @@ Next action: Merge branches to main or start next milestone.
 
 Recent decisions affecting current work:
 
+- [Phase 15]: JPEG logo replaced with CustomPainter vector widget (α mark + "ALPHA CONNECT" text)
+- [Phase 15]: Cyber-Academic design system: Electric Teal #00E5FF primary, Obsidian #111317 dark surface
+- [Phase 15]: Typography switched to Montserrat + JetBrains Mono
+- [Phase 15]: GlassCard enhanced with 20px blur, 5% fill, neon outer glow, 3 elevation levels
+- [Phase 15]: Navigation shells use neonTeal glow accent for selected state
 - [Phase 14-polish]: Dark mode audit applied — 28 hardcoded color issues fixed across 15 screen files
 - [Phase 14-polish]: Responsive audit — 15 layout constraints fixed (bottom sheets max-width 500px, chat bubbles max 500px, desktop panels max 400px)
 - [Phase 14-polish]: All amber/green/red status colors now adapt to brightness (lighter shades in dark mode)
@@ -125,6 +132,8 @@ Recent decisions affecting current work:
 - Phase 13 added: Resource Allocation (2026-05-06)
 - Phase 14 added: Human Intervention (2026-05-06)
 - Phase 15 added: Cyber-Academic Visual Redesign (2026-05-08)
+- Phase 15 executed: 4 plans, 3 waves — logo fix, design system, tests all pass (2026-05-08)
+- Phase 15.1 inserted after Phase 15: Fix logo — ugly, not as agreed, and tilted (URGENT)
 
 ### Quick Tasks Completed
 
@@ -142,6 +151,7 @@ Recent decisions affecting current work:
 | `fix/auth-tests-url-prefix` | Add /api/v1 prefix to 7 auth integration test files (38 URLs) | 37/37 integration tests pass |
 
 Additional validations performed (no code fix needed):
+
 - AI/RAG ingest: 6 docs, 47 chunks via OpenRouter embeddings — success
 - AI/RAG chat E2E: LLM responds with correct knowledge base context — success
 - Flutter tests: 8/8 pass via Windows Flutter SDK

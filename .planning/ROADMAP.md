@@ -81,10 +81,10 @@ Plans:
 **Goal:** Rewrite the CustomPainter α mark to accurately match the reference JPEG (circular O-body + X-tail) and remove the unwanted Transform.rotate tilt from the login screen.
 **Requirements**: UI-NFR-02
 **Depends on:** Phase 15
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
-- [ ] 15.1-01-PLAN.md — Rewrite α mark geometry (stroke-based arc + X-tail) and remove rotation from login
+- [x] 15.1-01-PLAN.md — Rewrite α mark geometry (stroke-based arc + X-tail) and remove rotation from login
 
 ### Phase 13: Resource Allocation
 
