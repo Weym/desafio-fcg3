@@ -3,7 +3,7 @@
 **Milestone:** M2 — Flutter Frontend
 **Granularity:** Standard
 **Coverage:** 17/17 requirements mapped
-**Last Updated:** 2026-05-06
+**Last Updated:** 2026-05-08
 **Previous Milestone:** M1 — Backend + AI Service + MCP Server (Phases 1-6, complete)
 
 ---
@@ -26,7 +26,8 @@
  (completed 2026-05-06)
 - [x] **Phase 14: Human Intervention** — Tela de intervenção humana (gestor assume chats não resolvidos pelo bot, responde via WhatsApp)
  (completed 2026-05-06)
-- [ ] **Phase 15: Cyber-Academic Visual Redesign** — Apply Cyber-Academic design system (obsidian palette, neon accents, Montserrat typography, glassmorphism) to make the app more attractive and modern
+- [x] **Phase 15: Cyber-Academic Visual Redesign** — Apply Cyber-Academic design system (obsidian palette, neon accents, Montserrat typography, glassmorphism) to make the app more attractive and modern
+ (completed 2026-05-08)
 
 ---
 
@@ -74,6 +75,16 @@ Plans:
 - [ ] 15-04-PLAN.md — Logo fix: replace JPEG with theme-adaptive CustomPainter vector widget
 
 ---
+
+### Phase 15.1: Fix logo — ugly, not as agreed, and tilted (INSERTED)
+
+**Goal:** Rewrite the CustomPainter α mark to accurately match the reference JPEG (circular O-body + X-tail) and remove the unwanted Transform.rotate tilt from the login screen.
+**Requirements**: UI-NFR-02
+**Depends on:** Phase 15
+**Plans:** 1 plan
+
+Plans:
+- [ ] 15.1-01-PLAN.md — Rewrite α mark geometry (stroke-based arc + X-tail) and remove rotation from login
 
 ### Phase 13: Resource Allocation
 
