@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/router/route_names.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../shared/widgets/alpha_connect_logo.dart';
 import '../../../shared/widgets/app_bar_actions.dart';
 import '../../../shared/widgets/app_skeleton_card.dart';
 import '../../../shared/widgets/glass_card.dart';
@@ -53,28 +54,7 @@ class ClientHomeScreen extends ConsumerWidget {
         title: const Text('Alpha Connect'),
         leading: Padding(
           padding: const EdgeInsets.all(8),
-          child: Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: colors.primary.withValues(alpha: 0.1),
-                  blurRadius: 4,
-                  offset: const Offset(0, 1),
-                ),
-              ],
-            ),
-            child: ClipOval(
-              child: Image.asset(
-                'assets/images/alpha_connect_logo.jpeg',
-                fit: BoxFit.cover,
-                alignment: const Alignment(0, -0.55),
-              ),
-            ),
-          ),
+          child: const AlphaConnectLogo(size: 36),
         ),
         actions: const [AppBarActions()],
       ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../shared/widgets/alpha_connect_logo.dart';
 import '../../auth/providers/auth_provider.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
@@ -31,37 +31,16 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 100,
-              height: 100,
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
                 boxShadow: [
                   BoxShadow(
-                    color: colors.primary.withValues(alpha: 0.15),
-                    blurRadius: 20,
-                    offset: const Offset(0, 4),
+                    color: colors.primary.withValues(alpha: 0.3),
+                    blurRadius: 24,
+                    spreadRadius: 2,
                   ),
                 ],
               ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
-                child: Image.asset(
-                  'assets/images/alpha_connect_logo.jpeg',
-                  fit: BoxFit.cover,
-                  alignment: const Alignment(0, -0.55),
-                ),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            Text(
-              'Alpha Connect',
-              style: GoogleFonts.montserrat(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: colors.primary,
-                letterSpacing: 2,
-              ),
+              child: const AlphaConnectLogo(size: 100, showTagline: true),
             ),
             const SizedBox(height: AppSpacing.xl),
             SizedBox(

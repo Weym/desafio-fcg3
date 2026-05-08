@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/models/user_model.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/theme_provider.dart';
+import '../../../shared/widgets/alpha_connect_logo.dart';
 import '../providers/auth_provider.dart';
 import '../providers/auth_state.dart';
 
@@ -254,40 +255,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           // Icon badge
           Transform.rotate(
             angle: 0.05,
-            child: Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-                boxShadow: [
-                  BoxShadow(
-                    color: colors.primary.withValues(alpha: 0.12),
-                    blurRadius: 16,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-                child: Image.asset(
-                  'assets/images/alpha_connect_logo.jpeg',
-                  fit: BoxFit.cover,
-                  alignment: const Alignment(0, -0.55),
-                ),
-              ),
-            ),
+            child: const AlphaConnectLogo(size: 80),
           ),
           const SizedBox(height: AppSpacing.md),
-          Text(
-            'Alpha Connect',
-            style: GoogleFonts.montserrat(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: colors.primary,
-              letterSpacing: 2,
-            ),
-          ),
           const SizedBox(height: AppSpacing.xl),
 
           // Heading
