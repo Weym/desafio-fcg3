@@ -252,11 +252,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         key: const ValueKey('email_step'),
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Icon badge
-          Transform.rotate(
-            angle: 0.05,
-            child: const AlphaConnectLogo(size: 80),
-          ),
+          // Logo mark — perfectly upright, no rotation
+          const AlphaConnectLogo(size: 80),
           const SizedBox(height: AppSpacing.md),
           const SizedBox(height: AppSpacing.xl),
 
@@ -371,19 +368,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       mainAxisSize: MainAxisSize.min,
       children: [
         // Icon badge
-        Transform.rotate(
-          angle: 0.05,
-          child: Container(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            decoration: BoxDecoration(
-              color: colors.primaryContainer,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-            ),
-            child: Icon(
-              Icons.email_outlined,
-              size: 48,
-              color: colors.onPrimaryContainer,
-            ),
+        Container(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          decoration: BoxDecoration(
+            color: colors.primaryContainer,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+          ),
+          child: Icon(
+            Icons.email_outlined,
+            size: 48,
+            color: colors.onPrimaryContainer,
           ),
         ),
         const SizedBox(height: AppSpacing.md),
