@@ -1,6 +1,6 @@
 {
-    "name": "frontend",
-    "short_name": "frontend",
+    "name": "Alpha Connect",
+    "short_name": "Alpha Connect",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

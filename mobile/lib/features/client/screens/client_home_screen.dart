@@ -50,7 +50,7 @@ class ClientHomeScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('SIAC'),
+        title: const Text('Alpha Connect'),
         leading: Padding(
           padding: const EdgeInsets.all(8),
           child: Container(
@@ -58,7 +58,15 @@ class ClientHomeScreen extends ConsumerWidget {
               color: colors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
             ),
-            child: Icon(Icons.school_rounded, color: colors.primary),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+              child: Image.asset(
+                'assets/images/alpha_connect_logo.jpeg',
+                width: 32,
+                height: 32,
+                fit: BoxFit.contain,
+              ),
+            ),
           ),
         ),
         actions: const [AppBarActions()],

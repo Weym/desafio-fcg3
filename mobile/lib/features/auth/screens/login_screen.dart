@@ -260,21 +260,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 color: colors.primaryContainer,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
               ),
-              child: Icon(
-                Icons.school_rounded,
-                size: 48,
-                color: colors.onPrimaryContainer,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                child: Image.asset(
+                  'assets/images/alpha_connect_logo.jpeg',
+                  width: 64,
+                  height: 64,
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
           ),
           const SizedBox(height: AppSpacing.md),
           Text(
-            'SIAC',
+            'Alpha Connect',
             style: GoogleFonts.montserrat(
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: colors.primary,
-              letterSpacing: 3,
+              letterSpacing: 2,
             ),
           ),
           const SizedBox(height: AppSpacing.xl),

@@ -36,20 +36,24 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                 color: colors.primaryContainer,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
               ),
-              child: Icon(
-                Icons.school_rounded,
-                size: 64,
-                color: colors.onPrimaryContainer,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+                child: Image.asset(
+                  'assets/images/alpha_connect_logo.jpeg',
+                  width: 80,
+                  height: 80,
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
             Text(
-              'SIAC',
+              'Alpha Connect',
               style: GoogleFonts.montserrat(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
                 color: colors.primary,
-                letterSpacing: 4,
+                letterSpacing: 2,
               ),
             ),
             const SizedBox(height: AppSpacing.xl),
