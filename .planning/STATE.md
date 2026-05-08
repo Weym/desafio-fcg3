@@ -20,7 +20,7 @@ progress:
 Phase: 14
 Plan: 2 of 2 complete
 Status: All phases delivered + dark mode/responsive polish applied
-Last activity: 2026-05-06 — Fixed 28 dark mode contrast issues + 15 responsive layout constraints across 20 files
+Last activity: 2026-05-08 — Rebrand: renamed SIAC→Alpha Connect, added logo asset, verified light/dark mode
 
 Progress: [██████████] 100%
 
@@ -124,6 +124,7 @@ Recent decisions affecting current work:
 - Phase 12 added: Frontend-Backend Integration (2026-05-06)
 - Phase 13 added: Resource Allocation (2026-05-06)
 - Phase 14 added: Human Intervention (2026-05-06)
+- Phase 15 added: Cyber-Academic Visual Redesign (2026-05-08)
 
 ### Quick Tasks Completed
 
@@ -131,6 +132,7 @@ Recent decisions affecting current work:
 |---|-------------|------|--------|-----------|
 | 260505-jcm | Validar e corrigir base URL de autenticação do frontend e adicionar CORS no backend para Flutter web | 2026-05-05 | 4e1ca3d | [260505-jcm-validar-e-corrigir-base-url-de-autentica](./quick/260505-jcm-validar-e-corrigir-base-url-de-autentica/) |
 | 260505-jur | Corrigir crash no login OTP alinhando frontend ao TokenPair do backend | 2026-05-05 | 5fee628 | [260505-jur-corrigir-crash-no-login-otp-alinhando-o-](./quick/260505-jur-corrigir-crash-no-login-otp-alinhando-o-/) |
+| 260508-0z | Rebrand SIAC→Alpha Connect, implement logo, verify light/dark mode | 2026-05-08 | 4b16b62 | [260508-0z-rebrand-alpha-connect-themes-logo](./quick/260508-0z-rebrand-alpha-connect-themes-logo/) |
 
 ### Hardening Session (2026-05-05)
 
