@@ -26,6 +26,7 @@
  (completed 2026-05-06)
 - [x] **Phase 14: Human Intervention** — Tela de intervenção humana (gestor assume chats não resolvidos pelo bot, responde via WhatsApp)
  (completed 2026-05-06)
+- [ ] **Phase 15: Cyber-Academic Visual Redesign** — Apply Cyber-Academic design system (obsidian palette, neon accents, Montserrat typography, glassmorphism) to make the app more attractive and modern
 
 ---
 
@@ -47,6 +48,29 @@
 Plans:
 - [x] 14-01-PLAN.md — Backend: migration, escalation detection, AI skip, assign/reply/resolve endpoints
 - [x] 14-02-PLAN.md — Frontend staff: intervention screen, chat detail, navigation wiring
+
+---
+
+### Phase 15: Cyber-Academic Visual Redesign
+
+**Goal:** Apply the Cyber-Academic design system — deep obsidian palette (#111317), Electric Teal (#00E5FF) primary, Cyber Violet (#7209B7) secondary, Montserrat + JetBrains Mono typography, glassmorphism cards with backdrop blur, neon glow elevation, and pill-shaped buttons — to make the app visually striking and modern. No changes to functionality, application logic, or responsive breakpoint behavior.
+**Depends on:** Phase 14
+**Requirements:** UI-NFR-02 (visual consistency), UI-NFR-04 (dark mode support)
+
+### Success Criteria
+1. Color palette replaced with Cyber-Academic tokens: primary Electric Teal, secondary Cyber Violet, tertiary Magenta, obsidian surfaces — in both light/dark modes.
+2. Typography switched to Montserrat (headlines Black/ExtraBold, body Regular) + JetBrains Mono (technical/AI data), with tracking and weight hierarchy per design spec.
+3. All cards use glassmorphism treatment (backdrop blur 20px, 5% white fill, 1px 12% white border, neon outer glow on Layer 2 elements).
+4. Buttons use pill-shaped style (full-round radius); primary solid Electric Teal with black text, secondary ghost with teal border.
+5. Spacing system migrated to 8px base unit with defined xs/sm/md/lg/xl tokens.
+6. Existing functionality, API integrations, and responsive breakpoints remain fully intact (no behavioral regressions).
+
+**Plans:** 3 plans
+
+Plans:
+- [ ] 15-01-PLAN.md — Theme foundation: Cyber-Academic color palette, Montserrat + JetBrains Mono typography, enhanced GlassCard with neon glow
+- [ ] 15-02-PLAN.md — Screen-level updates: replace old font refs, update branding, neon nav accents
+- [ ] 15-03-PLAN.md — Verification: update widget tests, full flutter analyze + test pass
 
 ---
 
@@ -224,3 +248,4 @@ Plans:
 | 12. Frontend-Backend Integration | 3/3 | Complete | 2026-05-06 |
 | 13. Resource Allocation | 3/3 | Complete | 2026-05-06 |
 | 14. Human Intervention | 2/2 | Complete | 2026-05-06 |
+| 15. Cyber-Academic Visual Redesign | 0/3 | Planned | — |
