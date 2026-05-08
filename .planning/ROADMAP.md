@@ -65,12 +65,13 @@ Plans:
 5. Spacing system migrated to 8px base unit with defined xs/sm/md/lg/xl tokens.
 6. Existing functionality, API integrations, and responsive breakpoints remain fully intact (no behavioral regressions).
 
-**Plans:** 3 plans
+**Plans:** 4 plans
 
 Plans:
 - [ ] 15-01-PLAN.md — Theme foundation: Cyber-Academic color palette, Montserrat + JetBrains Mono typography, enhanced GlassCard with neon glow
 - [ ] 15-02-PLAN.md — Screen-level updates: replace old font refs, update branding, neon nav accents
 - [ ] 15-03-PLAN.md — Verification: update widget tests, full flutter analyze + test pass
+- [ ] 15-04-PLAN.md — Logo fix: replace JPEG with theme-adaptive CustomPainter vector widget
 
 ---
 
