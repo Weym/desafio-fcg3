@@ -50,7 +50,7 @@ class ClientHomeScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Alpha Connect'),
+        title: const Text('SIAC'),
         leading: Padding(
           padding: const EdgeInsets.all(8),
           child: Container(

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/router/route_names.dart';
 import '../../../core/responsive/breakpoints.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/app_offline_banner.dart';
 import '../providers/chat_provider.dart';
@@ -161,7 +162,7 @@ class _NavItem {
   const _NavItem({required this.icon, required this.activeIcon, required this.label});
 }
 
-/// Glass-panel bottom navigation matching alpha-connect prototype.
+/// Glass-panel bottom navigation with Cyber-Academic neon glow accent.
 class _GlassBottomNav extends StatelessWidget {
   final int currentIndex;
   final List<_NavItem> destinations;
@@ -181,25 +182,25 @@ class _GlassBottomNav extends StatelessWidget {
 
     return ClipRRect(
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
         child: Container(
           height: 80 + bottomPadding,
           padding: EdgeInsets.only(bottom: bottomPadding),
           decoration: BoxDecoration(
             color: isDark
-                ? colors.surfaceContainerLowest.withValues(alpha: 0.7)
-                : Colors.white.withValues(alpha: 0.7),
+                ? AppColors.darkSurface.withValues(alpha: 0.85)
+                : Colors.white.withValues(alpha: 0.9),
             border: Border(
               top: BorderSide(
                 color: isDark
-                    ? Colors.white.withValues(alpha: 0.1)
-                    : Colors.white.withValues(alpha: 0.4),
+                    ? AppColors.neonTeal.withValues(alpha: 0.15)
+                    : colors.outline.withValues(alpha: 0.1),
               ),
             ),
             boxShadow: [
               BoxShadow(
                 color: isDark
-                    ? Colors.black.withValues(alpha: 0.3)
+                    ? AppColors.neonTeal.withValues(alpha: 0.08)
                     : colors.primary.withValues(alpha: 0.06),
                 blurRadius: 16,
                 offset: const Offset(0, -4),
@@ -223,8 +224,19 @@ class _GlassBottomNav extends StatelessWidget {
                     vertical: AppSpacing.sm,
                   ),
                   decoration: BoxDecoration(
-                    color: isSelected ? colors.primary : Colors.transparent,
+                    color: isSelected
+                        ? AppColors.neonTeal.withValues(alpha: 0.2)
+                        : Colors.transparent,
                     borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+                    boxShadow: isSelected
+                        ? [
+                            BoxShadow(
+                              color: AppColors.neonTeal.withValues(alpha: 0.3),
+                              blurRadius: 12,
+                              spreadRadius: 0,
+                            ),
+                          ]
+                        : null,
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -234,7 +246,7 @@ class _GlassBottomNav extends StatelessWidget {
                         isSelected ? item.activeIcon : item.icon,
                         size: 24,
                         color: isSelected
-                            ? colors.onPrimary
+                            ? AppColors.neonTeal
                             : colors.onSurfaceVariant,
                       ),
                       const SizedBox(height: 2),
@@ -245,7 +257,7 @@ class _GlassBottomNav extends StatelessWidget {
                           fontWeight: FontWeight.w700,
                           letterSpacing: 0.5,
                           color: isSelected
-                              ? colors.onPrimary
+                              ? AppColors.neonTeal
                               : colors.onSurfaceVariant,
                         ),
                       ),

@@ -8,32 +8,38 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('AppColors', () {
-    test('light primary matches alpha-connect prototype value', () {
-      expect(AppColors.primary, const Color(0xFF3B608F));
+    test('light primary matches Cyber-Academic Electric Teal', () {
+      expect(AppColors.primary, const Color(0xFF00E5FF));
     });
 
-    test('dark primary matches alpha-connect prototype value', () {
-      expect(AppColors.darkPrimary, const Color(0xFFA1C8FF));
+    test('dark primary matches Cyber-Academic Electric Teal', () {
+      expect(AppColors.darkPrimary, const Color(0xFF00E5FF));
     });
 
-    test('light surface matches alpha-connect value', () {
-      expect(AppColors.surface, const Color(0xFFF9F9FD));
+    test('light surface matches Cyber-Academic value', () {
+      expect(AppColors.surface, const Color(0xFFF5F5F7));
     });
 
-    test('dark surface matches alpha-connect value', () {
-      expect(AppColors.darkSurface, const Color(0xFF0F1114));
+    test('dark surface matches Cyber-Academic Obsidian', () {
+      expect(AppColors.darkSurface, const Color(0xFF111317));
     });
 
-    test('error color matches alpha-connect value', () {
-      expect(AppColors.error, const Color(0xFFBA1A1A));
+    test('error color matches Cyber-Academic value', () {
+      expect(AppColors.error, const Color(0xFFFF453A));
     });
 
-    test('secondary color set correctly', () {
-      expect(AppColors.secondary, const Color(0xFF6A548A));
+    test('secondary color is Cyber Violet', () {
+      expect(AppColors.secondary, const Color(0xFF7209B7));
     });
 
-    test('tertiary color set correctly', () {
-      expect(AppColors.tertiary, const Color(0xFF676001));
+    test('tertiary color is Magenta', () {
+      expect(AppColors.tertiary, const Color(0xFFF72585));
+    });
+
+    test('neon glow colors are defined', () {
+      expect(AppColors.neonTeal, const Color(0xFF00E5FF));
+      expect(AppColors.neonViolet, const Color(0xFF7209B7));
+      expect(AppColors.neonMagenta, const Color(0xFFF72585));
     });
   });
 

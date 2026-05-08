@@ -29,7 +29,7 @@ class AlphaConnectApp extends ConsumerWidget {
     final themeMode = ref.watch(themeModeNotifierProvider);
 
     return MaterialApp.router(
-      title: 'Alpha Connect',
+      title: 'SIAC',
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       themeMode: themeMode,

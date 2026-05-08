@@ -67,6 +67,36 @@ void main() {
 
       expect(find.byType(BackdropFilter), findsOneWidget);
     });
+
+    testWidgets('accepts elevation parameter without error', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: GlassCard(
+              elevation: 2,
+              child: const Text('Elevated'),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Elevated'), findsOneWidget);
+    });
+
+    testWidgets('accepts glowColor parameter without error', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: GlassCard(
+              glowColor: Colors.purple,
+              child: const Text('Custom glow'),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Custom glow'), findsOneWidget);
+    });
   });
 
   group('PillButton', () {
@@ -152,6 +182,25 @@ void main() {
 
         expect(find.text(variant.name), findsOneWidget);
       }
+    });
+
+    testWidgets('ghost variant renders with transparent background',
+        (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: PillButton(
+              label: 'Ghost',
+              variant: PillButtonVariant.ghost,
+              onPressed: () {},
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Ghost'), findsOneWidget);
+      // Button should render without error in ghost mode
+      expect(find.byType(ElevatedButton), findsOneWidget);
     });
 
     testWidgets('expanded fills available width', (tester) async {

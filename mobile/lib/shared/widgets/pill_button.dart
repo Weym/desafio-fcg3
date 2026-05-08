@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_spacing.dart';
 
-/// A pill-shaped button matching the alpha-connect prototype style.
+/// A pill-shaped button matching the Cyber-Academic design system.
 ///
-/// Variants: primary (filled), secondary (container fill), ghost (outlined), error.
+/// Variants: primary (solid teal/black text), secondary (container fill),
+/// ghost (transparent bg, teal border), error.
 enum PillButtonVariant { primary, secondary, ghost, error }
 
 class PillButton extends StatelessWidget {
@@ -42,9 +43,9 @@ class PillButton extends StatelessWidget {
         foregroundColor = colors.onSecondaryContainer;
         side = null;
       case PillButtonVariant.ghost:
-        backgroundColor = colors.surfaceContainer;
-        foregroundColor = colors.onSurfaceVariant;
-        side = BorderSide(color: colors.outlineVariant);
+        backgroundColor = Colors.transparent;
+        foregroundColor = colors.primary;
+        side = BorderSide(color: colors.primary);
       case PillButtonVariant.error:
         backgroundColor = colors.error;
         foregroundColor = colors.onError;

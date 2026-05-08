@@ -269,8 +269,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ),
           const SizedBox(height: AppSpacing.md),
           Text(
-            'ALPHA CONNECT',
-            style: GoogleFonts.plusJakartaSans(
+            'SIAC',
+            style: GoogleFonts.montserrat(
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: colors.primary,
@@ -408,7 +408,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         const SizedBox(height: AppSpacing.md),
         Text(
           'CÓDIGO DE ACESSO',
-          style: GoogleFonts.plusJakartaSans(
+          style: GoogleFonts.montserrat(
             fontSize: 18,
             fontWeight: FontWeight.bold,
             color: colors.primary,

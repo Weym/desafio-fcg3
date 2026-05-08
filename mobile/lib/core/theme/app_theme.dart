@@ -4,28 +4,62 @@ import '../responsive/breakpoints.dart';
 import 'app_colors.dart';
 import 'app_spacing.dart';
 
-/// Alpha Connect theme configuration.
+/// Cyber-Academic theme configuration.
 ///
-/// Typography: Plus Jakarta Sans (headings) + Inter (body).
-/// Color system: Material 3 with alpha-connect custom palette.
+/// Typography: Montserrat (headings + body) + JetBrains Mono (technical/code).
+/// Color system: Material 3 with Cyber-Academic neon palette.
 /// Shape system: Rounded with pill-style CTAs.
 class AppTheme {
   static TextTheme get _baseTextTheme {
-    final bodyFont = GoogleFonts.interTextTheme();
-    final headingFont = GoogleFonts.plusJakartaSansTextTheme();
+    final bodyFont = GoogleFonts.montserratTextTheme();
+    final headingFont = GoogleFonts.montserratTextTheme();
 
     return bodyFont.copyWith(
-      displayLarge: headingFont.displayLarge,
-      displayMedium: headingFont.displayMedium,
-      displaySmall: headingFont.displaySmall,
-      headlineLarge: headingFont.headlineLarge,
-      headlineMedium: headingFont.headlineMedium,
-      headlineSmall: headingFont.headlineSmall,
-      titleLarge: headingFont.titleLarge,
-      titleMedium: headingFont.titleMedium?.copyWith(fontWeight: FontWeight.w600),
-      titleSmall: headingFont.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+      displayLarge: headingFont.displayLarge?.copyWith(
+        fontWeight: FontWeight.w900,
+        letterSpacing: -0.5,
+      ),
+      displayMedium: headingFont.displayMedium?.copyWith(
+        fontWeight: FontWeight.w900,
+        letterSpacing: -0.5,
+      ),
+      displaySmall: headingFont.displaySmall?.copyWith(
+        fontWeight: FontWeight.w900,
+        letterSpacing: -0.5,
+      ),
+      headlineLarge: headingFont.headlineLarge?.copyWith(
+        fontWeight: FontWeight.w800,
+        letterSpacing: -0.5,
+      ),
+      headlineMedium: headingFont.headlineMedium?.copyWith(
+        fontWeight: FontWeight.w800,
+        letterSpacing: -0.5,
+      ),
+      headlineSmall: headingFont.headlineSmall?.copyWith(
+        fontWeight: FontWeight.w700,
+        letterSpacing: -0.3,
+      ),
+      titleLarge: headingFont.titleLarge?.copyWith(
+        fontWeight: FontWeight.w600,
+        letterSpacing: -0.3,
+      ),
+      titleMedium: headingFont.titleMedium?.copyWith(
+        fontWeight: FontWeight.w600,
+        letterSpacing: -0.3,
+      ),
+      titleSmall: headingFont.titleSmall?.copyWith(
+        fontWeight: FontWeight.w600,
+        letterSpacing: -0.3,
+      ),
     );
   }
+
+  /// Monospace text style for technical data display (grades, codes, etc.)
+  static TextStyle get monoStyle => GoogleFonts.jetBrainsMono(
+        fontSize: 13,
+        fontWeight: FontWeight.w400,
+        letterSpacing: -0.2,
+      );
 
   static ColorScheme get _lightColorScheme => const ColorScheme(
         brightness: Brightness.light,
@@ -34,7 +68,7 @@ class AppTheme {
         primaryContainer: AppColors.primaryContainer,
         onPrimaryContainer: AppColors.onPrimaryContainer,
         secondary: AppColors.secondary,
-        onSecondary: Color(0xFFFFFFFF),
+        onSecondary: AppColors.onSecondary,
         secondaryContainer: AppColors.secondaryContainer,
         onSecondaryContainer: AppColors.onSecondaryContainer,
         tertiary: AppColors.tertiary,
@@ -97,10 +131,10 @@ class AppTheme {
           scrolledUnderElevation: 0,
           backgroundColor: Colors.transparent,
           surfaceTintColor: Colors.transparent,
-          titleTextStyle: GoogleFonts.plusJakartaSans(
+          titleTextStyle: GoogleFonts.montserrat(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: AppColors.primary,
+            color: AppColors.onSurface,
           ),
         ),
         inputDecorationTheme: InputDecorationTheme(
@@ -133,7 +167,7 @@ class AppTheme {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
             ),
-            textStyle: GoogleFonts.plusJakartaSans(
+            textStyle: GoogleFonts.montserrat(
               fontSize: 16,
               fontWeight: FontWeight.w700,
             ),
@@ -145,7 +179,7 @@ class AppTheme {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
             ),
-            textStyle: GoogleFonts.plusJakartaSans(
+            textStyle: GoogleFonts.montserrat(
               fontSize: 16,
               fontWeight: FontWeight.w700,
             ),
@@ -157,8 +191,8 @@ class AppTheme {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
             ),
-            side: const BorderSide(color: AppColors.outlineVariant),
-            textStyle: GoogleFonts.plusJakartaSans(
+            side: const BorderSide(color: AppColors.primary),
+            textStyle: GoogleFonts.montserrat(
               fontSize: 16,
               fontWeight: FontWeight.w700,
             ),
@@ -190,14 +224,14 @@ class AppTheme {
           indicatorColor: AppColors.primary,
           labelTextStyle: WidgetStateProperty.resolveWith((states) {
             if (states.contains(WidgetState.selected)) {
-              return GoogleFonts.inter(
+              return GoogleFonts.montserrat(
                 fontSize: 10,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 0.5,
                 color: AppColors.primary,
               );
             }
-            return GoogleFonts.inter(
+            return GoogleFonts.montserrat(
               fontSize: 10,
               fontWeight: FontWeight.w700,
               letterSpacing: 0.5,
@@ -235,10 +269,10 @@ class AppTheme {
           scrolledUnderElevation: 0,
           backgroundColor: Colors.transparent,
           surfaceTintColor: Colors.transparent,
-          titleTextStyle: GoogleFonts.plusJakartaSans(
+          titleTextStyle: GoogleFonts.montserrat(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: AppColors.darkPrimary,
+            color: AppColors.darkOnSurface,
           ),
         ),
         inputDecorationTheme: InputDecorationTheme(
@@ -271,7 +305,7 @@ class AppTheme {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
             ),
-            textStyle: GoogleFonts.plusJakartaSans(
+            textStyle: GoogleFonts.montserrat(
               fontSize: 16,
               fontWeight: FontWeight.w700,
             ),
@@ -283,7 +317,7 @@ class AppTheme {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
             ),
-            textStyle: GoogleFonts.plusJakartaSans(
+            textStyle: GoogleFonts.montserrat(
               fontSize: 16,
               fontWeight: FontWeight.w700,
             ),
@@ -295,8 +329,8 @@ class AppTheme {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
             ),
-            side: const BorderSide(color: AppColors.darkOutlineVariant),
-            textStyle: GoogleFonts.plusJakartaSans(
+            side: const BorderSide(color: AppColors.darkPrimary),
+            textStyle: GoogleFonts.montserrat(
               fontSize: 16,
               fontWeight: FontWeight.w700,
             ),
@@ -328,14 +362,14 @@ class AppTheme {
           indicatorColor: AppColors.darkPrimary,
           labelTextStyle: WidgetStateProperty.resolveWith((states) {
             if (states.contains(WidgetState.selected)) {
-              return GoogleFonts.inter(
+              return GoogleFonts.montserrat(
                 fontSize: 10,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 0.5,
                 color: AppColors.darkPrimary,
               );
             }
-            return GoogleFonts.inter(
+            return GoogleFonts.montserrat(
               fontSize: 10,
               fontWeight: FontWeight.w700,
               letterSpacing: 0.5,

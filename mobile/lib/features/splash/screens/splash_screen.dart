@@ -44,8 +44,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
             ),
             const SizedBox(height: AppSpacing.lg),
             Text(
-              'ALPHA CONNECT',
-              style: GoogleFonts.plusJakartaSans(
+              'SIAC',
+              style: GoogleFonts.montserrat(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
                 color: colors.primary,
