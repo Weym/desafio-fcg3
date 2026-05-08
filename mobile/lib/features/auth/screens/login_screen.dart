@@ -255,18 +255,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           Transform.rotate(
             angle: 0.05,
             child: Container(
-              padding: const EdgeInsets.all(AppSpacing.lg),
+              width: 80,
+              height: 80,
               decoration: BoxDecoration(
-                color: colors.primaryContainer,
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+                boxShadow: [
+                  BoxShadow(
+                    color: colors.primary.withValues(alpha: 0.12),
+                    blurRadius: 16,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
                 child: Image.asset(
                   'assets/images/alpha_connect_logo.jpeg',
-                  width: 64,
-                  height: 64,
-                  fit: BoxFit.contain,
+                  fit: BoxFit.cover,
+                  alignment: const Alignment(0, -0.55),
                 ),
               ),
             ),

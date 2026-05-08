@@ -31,18 +31,25 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(AppSpacing.lg),
+              width: 100,
+              height: 100,
               decoration: BoxDecoration(
-                color: colors.primaryContainer,
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
+                boxShadow: [
+                  BoxShadow(
+                    color: colors.primary.withValues(alpha: 0.15),
+                    blurRadius: 20,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
                 child: Image.asset(
                   'assets/images/alpha_connect_logo.jpeg',
-                  width: 80,
-                  height: 80,
-                  fit: BoxFit.contain,
+                  fit: BoxFit.cover,
+                  alignment: const Alignment(0, -0.55),
                 ),
               ),
             ),

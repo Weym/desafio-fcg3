@@ -54,17 +54,24 @@ class ClientHomeScreen extends ConsumerWidget {
         leading: Padding(
           padding: const EdgeInsets.all(8),
           child: Container(
+            width: 36,
+            height: 36,
             decoration: BoxDecoration(
-              color: colors.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+              color: Colors.white,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: colors.primary.withValues(alpha: 0.1),
+                  blurRadius: 4,
+                  offset: const Offset(0, 1),
+                ),
+              ],
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+            child: ClipOval(
               child: Image.asset(
                 'assets/images/alpha_connect_logo.jpeg',
-                width: 32,
-                height: 32,
-                fit: BoxFit.contain,
+                fit: BoxFit.cover,
+                alignment: const Alignment(0, -0.55),
               ),
             ),
           ),
