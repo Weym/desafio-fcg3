@@ -132,7 +132,14 @@ GROUP 4 — Polish (depends on all above):
   2. Provider can CRUD staff members (cadastrar, editar, ativar/desativar, remover) with required fields
   3. Staff can CRUD students (cadastrar, editar, ativar/desativar, remover) with required fields
   4. Provider screen has 2 tabs (staff + aluno) with separate CRUD interfaces
-**Plans**: TBD
+**Plans:** 4 plans
+
+Plans:
+- [ ] 21-01-PLAN.md — Backend migration + auth expansion (provider role, new columns, require_provider)
+- [ ] 21-02-PLAN.md — Staff CRUD endpoints (5 routes, provider-only)
+- [ ] 21-03-PLAN.md — Flutter navigation expansion (6th tab, UserModel, router guards)
+- [ ] 21-04-PLAN.md — Flutter staff management UI (list, form, CRUD operations)
+
 **UI hint**: yes
 
 ### Phase 22: FCM Push Notifications
@@ -188,7 +195,7 @@ GROUP 4 — Polish (depends on all above):
 | 18. Student UX Corrections | v3.0 | 0/TBD | Not started | - |
 | 19. Staff UX Corrections | v3.0 | 0/TBD | Not started | - |
 | 20. LangChain Workflow | v3.0 | 0/TBD | Not started | - |
-| 21. Roles & Auth Expansion | v3.0 | 0/TBD | Not started | - |
+| 21. Roles & Auth Expansion | v3.0 | 0/4 | Planned | - |
 | 22. FCM Push Notifications | v3.0 | 0/TBD | Not started | - |
 | 23. New Features | v3.0 | 0/TBD | Not started | - |
 | 24. UI Polish & Integration | v3.0 | 0/TBD | Not started | - |
