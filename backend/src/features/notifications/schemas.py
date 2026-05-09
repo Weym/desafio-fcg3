@@ -16,7 +16,7 @@ from pydantic import BaseModel, Field
 class FcmTokenRegister(BaseModel):
     """Request body for PUT /students/{id}/fcm-token."""
 
-    token: str = Field(..., min_length=1, max_length=255, description="FCM device token")
+    token: str = Field(..., min_length=1, max_length=4096, description="FCM device token")
     device_name: str | None = Field(
         default=None, max_length=100, description="Optional device identifier"
     )
@@ -25,7 +25,7 @@ class FcmTokenRegister(BaseModel):
 class FcmTokenDelete(BaseModel):
     """Request body for DELETE /students/{id}/fcm-token."""
 
-    token: str = Field(..., min_length=1, max_length=255, description="FCM device token to remove")
+    token: str = Field(..., min_length=1, max_length=4096, description="FCM device token to remove")
 
 
 class NotificationEvent(StrEnum):
