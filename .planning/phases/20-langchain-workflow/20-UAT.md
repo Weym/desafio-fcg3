@@ -1,5 +1,5 @@
 ---
-status: complete
+status: diagnosed
 phase: 20-langchain-workflow
 source: [20-01-SUMMARY.md, 20-02-SUMMARY.md, 20-03-SUMMARY.md, 20-04-SUMMARY.md, 20-05-SUMMARY.md, 20-06-SUMMARY.md, 20-07-SUMMARY.md, 20-08-SUMMARY.md]
 started: 2026-05-09T20:30:00Z
@@ -90,47 +90,87 @@ blocked: 0
   reason: "User reported: no"
   severity: major
   test: 5
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "System prompt rule #9 tells agent to ask for email before any action. Agent has no verification_state context passed to it, so it gates everything (including reads) behind email verification. Backend routing is correct — problem is entirely in the LLM instruction layer."
+  artifacts:
+    - path: "ai_service/prompts/system_prompt.txt"
+      issue: "Rule #9 instructs agent to gate ALL actions behind verification but agent has no mechanism to check state"
+    - path: "backend/src/features/webhook/background.py"
+      issue: "Does not pass verification_state to AI service"
+    - path: "ai_service/agent.py"
+      issue: "invoke_agent() has no verification_state parameter"
+  missing:
+    - "Rewrite system prompt rule #9 to distinguish read-only (no verification) from mutations (require verification)"
+    - "Pass verification_state from background.py to AI service so agent has context"
+    - "Add verification_state parameter to invoke_agent()"
+  debug_session: ".planning/debug/lazy-otp-unverified-blocked.md"
 
 - truth: "Unverified student requests mutating action, agent triggers OTP flow asking for email, sends code, and completes verification"
   status: failed
   reason: "User reported: o fluxo de OTP está quebrado: é exigido o email para read-only operations, mas ao enviar o email ele n pediu código e apenas trouxe a informação. É exigido email ao realizar mutating actions, mas ao enviar ele n passa pq diz que o email n é institucional, embora o email seja o correto."
   severity: blocker
   test: 6
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "initiate_mid_conversation_verification() is dead code (zero callers). Agent handles verification via natural language text (not tools), causing LLM to hallucinate email validation. MCP middleware has no verification gate on mutating tools — readOnlyHint annotation is decorative only."
+  artifacts:
+    - path: "backend/src/features/webhook/service.py:215-226"
+      issue: "initiate_mid_conversation_verification() is dead code — never called"
+    - path: "ai_service/prompts/system_prompt.txt:9"
+      issue: "Rule #9 asks LLM to handle verification via text — needs to use a tool/signal instead"
+    - path: "mcp_server/middleware.py"
+      issue: "No verification_state check before mutating tool execution"
+    - path: "backend/src/features/webhook/router.py:174-186"
+      issue: "No mechanism to trigger OTP when agent signals verification needed"
+  missing:
+    - "MCP middleware must check verification_state before mutating tools (enforce readOnlyHint)"
+    - "Wire initiate_mid_conversation_verification() — create a trigger mechanism when agent needs verification"
+    - "Update system prompt to tell agent to signal verification need (not handle email directly)"
+    - "Pass verification_state to agent so it knows student status"
+  debug_session: ".planning/debug/otp-flow-email-rejection-read-bypass.md"
 
 - truth: "Welcome greeting includes the student's name in a personalized message"
   status: failed
   reason: "User reported: it doesnt includes de student name"
   severity: minor
   test: 9
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "agent.py:155 condition 'if is_new_session and not history_messages' is always False because router commits the user message to DB before dispatching the background task. By the time invoke_agent() loads history, the user message is already there."
+  artifacts:
+    - path: "ai_service/agent.py:155"
+      issue: "'not history_messages' is always False — dead branch due to commit-before-dispatch ordering"
+    - path: "backend/src/features/webhook/router.py:186"
+      issue: "db.commit() before create_task makes history non-empty before agent reads it"
+  missing:
+    - "Change condition from 'if is_new_session and not history_messages' to just 'if is_new_session'"
+  debug_session: ".planning/debug/welcome-msg-missing-name.md"
 
 - truth: "Farewell detection closes the session after agent sends goodbye message"
   status: failed
   reason: "User reported: it only say a goodbye message, but the session nevers end"
   severity: major
   test: 10
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "_is_farewell_response threshold >= 2 is too strict — typical LLM farewell outputs contain only 1 farewell phrase. Also 'bom estudo' (singular) never matches LLM's natural 'bons estudos' (plural)."
+  artifacts:
+    - path: "backend/src/features/webhook/background.py:99"
+      issue: ">= 2 threshold too strict for typical LLM farewell patterns"
+    - path: "backend/src/features/webhook/background.py:55"
+      issue: "'bom estudo' singular never matches LLM's 'bons estudos' plural"
+  missing:
+    - "Lower threshold to >= 1 for strong farewell indicators (tchau, ate mais, adeus)"
+    - "Add 'bons estudos' to indicator list"
+    - "Split indicators into strong (1 sufficient) vs weak (need 2+)"
+  debug_session: ".planning/debug/farewell-no-session-close.md"
 
 - truth: "Stale OTP state is reset after 5+ minutes so student can chat normally without being trapped"
   status: failed
   reason: "User reported: não é iniciado a verificação OTP, ele tenta acessar sem token e retorna erro"
   severity: blocker
   test: 12
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "Timezone-naive session.updated_at comparison with timezone-aware datetime.now(timezone.utc) raises TypeError, crashing the stale check with a 500 error. The timezone defense pattern exists elsewhere (line 369-370) but is missing from the stale check at line 152."
+  artifacts:
+    - path: "backend/src/features/webhook/service.py:152"
+      issue: "Timezone-naive updated_at comparison crashes with TypeError — needs tzinfo defense"
+    - path: "backend/src/features/webhook/service.py:215-226"
+      issue: "initiate_mid_conversation_verification() is dead code — zero callers"
+  missing:
+    - "Add timezone defense: if updated_at.tzinfo is None: updated_at = updated_at.replace(tzinfo=timezone.utc)"
+    - "Wire initiate_mid_conversation_verification() or remove dead code until D-15 is implemented"
+    - "Fix broken test test_unverified_transitions_to_awaiting_email"
+  debug_session: ".planning/debug/stale-otp-state-not-resetting.md"
