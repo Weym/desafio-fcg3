@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import re
 import unicodedata
 from datetime import datetime, timezone
 from uuid import UUID
@@ -59,6 +60,32 @@ def _strip_accents(text: str) -> str:
     """Remove diacritical marks (accents) from text for fuzzy matching."""
     nfkd = unicodedata.normalize("NFKD", text)
     return "".join(c for c in nfkd if not unicodedata.combining(c))
+
+
+def _strip_markdown(text: str) -> str:
+    """Remove common markdown formatting for WhatsApp plain-text delivery.
+
+    Strips: bold (**), italic (*_), headers (##), code blocks (```),
+    inline code (`), and converts markdown lists to plain lines.
+    Preserves the actual content and readability.
+    """
+    # Remove code blocks (``` ... ```)
+    text = re.sub(r"```[\s\S]*?```", lambda m: m.group(0).strip("`").strip(), text)
+    # Remove inline code backticks
+    text = re.sub(r"`([^`]+)`", r"\1", text)
+    # Remove headers (## Header -> Header)
+    text = re.sub(r"^#{1,6}\s+", "", text, flags=re.MULTILINE)
+    # Remove bold (**text** or __text__)
+    text = re.sub(r"\*\*(.+?)\*\*", r"\1", text)
+    text = re.sub(r"__(.+?)__", r"\1", text)
+    # Remove italic (*text* or _text_) — careful not to strip underscores in words
+    text = re.sub(r"(?<!\w)\*(.+?)\*(?!\w)", r"\1", text)
+    text = re.sub(r"(?<!\w)_(.+?)_(?!\w)", r"\1", text)
+    # Convert markdown list items to plain text with bullet
+    text = re.sub(r"^\s*[-*+]\s+", "• ", text, flags=re.MULTILINE)
+    # Convert numbered markdown lists (1. item) — keep the number
+    text = re.sub(r"^\s*(\d+)\.\s+", r"\1. ", text, flags=re.MULTILINE)
+    return text.strip()
 
 
 def _is_farewell_response(response: str) -> bool:
@@ -266,7 +293,7 @@ async def process_message(
                 await db.commit()
 
             # Send AI response to student (they see the bot's last message)
-            await wa_client.send_text_message(phone, agent_response)
+            await wa_client.send_text_message(phone, _strip_markdown(agent_response))
             # Then escalate
             await _escalate_session(session_id, phone, wa_client)
             return
@@ -287,7 +314,7 @@ async def process_message(
             await db.commit()
 
         # Send response via WhatsApp (D-07: WhatsApp client already handles retry)
-        await wa_client.send_text_message(phone, agent_response)
+        await wa_client.send_text_message(phone, _strip_markdown(agent_response))
 
         # D-02 Layer 1, D-04: Farewell detection — close session on goodbye
         if _is_farewell_response(agent_response):
