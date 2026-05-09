@@ -29,6 +29,10 @@ from src.shared.dependencies import (
 )
 from src.shared.pagination import PaginationParams, paginated_response
 
+from sqlalchemy import select, delete as sql_delete
+
+from src.features.auth.models import FcmToken
+from src.features.notifications.schemas import FcmTokenRegister, FcmTokenDelete
 from src.features.students.schemas import (
     AcademicSummaryResponse,
     AvailableCourseItem,
@@ -233,3 +237,78 @@ async def get_student_transcript(
 
     transcript = await grade_service.get_transcript(db, student_id)
     return transcript.model_dump()
+
+
+# ------------------------------------------------------------------
+# FCM-02: PUT /students/{id}/fcm-token — register/upsert device token
+# ------------------------------------------------------------------
+
+@router.put("/{student_id}/fcm-token", status_code=200)
+async def register_fcm_token(
+    student_id: UUID,
+    data: FcmTokenRegister,
+    user: UserContext = Depends(get_current_user_or_service),
+    db: AsyncSession = Depends(get_db_session),
+) -> dict:
+    """Register or update an FCM device token for push notifications.
+
+    IDOR protection (T-22-01): students can only register tokens for their own id.
+    Service token can register for any student_id.
+    Supports multiple tokens per student (D-04) — different token strings = different devices.
+    """
+    if user.role == "student":
+        check_ownership(student_id, user)
+
+    # Check if token already exists for this student (upsert)
+    result = await db.execute(
+        select(FcmToken).where(
+            FcmToken.student_id == student_id,
+            FcmToken.token == data.token,
+        )
+    )
+    existing = result.scalar_one_or_none()
+
+    if existing:
+        # Update device_name and updated_at
+        existing.device_name = data.device_name
+        await db.flush()
+    else:
+        # Insert new token
+        new_token = FcmToken(
+            student_id=student_id,
+            token=data.token,
+            device_name=data.device_name,
+        )
+        db.add(new_token)
+
+    await db.commit()
+    return {"message": "Token registrado"}
+
+
+# ------------------------------------------------------------------
+# FCM-03: DELETE /students/{id}/fcm-token — remove device token
+# ------------------------------------------------------------------
+
+@router.delete("/{student_id}/fcm-token", status_code=200)
+async def delete_fcm_token(
+    student_id: UUID,
+    data: FcmTokenDelete,
+    user: UserContext = Depends(get_current_user_or_service),
+    db: AsyncSession = Depends(get_db_session),
+) -> dict:
+    """Remove an FCM device token. Idempotent — returns 200 even if token not found (D-02).
+
+    IDOR protection (T-22-01): students can only delete their own tokens.
+    Service token can delete for any student_id.
+    """
+    if user.role == "student":
+        check_ownership(student_id, user)
+
+    await db.execute(
+        sql_delete(FcmToken).where(
+            FcmToken.student_id == student_id,
+            FcmToken.token == data.token,
+        )
+    )
+    await db.commit()
+    return {"message": "Token removido"}
