@@ -51,8 +51,19 @@ class _ClientChatScreenState extends ConsumerState<ClientChatScreen> {
             onPressed: () async {
               final newName = controller.text.trim();
               if (newName.isNotEmpty) {
-                await ref.read(renameChatSessionProvider(session.id, newName).future);
-                if (ctx.mounted) Navigator.of(ctx).pop();
+                try {
+                  await ref.read(renameChatSessionProvider(session.id, newName).future);
+                  if (ctx.mounted) Navigator.of(ctx).pop();
+                } catch (e) {
+                  if (ctx.mounted) {
+                    ScaffoldMessenger.of(ctx).showSnackBar(
+                      SnackBar(
+                        content: const Text('Erro ao renomear conversa. Tente novamente.'),
+                        backgroundColor: Theme.of(ctx).colorScheme.error,
+                      ),
+                    );
+                  }
+                }
               }
             },
             child: const Text('Salvar'),
