@@ -15,6 +15,7 @@ from ai_service.embedding_factory import create_embeddings
 from ai_service.llm_factory import create_llm
 from ai_service.mcp_tools import load_mcp_tools
 from ai_service.rag import create_rag_tool
+from ai_service.security import sanitize_input, filter_output
 
 logger = logging.getLogger(__name__)
 
@@ -119,6 +120,16 @@ async def invoke_agent(
     service design for the AI container.
     """
 
+    # Layer 2: Input sanitization (D-05)
+    sanitized_message, injection_detected = sanitize_input(user_message)
+
+    # If injection detected, prepend a context note for the agent (D-06)
+    if injection_detected:
+        logger.warning("Injection attempt detected for session %s", session_id)
+        # The agent's system prompt instructs it to warn the student (## Seguranca section)
+        # We use the sanitized message so the agent still sees context
+        user_message = sanitized_message
+
     mcp_tools = await load_mcp_tools(settings.MCP_SERVER_URL, session_id)
     embeddings = create_embeddings(settings)
     rag_tool = create_rag_tool(
@@ -158,4 +169,12 @@ async def invoke_agent(
         logger.exception("Agent execution failed for session %s", session_id)
         return FALLBACK_MESSAGE
 
-    return _extract_response_text(result)
+    response_text = _extract_response_text(result)
+
+    # Layer 4: Output filtering (D-05)
+    filtered_response, was_filtered = filter_output(response_text)
+    if was_filtered:
+        logger.warning("Output filter triggered for session %s", session_id)
+    response_text = filtered_response
+
+    return response_text
