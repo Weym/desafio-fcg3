@@ -8,6 +8,30 @@ part 'notification_provider.g.dart';
 
 enum NotificationType { documentStatus, appointmentReminder, errorAlert }
 
+enum NotificationFilter { all, unread, read }
+
+@riverpod
+class ReadNotificationIds extends _$ReadNotificationIds {
+  @override
+  Set<String> build() => {};
+
+  void markAsRead(String id) {
+    state = {...state, id};
+  }
+
+  void markAllAsRead(List<String> ids) {
+    state = {...state, ...ids};
+  }
+}
+
+@riverpod
+class NotificationFilterNotifier extends _$NotificationFilterNotifier {
+  @override
+  NotificationFilter build() => NotificationFilter.all;
+
+  void setFilter(NotificationFilter filter) => state = filter;
+}
+
 class DerivedNotification {
   final String id;
   final NotificationType type;
