@@ -35,3 +35,11 @@ class StaffScheduleFilter extends _$StaffScheduleFilter {
 
   void setFilter(String? status) => state = status;
 }
+
+@riverpod
+class StaffScheduleSearch extends _$StaffScheduleSearch {
+  @override
+  String build() => '';
+
+  void setQuery(String query) => state = query;
+}
