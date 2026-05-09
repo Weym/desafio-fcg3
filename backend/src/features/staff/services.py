@@ -21,7 +21,7 @@ from src.features.enrollment.models import Enrollment, EnrollmentPeriod
 from src.features.scheduling.models import Appointment, SchedulingSlot
 from src.features.staff.schemas import DashboardResponse, EnrollmentPeriodSummary, StaffCreate, StaffUpdate
 from src.shared.base_service import BaseService
-from src.shared.exceptions import ConflictException, ForbiddenException
+from src.shared.exceptions import ConflictException, ForbiddenException, NotFoundException
 from src.shared.pagination import PaginationParams
 
 
@@ -215,8 +215,14 @@ class StaffManagementService(BaseService[Staff]):
     # ------------------------------------------------------------------
 
     async def get_staff_member(self, db: AsyncSession, staff_id: UUID) -> Staff:
-        """Get staff member by ID or raise 404."""
-        return await self.get_or_404(db, staff_id, "staff")
+        """Get staff member by ID or raise 404.
+
+        Hides provider records (D-17) — consistent with list filtering.
+        """
+        staff = await self.get_or_404(db, staff_id, "staff")
+        if staff.role == "provider":
+            raise NotFoundException("staff", staff_id)
+        return staff
 
     # ------------------------------------------------------------------
     # Create staff (D-18, D-19)
