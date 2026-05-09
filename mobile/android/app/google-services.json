@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "657343757906",
+    "project_id": "desafio-fcg-g3",
+    "storage_bucket": "desafio-fcg-g3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:657343757906:android:147d1c33b3befd63c5e98b",
+        "android_client_info": {
+          "package_name": "com.example.frontend"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAFAChiwkqlw9h7I6xWnKLFK4Y0qQ5n41E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
