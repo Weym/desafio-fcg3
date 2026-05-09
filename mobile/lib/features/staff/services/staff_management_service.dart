@@ -24,7 +24,7 @@ class StaffManagementService {
       queryParameters: queryParams,
     );
     final data = response.data['data'] as List;
-    final total = response.data['meta']['total'] as int;
+    final total = response.data['pagination']['total'] as int;
     return (
       items: data
           .map((e) => StaffMemberModel.fromJson(e as Map<String, dynamic>))
