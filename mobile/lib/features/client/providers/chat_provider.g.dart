@@ -436,5 +436,22 @@ class _RenameChatSessionProviderElement
   String get newName => (origin as RenameChatSessionProvider).newName;
 }
 
+String _$chatFilterNotifierHash() =>
+    r'2786f654cf1909dc0851739127ec07e425f2afd6';
+
+/// See also [ChatFilterNotifier].
+@ProviderFor(ChatFilterNotifier)
+final chatFilterNotifierProvider =
+    AutoDisposeNotifierProvider<ChatFilterNotifier, ChatStatusFilter>.internal(
+      ChatFilterNotifier.new,
+      name: r'chatFilterNotifierProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$chatFilterNotifierHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+typedef _$ChatFilterNotifier = AutoDisposeNotifier<ChatStatusFilter>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
