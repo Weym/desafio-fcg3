@@ -149,7 +149,10 @@ class WebhookService:
             if session.verification_state in ("awaiting_email", "awaiting_code"):
                 otp_ttl = timedelta(minutes=5)
                 now = datetime.now(timezone.utc)
-                if session.updated_at < (now - otp_ttl):
+                updated_at = session.updated_at
+                if updated_at.tzinfo is None:
+                    updated_at = updated_at.replace(tzinfo=timezone.utc)
+                if updated_at < (now - otp_ttl):
                     session.verification_state = "unverified"
             # Touch updated_at for auto-close tracking (D-12)
             session.updated_at = datetime.now(timezone.utc)
