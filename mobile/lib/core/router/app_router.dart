@@ -149,8 +149,12 @@ GoRouter appRouter(Ref ref) {
           GoRoute(
             path: RoutePaths.clientResources,
             name: RouteNames.clientResources,
-            builder: (context, state) =>
-                const ClientResourcesScreen(),
+            builder: (context, state) {
+              final tab = int.tryParse(
+                      state.uri.queryParameters['tab'] ?? '') ??
+                  0;
+              return ClientResourcesScreen(initialTabIndex: tab);
+            },
           ),
         ],
       ),

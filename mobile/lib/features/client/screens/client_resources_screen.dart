@@ -12,14 +12,17 @@ import '../models/appointment_model.dart';
 import '../providers/resource_booking_provider.dart';
 import '../providers/appointment_provider.dart';
 import 'widgets/booking_flow_sheet.dart';
+import 'widgets/appointment_detail_sheet.dart';
 
 class ClientResourcesScreen extends ConsumerWidget {
-  const ClientResourcesScreen({super.key});
+  final int initialTabIndex;
+  const ClientResourcesScreen({super.key, this.initialTabIndex = 0});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return DefaultTabController(
       length: 2,
+      initialIndex: initialTabIndex,
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Recursos'),
@@ -427,6 +430,7 @@ class _AppointmentCard extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
 
     return GlassCard(
+      onTap: () => showAppointmentDetailSheet(context, appointment),
       padding: const EdgeInsets.all(AppSpacing.md),
       child: Row(
         children: [

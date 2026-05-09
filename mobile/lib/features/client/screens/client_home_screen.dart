@@ -14,7 +14,7 @@ import '../providers/document_provider.dart';
 import '../providers/appointment_provider.dart';
 import '../models/chat_session_model.dart';
 import '../models/appointment_model.dart';
-import 'widgets/appointment_detail_sheet.dart';
+
 
 String _formatDateTime(DateTime dt) {
   final day = dt.day.toString().padLeft(2, '0');
@@ -234,7 +234,7 @@ class ClientHomeScreen extends ConsumerWidget {
         label: 'Agendamentos',
         icon: Icons.calendar_today_outlined,
         color: colors.secondary,
-        onTap: () => _showNearestAppointment(context, ref, appointmentsAsync),
+        onTap: () => context.go('${RoutePaths.clientResources}?tab=1'),
       ),
       _QuickAction(
         label: 'Solicitar documentos',
@@ -291,44 +291,6 @@ class ClientHomeScreen extends ConsumerWidget {
         );
       }).toList(),
     );
-  }
-
-  void _showNearestAppointment(
-    BuildContext context,
-    WidgetRef ref,
-    AsyncValue<List<AppointmentModel>> appointmentsAsync,
-  ) {
-    appointmentsAsync.whenData((appointments) {
-      final upcoming = appointments.where((a) => a.isUpcoming).toList();
-      if (upcoming.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Sem agendamentos próximos')),
-        );
-        return;
-      }
-
-      // Sort by slotDate to find the nearest
-      upcoming.sort((a, b) {
-        final dateA = a.slotDate ?? '';
-        final dateB = b.slotDate ?? '';
-        final cmp = dateA.compareTo(dateB);
-        if (cmp != 0) return cmp;
-        return (a.slotStartTime ?? '').compareTo(b.slotStartTime ?? '');
-      });
-
-      showAppointmentDetailSheet(context, upcoming.first);
-    });
-
-    // If data isn't loaded yet, show a snackbar
-    if (appointmentsAsync is AsyncLoading) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Carregando agendamentos...')),
-      );
-    } else if (appointmentsAsync is AsyncError) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Erro ao carregar agendamentos')),
-      );
-    }
   }
 
 }
