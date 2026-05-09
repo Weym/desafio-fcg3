@@ -34,7 +34,7 @@ def get_db_pool(lifespan_context: dict[str, object]) -> object:
 async def validate_active_chat_session(db_pool: object, chat_session_id: UUID) -> dict:
     row = await db_pool.fetchrow(
         """
-        SELECT id, student_id
+        SELECT id, student_id, verification_state
         FROM chat_sessions
         WHERE id = $1 AND status = 'active'
         """,

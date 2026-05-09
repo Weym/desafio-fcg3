@@ -5,6 +5,7 @@ import time
 from typing import Any
 from uuid import UUID
 
+from fastmcp.exceptions import ToolError
 from fastmcp.server.dependencies import get_http_headers
 from fastmcp.server.middleware import Middleware, MiddlewareContext
 
@@ -53,7 +54,10 @@ class ToolLoggingMiddleware(Middleware):
 
         chat_session_id = validate_chat_session_id(raw_chat_session_id)
         db_pool = get_db_pool(fastmcp_context.lifespan_context)
-        await validate_active_chat_session(db_pool, chat_session_id)
+        session_data = await validate_active_chat_session(db_pool, chat_session_id)
+
+        # D-15/D-21: Enforce verification gate on mutating tools
+        await self._enforce_verification_gate(context, session_data)
 
         start = time.monotonic()
         result: Any = None
@@ -78,6 +82,34 @@ class ToolLoggingMiddleware(Middleware):
             )
 
         return result
+
+    async def _enforce_verification_gate(
+        self, context: MiddlewareContext, session_data: dict
+    ) -> None:
+        """Block mutating tool calls for unverified students (D-15/D-21).
+
+        Read-only tools (readOnlyHint=True) are allowed for all students.
+        Mutating tools (no readOnlyHint) require verification_state='verified'.
+        """
+        verification_state = session_data.get("verification_state", "unverified")
+        if verification_state == "verified":
+            return  # Verified students can use all tools
+
+        # Check if the tool is read-only via annotations
+        tool_name = context.message.name
+        try:
+            tool = await context.fastmcp_context.fastmcp.get_tool(tool_name)
+            annotations = getattr(tool, "annotations", None)
+            if annotations and getattr(annotations, "readOnlyHint", False):
+                return  # Read-only tool, allowed for unverified students
+        except Exception:
+            pass  # If we can't determine, block by default (safe side)
+
+        # Mutating tool + unverified student → block with actionable error
+        raise ToolError(
+            f"Acao bloqueada: o aluno precisa verificar sua identidade antes de executar '{tool_name}'. "
+            "Solicite que o aluno informe seu email institucional para receber o codigo de verificacao."
+        )
 
     async def _log_call(
         self,
