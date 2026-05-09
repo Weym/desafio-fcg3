@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Correções, Melhorias & Features
 status: executing
-last_updated: "2026-05-09T02:47:02.894Z"
+last_updated: "2026-05-09T02:55:48.740Z"
 last_activity: 2026-05-09
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 11
-  completed_plans: 7
-  percent: 64
+  completed_plans: 8
+  percent: 73
 ---
 
 # Project State
@@ -18,7 +18,7 @@ progress:
 ## Current Position
 
 Phase: 19 (staff-ux-corrections) — EXECUTING
-Plan: 3 of 6
+Plan: 5 of 6
 Status: Ready to execute
 Last activity: 2026-05-09
 
@@ -90,6 +90,11 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 - **19-02:** StaffScheduleSearch provider for client-side filtering by name/RA
 - **19-02:** Detail screen shows Nome, RA, Data emissão, Recurso, Status badge, Motivo
 - **19-02:** Confirm/cancel actions with try/catch error handling and colored SnackBar
+- **19-04:** Document tabs corrected: Todos | Processando | Prontos (not Pendentes)
+- **19-04:** StaffDocumentTypeFilter provider for secondary type-based filtering pills
+- **19-04:** Detail bottom sheet on document card tap with action buttons
+- **19-04:** Query param ?filter=pendentes maps to 'processing' status
+- **19-04:** Error SnackBar (colorScheme.error) prevents finalization without file attached
 
 ## Session Continuity
 

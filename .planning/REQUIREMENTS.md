@@ -40,11 +40,11 @@ Requirements for milestone v3.0. Each maps to roadmap phases.
 - [ ] **SFUX-11**: Intervenção — acessível para teste após correção LangChain
 - [ ] **SFUX-12**: Intervenção — widgets adequados ao padrão (drawer, search por Nome/RA/Telefone)
 - [ ] **SFUX-13**: Intervenção — tab de concluídos adicionada
-- [ ] **SFUX-14**: Documentos — tabs para "processando" e "prontos"
-- [ ] **SFUX-15**: Documentos — filtro por tipo de documento
-- [ ] **SFUX-16**: Documentos — visualização completa dos dados da solicitação ao clicar
-- [ ] **SFUX-17**: Documentos — widget de adicionar/editar segue padrão drawer
-- [ ] **SFUX-18**: Documentos — mensagem de erro clara ao finalizar sem arquivo anexado
+- [x] **SFUX-14**: Documentos — tabs para "processando" e "prontos"
+- [x] **SFUX-15**: Documentos — filtro por tipo de documento
+- [x] **SFUX-16**: Documentos — visualização completa dos dados da solicitação ao clicar
+- [x] **SFUX-17**: Documentos — widget de adicionar/editar segue padrão drawer
+- [x] **SFUX-18**: Documentos — mensagem de erro clara ao finalizar sem arquivo anexado
 - [ ] **SFUX-19**: Recursos — toggle ativar/desativar com feedback visual correto
 - [ ] **SFUX-20**: Recursos — opção de deletar recurso
 - [ ] **SFUX-21**: Cadastro — tela CRUD completa para alunos (cadastrar, visualizar, editar, remover, ativar/desativar)
@@ -169,11 +169,11 @@ Requirements for milestone v3.0. Each maps to roadmap phases.
 | SFUX-11 | Phase 19 | Pending |
 | SFUX-12 | Phase 19 | Pending |
 | SFUX-13 | Phase 19 | Pending |
-| SFUX-14 | Phase 19 | Pending |
-| SFUX-15 | Phase 19 | Pending |
-| SFUX-16 | Phase 19 | Pending |
-| SFUX-17 | Phase 19 | Pending |
-| SFUX-18 | Phase 19 | Pending |
+| SFUX-14 | Phase 19 | Complete |
+| SFUX-15 | Phase 19 | Complete |
+| SFUX-16 | Phase 19 | Complete |
+| SFUX-17 | Phase 19 | Complete |
+| SFUX-18 | Phase 19 | Complete |
 | SFUX-19 | Phase 19 | Pending |
 | SFUX-20 | Phase 19 | Pending |
 | SFUX-21 | Phase 19 | Pending |
