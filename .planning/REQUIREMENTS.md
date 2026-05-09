@@ -63,7 +63,7 @@ Requirements for milestone v3.0. Each maps to roadmap phases.
 - [ ] **LANG-06**: Falha de atendimento ativa intervenção humana automaticamente
 - [ ] **LANG-07**: System prompt define persona, instruções operacionais e ações disponíveis
 - [x] **LANG-08**: Mídia recebida (imagem/áudio) recebe rejeição educada e criativa
-- [ ] **LANG-09**: Prompt injection defense via hardening + sanitização + canary tokens
+- [x] **LANG-09**: Prompt injection defense via hardening + sanitização + canary tokens
 - [ ] **LANG-10**: Logging estruturado para RAG (chunks recuperados, similarity score)
 - [ ] **LANG-11**: Logging estruturado para MCP (tool call, params, resultado, latência)
 - [ ] **LANG-12**: Debug tooling para fluxo geral do LangChain (traceability de decisões)
@@ -189,7 +189,7 @@ Requirements for milestone v3.0. Each maps to roadmap phases.
 | LANG-06 | Phase 20 | Pending |
 | LANG-07 | Phase 20 | Pending |
 | LANG-08 | Phase 20 | Complete |
-| LANG-09 | Phase 20 | Pending |
+| LANG-09 | Phase 20 | Complete |
 | LANG-10 | Phase 20 | Pending |
 | LANG-11 | Phase 20 | Pending |
 | LANG-12 | Phase 20 | Pending |
