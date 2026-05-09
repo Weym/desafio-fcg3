@@ -1,3 +1,6 @@
+import 'dart:developer' as developer;
+
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,6 +10,17 @@ import 'core/theme/theme_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Firebase — graceful failure so app works without push notifications
+  try {
+    await Firebase.initializeApp();
+  } catch (e) {
+    developer.log(
+      'Firebase initialization failed: $e',
+      name: 'main',
+      level: 900, // WARNING
+    );
+  }
 
   final prefs = await SharedPreferences.getInstance();
 

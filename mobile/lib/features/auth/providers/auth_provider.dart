@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/models/user_model.dart';
+import '../../../core/providers/fcm_provider.dart';
 import '../../../core/providers/storage_provider.dart';
 import '../../../core/providers/dio_provider.dart';
 import '../services/auth_service.dart';
@@ -72,6 +73,12 @@ class Auth extends _$Auth {
       try {
         final user = await _authService.getMe();
         state = AuthAuthenticated(user: user);
+
+        // Register FCM token (immediately after login)
+        if (user.isStudent) {
+          ref.read(fcmServiceProvider.notifier).registerToken(user.id);
+        }
+
         return AuthVerifyResult.success;
       } catch (_) {
         await storage.delete(key: _accessTokenKey);
@@ -119,6 +126,14 @@ class Auth extends _$Auth {
 
   /// Logout — clear tokens and reset state
   Future<void> logout() async {
+    // Unregister FCM token before clearing auth state
+    final currentState = state;
+    if (currentState is AuthAuthenticated && currentState.user.isStudent) {
+      await ref
+          .read(fcmServiceProvider.notifier)
+          .unregisterToken(currentState.user.id);
+    }
+
     try {
       await _authService.logout();
     } catch (_) {

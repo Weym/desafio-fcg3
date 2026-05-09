@@ -1,25 +1,25 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'auth_provider.dart';
+part of 'fcm_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$authHash() => r'6af9276d9c1726cc188a5e967bf249e07dab45d3';
+String _$fcmServiceHash() => r'ef200bf57ac3e9fdb59f7fe14f8da89898dfe793';
 
-/// See also [Auth].
-@ProviderFor(Auth)
-final authProvider = NotifierProvider<Auth, AuthState>.internal(
-  Auth.new,
-  name: r'authProvider',
+/// See also [FcmService].
+@ProviderFor(FcmService)
+final fcmServiceProvider = NotifierProvider<FcmService, void>.internal(
+  FcmService.new,
+  name: r'fcmServiceProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$authHash,
+      : _$fcmServiceHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$Auth = Notifier<AuthState>;
+typedef _$FcmService = Notifier<void>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
