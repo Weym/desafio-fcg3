@@ -72,7 +72,7 @@ GROUP 4 — Polish (depends on all above):
 - [ ] **Phase 18: Student UX Corrections** - Fix navigation, chat UX, documents, notifications on student screens
 - [ ] **Phase 19: Staff UX Corrections** - Fix dashboard, agendamentos, chats, intervenção, documentos, recursos, cadastro
 - [ ] **Phase 20: LangChain Workflow** - Complete agent lifecycle, RAG, MCP, defenses, logging
-- [ ] **Phase 21: Roles & Auth Expansion** - Add provider role with hierarchical CRUDs
+- [x] **Phase 21: Roles & Auth Expansion** - Add provider role with hierarchical CRUDs (completed 2026-05-09)
 - [ ] **Phase 22: FCM Push Notifications** - End-to-end push infrastructure (backend + Flutter)
 - [ ] **Phase 23: New Features** - Cardápio semanal, perfil do aluno, grade curricular
 - [ ] **Phase 24: UI Polish & Integration** - Splash screen, dashboard metrics, end-to-end coherence
@@ -132,13 +132,13 @@ GROUP 4 — Polish (depends on all above):
   2. Provider can CRUD staff members (cadastrar, editar, ativar/desativar, remover) with required fields
   3. Staff can CRUD students (cadastrar, editar, ativar/desativar, remover) with required fields
   4. Provider screen has 2 tabs (staff + aluno) with separate CRUD interfaces
-**Plans:** 4 plans
+**Plans:** 4/4 plans complete
 
 Plans:
-- [ ] 21-01-PLAN.md — Backend migration + auth expansion (provider role, new columns, require_provider)
-- [ ] 21-02-PLAN.md — Staff CRUD endpoints (5 routes, provider-only)
-- [ ] 21-03-PLAN.md — Flutter navigation expansion (6th tab, UserModel, router guards)
-- [ ] 21-04-PLAN.md — Flutter staff management UI (list, form, CRUD operations)
+- [x] 21-01-PLAN.md — Backend migration + auth expansion (provider role, new columns, require_provider)
+- [x] 21-02-PLAN.md — Staff CRUD endpoints (5 routes, provider-only)
+- [x] 21-03-PLAN.md — Flutter navigation expansion (6th tab, UserModel, router guards)
+- [x] 21-04-PLAN.md — Flutter staff management UI (list, form, CRUD operations)
 
 **UI hint**: yes
 
@@ -195,7 +195,7 @@ Plans:
 | 18. Student UX Corrections | v3.0 | 0/TBD | Not started | - |
 | 19. Staff UX Corrections | v3.0 | 0/TBD | Not started | - |
 | 20. LangChain Workflow | v3.0 | 0/TBD | Not started | - |
-| 21. Roles & Auth Expansion | v3.0 | 0/4 | Planned | - |
+| 21. Roles & Auth Expansion | v3.0 | 4/4 | Complete   | 2026-05-09 |
 | 22. FCM Push Notifications | v3.0 | 0/TBD | Not started | - |
 | 23. New Features | v3.0 | 0/TBD | Not started | - |
 | 24. UI Polish & Integration | v3.0 | 0/TBD | Not started | - |
