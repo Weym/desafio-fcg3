@@ -287,7 +287,7 @@ class _DocumentCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  _formatDate(document.requestedAt),
+                  'Solicitado em ${_formatDateTime(document.requestedAt)}',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: colors.onSurfaceVariant,
                       ),
@@ -353,10 +353,12 @@ class _DocumentCard extends StatelessWidget {
     );
   }
 
-  String _formatDate(DateTime date) {
+  String _formatDateTime(DateTime date) {
     final day = date.day.toString().padLeft(2, '0');
     final month = date.month.toString().padLeft(2, '0');
     final year = date.year;
-    return '$day/$month/$year';
+    final hour = date.hour.toString().padLeft(2, '0');
+    final minute = date.minute.toString().padLeft(2, '0');
+    return '$day/$month/$year $hour:$minute';
   }
 }
