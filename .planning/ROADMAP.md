@@ -120,7 +120,7 @@ GROUP 4 — Polish (depends on all above):
   3. Off-scope questions receive polite redirection; media messages receive creative rejection; failures trigger human intervention
   4. Prompt injection attempts are detected and neutralized without disrupting legitimate conversation
   5. Staff can see RAG debug info (chunks, scores) in chat logs; system logs capture full LangChain decision traceability
-**Plans:** 6/6 plans complete
+**Plans:** 8 plans (6 complete, 2 gap closure)
 
 Plans:
 - [x] 20-01-PLAN.md — System prompt + Alpha persona + off-scope + media enhancement
@@ -129,6 +129,8 @@ Plans:
 - [x] 20-04-PLAN.md — Lazy OTP strategy + webhook flow modification
 - [x] 20-05-PLAN.md — Prompt injection defense (4 layers)
 - [x] 20-06-PLAN.md — Session lifecycle (welcome/goodbye/idle timeout)
+- [ ] 20-07-PLAN.md — Gap closure: stale OTP reset + farewell accent normalization
+- [ ] 20-08-PLAN.md — Gap closure: plain-text formatting + personalized welcome name
 
 ### Phase 21: Roles & Auth Expansion
 
