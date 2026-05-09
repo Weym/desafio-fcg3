@@ -13,7 +13,6 @@ import '../providers/chat_provider.dart';
 import '../providers/document_provider.dart';
 import '../providers/appointment_provider.dart';
 import '../models/chat_session_model.dart';
-import '../models/document_model.dart';
 import '../models/appointment_model.dart';
 
 String _formatDateTime(DateTime dt) {
@@ -45,7 +44,6 @@ class ClientHomeScreen extends ConsumerWidget {
     final colors = Theme.of(context).colorScheme;
 
     final chatSessionsAsync = ref.watch(chatSessionsProvider);
-    final documentsAsync = ref.watch(documentsProvider);
     final appointmentsAsync = ref.watch(appointmentsProvider);
 
     return Scaffold(
@@ -135,7 +133,7 @@ class ClientHomeScreen extends ConsumerWidget {
                       ),
                 ),
                 const SizedBox(height: AppSpacing.md),
-                _buildQuickActions(context, documentsAsync),
+                _buildQuickActions(context, ref, appointmentsAsync),
               ],
             ),
           ),
@@ -225,34 +223,32 @@ class ClientHomeScreen extends ConsumerWidget {
 
   Widget _buildQuickActions(
     BuildContext context,
-    AsyncValue<List<DocumentModel>> documentsAsync,
+    WidgetRef ref,
+    AsyncValue<List<AppointmentModel>> appointmentsAsync,
   ) {
     final colors = Theme.of(context).colorScheme;
 
     final actions = [
       _QuickAction(
-        label: 'Solicitar documento',
-        icon: Icons.description_outlined,
-        color: colors.primary,
-        onTap: () => context.go(RoutePaths.clientDocuments),
+        label: 'Agendamentos',
+        icon: Icons.calendar_today_outlined,
+        color: colors.secondary,
+        onTap: () => _showNearestAppointment(context, ref, appointmentsAsync),
       ),
       _QuickAction(
-        label: 'Conversar com Mentor',
-        icon: Icons.chat_outlined,
-        color: colors.secondary,
-        onTap: () => context.go(RoutePaths.clientChat),
+        label: 'Solicitar documentos',
+        icon: Icons.description_outlined,
+        color: colors.primary,
+        onTap: () {
+          ref.read(documentAutoOpenDrawerProvider.notifier).state = true;
+          context.go(RoutePaths.clientDocuments);
+        },
       ),
       _QuickAction(
         label: 'Notificações',
         icon: Icons.notifications_outlined,
         color: colors.tertiary,
         onTap: () => context.go(RoutePaths.clientNotifications),
-      ),
-      _QuickAction(
-        label: 'Suporte',
-        icon: Icons.support_agent_outlined,
-        color: colors.error,
-        onTap: () => context.go(RoutePaths.clientSupport),
       ),
     ];
 
@@ -293,6 +289,134 @@ class ClientHomeScreen extends ConsumerWidget {
           ),
         );
       }).toList(),
+    );
+  }
+
+  void _showNearestAppointment(
+    BuildContext context,
+    WidgetRef ref,
+    AsyncValue<List<AppointmentModel>> appointmentsAsync,
+  ) {
+    final colors = Theme.of(context).colorScheme;
+
+    appointmentsAsync.whenData((appointments) {
+      final upcoming = appointments.where((a) => a.isUpcoming).toList();
+      if (upcoming.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Sem agendamentos próximos')),
+        );
+        return;
+      }
+
+      // Sort by slotDate to find the nearest
+      upcoming.sort((a, b) {
+        final dateA = a.slotDate ?? '';
+        final dateB = b.slotDate ?? '';
+        final cmp = dateA.compareTo(dateB);
+        if (cmp != 0) return cmp;
+        return (a.slotStartTime ?? '').compareTo(b.slotStartTime ?? '');
+      });
+
+      final nearest = upcoming.first;
+
+      showModalBottomSheet(
+        context: context,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+        builder: (ctx) => Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: colors.secondaryContainer,
+                      borderRadius:
+                          BorderRadius.circular(AppSpacing.radiusFull),
+                    ),
+                    child: Icon(Icons.calendar_today,
+                        color: colors.onSecondaryContainer),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Próximo Agendamento',
+                      style:
+                          Theme.of(ctx).textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              _appointmentDetailRow(
+                  ctx, 'Motivo', nearest.reason, colors),
+              const SizedBox(height: 12),
+              _appointmentDetailRow(
+                  ctx, 'Data', nearest.slotDate ?? '-', colors),
+              const SizedBox(height: 12),
+              _appointmentDetailRow(
+                ctx,
+                'Horário',
+                '${nearest.slotStartTime ?? '-'} — ${nearest.endTime ?? '-'}',
+                colors,
+              ),
+              const SizedBox(height: 12),
+              _appointmentDetailRow(
+                  ctx, 'Status', nearest.status, colors),
+              const SizedBox(height: 24),
+            ],
+          ),
+        ),
+      );
+    });
+
+    // If data isn't loaded yet, show a snackbar
+    if (appointmentsAsync is AsyncLoading) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Carregando agendamentos...')),
+      );
+    } else if (appointmentsAsync is AsyncError) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Erro ao carregar agendamentos')),
+      );
+    }
+  }
+
+  Widget _appointmentDetailRow(
+    BuildContext context,
+    String label,
+    String value,
+    ColorScheme colors,
+  ) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 80,
+          child: Text(
+            label,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: colors.onSurfaceVariant,
+                  fontWeight: FontWeight.w600,
+                ),
+          ),
+        ),
+        Expanded(
+          child: Text(
+            value,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: colors.onSurface,
+                ),
+          ),
+        ),
+      ],
     );
   }
 }

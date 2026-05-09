@@ -28,3 +28,6 @@ class DocumentFilter extends _$DocumentFilter {
 
   void setFilter(String? status) => state = status;
 }
+
+/// When true, the documents screen auto-opens the request drawer on build.
+final documentAutoOpenDrawerProvider = StateProvider<bool>((ref) => false);

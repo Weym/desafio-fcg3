@@ -12,11 +12,29 @@ import '../models/document_model.dart';
 import '../providers/document_provider.dart';
 import 'widgets/document_request_sheet.dart';
 
-class ClientDocumentsScreen extends ConsumerWidget {
+class ClientDocumentsScreen extends ConsumerStatefulWidget {
   const ClientDocumentsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ClientDocumentsScreen> createState() =>
+      _ClientDocumentsScreenState();
+}
+
+class _ClientDocumentsScreenState extends ConsumerState<ClientDocumentsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final autoOpen = ref.read(documentAutoOpenDrawerProvider);
+      if (autoOpen) {
+        ref.read(documentAutoOpenDrawerProvider.notifier).state = false;
+        showDocumentRequestSheet(context, ref);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final filter = ref.watch(documentFilterProvider);
     final documentsAsync = ref.watch(documentsProvider);
     final colors = Theme.of(context).colorScheme;
