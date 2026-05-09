@@ -152,7 +152,7 @@ async def invoke_agent(
     )
 
     # D-01, LANG-01: Inject welcome generation instruction on new sessions
-    if is_new_session and not history_messages:
+    if is_new_session:
         name_part = f" o aluno {student_name}" if student_name else " o aluno"
         welcome_instruction = SystemMessage(
             content=(
