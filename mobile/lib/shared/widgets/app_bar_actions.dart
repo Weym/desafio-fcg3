@@ -25,6 +25,11 @@ class AppBarActions extends ConsumerWidget {
           tooltip: 'Suporte',
         ),
         IconButton(
+          icon: Icon(Icons.notifications_outlined, color: colors.primary),
+          onPressed: () => GoRouter.of(context).go(RoutePaths.clientNotifications),
+          tooltip: 'Notificações',
+        ),
+        IconButton(
           icon: Icon(
             isDark ? Icons.light_mode : Icons.dark_mode,
             color: colors.primary,
