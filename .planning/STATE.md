@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Correções, Melhorias & Features
 status: executing
-last_updated: "2026-05-09T02:55:48.740Z"
+last_updated: "2026-05-09T03:00:19.617Z"
 last_activity: 2026-05-09
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 11
-  completed_plans: 8
-  percent: 73
+  completed_plans: 9
+  percent: 82
 ---
 
 # Project State
@@ -18,7 +18,7 @@ progress:
 ## Current Position
 
 Phase: 19 (staff-ux-corrections) — EXECUTING
-Plan: 5 of 6
+Plan: 6 of 6
 Status: Ready to execute
 Last activity: 2026-05-09
 
@@ -95,6 +95,9 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 - **19-04:** Detail bottom sheet on document card tap with action buttons
 - **19-04:** Query param ?filter=pendentes maps to 'processing' status
 - **19-04:** Error SnackBar (colorScheme.error) prevents finalization without file attached
+- **19-05:** _ResourceCard converted to ConsumerWidget for direct ref access (toggle/delete)
+- **19-05:** Switch widget replaces static availability dot for toggle ativar/desativar
+- **19-05:** PopupMenu has Editar + dynamic Ativar/Desativar + Deletar (with confirmation dialog)
 
 ## Session Continuity
 

@@ -45,8 +45,8 @@ Requirements for milestone v3.0. Each maps to roadmap phases.
 - [x] **SFUX-16**: Documentos — visualização completa dos dados da solicitação ao clicar
 - [x] **SFUX-17**: Documentos — widget de adicionar/editar segue padrão drawer
 - [x] **SFUX-18**: Documentos — mensagem de erro clara ao finalizar sem arquivo anexado
-- [ ] **SFUX-19**: Recursos — toggle ativar/desativar com feedback visual correto
-- [ ] **SFUX-20**: Recursos — opção de deletar recurso
+- [x] **SFUX-19**: Recursos — toggle ativar/desativar com feedback visual correto
+- [x] **SFUX-20**: Recursos — opção de deletar recurso
 - [ ] **SFUX-21**: Cadastro — tela CRUD completa para alunos (cadastrar, visualizar, editar, remover, ativar/desativar)
 - [ ] **SFUX-22**: Cadastro — lista de alunos como cards com menu 3 pontos (editar, excluir, ativar/desativar) e indicador de estado
 - [ ] **SFUX-23**: Cadastro — botão flutuante "+" para adicionar aluno
@@ -174,8 +174,8 @@ Requirements for milestone v3.0. Each maps to roadmap phases.
 | SFUX-16 | Phase 19 | Complete |
 | SFUX-17 | Phase 19 | Complete |
 | SFUX-18 | Phase 19 | Complete |
-| SFUX-19 | Phase 19 | Pending |
-| SFUX-20 | Phase 19 | Pending |
+| SFUX-19 | Phase 19 | Complete |
+| SFUX-20 | Phase 19 | Complete |
 | SFUX-21 | Phase 19 | Pending |
 | SFUX-22 | Phase 19 | Pending |
 | SFUX-23 | Phase 19 | Pending |
