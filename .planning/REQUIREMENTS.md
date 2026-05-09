@@ -34,12 +34,12 @@ Requirements for milestone v3.0. Each maps to roadmap phases.
 - [x] **SFUX-05**: Agendamentos — card exibe nome e recurso (não motivo)
 - [x] **SFUX-06**: Agendamentos — confirmar agendamento funciona corretamente
 - [x] **SFUX-07**: Agendamentos — search por RA ou nome de aluno
-- [ ] **SFUX-08**: Chats — tab de navegação para tela de chats no menu
-- [ ] **SFUX-09**: Chats — identificação mostra nome do aluno + número formatado
-- [ ] **SFUX-10**: Chats — header ao entrar no chat com nome, RA e dados da sessão
-- [ ] **SFUX-11**: Intervenção — acessível para teste após correção LangChain
-- [ ] **SFUX-12**: Intervenção — widgets adequados ao padrão (drawer, search por Nome/RA/Telefone)
-- [ ] **SFUX-13**: Intervenção — tab de concluídos adicionada
+- [x] **SFUX-08**: Chats — tab de navegação para tela de chats no menu
+- [x] **SFUX-09**: Chats — identificação mostra nome do aluno + número formatado
+- [x] **SFUX-10**: Chats — header ao entrar no chat com nome, RA e dados da sessão
+- [x] **SFUX-11**: Intervenção — acessível para teste após correção LangChain
+- [x] **SFUX-12**: Intervenção — widgets adequados ao padrão (drawer, search por Nome/RA/Telefone)
+- [x] **SFUX-13**: Intervenção — tab de concluídos adicionada
 - [x] **SFUX-14**: Documentos — tabs para "processando" e "prontos"
 - [x] **SFUX-15**: Documentos — filtro por tipo de documento
 - [x] **SFUX-16**: Documentos — visualização completa dos dados da solicitação ao clicar
@@ -163,12 +163,12 @@ Requirements for milestone v3.0. Each maps to roadmap phases.
 | SFUX-05 | Phase 19 | Complete |
 | SFUX-06 | Phase 19 | Complete |
 | SFUX-07 | Phase 19 | Complete |
-| SFUX-08 | Phase 19 | Pending |
-| SFUX-09 | Phase 19 | Pending |
-| SFUX-10 | Phase 19 | Pending |
-| SFUX-11 | Phase 19 | Pending |
-| SFUX-12 | Phase 19 | Pending |
-| SFUX-13 | Phase 19 | Pending |
+| SFUX-08 | Phase 19 | Complete |
+| SFUX-09 | Phase 19 | Complete |
+| SFUX-10 | Phase 19 | Complete |
+| SFUX-11 | Phase 19 | Complete |
+| SFUX-12 | Phase 19 | Complete |
+| SFUX-13 | Phase 19 | Complete |
 | SFUX-14 | Phase 19 | Complete |
 | SFUX-15 | Phase 19 | Complete |
 | SFUX-16 | Phase 19 | Complete |

@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Correções, Melhorias & Features
-status: verifying
-last_updated: "2026-05-09T03:11:46.575Z"
+status: All plans executed
+last_updated: "2026-05-09T03:20:38.688Z"
 last_activity: 2026-05-09
 progress:
   total_phases: 7
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 11
-  completed_plans: 10
-  percent: 91
+  completed_plans: 11
+  percent: 100
 ---
 
 # Project State
@@ -90,6 +90,11 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 - **19-02:** StaffScheduleSearch provider for client-side filtering by name/RA
 - **19-02:** Detail screen shows Nome, RA, Data emissão, Recurso, Status badge, Motivo
 - **19-02:** Confirm/cancel actions with try/catch error handling and colored SnackBar
+- **19-03:** StaffChatsScreen: unified 4-tab screen (Todos/Pendentes/Em atendimento/Concluídos) merging AI + intervention
+- **19-03:** StaffChatsSearch provider for client-side search by name/RA/phone
+- **19-03:** Router /staff/chats now points to StaffChatsScreen (replaced StaffAiScreen placeholder)
+- **19-03:** Chat detail header shows studentName, RA, session date+status with surfaceContainerLow bg
+- **19-03:** ChatSessionModel extended with studentName, studentRa nullable fields
 - **19-04:** Document tabs corrected: Todos | Processando | Prontos (not Pendentes)
 - **19-04:** StaffDocumentTypeFilter provider for secondary type-based filtering pills
 - **19-04:** Detail bottom sheet on document card tap with action buttons
