@@ -65,6 +65,20 @@ class _UpdateStatusSheetState extends ConsumerState<_UpdateStatusSheet> {
   }
 
   Future<void> _submit() async {
+    // Validate: file required when setting status to 'ready'
+    if (_selectedStatus == 'ready' &&
+        _pickedFilePath == null &&
+        widget.document.fileUrl == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content:
+              const Text('Anexe o arquivo antes de finalizar o documento'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
 
     try {
