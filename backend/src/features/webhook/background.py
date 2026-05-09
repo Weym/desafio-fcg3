@@ -1,0 +1,254 @@
+"""Background task for AI service integration with retry, fallback, and per-session locking.
+
+CRITICAL-3: _handle_task_result logs exceptions from background tasks.
+CRITICAL-4: Opens its OWN DB session via async_session_maker — never request-scoped.
+D-06: Retry once on AI service failure, then send fallback message.
+D-09: Per-session asyncio.Lock prevents concurrent processing for same student.
+HI-01: Escalation detection by keywords (before AI) and AI response (after AI).
+"""
+
+from __future__ import annotations
+
+import asyncio
+import logging
+from datetime import datetime, timezone
+from uuid import UUID
+
+import httpx
+from sqlalchemy import update
+
+from src.infrastructure.config import get_settings
+from src.infrastructure.database import async_session
+from src.infrastructure.whatsapp_client import WhatsAppClient
+
+logger = logging.getLogger(__name__)
+
+# Per-session locks to prevent concurrent processing (D-09, MINOR-3)
+_session_locks: dict[str, asyncio.Lock] = {}
+
+FALLBACK_MESSAGE = (
+    "Desculpe, estou com dificuldades tecnicas. "
+    "Tente novamente em alguns minutos."
+)
+
+# Escalation constants (HI-01)
+ESCALATION_KEYWORDS = {
+    "atendente", "humano", "pessoa", "secretaria",
+    "falar com alguem", "atendimento humano",
+}
+ESCALATION_BOT_PHRASES = [
+    "procurar a secretaria",
+    "secretaria presencialmente",
+    "entrar em contato com a secretaria",
+]
+ESCALATION_ACK_MESSAGE = "Vou transferir voce para um atendente. Aguarde um momento."
+
+
+def _handle_task_result(task: asyncio.Task) -> None:
+    """Done callback for background tasks.
+
+    Logs exceptions that would be silently swallowed (CRITICAL-3).
+    """
+    try:
+        exc = task.exception()
+        if exc is not None:
+            logger.error(
+                "Background task failed with unhandled exception: %s: %s",
+                type(exc).__name__,
+                exc,
+                exc_info=exc,
+            )
+    except asyncio.CancelledError:
+        logger.warning("Background message processing task was cancelled")
+
+
+def _should_escalate_by_keywords(message_text: str) -> bool:
+    """Check if student message contains escalation keywords (HI-01).
+
+    Returns True if any keyword from ESCALATION_KEYWORDS is found
+    as a substring in the normalized (lowercased) message text.
+    """
+    normalized = message_text.strip().lower()
+    return any(keyword in normalized for keyword in ESCALATION_KEYWORDS)
+
+
+def _should_escalate_by_ai_response(ai_response: str) -> bool:
+    """Check if AI response contains escalation-triggering phrases (HI-01).
+
+    Returns True if any phrase from ESCALATION_BOT_PHRASES is found
+    (case-insensitive) in the AI response.
+    """
+    normalized = ai_response.lower()
+    return any(phrase in normalized for phrase in ESCALATION_BOT_PHRASES)
+
+
+async def _escalate_session(
+    session_id: UUID, phone: str, wa_client: WhatsAppClient
+) -> None:
+    """Escalate a chat session to human intervention (HI-01).
+
+    - Sets status to 'human_needed' and escalated_at to now
+    - Saves a system message recording the escalation
+    - Sends acknowledgment to student via WhatsApp
+    - Opens its OWN DB session (CRITICAL-4)
+    """
+    from src.features.chat.models import ChatSession
+
+    async with async_session() as db:
+        await db.execute(
+            update(ChatSession)
+            .where(ChatSession.id == session_id)
+            .values(
+                status="human_needed",
+                escalated_at=datetime.now(timezone.utc),
+            )
+        )
+
+        from src.features.webhook.service import WebhookService
+
+        webhook_service = WebhookService()
+        await webhook_service.save_message(
+            session_id=session_id,
+            role="system",
+            content="[Escalação para atendimento humano]",
+            media_type=None,
+            wamid=None,
+            db=db,
+        )
+        await db.commit()
+
+    await wa_client.send_text_message(phone, ESCALATION_ACK_MESSAGE)
+
+
+async def process_verified_message(
+    session_id: UUID,
+    message_text: str,
+    phone: str,
+    wa_client: WhatsAppClient,
+) -> None:
+    """Process a verified student's text message.
+
+    1. Check escalation keywords — if matched, escalate without AI (HI-01)
+    2. Acquire per-session lock (D-09)
+    3. Call AI service with message + session_id
+    4. On failure: retry once, then send fallback (D-06)
+    5. Check AI response for escalation phrases (HI-01)
+    6. Save assistant response to chat_messages
+    7. Send response via WhatsApp
+
+    CRITICAL-4: Opens its OWN DB session — never uses the request-scoped one.
+    """
+    # HI-01: Check escalation keywords BEFORE AI call
+    if _should_escalate_by_keywords(message_text):
+        logger.info(
+            "Escalation triggered by keyword for session %s", session_id
+        )
+        await _escalate_session(session_id, phone, wa_client)
+        return
+
+    settings = get_settings()
+    lock_key = str(session_id)
+    lock = _session_locks.setdefault(lock_key, asyncio.Lock())
+
+    async with lock:
+        agent_response: str | None = None
+
+        # Call AI service with one retry on failure (D-06).
+        # The AI service `/chat` endpoint requires the shared internal
+        # service token (see ai_service/main.py::require_service_token) —
+        # omitting this header causes a 401 on every request, which
+        # would route every verified student straight to the fallback
+        # "Desculpe, estou com dificuldades tecnicas..." message.
+        for attempt in range(2):
+            try:
+                async with httpx.AsyncClient(
+                    timeout=httpx.Timeout(50.0, connect=5.0)
+                ) as http:
+                    response = await http.post(
+                        f"{settings.ai_service_url}/chat",
+                        json={
+                            "session_id": str(session_id),
+                            "message": message_text,
+                        },
+                        headers={
+                            "X-Service-Token": settings.mcp_service_token,
+                        },
+                    )
+                    if response.status_code == 200:
+                        data = response.json()
+                        agent_response = data.get("response", FALLBACK_MESSAGE)
+                        break
+                    else:
+                        logger.warning(
+                            "AI service returned %d on attempt %d",
+                            response.status_code,
+                            attempt + 1,
+                        )
+            except httpx.HTTPError as e:
+                logger.warning(
+                    "AI service call attempt %d failed: %s", attempt + 1, e
+                )
+            except Exception as e:
+                logger.error(
+                    "Unexpected error calling AI service attempt %d: %s",
+                    attempt + 1,
+                    e,
+                )
+                break  # Don't retry on unexpected errors
+
+        # If both attempts failed, use fallback (D-06)
+        if agent_response is None:
+            agent_response = FALLBACK_MESSAGE
+            logger.error(
+                "AI service unavailable for session %s, sending fallback",
+                session_id,
+            )
+
+        # HI-01: Check AI response for escalation phrases
+        if _should_escalate_by_ai_response(agent_response):
+            logger.info(
+                "Escalation triggered by AI response for session %s",
+                session_id,
+            )
+            # Save AI response first (so staff can see what triggered escalation)
+            async with async_session() as db:
+                from src.features.webhook.service import WebhookService
+
+                webhook_service = WebhookService()
+                await webhook_service.save_message(
+                    session_id=session_id,
+                    role="assistant",
+                    content=agent_response,
+                    media_type=None,
+                    wamid=None,
+                    db=db,
+                )
+                await db.commit()
+
+            # Send AI response to student (they see the bot's last message)
+            await wa_client.send_text_message(phone, agent_response)
+            # Then escalate
+            await _escalate_session(session_id, phone, wa_client)
+            return
+
+        # Save assistant response to chat_messages (CRITICAL-4: own session)
+        async with async_session() as db:
+            from src.features.webhook.service import WebhookService
+
+            webhook_service = WebhookService()
+            await webhook_service.save_message(
+                session_id=session_id,
+                role="assistant",
+                content=agent_response,
+                media_type=None,
+                wamid=None,
+                db=db,
+            )
+            await db.commit()
+
+        # Send response via WhatsApp (D-07: WhatsApp client already handles retry)
+        await wa_client.send_text_message(phone, agent_response)
+
+    # Clean up lock if no other coroutine is waiting on it (prevent memory leak)
+    if not lock.locked():
+        _session_locks.pop(lock_key, None)

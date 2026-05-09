@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.env
+.env.local
+.git/
+.gitignore
+.planning/
+*.md
+mobile/
+scripts/seed.py
+alembic/versions/*.pyc

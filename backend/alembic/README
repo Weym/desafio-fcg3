@@ -1,0 +1,5 @@
+Single-database configuration for the backend service.
+
+Alembic runs with a synchronous PostgreSQL driver while the FastAPI runtime
+uses asyncpg. Migrations import metadata from src feature models and are kept
+domain-grouped for readability.

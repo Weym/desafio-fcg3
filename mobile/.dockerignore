@@ -1,0 +1,41 @@
+# Flutter/Dart ephemeral build output — contains host-specific absolute paths
+# in package_config.json that break container builds when copied over the
+# container's freshly-generated pub-get output.
+.dart_tool/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+
+# IDE / editor
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# OS
+.DS_Store
+
+# Git
+.git/
+.gitignore
+
+# Logs
+*.log
+
+# Platform-specific build dirs not needed for web build
+android/.gradle/
+android/app/build/
+android/build/
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+linux/flutter/ephemeral/
+macos/Flutter/ephemeral/
+macos/Pods/
+windows/flutter/ephemeral/
+
+# Test coverage
+coverage/

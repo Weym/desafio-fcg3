@@ -1,141 +1,89 @@
-# Projeto acadêmico - Assistente Inteligente
+# Desafio FCG3
 
-Plataforma de assistente acadêmico com integração Flutter mobile, backend em TypeScript e serviço de IA em Python.
+Plataforma academica com backend em FastAPI, servico de IA, servidor MCP e app Flutter.
 
-## Arquitetura do Projeto (Monorepo + VSA)
+## Requisitos
 
-```
-desafio-fcg3/
-├── ai_service/       # Serviço de IA (Python) - LangChain + RAG
-│   ├── app/          # Código da aplicação
-│   │   ├── agents/   # Agentes de IA
-│   │   └── rag/      # Lógica de RAG
-│   ├── data/         # Dados e vetores
-│   └── requirements.txt
-│
-├── backend/          # API em TypeScript (Vertical Slice Architecture)
-│   ├── src/
-│   │   ├── features/    # Slices (endpoints, controllers, business logic)
-│   │   ├── infrastructure/  # DB, external services
-│   │   ├── shared/      # Código reutilizável
-│   │   ├── main.ts      # Entry point
-│   │   └── routes.ts    # Definição de rotas
-│   └── package.json
-│
-└── mobile/           # Aplicação Flutter
-    ├── lib/
-    └── pubspec.yaml
-```
+- Docker e Docker Compose
+- Python 3.12
+- Flutter 3.41.6 (opcional para o app `mobile/`)
 
-### Fluxo de Comunicação
+## Como rodar
 
-```
-Mobile (Flutter) → Backend (TypeScript) → AI Service (Python)
-                            ↓
-                      MongoDB/PostgreSQL
-```
+1. Copie o arquivo de ambiente:
 
-## Stack Tecnológico
-
-### AI Service
-- **Linguagem**: Python
-- **Framework**: LangChain
-- **IA**: RAG (Retrieval-Augmented Generation)
-- **Vector DB**: Para armazenamento de embeddings
-
-### Backend
-- **Linguagem**: TypeScript
-- **Framework**: Node.js (Express)
-- **Banco de Dados**: MongoDB ou PostgreSQL
-- **Arquitetura**: Vertical Slice Architecture (VSA)
-- **Hospedagem**: Docker/LXC (deploy)
-
-### Mobile
-- **Framework**: Flutter
-- **Perfis**: Cliente e Fornecedor/Administrador
-- **Notificações**: Firebase Cloud Messaging (FCM)
-
-## Funcionalidades Principais
-
-### AI Service
-- Processamento de linguagem natural via LangChain
-- Sistema de RAG para recuperação de documentos acadêmicos
-- Geração de respostas contextuais
-
-### Backend
-- API RESTful para comunicação com o mobile
-- Integração com AI Service para assistente acadêmico
-- Autenticação e autorização
-- Gerenciamento de usuários e dados acadêmicos
-
-### Mobile (Flutter)
-- **Perfil Cliente**: Acompanhamento de atividades, histórico, documentos e notificações
-- **Perfil Fornecedor**: Dashboard de gestão, controle de atividades acadêmicas
-
-## Estrutura de Pastas (Vertical Slice Architecture)
-
-### AI Service
-```
-ai_service/
-├── app/
-│   ├── agents/    # Definição de agentes de IA
-│   └── rag/       # Pipeline de RAG
-├── data/          # Armazenamento de dados e vetores
-└── requirements.txt
-```
-
-### Backend (VSA)
-```
-backend/src/
-├── features/           # Cada feature é um "slice" completo
-│   └── [feature]/
-│       ├── controllers/
-│       ├── services/
-│       └── routes.ts
-├── infrastructure/     # Configurações de DB, serviços externos
-├── shared/             # Código reutilizável entre features
-├── main.ts             # Entry point
-└── routes.ts           # Agregação das rotas
-```
-
-### Mobile
-```
-mobile/
-├── lib/               # Código Flutter
-└── pubspec.yaml
-```
-
-## Como Executar
-
-### AI Service
 ```bash
-cd ai_service
-pip install -r requirements.txt
-python app/main.py
+cp .env.example .env
 ```
 
-### Backend
+2. Preencha os valores do `.env`.
+
+Observacoes:
+
+- `JWT_SECRET` deve ser unico por ambiente
+- `MCP_SERVICE_TOKEN` deve ser unico por ambiente
+- nunca versione o `.env`
+
+3. Suba a stack:
+
 ```bash
-cd backend
-npm install
-npm run dev
+docker compose up --build -d
 ```
 
-### Mobile
+O comando destacado acima termina antes dos healthchecks dos servicos HTTP concluirem. Trate essa saida destacada como um estado intermediario de startup, nao como veredito final de falha.
+
+4. Confira a saude dos servicos:
+
 ```bash
-cd mobile
-flutter pub get
-flutter run
+docker compose ps
+curl http://localhost:8000/health
+curl http://localhost:8001/health
+curl http://localhost:8002/health
 ```
 
-### Docker (Monorepo)
+Se `docker compose ps` ainda mostrar servicos em estado de transicao (`created`, `starting` ou equivalente), aguarde alguns segundos e rode o comando novamente por ate 60 segundos antes de declarar falha no cold start. Considere a stack realmente falha apenas se esse intervalo terminar sem os servicos estabilizarem ou se o `curl http://localhost:8000/health` nao responder com sucesso.
+
+## Banco de dados
+
+Aplicar migrations:
+
 ```bash
-docker-compose up --build
+docker compose exec fastapi-app alembic upgrade head
 ```
 
-## Tech Lead / Responsáveis
+Popular dados de desenvolvimento:
 
-- **Backend Developer**: API TypeScript e infraestrutura
-- **AI Specialist**: LangChain, RAG e integração com LLM
-- **Flutter Developer**: Mobile app (cliente e fornecedor)
-- **DevOps**: Docker, deploy e Firebase
+```bash
+docker compose exec fastapi-app python -m scripts.seed
+```
+
+## Servicos locais
+
+- API FastAPI: `http://localhost:8000`
+- AI service: `http://localhost:8001`
+- MCP server: `http://localhost:8002`
+- PostgreSQL: `localhost:5432`
+
+## Estrutura
+
+- `backend/` - API FastAPI, Alembic, seed e modelos
+- `ai_service/` - servico de IA
+- `mcp_server/` - servidor MCP
+- `mobile/` - app Flutter
+- `.planning/` - artefatos do workflow GSD
+
+## Comandos uteis
+
+Parar a stack:
+
+```bash
+docker compose down
+```
+
+Ver logs da API:
+
+```bash
+docker compose logs -f fastapi-app
+```
+
+O app Flutter tem instrucoes proprias em `mobile/README.md`.

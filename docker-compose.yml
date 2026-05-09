@@ -1,0 +1,190 @@
+services:
+  postgres:
+    build: ./backend/docker/postgres
+    container_name: fcg3-postgres
+    entrypoint:
+      - /bin/bash
+      - -ceu
+      - |
+          docker-entrypoint.sh postgres \
+            -c shared_preload_libraries=pg_cron \
+            -c cron.database_name=${POSTGRES_DB:-postgres} \
+            -c hba_file=/etc/postgresql/pg_hba_custom.conf &
+          postgres_pid=$$!
+          trap 'kill -TERM "$$postgres_pid"; wait "$$postgres_pid"' INT TERM
+          until pg_isready -h 127.0.0.1 -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-postgres} >/dev/null 2>&1; do
+            sleep 1
+          done
+          bash /docker-entrypoint-initdb.d/reconcile_dev_credentials.sh
+          wait "$$postgres_pid"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/docker/postgres/reconcile_dev_credentials.sh:/docker-entrypoint-initdb.d/reconcile_dev_credentials.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "PGPASSWORD=${POSTGRES_PASSWORD} psql -h 127.0.0.1 -U ${POSTGRES_USER} -d ${POSTGRES_DB} -tAc 'SELECT 1' >/dev/null"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    networks:
+      - data-network
+
+  fastapi-app:
+    build: ./backend
+    container_name: fcg3-api
+    ports:
+      - "8000:8000"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      DATABASE_URL: ${DATABASE_URL}
+      ALEMBIC_DATABASE_URL: ${ALEMBIC_DATABASE_URL}
+      MCP_SERVICE_TOKEN: ${MCP_SERVICE_TOKEN}
+      WHATSAPP_TOKEN: ${WHATSAPP_TOKEN}
+      WHATSAPP_PHONE_NUMBER_ID: ${WHATSAPP_PHONE_NUMBER_ID}
+      WHATSAPP_WEBHOOK_VERIFY_TOKEN: ${WHATSAPP_WEBHOOK_VERIFY_TOKEN}
+      WHATSAPP_APP_SECRET: ${WHATSAPP_APP_SECRET}
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      RESEND_FROM: ${RESEND_FROM:-onboarding@resend.dev}
+      JWT_SECRET: ${JWT_SECRET}
+      LLM_PROVIDER: ${LLM_PROVIDER}
+      LLM_MODEL: ${LLM_MODEL}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+      FCM_CREDENTIALS_PATH: ${FCM_CREDENTIALS_PATH}
+      FASTAPI_URL: ${FASTAPI_URL}
+      # DEV ONLY — remove before any non-dev deploy.
+      DEV_MASTER_OTP: ${DEV_MASTER_OTP:-}
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/scripts:/app/scripts
+      - ./backend/tests:/app/tests
+      - ./backend/pyproject.toml:/app/pyproject.toml
+      # Close the 03-UAT 009a drift: keep runtime Alembic assets synced from the
+      # repo so D-11 enrollment locking is verified against the right schema.
+      - ./backend/alembic:/app/alembic
+      - ./backend/alembic.ini:/app/alembic.ini
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - app-network
+      - data-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    command: bash -c "alembic upgrade head && python -m scripts.seed && exec uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload"
+
+  langchain-service:
+    build: ./ai_service
+    container_name: fcg3-ai
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      MCP_SERVICE_TOKEN: ${MCP_SERVICE_TOKEN}
+      LLM_PROVIDER: ${LLM_PROVIDER}
+      LLM_MODEL: ${LLM_MODEL}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+      EMBEDDING_PROVIDER: ${EMBEDDING_PROVIDER:-openai}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-text-embedding-3-small}
+      MCP_SERVER_URL: ${MCP_URL}
+    volumes:
+      - ./ai_service:/app/ai_service
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - app-network
+      - data-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8001/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    command: python -m ai_service.main
+
+  mcp-server:
+    build: ./mcp_server
+    container_name: fcg3-mcp
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      DATABASE_URL: ${DATABASE_URL}
+      ALEMBIC_DATABASE_URL: ${ALEMBIC_DATABASE_URL}
+      MCP_SERVICE_TOKEN: ${MCP_SERVICE_TOKEN}
+      WHATSAPP_TOKEN: ${WHATSAPP_TOKEN}
+      WHATSAPP_PHONE_NUMBER_ID: ${WHATSAPP_PHONE_NUMBER_ID}
+      WHATSAPP_WEBHOOK_VERIFY_TOKEN: ${WHATSAPP_WEBHOOK_VERIFY_TOKEN}
+      WHATSAPP_APP_SECRET: ${WHATSAPP_APP_SECRET}
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      JWT_SECRET: ${JWT_SECRET}
+      LLM_PROVIDER: ${LLM_PROVIDER}
+      LLM_MODEL: ${LLM_MODEL}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+      FCM_CREDENTIALS_PATH: ${FCM_CREDENTIALS_PATH}
+      FASTAPI_URL: ${FASTAPI_URL}
+    volumes:
+      - ./mcp_server:/app/mcp_server
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - app-network
+      - data-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8002/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    command: python -m mcp_server.main
+
+  flutter-web:
+    build: ./mobile
+    container_name: fcg3-flutter-web
+    ports:
+      - "3000:80"
+    depends_on:
+      fastapi-app:
+        condition: service_healthy
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:80/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+
+networks:
+  app-network:
+    driver: bridge
+  data-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
