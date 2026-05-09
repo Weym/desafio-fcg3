@@ -192,6 +192,7 @@ async def process_message(
     wa_client: WhatsAppClient,
     is_new_session: bool = False,
     student_name: str = "",
+    verification_state: str = "unverified",
 ) -> None:
     """Process a student's text message (verified and unverified).
 
@@ -248,6 +249,7 @@ async def process_message(
                             "message": message_text,
                             "is_new_session": is_new_session,
                             "student_name": student_name,
+                            "verification_state": verification_state,
                         },
                         headers={
                             "X-Service-Token": settings.mcp_service_token,

@@ -113,6 +113,7 @@ async def invoke_agent(
     user_message: str,
     is_new_session: bool = False,
     student_name: str = "",
+    verification_state: str = "unverified",
 ) -> str:
     """Process one student message through the LangChain agent.
 
@@ -164,6 +165,18 @@ async def invoke_agent(
         all_messages = [welcome_instruction, *history_messages, HumanMessage(content=user_message)]
     else:
         all_messages = [*history_messages, HumanMessage(content=user_message)]
+
+    # D-14/D-15: Inject verification state context so agent knows student status
+    if verification_state != "verified":
+        verification_context = SystemMessage(
+            content=(
+                "Estado de verificacao do aluno: NAO VERIFICADO. "
+                "Operacoes de leitura estao liberadas. "
+                "Se o aluno solicitar uma acao que altere dados e a ferramenta retornar erro de verificacao, "
+                "solicite o email institucional do aluno para enviar o codigo de verificacao."
+            )
+        )
+        all_messages = [verification_context, *all_messages]
 
     try:
         result = await asyncio.wait_for(

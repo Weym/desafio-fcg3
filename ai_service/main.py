@@ -52,6 +52,7 @@ class ChatRequest(BaseModel):
     message: str
     is_new_session: bool = False
     student_name: str = ""
+    verification_state: str = "unverified"
 
 
 class ChatResponse(BaseModel):
@@ -144,6 +145,7 @@ async def chat(
             user_message=request.message,
             is_new_session=request.is_new_session,
             student_name=request.student_name,
+            verification_state=request.verification_state,
         )
 
         return ChatResponse(
