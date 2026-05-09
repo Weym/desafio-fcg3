@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import unicodedata
 from datetime import datetime, timezone
 from uuid import UUID
 
@@ -54,13 +55,20 @@ FAREWELL_INDICATORS = [
 ]
 
 
+def _strip_accents(text: str) -> str:
+    """Remove diacritical marks (accents) from text for fuzzy matching."""
+    nfkd = unicodedata.normalize("NFKD", text)
+    return "".join(c for c in nfkd if not unicodedata.combining(c))
+
+
 def _is_farewell_response(response: str) -> bool:
     """Check if agent response is a farewell (indicating session should close).
 
     Uses a 2+ indicator threshold to avoid false positives on casual mentions.
     D-02 Layer 1: Agent recognizes farewell intent naturally.
+    Accent normalization ensures accented LLM output matches unaccented indicators.
     """
-    normalized = response.lower()
+    normalized = _strip_accents(response.lower())
     return sum(1 for phrase in FAREWELL_INDICATORS if phrase in normalized) >= 2
 
 
