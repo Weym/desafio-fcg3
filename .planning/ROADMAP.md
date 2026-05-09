@@ -69,7 +69,7 @@ GROUP 4 — Polish (depends on all above):
 
 ## Phases
 
-- [ ] **Phase 18: Student UX Corrections** - Fix navigation, chat UX, documents, notifications on student screens (gap closure)
+- [x] **Phase 18: Student UX Corrections** - Fix navigation, chat UX, documents, notifications on student screens (gap closure) (completed 2026-05-09)
 - [x] **Phase 19: Staff UX Corrections** - Fix dashboard, agendamentos, chats, intervenção, documentos, recursos, cadastro (completed 2026-05-09)
 - [ ] **Phase 20: LangChain Workflow** - Complete agent lifecycle, RAG, MCP, defenses, logging
 - [ ] **Phase 21: Roles & Auth Expansion** - Add provider role with hierarchical CRUDs
@@ -90,7 +90,7 @@ GROUP 4 — Polish (depends on all above):
   3. Student can view full document details in a drawer, see type/date on each item, and add documents via drawer
   4. Student notifications show read/unread state, can be filtered, individually marked as read, and bulk-marked
   5. Student accesses support via header icon and views agendamento details via drawer
-**Plans:** 7 plans (5 complete + 2 gap closure)
+**Plans:** 7/7 plans complete
 
 Plans:
 - [x] 18-01-PLAN.md — Fix home quick actions + add support/notifications to header
@@ -99,7 +99,7 @@ Plans:
 - [x] 18-04-PLAN.md — Notifications read/unread state + filters + mark-as-read
 - [x] 18-05-PLAN.md — Appointment detail drawer + wiring
 - [x] 18-06-PLAN.md — GAP: Agendamentos quick action → navigate to resources tab + card onTap
-- [ ] 18-07-PLAN.md — GAP: Chat rename backend endpoint + Flutter error handling
+- [x] 18-07-PLAN.md — GAP: Chat rename backend endpoint + Flutter error handling
 
 **UI hint**: yes
 
@@ -204,7 +204,7 @@ Plans:
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 18. Student UX Corrections | v3.0 | 5/7 | Gap closure | - |
+| 18. Student UX Corrections | v3.0 | 7/7 | Complete    | 2026-05-09 |
 | 19. Staff UX Corrections | v3.0 | 6/6 | Complete    | 2026-05-09 |
 | 20. LangChain Workflow | v3.0 | 0/TBD | Not started | - |
 | 21. Roles & Auth Expansion | v3.0 | 0/TBD | Not started | - |
