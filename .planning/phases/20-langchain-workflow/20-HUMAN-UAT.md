@@ -2,8 +2,8 @@
 status: partial
 phase: 20-langchain-workflow
 source: [20-VERIFICATION.md]
-started: 2026-05-09T04:02:47Z
-updated: 2026-05-09T04:02:47Z
+started: 2026-05-09T20:30:00Z
+updated: 2026-05-09T20:30:00Z
 ---
 
 ## Current Test
@@ -12,42 +12,47 @@ updated: 2026-05-09T04:02:47Z
 
 ## Tests
 
-### 1. Welcome Message Quality
+### 1. Welcome Message with Student Name
 
-expected: Student sends first WhatsApp message to a new session; AI generates personalized greeting using student's name with Alpha persona tone
+expected: Agent responds with personalized greeting ('Oi, [Nome], sou o Alpha...') followed by answering the question
 result: [pending]
 
-### 2. Farewell Detection Accuracy
+### 2. Farewell Detection with Accents
 
-expected: Student says "obrigado, tchau" or similar farewell; agent responds with warm goodbye using student's name and session closes automatically
+expected: Agent responds with warm farewell using student name; session status becomes 'closed'
 result: [pending]
 
-### 3. Off-Scope Redirection Quality
+### 3. Off-Scope Redirection
 
-expected: Student asks off-topic question (e.g., weather, politics); agent politely redirects to academic scope without being dismissive
+expected: Agent politely redirects to academic scope without answering
 result: [pending]
 
-### 4. Prompt Injection Neutralization
+### 4. Prompt Injection Defense
 
-expected: Student sends injection attempt (e.g., "ignore all previous instructions"); input sanitizer strips pattern, agent warns student with security message
+expected: Input sanitizer strips injection; agent warns about off-pattern message; no system prompt leaked
 result: [pending]
 
-### 5. Idle Timeout Behavior
+### 5. Idle Timeout
 
-expected: Student goes silent for 5+ min after last response; receives "precisa de mais alguma coisa?" follow-up; 10 min total idle triggers goodbye + session close
+expected: Receive 'Precisa de mais alguma coisa?' after 5 min; goodbye + close after 10 min total
 result: [pending]
 
 ### 6. Lazy OTP Flow
 
-expected: Unverified student asks read-only question (e.g., "quais minhas notas?") and gets answer without OTP; attempts mutating action (e.g., "quero me matricular") and is prompted for verification
+expected: First query answered without OTP; second (mutating) triggers verification request mid-conversation
+result: [pending]
+
+### 7. Plain-Text Delivery
+
+expected: WhatsApp messages contain no markdown artifacts — plain text only
 result: [pending]
 
 ## Summary
 
-total: 6
+total: 7
 passed: 0
 issues: 0
-pending: 6
+pending: 7
 skipped: 0
 blocked: 0
 
