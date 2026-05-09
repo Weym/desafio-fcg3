@@ -123,7 +123,7 @@ services:
       timeout: 5s
       retries: 3
       start_period: 30s
-    command: python -m ai_service.main
+    command: bash /app/entrypoint.sh
 
   mcp-server:
     build: ./mcp_server
