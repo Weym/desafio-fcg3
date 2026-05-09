@@ -125,6 +125,7 @@ async def invoke_agent(
         db_pool,
         embeddings,
         similarity_threshold=settings.RAG_SIMILARITY_THRESHOLD,
+        session_id=session_id,
     )
     agent = create_chat_agent(settings, [*mcp_tools, rag_tool], system_prompt)
 

@@ -63,6 +63,19 @@ def _resolve_prompt_path() -> Path:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Configure LangSmith tracing if enabled
+    import os as _os
+
+    if settings.LANGCHAIN_TRACING_V2.lower() == "true":
+        _os.environ["LANGCHAIN_TRACING_V2"] = "true"
+        _os.environ["LANGCHAIN_PROJECT"] = settings.LANGCHAIN_PROJECT
+        if settings.LANGSMITH_API_KEY:
+            _os.environ["LANGSMITH_API_KEY"] = settings.LANGSMITH_API_KEY
+        logger.info(
+            "LangSmith tracing enabled for project: %s",
+            settings.LANGCHAIN_PROJECT,
+        )
+
     pool = create_pool(settings.DATABASE_URL)
     app.state.db_pool = pool
     app.state.system_prompt = _resolve_prompt_path().read_text(encoding="utf-8")

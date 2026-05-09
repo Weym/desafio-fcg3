@@ -38,6 +38,11 @@ class Settings:
         os.environ.get("RAG_SIMILARITY_THRESHOLD", "0.45")
     )
 
+    # LangSmith tracing (optional — non-blocking if not configured)
+    LANGSMITH_API_KEY: str | None = os.environ.get("LANGSMITH_API_KEY")
+    LANGCHAIN_TRACING_V2: str = os.environ.get("LANGCHAIN_TRACING_V2", "false")
+    LANGCHAIN_PROJECT: str = os.environ.get("LANGCHAIN_PROJECT", "fcg3-ai-service")
+
     def __post_init__(self) -> None:
         if not self.DATABASE_URL:
             user = os.environ.get("POSTGRES_USER", "fcg3")
