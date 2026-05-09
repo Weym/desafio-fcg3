@@ -34,6 +34,7 @@ from src.features.chat.schemas import (
     StaffReplyRequest,
     StaffReplyResponse,
     SessionActionResponse,
+    RenameSessionRequest,
 )
 from src.features.webhook.dependencies import get_whatsapp_client
 
@@ -72,6 +73,26 @@ async def list_chat_sessions(
         data=sessions,
         pagination={"page": page, "per_page": per_page, "total": total},
     )
+
+
+# ------------------------------------------------------------------
+# PUT /chat-sessions/{id} — rename session (student owns it)
+# ------------------------------------------------------------------
+
+@router.put(
+    "/{session_id}",
+    response_model=ChatSessionResponse,
+)
+async def rename_session(
+    session_id: UUID,
+    body: RenameSessionRequest,
+    db: AsyncSession = Depends(get_db_session),
+    current_user: CurrentUser = Depends(get_current_user),
+):
+    """Rename a chat session. Students can only rename their own sessions."""
+    session = await chat_service.rename_session(session_id, current_user.id, body.name, db)
+    await db.commit()
+    return session
 
 
 # ------------------------------------------------------------------

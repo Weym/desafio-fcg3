@@ -97,6 +97,26 @@ class ChatService:
         )
         return result.scalar_one_or_none()
 
+    async def rename_session(
+        self, session_id: UUID, student_id: UUID, name: str, db: AsyncSession
+    ) -> ChatSession:
+        """Rename a chat session. Students can only rename their own sessions."""
+        session = await self.get_session(session_id, db)
+        if session is None:
+            raise HTTPException(
+                status_code=404,
+                detail={"error": {"code": "SESSAO_NAO_ENCONTRADA", "message": "Chat session not found"}},
+            )
+        if session.student_id != student_id:
+            raise HTTPException(
+                status_code=403,
+                detail={"error": {"code": "forbidden", "message": "You do not own this chat session"}},
+            )
+        session.name = name
+        session.updated_at = datetime.now(timezone.utc)
+        await db.flush()
+        return session
+
     # --- Human Intervention Methods (HI-01) ---
 
     async def list_intervention_sessions(

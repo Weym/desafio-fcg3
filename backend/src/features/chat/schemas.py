@@ -19,6 +19,7 @@ class ChatSessionResponse(BaseModel):
     student_id: UUID
     whatsapp_phone: str
     status: str
+    name: str | None = None
     verification_state: str
     assigned_staff_id: UUID | None = None
     escalated_at: datetime | None = None
@@ -27,6 +28,11 @@ class ChatSessionResponse(BaseModel):
     updated_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class RenameSessionRequest(BaseModel):
+    """Request body for renaming a chat session."""
+    name: str = Field(..., min_length=1, max_length=100)
 
 
 class ChatMessageResponse(BaseModel):

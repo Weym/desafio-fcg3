@@ -33,6 +33,7 @@ class ChatSession(Base):
     student_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("students.id"), nullable=False)
     whatsapp_phone: Mapped[str] = mapped_column(String(20), nullable=False)
     status: Mapped[str] = mapped_column(String(20), nullable=False, server_default=text("'active'"))
+    name: Mapped[str | None] = mapped_column(String(100), nullable=True)
     verification_state: Mapped[str] = mapped_column(String(20), nullable=False, server_default=text("'unverified'"))
     assigned_staff_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("staff.id"), nullable=True)
     escalated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
