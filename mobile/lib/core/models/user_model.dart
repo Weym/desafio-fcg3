@@ -8,7 +8,7 @@ class UserModel {
   final String name;
   final String email;
   @JsonKey(readValue: _readRole)
-  final String role; // 'student' or 'staff'
+  final String role; // 'student', 'staff', or 'provider'
   final String? phone;
 
   const UserModel({
@@ -25,6 +25,8 @@ class UserModel {
 
   bool get isStudent => role == 'student';
   bool get isStaff => role == 'staff';
+  bool get isProvider => role == 'provider';
+  bool get isStaffOrProvider => isStaff || isProvider;
 }
 
 Object? _readRole(Map json, String key) => json['role'] ?? json['type'];
