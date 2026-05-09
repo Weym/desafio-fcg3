@@ -194,6 +194,19 @@ GoRouter appRouter(Ref ref) {
             ],
           ),
           GoRoute(
+            path: RoutePaths.staffChats,
+            name: RouteNames.staffChats,
+            builder: (context, state) => const StaffAiScreen(),
+          ),
+          GoRoute(
+            path: RoutePaths.staffCadastro,
+            name: RouteNames.staffCadastro,
+            builder: (context, state) => Scaffold(
+              appBar: AppBar(title: const Text('Cadastro de Alunos')),
+              body: const Center(child: Text('Em construção')),
+            ),
+          ),
+          GoRoute(
             path: RoutePaths.staffDocuments,
             name: RouteNames.staffDocuments,
             builder: (context, state) => const StaffDocumentsScreen(),

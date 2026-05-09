@@ -18,11 +18,13 @@ class RouteNames {
   static const String staffDashboard = 'staff-dashboard';
   static const String staffSchedule = 'staff-schedule';
   static const String staffAI = 'staff-ai';
+  static const String staffChats = 'staff-chats';
   static const String staffDocuments = 'staff-documents';
 
   // Staff tabs (continued)
   static const String staffResources = 'staff-resources';
   static const String staffIntervention = 'staff-intervention';
+  static const String staffCadastro = 'staff-cadastro';
 
   // Staff detail
   static const String staffAppointmentDetail = 'staff-appointment-detail';
@@ -47,11 +49,13 @@ class RoutePaths {
   static const String staffDashboard = '/staff';
   static const String staffSchedule = '/staff/schedule';
   static const String staffAI = '/staff/ai';
+  static const String staffChats = '/staff/chats';
   static const String staffDocuments = '/staff/documents';
 
   // Staff tabs (continued)
   static const String staffResources = '/staff/resources';
   static const String staffIntervention = '/staff/intervention';
+  static const String staffCadastro = '/staff/cadastro';
 
   // Staff detail
   static const String staffAppointmentDetail = '/staff/schedule/:appointmentId';
