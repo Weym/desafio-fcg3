@@ -2,24 +2,24 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Correções, Melhorias & Features
-status: executing
-last_updated: "2026-05-09T01:56:23.165Z"
+status: verifying
+last_updated: "2026-05-09T02:03:18.300Z"
 last_activity: 2026-05-09
 progress:
   total_phases: 7
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 5
-  completed_plans: 4
-  percent: 80
+  completed_plans: 5
+  percent: 100
 ---
 
 # Project State
 
 ## Current Position
 
-Phase: 18 (Student UX Corrections) — EXECUTING
-Plan: 5 of 5
-Status: Ready to execute
+Phase: 18 (Student UX Corrections) — COMPLETE
+Plan: 5 of 5 (all completed)
+Status: Phase complete — ready for verification
 Last activity: 2026-05-09
 
 ## Project Reference
@@ -76,6 +76,9 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 - **18-04:** Notifications: read/unread state via client-side Set<String> (ReadNotificationIds provider)
 - **18-04:** Filter tabs (Todas/Não lidas/Lidas) and "Visualizar todos" bulk mark-as-read
 - **18-04:** Individual notification marked as read only on direct tap (not on scroll/view)
+- **18-05:** showAppointmentDetailSheet: reusable appointment detail bottom sheet widget
+- **18-05:** Refactored home screen inline sheet to use shared widget (DRY)
+- **18-05:** onDetailTap pattern: combined mark-as-read + open detail on notification tap
 
 ## Session Continuity
 
