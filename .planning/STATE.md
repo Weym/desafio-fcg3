@@ -3,31 +3,31 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Correções, Melhorias & Features
 status: executing
-last_updated: "2026-05-09T01:17:45.471Z"
-last_activity: 2026-05-09 -- Phase 18 planning complete
+last_updated: "2026-05-09T01:33:37.605Z"
+last_activity: 2026-05-09
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 5
-  completed_plans: 0
-  percent: 0
+  completed_plans: 1
+  percent: 20
 ---
 
 # Project State
 
 ## Current Position
 
-Phase: 18 (first phase of v3.0, not yet started)
-Plan: —
+Phase: 18 (Student UX Corrections) — EXECUTING
+Plan: 2 of 5
 Status: Ready to execute
-Last activity: 2026-05-09 -- Phase 18 planning complete
+Last activity: 2026-05-09
 
 ## Project Reference
 
 See: .planning/PROJECT.md (updated 2026-05-08)
 
 **Core value:** Aluno envia mensagem no WhatsApp e recebe resposta precisa sobre sua situação acadêmica — com ações concretas executadas em tempo real.
-**Current focus:** v3.0 — Correções, Melhorias & Features (7 phases, 81 requirements)
+**Current focus:** Phase 18 — Student UX Corrections
 
 ## Milestones Shipped
 
@@ -65,6 +65,9 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 - Docker 5-service stack (fastapi:8000, langchain:8001, mcp:8002, postgres:5432, flutter-web:3000)
 - DEV_MASTER_OTP bypass available for dev/testing
 - v3.0 phases designed for maximum parallel execution within groups
+- **18-01:** StateProvider pattern for cross-screen drawer auto-open (documentAutoOpenDrawerProvider)
+- **18-01:** AppBarActions contains support + notifications icons in header (support_agent_outlined, notifications_outlined)
+- **18-01:** Bottom nav reduced to 4 items (Início, Chat, Docs, Recursos) — Avisos moved to header
 
 ## Session Continuity
 
