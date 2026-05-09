@@ -32,12 +32,12 @@ _bearer = HTTPBearer(auto_error=False)
 class UserContext:
     """Unified identity returned by get_current_user_or_service.
 
-    For JWT auth: id=user_id from token sub, role=student|staff.
+    For JWT auth: id=user_id from token sub, role=student|staff|provider.
     For service token auth: id=student_id from X-Student-Id header, role=service.
     """
 
     id: UUID
-    role: str           # "student" | "staff" | "service"
+    role: str           # "student" | "staff" | "provider" | "service"
     name: str | None = None
     email: str | None = None
 
@@ -139,11 +139,11 @@ async def get_current_user_or_service(
 def check_ownership(resource_student_id: UUID, user: UserContext) -> None:
     """IDOR protection (D-05, D-06, T-03-02).
 
-    - Staff role → bypass (can access any student's data)
+    - Staff or provider role → bypass (can access any student's data)
     - Student or service role → resource.student_id must match user.id
     - Defense in depth (D-05): even service token requests go through this check
     """
-    if user.role == "staff":
+    if user.role in ("staff", "provider"):
         return
 
     if resource_student_id != user.id:
@@ -153,14 +153,28 @@ def check_ownership(resource_student_id: UUID, user: UserContext) -> None:
 
 
 def require_staff(user: UserContext) -> None:
-    """Block non-staff roles. For staff-only endpoints (T-03-05).
+    """Block non-staff roles. Provider inherits all staff permissions (D-04).
 
     Usage:
         @router.get("/admin/thing")
         async def admin_thing(user: UserContext = Depends(get_current_user_or_service)):
             require_staff(user)
     """
-    if user.role != "staff":
+    if user.role not in ("staff", "provider"):
         raise ForbiddenException(
             "Esta acao requer permissao de staff",
+        )
+
+
+def require_provider(user: UserContext) -> None:
+    """Block non-provider roles. For provider-only endpoints (staff CRUD).
+
+    Usage:
+        @router.post("/staff")
+        async def create_staff_member(user: UserContext = Depends(get_current_user_or_service)):
+            require_provider(user)
+    """
+    if user.role != "provider":
+        raise ForbiddenException(
+            "Esta acao requer permissao de provider",
         )
