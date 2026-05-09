@@ -23,6 +23,7 @@ class RouteNames {
   // Staff tabs (continued)
   static const String staffResources = 'staff-resources';
   static const String staffIntervention = 'staff-intervention';
+  static const String staffGestao = 'staff-gestao';
 
   // Staff detail
   static const String staffAppointmentDetail = 'staff-appointment-detail';
@@ -52,6 +53,7 @@ class RoutePaths {
   // Staff tabs (continued)
   static const String staffResources = '/staff/resources';
   static const String staffIntervention = '/staff/intervention';
+  static const String staffGestao = '/staff/gestao';
 
   // Staff detail
   static const String staffAppointmentDetail = '/staff/schedule/:appointmentId';

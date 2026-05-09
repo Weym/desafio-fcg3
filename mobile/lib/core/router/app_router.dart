@@ -25,6 +25,7 @@ import '../../features/staff/screens/staff_documents_screen.dart';
 import '../../features/staff/screens/staff_resources_screen.dart';
 import '../../features/staff/screens/staff_intervention_screen.dart';
 import '../../features/staff/screens/staff_intervention_chat_screen.dart';
+import '../../features/staff/screens/staff_gestao_screen.dart';
 import '../../features/client/models/appointment_model.dart';
 import 'route_names.dart';
 
@@ -77,8 +78,8 @@ GoRouter appRouter(Ref ref) {
           return RoutePaths.clientHome;
         }
 
-        // Role guards: staff blocked from /client/*
-        if (user.isStaff && currentPath.startsWith('/client')) {
+        // Role guards: staff/provider blocked from /client/*
+        if (user.isStaffOrProvider && currentPath.startsWith('/client')) {
           return RoutePaths.staffDashboard;
         }
 
@@ -217,6 +218,11 @@ GoRouter appRouter(Ref ref) {
                 },
               ),
             ],
+          ),
+          GoRoute(
+            path: RoutePaths.staffGestao,
+            name: RouteNames.staffGestao,
+            builder: (context, state) => const StaffGestaoScreen(),
           ),
         ],
       ),
