@@ -14,7 +14,7 @@ from __future__ import annotations
 import logging
 import re
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 from sqlalchemy import select, update, and_
@@ -143,6 +143,14 @@ class WebhookService:
         )
         session = result.scalar_one_or_none()
         if session is not None:
+            # Reset stale OTP state — if student abandoned verification and returns
+            # after OTP TTL (5 min), they should not be trapped in awaiting_* state.
+            # This fixes UAT test 4: unverified students getting pulled into OTP.
+            if session.verification_state in ("awaiting_email", "awaiting_code"):
+                otp_ttl = timedelta(minutes=5)
+                now = datetime.now(timezone.utc)
+                if session.updated_at < (now - otp_ttl):
+                    session.verification_state = "unverified"
             # Touch updated_at for auto-close tracking (D-12)
             session.updated_at = datetime.now(timezone.utc)
             await db.flush()
