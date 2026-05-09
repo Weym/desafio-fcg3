@@ -71,7 +71,7 @@ GROUP 4 — Polish (depends on all above):
 
 - [ ] **Phase 18: Student UX Corrections** - Fix navigation, chat UX, documents, notifications on student screens
 - [ ] **Phase 19: Staff UX Corrections** - Fix dashboard, agendamentos, chats, intervenção, documentos, recursos, cadastro
-- [x] **Phase 20: LangChain Workflow** - Complete agent lifecycle, RAG, MCP, defenses, logging (completed 2026-05-09)
+- [ ] **Phase 20: LangChain Workflow** - Complete agent lifecycle, RAG, MCP, defenses, logging (gap closure in progress)
 - [ ] **Phase 21: Roles & Auth Expansion** - Add provider role with hierarchical CRUDs
 - [ ] **Phase 22: FCM Push Notifications** - End-to-end push infrastructure (backend + Flutter)
 - [ ] **Phase 23: New Features** - Cardápio semanal, perfil do aluno, grade curricular
@@ -120,7 +120,7 @@ GROUP 4 — Polish (depends on all above):
   3. Off-scope questions receive polite redirection; media messages receive creative rejection; failures trigger human intervention
   4. Prompt injection attempts are detected and neutralized without disrupting legitimate conversation
   5. Staff can see RAG debug info (chunks, scores) in chat logs; system logs capture full LangChain decision traceability
-**Plans:** 8 plans (6 complete, 2 gap closure)
+**Plans:** 11 plans (8 complete, 3 gap closure)
 
 Plans:
 - [x] 20-01-PLAN.md — System prompt + Alpha persona + off-scope + media enhancement
@@ -129,8 +129,11 @@ Plans:
 - [x] 20-04-PLAN.md — Lazy OTP strategy + webhook flow modification
 - [x] 20-05-PLAN.md — Prompt injection defense (4 layers)
 - [x] 20-06-PLAN.md — Session lifecycle (welcome/goodbye/idle timeout)
-- [ ] 20-07-PLAN.md — Gap closure: stale OTP reset + farewell accent normalization
-- [ ] 20-08-PLAN.md — Gap closure: plain-text formatting + personalized welcome name
+- [x] 20-07-PLAN.md — Gap closure: stale OTP reset + farewell accent normalization
+- [x] 20-08-PLAN.md — Gap closure: plain-text formatting + personalized welcome name
+- [ ] 20-09-PLAN.md — Gap closure: welcome name fix + farewell detection threshold
+- [ ] 20-10-PLAN.md — Gap closure: stale OTP timezone crash fix + test repair
+- [ ] 20-11-PLAN.md — Gap closure: MCP verification gate + system prompt lazy OTP + verification_state propagation
 
 ### Phase 21: Roles & Auth Expansion
 
@@ -197,7 +200,7 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 18. Student UX Corrections | v3.0 | 0/TBD | Not started | - |
 | 19. Staff UX Corrections | v3.0 | 0/TBD | Not started | - |
-| 20. LangChain Workflow | v3.0 | 6/6 | Complete    | 2026-05-09 |
+| 20. LangChain Workflow | v3.0 | 8/11 | Gap Closure | - |
 | 21. Roles & Auth Expansion | v3.0 | 0/TBD | Not started | - |
 | 22. FCM Push Notifications | v3.0 | 0/TBD | Not started | - |
 | 23. New Features | v3.0 | 0/TBD | Not started | - |
