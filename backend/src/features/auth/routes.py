@@ -131,7 +131,13 @@ async def verify_code(
         qst = await db.execute(select(Staff).where(Staff.email == payload.email))
         staff = qst.scalar_one_or_none()
         if staff is not None:
-            user, role = staff, "staff"
+            # D-20: inactive staff cannot log in
+            if staff.status == "inactive":
+                await db.commit()
+                return _auth_error(401, "ACCOUNT_INACTIVE", "Conta desativada")
+            # D-03: Provider gets distinct JWT role; other staff.roles map to 'staff'
+            jwt_role = "provider" if staff.role == "provider" else "staff"
+            user, role = staff, jwt_role
 
     if user is None:
         # Should be unreachable if D-07 holds, but be defensive
@@ -139,7 +145,9 @@ async def verify_code(
         return _auth_error(401, "INVALID_CODE", "Invalid or expired code")
 
     pair = jwt_service.issue_token_pair(user.id, role, user.name, user.email)
-    await session_service.create_session_pair(db, user.id, pair, user_type=role)
+    # D-07: provider uses user_type='staff' in sessions table
+    session_user_type = "staff" if role == "provider" else role
+    await session_service.create_session_pair(db, user.id, pair, user_type=session_user_type)
     await db.commit()
     return TokenPair(
         access_token=pair.access.token,
