@@ -195,7 +195,7 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 18. Student UX Corrections | v3.0 | 0/TBD | Not started | - |
 | 19. Staff UX Corrections | v3.0 | 0/TBD | Not started | - |
-| 20. LangChain Workflow | v3.0 | 6/6 | Complete   | 2026-05-09 |
+| 20. LangChain Workflow | v3.0 | 6/6 | Complete    | 2026-05-09 |
 | 21. Roles & Auth Expansion | v3.0 | 0/TBD | Not started | - |
 | 22. FCM Push Notifications | v3.0 | 0/TBD | Not started | - |
 | 23. New Features | v3.0 | 0/TBD | Not started | - |
