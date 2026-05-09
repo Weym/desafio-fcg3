@@ -22,6 +22,10 @@ class ChatSessionModel {
   final int? messageCount;
   @JsonKey(name: 'name')
   final String? name;
+  @JsonKey(name: 'student_name')
+  final String? studentName;
+  @JsonKey(name: 'student_ra')
+  final String? studentRa;
 
   const ChatSessionModel({
     required this.id,
@@ -34,6 +38,8 @@ class ChatSessionModel {
     this.updatedAt,
     this.messageCount,
     this.name,
+    this.studentName,
+    this.studentRa,
   });
 
   factory ChatSessionModel.fromJson(Map<String, dynamic> json) =>
