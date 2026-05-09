@@ -1,276 +1,242 @@
-# Stack Research — Desafio FCG3
+# Technology Stack — v3.0 Additions
 
-**Domain:** Python/FastAPI academic platform with WhatsApp chatbot
-**Mode:** Brownfield / Subsequent milestone
-**Date:** 2026-04-15
-**Sources:** Official docs — FastAPI, MCP Python SDK (modelcontextprotocol.io), LangChain, SQLAlchemy
+**Project:** Desafio FCG3 — Plataforma Acadêmica
+**Researched:** 2026-05-08
+**Scope:** NEW dependencies only for FCM, prompt injection defense, session management, role expansion, and Flutter calendar
 
----
+## Recommended Stack Additions
 
-## Core Stack Decisions
+### 1. FCM Push Notifications — Backend (Python)
 
-### MCP Server — Transport: Streamable HTTP (NOT stdio)
+| Technology | Version | Purpose | Why |
+|---|---|---|---|
+| `firebase-admin` | `>=7.4.0` | Send FCM messages from FastAPI | **Already in requirements.txt** at `>=6.6.0`. Bump to `>=7.4.0` (latest, Apr 2026) for current FCM v1 HTTP API support. Handles `messaging.send()` and `messaging.send_each()` for batch notifications |
 
-**Decision:** Use `mcp[cli]>=1.2.0` with `FastMCP` and `mcp.run(transport="streamable-http")`
+**Integration Point:** `backend/src/infrastructure/` — create `fcm_client.py` that initializes Firebase app from `settings.fcm_credentials_path` (already configured in `config.py` line 195). The `fcm_tokens` table and `FcmToken` model already exist.
 
-- **Why:** stdio transport requires subprocess spawning — impossible across Docker containers. Streamable HTTP works over the network between containers.
-- **Transport URL:** `http://mcp-server:8002/sse` (SSE endpoint)
-- **Confidence:** HIGH — confirmed in official MCP docs
+**No new backend dependency needed** — `firebase-admin` is already declared. Just bump version pin.
 
-```python
-from mcp.server.fastmcp import FastMCP
+### 2. FCM Push Notifications — Flutter (Mobile)
 
-mcp = FastMCP("academic-tools")
+| Technology | Version | Purpose | Why |
+|---|---|---|---|
+| `firebase_core` | `^4.7.0` | Firebase initialization | Required foundation for all Firebase plugins. 4.0k likes, published by firebase.google.com. Cross-platform (Android, iOS, macOS, web, Windows) |
+| `firebase_messaging` | `^16.2.0` | Receive push notifications, get device token | Official FlutterFire plugin. 3.9k likes, handles foreground/background/terminated states. Auto-handles token refresh |
+| `flutter_local_notifications` | `^21.0.0` | Display notifications in system tray when app is foreground | firebase_messaging alone doesn't show heads-up notifications while app is open. This bridges the gap. 7.2k likes, cross-platform |
 
-@mcp.tool()
-async def get_grades(semester: str) -> dict:
-    ...
+**Why NOT just `firebase_messaging` alone:** On Android, FCM messages arriving while the app is in foreground don't automatically show in the notification tray. `flutter_local_notifications` solves this by letting you trigger a local notification display from the FCM `onMessage` handler.
 
-if __name__ == "__main__":
-    mcp.run(transport="streamable-http")
+**Integration Point:** Initialize Firebase in `main.dart` before `runApp()`. Register FCM token on login, send to `POST /auth/fcm-token` endpoint. Listen to `onMessage`, `onMessageOpenedApp`, `onBackgroundMessage`.
+
+### 3. Prompt Injection Defense — AI Service (Python)
+
+| Technology | Version | Purpose | Why |
+|---|---|---|---|
+| Custom prompt-based defense | N/A | System prompt hardening | Zero-dependency, works within existing LangChain agent. Most practical for this use case because: (1) no external API calls = no latency penalty, (2) no ML model downloads = no Docker image bloat, (3) the system prompt already goes through the LLM which inherently classifies intent |
+| `llm-guard` (optional, future) | `>=0.3.16` | ML-based prompt injection scanner | **NOT recommended for MVP** — requires ONNX runtime, downloads ML models (~500MB), adds cold start latency. Consider post-MVP if prompt-based defense proves insufficient |
+
+**Rationale for NOT using `llm-guard` or `rebuff`:**
+
+- **`rebuff`** (v0.1.1, Jan 2024) — Requires Pinecone vector DB as external dependency. Adds API call latency to every message. Overkill for a controlled academic chatbot.
+- **`llm-guard`** (v0.3.16, May 2025) — Production-quality but heavy. Downloads transformer models. Requires `onnxruntime`. Docker image would grow ~500MB. Appropriate for public-facing LLM APIs, not a scoped WhatsApp bot with known user base.
+- **`lakera-chainguard`** — External API service (Lakera Guard). Adds vendor dependency and per-request cost.
+
+**Recommended approach:** Multi-layer defense via prompt engineering + input sanitization:
+
+1. **System prompt hardening** — Clear persona boundaries, explicit refusal instructions, delimiter separation of user input
+2. **Input length limiting** — Already have `MAX_AGENT_EXECUTION_TIME=45s` and `MAX_AGENT_ITERATIONS=10`; add character limit on user messages (e.g., 2000 chars)
+3. **Canary token technique** — Inject a canary string in system prompt, check if output contains it (indicates prompt leak)
+4. **Role separation** — User messages wrapped in delimiters: `<user_message>{input}</user_message>`
+
+**No new pip dependency required.**
+
+### 4. LangChain Session Lifecycle Management
+
+| Technology | Version | Purpose | Why |
+|---|---|---|---|
+| LangChain `BaseCallbackHandler` | (included in `langchain>=0.3`) | Detect conversation start/end, log lifecycle events | Already available. Custom callback handler can emit session lifecycle events (first message = "start", timeout/goodbye = "end") |
+| Existing `chat_sessions` + `chat_messages` tables | N/A | Session state tracking | Already modeled. Add `closed_at` timestamp column via Alembic migration |
+
+**Approach:** Session lifecycle is a backend concern, not an AI library concern:
+
+1. **Session creation** — Already happens when first WhatsApp message arrives (webhook creates `chat_session`)
+2. **Session activity detection** — Query `chat_messages` for last message timestamp. If gap > 30 min, consider session stale
+3. **Explicit goodbye** — System prompt instructs agent to output `[SESSION_END]` marker. Backend webhook handler detects and closes session
+4. **Welcome message** — On new session creation, send predefined greeting via WhatsApp before invoking agent
+
+**No new pip dependency required.**
+
+### 5. Role Expansion (student/staff/provider)
+
+| Technology | Version | Purpose | Why |
+|---|---|---|---|
+| Existing `require_role()` dependency | N/A | Role guard | Already implemented in `backend/src/shared/auth.py`. Supports single-role check per endpoint |
+| `require_any_role()` (new utility) | N/A | Multi-role guard | Simple addition: `require_any_role('staff', 'provider')` for shared endpoints |
+
+**Approach:** The current auth system stores `role` as a string in the JWT claims. Adding `provider` requires:
+
+1. **Alembic migration** — Add `provider` to allowed roles in `students` table (or create separate `providers` table if semantics differ significantly from students)
+2. **JWT role claim** — Already dynamic from DB. No JWT code changes needed
+3. **New `require_any_role` dependency** — Trivial extension of existing `require_role` in `shared/auth.py`
+4. **Route-level guards** — Apply `Depends(require_role('provider'))` or `Depends(require_any_role('staff', 'provider'))` to new endpoints
+
+**No new pip dependency required.**
+
+### 6. Flutter Weekly Calendar View
+
+| Technology | Version | Purpose | Why |
+|---|---|---|---|
+| `table_calendar` | `^3.2.0` | Weekly schedule display | 3.3k likes, 140 pub points. Supports week/month/2-week formats natively. Has `eventLoader` for marking class slots. Locale support (`pt_BR`). Highly customizable via `CalendarBuilders`. Active maintenance (16 months since last release but stable API) |
+| `intl` | `^0.19.0` | Date formatting + locale for calendar | Required by `table_calendar` for locale support. Likely already transitively available but should be explicit |
+
+**Why `table_calendar` over alternatives:**
+
+- **`weekly_calendar`** (v0.1.2) — Only 21 likes, 24 weekly downloads. Too simple, no event marking, no time slots. Not production-ready.
+- **`syncfusion_flutter_calendar`** — Feature-rich but requires Syncfusion license for commercial use. Community edition has watermark.
+- **Custom widget** — Unnecessary when `table_calendar` supports `CalendarFormat.week` mode with full customization.
+
+**Integration Point:** Use `TableCalendar(calendarFormat: CalendarFormat.week)` with `eventLoader` that maps class schedule data from API. The glassmorphism design system can be applied via `CalendarBuilders` for custom day cell rendering.
+
+## What NOT to Add
+
+| Library | Why NOT |
+|---|---|
+| `rebuff` | Requires Pinecone. Academic chatbot with authenticated users doesn't need external vector-based injection detection |
+| `llm-guard` | 500MB+ model downloads. Overkill for controlled user base. Adds cold start latency |
+| `nemoguardrails` (NeMo Guardrails) | NVIDIA's framework. Heavy, opinionated, replaces your agent architecture. Not compatible with existing LangChain ReAct setup |
+| `redis` | Out of scope per PROJECT.md. Session management via PostgreSQL is sufficient at current scale |
+| `celery` / `dramatiq` | Out of scope. `asyncio.create_task` is sufficient for webhook processing within 5s constraint |
+| `syncfusion_flutter_calendar` | License concerns for academic project |
+| `firebase_analytics` | Not needed for push notifications. Would add unnecessary tracking |
+| `firebase_crashlytics` | Not needed for push notifications. Sentry is out of scope per PROJECT.md |
+
+## Alternatives Considered
+
+| Category | Recommended | Alternative | Why Not Alternative |
+|---|---|---|---|
+| FCM Flutter | `firebase_messaging` | `onesignal_flutter` | OneSignal adds vendor layer between you and FCM. Backend already uses `firebase-admin` directly |
+| Local notifications | `flutter_local_notifications` | `awesome_notifications` | Less mainstream (1.8k vs 7.2k likes), more complex API, compatibility issues reported with firebase_messaging |
+| Calendar | `table_calendar` | Custom `PageView` + `GridView` | table_calendar handles edge cases (week boundaries, locale, swipe) that take weeks to implement correctly |
+| Prompt defense | System prompt hardening | `llm-guard` PromptInjection scanner | Latency + Docker bloat. Prompt hardening is the industry standard for scoped bots (not public GPT wrappers) |
+| Session management | DB-driven lifecycle | LangChain `RunnableWithMessageHistory` | Already have custom chat_sessions table. RunnableWithMessageHistory adds abstraction without value for existing architecture |
+
+## Installation Commands
+
+### Backend (bump version pin)
+
+```bash
+# In backend/requirements.txt — change:
+# firebase-admin>=6.6.0
+# To:
+firebase-admin>=7.4.0
 ```
 
----
+No other backend pip additions needed.
 
-### PostgreSQL Drivers — Two Drivers Required
+### AI Service
 
-**Service split:**
-- `fastapi-app` + `mcp-server`: use `asyncpg` (SQLAlchemy async engine)
-- `langchain-service`: use `psycopg[binary]` (psycopg3) — **mandated by `langchain-postgres`**
+No new dependencies. Prompt injection defense is prompt-engineering based.
 
-```
-# FastAPI / MCP requirements
-sqlalchemy[asyncio]>=2.0
-asyncpg>=0.29
-alembic>=1.13
-
-# AI Service requirements  
-psycopg[binary]>=3.1
-langchain-postgres>=0.0.9
-langchain>=0.3
-langchain-openai>=0.2  # or langchain-google-genai — configurable via env
-```
-
-**Confidence:** MEDIUM — langchain-postgres mandates psycopg3
-
----
-
-### PGVector — Use `langchain-postgres`, NOT `langchain-community`
-
-**Decision:** `langchain-postgres` replaces the deprecated community integration
-
-- `langchain-community` PGVector uses sync psycopg2 — broken in async context
-- `langchain-postgres` provides `PGVector` class with psycopg3 + JSONB metadata support
-
-```python
-from langchain_postgres import PGVector
-
-vector_store = PGVector(
-    embeddings=embeddings,
-    collection_name="knowledge_base",
-    connection=DATABASE_URL_PSYCOPG3,
-    use_jsonb=True,
-)
-```
-
-**Confidence:** MEDIUM
-
----
-
-### SQLAlchemy Async — Critical Patterns
-
-**1. Async engine setup:**
-
-```python
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
-
-engine = create_async_engine(
-    DATABASE_URL,  # postgresql+asyncpg://...
-    pool_size=10,
-    max_overflow=20,
-    echo=False,
-)
-
-async_session_maker = async_sessionmaker(
-    engine,
-    expire_on_commit=False,  # MANDATORY — prevents lazy-load errors after commit
-    class_=AsyncSession,
-)
-```
-
-**2. `expire_on_commit=False` is MANDATORY** — without it, accessing attributes after `session.commit()` triggers lazy SQL loads that fail silently in async context.
-
-**3. FastAPI dependency for request-scoped sessions:**
-
-```python
-async def get_db() -> AsyncGenerator[AsyncSession, None]:
-    async with async_session_maker() as session:
-        try:
-            yield session
-            await session.commit()
-        except Exception:
-            await session.rollback()
-            raise
-```
-
-**4. Background tasks must open their own sessions** — never pass a FastAPI-scoped `db` session into `asyncio.create_task`. The request session closes before the task runs.
-
-```python
-async def process_whatsapp_message(message_id: str):
-    async with async_session_maker() as db:  # own session
-        ...
-```
-
----
-
-### Alembic — Async Configuration
-
-**`alembic/env.py` pattern for async:**
-
-```python
-from sqlalchemy.ext.asyncio import async_engine_from_config
-
-async def run_async_migrations():
-    connectable = async_engine_from_config(config.get_section(config.config_ini_section))
-    async with connectable.connect() as connection:
-        await connection.run_sync(do_run_migrations)
-
-def run_migrations_online():
-    asyncio.run(run_async_migrations())
-```
-
-**PGVector extension — must be migration #001:**
-
-```python
-def upgrade():
-    op.execute("CREATE EXTENSION IF NOT EXISTS vector")
-```
-
-This must run before any table with a `vector` column. Extension creation is tracked in `alembic_version`.
-
-**HNSW index — autogenerate is broken** — must be hand-written:
-
-```python
-op.execute(
-    "CREATE INDEX knowledge_base_chunks_embedding_idx "
-    "ON knowledge_base_chunks USING hnsw (embedding vector_cosine_ops) "
-    "WITH (m = 16, ef_construction = 64)"
-)
-```
-
----
-
-### Vector Column in SQLAlchemy Models
-
-```python
-from pgvector.sqlalchemy import Vector
-from sqlalchemy import Column
-
-class KnowledgeBaseChunk(Base):
-    __tablename__ = "knowledge_base_chunks"
-    embedding = Column(Vector(1536), nullable=False)
-```
-
-**Similarity query:**
-
-```python
-from pgvector.sqlalchemy import cosine_distance
-
-results = await session.execute(
-    select(KnowledgeBaseChunk)
-    .where(cosine_distance(KnowledgeBaseChunk.embedding, query_vec) <= 0.25)
-    .order_by(cosine_distance(KnowledgeBaseChunk.embedding, query_vec))
-    .limit(5)
-)
-```
-
-> ⚠️ Common error: threshold is DISTANCE (1 - similarity), not similarity. `0.25 distance = 0.75 similarity`
-
----
-
-### LangChain Agent — Key Config
-
-```python
-from langchain.agents import AgentExecutor, create_react_agent
-from langchain.memory import ConversationBufferWindowMemory
-
-agent_executor = AgentExecutor(
-    agent=agent,
-    tools=tools,
-    memory=memory,
-    max_iterations=5,          # MANDATORY — prevents infinite loops on tool error
-    max_execution_time=30.0,   # MANDATORY — prevents hanging on LLM timeout
-    handle_parsing_errors=True,
-    verbose=False,
-)
-```
-
-**LLM provider agnostic — configure via env:**
-
-```python
-import os
-from langchain_openai import ChatOpenAI
-from langchain_google_genai import ChatGoogleGenerativeAI
-
-def get_llm():
-    provider = os.getenv("LLM_PROVIDER", "openai")
-    if provider == "openai":
-        return ChatOpenAI(model=os.getenv("LLM_MODEL", "gpt-4o-mini"))
-    elif provider == "gemini":
-        return ChatGoogleGenerativeAI(model=os.getenv("LLM_MODEL", "gemini-1.5-flash"))
-    raise ValueError(f"Unknown LLM provider: {provider}")
-```
-
-**Open question (needs phase research):** How does `langchain-mcp-adapters` (or equivalent) inject per-request `student_id` into MCP tool calls? This must be resolved before implementing the AI service phase.
-
----
-
-### Docker Compose — Service Versions
+### Flutter (mobile/pubspec.yaml)
 
 ```yaml
-services:
-  postgres:
-    image: pgvector/pgvector:pg16
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-  fastapi-app:
-    image: python:3.12-slim
-    depends_on:
-      postgres:
-        condition: service_healthy
-
-  langchain-service:
-    image: python:3.12-slim
-    depends_on:
-      postgres:
-        condition: service_healthy
-      mcp-server:
-        condition: service_healthy
-
-  mcp-server:
-    image: python:3.12-slim
-    depends_on:
-      postgres:
-        condition: service_healthy
+dependencies:
+  # ... existing deps ...
+  firebase_core: ^4.7.0
+  firebase_messaging: ^16.2.0
+  flutter_local_notifications: ^21.0.0
+  table_calendar: ^3.2.0
+  intl: ^0.19.0
 ```
 
-**`depends_on` with `condition: service_healthy` is required** on postgres — without it, services crash on startup before the DB is ready.
+### Flutter Platform Setup Required
 
----
+**Android (`android/app/build.gradle.kts`):**
+- Apply `com.google.gms.google-services` plugin
+- Add `google-services.json` to `android/app/`
+- Enable desugaring for `flutter_local_notifications`
+- Set `compileSdk = 35` minimum
+- Set `minSdk = 21` minimum (for firebase_messaging)
 
-## Package Summary
+**iOS (`ios/`):**
+- Add `GoogleService-Info.plist` to Runner
+- Enable Push Notifications capability in Xcode
+- Enable Background Modes > Remote notifications
+- Add `UNUserNotificationCenter.current().delegate = self` in AppDelegate
 
-| Service | Key Packages |
-|---------|-------------|
-| `fastapi-app` | `fastapi`, `uvicorn[standard]`, `sqlalchemy[asyncio]`, `asyncpg`, `alembic`, `pgvector`, `pyjwt`, `httpx`, `resend` |
-| `langchain-service` | `langchain>=0.3`, `langchain-postgres`, `langchain-openai` or `langchain-google-genai`, `psycopg[binary]`, `httpx` |
-| `mcp-server` | `mcp[cli]>=1.2.0`, `httpx`, `sqlalchemy[asyncio]`, `asyncpg` |
-| `postgres` | `pgvector/pgvector:pg16` (Docker image, no pip) |
+**Firebase Console:**
+- Create Firebase project (or reuse existing)
+- Register Android app (package name)
+- Register iOS app (bundle ID)
+- Download config files (`google-services.json`, `GoogleService-Info.plist`)
+- Generate service account JSON for backend (already planned via `fcm_credentials_path`)
 
----
+## Version Compatibility Matrix
 
-*Research date: 2026-04-15 | Confidence levels noted per finding*
+| Component | Dart SDK | Flutter | Notes |
+|---|---|---|---|
+| `firebase_core ^4.7.0` | `^3.2` | `>=3.x` | Compatible with Dart ^3.11.4 |
+| `firebase_messaging ^16.2.0` | `^3.2` | `>=3.x` | Compatible |
+| `flutter_local_notifications ^21.0.0` | `^3.2` | `>=3.38.1` | **Requires Flutter 3.38.1+** — project uses 3.41.6, compatible |
+| `table_calendar ^3.2.0` | `^2.17` | `>=2.x` | Very compatible, no constraints |
+| `intl ^0.19.0` | `>=2.12` | any | Compatible |
+
+| Component | Python | Notes |
+|---|---|---|
+| `firebase-admin >=7.4.0` | `>=3.9` | Compatible with Python 3.12 |
+| `llm-guard >=0.3.16` (NOT recommended) | `>=3.10, <3.13` | Would be compatible but NOT adding |
+
+## Architecture Integration Summary
+
+```
+┌─────────────────────────────────────────────────────────┐
+│ Flutter App (mobile/)                                    │
+│  + firebase_core (init)                                 │
+│  + firebase_messaging (receive push, get token)         │
+│  + flutter_local_notifications (foreground display)     │
+│  + table_calendar (weekly schedule view)                │
+│  + intl (locale for calendar)                          │
+└────────────────────┬────────────────────────────────────┘
+                     │ FCM token registration
+                     │ POST /auth/fcm-token
+                     ▼
+┌─────────────────────────────────────────────────────────┐
+│ FastAPI Backend (backend/)                               │
+│  firebase-admin >=7.4.0 (send notifications)            │
+│  + fcm_client.py (new infrastructure module)            │
+│  + notifications feature slice (new)                    │
+│  + require_any_role() (new auth utility)                │
+│  + provider role support (migration)                    │
+└────────────────────┬────────────────────────────────────┘
+                     │ (no changes)
+                     ▼
+┌─────────────────────────────────────────────────────────┐
+│ AI Service (ai_service/)                                │
+│  NO new dependencies                                    │
+│  + System prompt hardening (prompt injection defense)   │
+│  + Session lifecycle hooks (callback handlers)          │
+│  + Input sanitization (char limits, delimiter wrapping) │
+└─────────────────────────────────────────────────────────┘
+```
+
+## Confidence Assessment
+
+| Area | Confidence | Reason |
+|---|---|---|
+| FCM Backend | HIGH | `firebase-admin` already in project, official Google SDK, verified on PyPI (v7.4.0, Apr 2026) |
+| FCM Flutter | HIGH | Official FlutterFire packages, published by firebase.google.com, millions of downloads |
+| Prompt injection defense | MEDIUM | Prompt-engineering approach is standard practice but effectiveness varies by LLM model. No library provides 100% guarantee |
+| Session management | HIGH | No new deps needed. Pure application logic on existing DB schema |
+| Role expansion | HIGH | Trivial extension of existing `require_role()` pattern |
+| Calendar widget | HIGH | `table_calendar` is the de facto standard Flutter calendar. Verified on pub.dev (3.3k likes, 494k downloads) |
+
+## Sources
+
+- PyPI: `firebase-admin` v7.4.0 — https://pypi.org/project/firebase-admin/ (verified Apr 2026)
+- pub.dev: `firebase_core` v4.7.0 — https://pub.dev/packages/firebase_core
+- pub.dev: `firebase_messaging` v16.2.0 — https://pub.dev/packages/firebase_messaging
+- pub.dev: `flutter_local_notifications` v21.0.0 — https://pub.dev/packages/flutter_local_notifications
+- pub.dev: `table_calendar` v3.2.0 — https://pub.dev/packages/table_calendar
+- PyPI: `llm-guard` v0.3.16 — https://pypi.org/project/llm-guard/ (evaluated, not recommended)
+- PyPI: `rebuff` v0.1.1 — https://pypi.org/project/rebuff/ (evaluated, not recommended)
+- Existing codebase: `backend/requirements.txt`, `mobile/pubspec.yaml`, `ai_service/agent.py`, `backend/src/shared/auth.py`
