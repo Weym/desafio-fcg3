@@ -50,6 +50,7 @@ async def require_service_token(
 class ChatRequest(BaseModel):
     session_id: str
     message: str
+    is_new_session: bool = False
 
 
 class ChatResponse(BaseModel):
@@ -140,6 +141,7 @@ async def chat(
             system_prompt=app.state.system_prompt,
             session_id=request.session_id,
             user_message=request.message,
+            is_new_session=request.is_new_session,
         )
 
         return ChatResponse(

@@ -8,7 +8,7 @@ from typing import Any
 
 from langchain.agents import create_agent
 from langchain.agents.middleware import wrap_tool_call
-from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
 
 from ai_service.database import load_chat_history
 from ai_service.embedding_factory import create_embeddings
@@ -111,6 +111,7 @@ async def invoke_agent(
     system_prompt: str,
     session_id: str,
     user_message: str,
+    is_new_session: bool = False,
 ) -> str:
     """Process one student message through the LangChain agent.
 
@@ -118,6 +119,9 @@ async def invoke_agent(
     session-specific ``X-Chat-Session-ID`` header. Conversation history is
     loaded fresh from PostgreSQL on every invocation to preserve the stateless
     service design for the AI container.
+
+    When is_new_session=True and no prior history exists, a welcome instruction
+    is injected so the agent generates a personalized greeting (D-01, LANG-01).
     """
 
     # Layer 2: Input sanitization (D-05)
@@ -145,7 +149,19 @@ async def invoke_agent(
         session_id,
         k=settings.CHAT_HISTORY_K,
     )
-    all_messages = [*history_messages, HumanMessage(content=user_message)]
+
+    # D-01, LANG-01: Inject welcome generation instruction on new sessions
+    if is_new_session and not history_messages:
+        welcome_instruction = SystemMessage(
+            content=(
+                "Este e o inicio de uma nova conversa. Cumprimente o aluno pelo nome "
+                "de forma calorosa e breve, apresente-se como Alpha, e pergunte como "
+                "pode ajudar. Em seguida, responda a mensagem do aluno."
+            )
+        )
+        all_messages = [welcome_instruction, *history_messages, HumanMessage(content=user_message)]
+    else:
+        all_messages = [*history_messages, HumanMessage(content=user_message)]
 
     try:
         result = await asyncio.wait_for(

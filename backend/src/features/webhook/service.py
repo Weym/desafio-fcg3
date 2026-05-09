@@ -122,12 +122,16 @@ class WebhookService:
 
     async def get_or_create_session(
         self, student_id: uuid.UUID, phone: str, db: AsyncSession
-    ) -> ChatSession:
+    ) -> tuple[ChatSession, bool]:
         """Reuse active session or create new one per D-10.
 
         D-10: Reuse active session per phone number.
         D-13: Closed session → new session, verification_state starts unverified.
         Updates updated_at on reuse for pg_cron auto-close tracking.
+
+        Returns:
+            Tuple of (session, is_new) where is_new=True if session was just created.
+            Used by router to trigger welcome message generation (D-01).
         """
         result = await db.execute(
             select(ChatSession).where(
@@ -142,7 +146,7 @@ class WebhookService:
             # Touch updated_at for auto-close tracking (D-12)
             session.updated_at = datetime.now(timezone.utc)
             await db.flush()
-            return session
+            return session, False
 
         # Create new session — starts unverified (D-13)
         session = ChatSession(
@@ -153,7 +157,7 @@ class WebhookService:
         )
         db.add(session)
         await db.flush()
-        return session
+        return session, True
 
     async def save_message(
         self,

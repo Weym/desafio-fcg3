@@ -113,7 +113,7 @@ async def whatsapp_webhook(request: Request) -> Response:
                         )
                         continue
 
-                    session = await webhook_service.get_or_create_session(
+                    session, is_new_session = await webhook_service.get_or_create_session(
                         student.id, phone, db
                     )
 
@@ -196,7 +196,8 @@ async def whatsapp_webhook(request: Request) -> Response:
 
                     task = asyncio.create_task(
                         process_message(
-                            session.id, text_content, phone, wa_client
+                            session.id, text_content, phone, wa_client,
+                            is_new_session=is_new_session,
                         )
                     )
                     task.add_done_callback(_handle_task_result)  # CRITICAL-3
