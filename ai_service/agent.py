@@ -112,6 +112,7 @@ async def invoke_agent(
     session_id: str,
     user_message: str,
     is_new_session: bool = False,
+    student_name: str = "",
 ) -> str:
     """Process one student message through the LangChain agent.
 
@@ -152,9 +153,10 @@ async def invoke_agent(
 
     # D-01, LANG-01: Inject welcome generation instruction on new sessions
     if is_new_session and not history_messages:
+        name_part = f" o aluno {student_name}" if student_name else " o aluno"
         welcome_instruction = SystemMessage(
             content=(
-                "Este e o inicio de uma nova conversa. Cumprimente o aluno pelo nome "
+                f"Este e o inicio de uma nova conversa. Cumprimente{name_part} pelo nome "
                 "de forma calorosa e breve, apresente-se como Alpha, e pergunte como "
                 "pode ajudar. Em seguida, responda a mensagem do aluno."
             )

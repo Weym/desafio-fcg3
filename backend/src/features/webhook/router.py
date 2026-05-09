@@ -198,6 +198,7 @@ async def whatsapp_webhook(request: Request) -> Response:
                         process_message(
                             session.id, text_content, phone, wa_client,
                             is_new_session=is_new_session,
+                            student_name=student.name,
                         )
                     )
                     task.add_done_callback(_handle_task_result)  # CRITICAL-3

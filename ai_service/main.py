@@ -51,6 +51,7 @@ class ChatRequest(BaseModel):
     session_id: str
     message: str
     is_new_session: bool = False
+    student_name: str = ""
 
 
 class ChatResponse(BaseModel):
@@ -142,6 +143,7 @@ async def chat(
             session_id=request.session_id,
             user_message=request.message,
             is_new_session=request.is_new_session,
+            student_name=request.student_name,
         )
 
         return ChatResponse(
