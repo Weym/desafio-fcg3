@@ -1,8 +1,12 @@
 """Webhook business logic: phone lookup, session management, verification state machine.
 
 This module contains the core webhook processing logic that runs BEFORE any
-LangChain agent involvement. The verification state machine gates access to the
-agent — unverified students NEVER reach the AI service (D-02).
+LangChain agent involvement. With lazy OTP (D-13/D-14), unverified students
+CAN reach the AI agent for read-only operations — verification is only triggered
+mid-conversation when a mutating action is needed (D-15/D-16).
+
+The verification state machine handles OTP flow once initiated (awaiting_email,
+awaiting_code states).
 """
 
 from __future__ import annotations
@@ -196,6 +200,19 @@ class WebhookService:
         session.ended_at = datetime.now(timezone.utc)
         await db.flush()
 
+    async def initiate_mid_conversation_verification(
+        self, session: ChatSession, db: AsyncSession
+    ) -> None:
+        """Transition session to awaiting_email state for mid-conversation OTP.
+
+        Called when the agent requests verification for a mutating action.
+        The student's next message will be processed by the verification flow.
+        Per D-15: Agent naturally asks for email when mutating action is needed.
+        Per D-16: Once OTP is completed, verification persists for entire session.
+        """
+        session.verification_state = "awaiting_email"
+        await db.flush()
+
     async def handle_verification_flow(
         self,
         session: ChatSession,
@@ -204,26 +221,21 @@ class WebhookService:
         db: AsyncSession,
         wa_client: WhatsAppClient,
     ) -> None:
-        """Implement the verification state machine per D-02.
+        """Implement the verification state machine for OTP in progress.
 
-        States:
-        - unverified: Ask for institutional email
+        With lazy OTP (D-13/D-14), this method is only called when OTP is
+        already in progress (awaiting_email or awaiting_code). The "unverified"
+        state no longer routes here — unverified students go directly to the
+        AI agent for read-only operations.
+
+        States handled:
         - awaiting_email: Validate email, send OTP
         - awaiting_code: Validate 6-digit code
         - verified: Message goes to agent (handled in router, not here)
         """
         state = session.verification_state
 
-        if state == "unverified":
-            # First message from unverified user — ask for email
-            session.verification_state = "awaiting_email"
-            await db.flush()
-            await wa_client.send_text_message(
-                phone,
-                "Preciso verificar sua identidade. Qual seu email institucional?",
-            )
-
-        elif state == "awaiting_email":
+        if state == "awaiting_email":
             await self._handle_awaiting_email(
                 session, message_text, phone, db, wa_client
             )
