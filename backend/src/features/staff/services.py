@@ -7,6 +7,7 @@ Contains:
 
 from __future__ import annotations
 
+import re
 from datetime import date
 from uuid import UUID
 
@@ -139,6 +140,11 @@ dashboard_service = DashboardService()
 # ---------------------------------------------------------------------------
 
 
+def _escape_like(value: str) -> str:
+    """Escape SQL LIKE wildcards for literal matching."""
+    return re.sub(r"([%_\\])", r"\\\1", value)
+
+
 class StaffManagementService(BaseService[Staff]):
     """Service layer for staff CRUD operations (ROLE-03, ROLE-07).
 
@@ -174,7 +180,7 @@ class StaffManagementService(BaseService[Staff]):
 
         # Apply search filter (ILIKE on name OR email)
         if search:
-            search_pattern = f"%{search}%"
+            search_pattern = f"%{_escape_like(search)}%"
             search_filter = or_(
                 Staff.name.ilike(search_pattern),
                 Staff.email.ilike(search_pattern),
