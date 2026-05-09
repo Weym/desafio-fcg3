@@ -10,6 +10,7 @@ import '../../../shared/widgets/glass_card.dart';
 import '../../../shared/widgets/responsive_container.dart';
 import '../models/document_model.dart';
 import '../providers/document_provider.dart';
+import 'widgets/document_detail_sheet.dart';
 import 'widgets/document_request_sheet.dart';
 
 class ClientDocumentsScreen extends ConsumerStatefulWidget {
@@ -255,6 +256,7 @@ class _DocumentCard extends StatelessWidget {
     final isReady = document.status == 'ready';
 
     return GlassCard(
+      onTap: () => showDocumentDetailSheet(context, document),
       padding: const EdgeInsets.all(AppSpacing.md),
       child: Row(
         children: [
