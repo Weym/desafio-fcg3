@@ -135,11 +135,14 @@ async def confirm_enrollment(
     result = await enrollment_service.confirm_enrollment(
         db, enrollment_id=enrollment_id, student_id=user.id,
     )
+
+    # Capture values before commit to avoid lazy-load issues (WR-01)
+    student_id_for_notification = user.id
+    enrollment_id_for_notification = enrollment_id
+
     await db.commit()
 
     # FCM: Notify student that enrollment was confirmed
-    student_id_for_notification = user.id
-    enrollment_id_for_notification = enrollment_id
 
     async def _send_notification():
         async for fresh_db in get_db_session():
