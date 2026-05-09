@@ -55,14 +55,14 @@ Requirements for milestone v3.0. Each maps to roadmap phases.
 
 ### LangChain Workflow
 
-- [ ] **LANG-01**: Agente detecta início de sessão e envia welcome message via template
+- [x] **LANG-01**: Agente detecta início de sessão e envia welcome message via template
 - [ ] **LANG-02**: Agente detecta fim de sessão (timeout ou despedida) e envia goodbye + atualiza status
 - [ ] **LANG-03**: RAG responde perguntas acadêmicas com base em knowledge base
 - [ ] **LANG-04**: MCP tool calling executa ações no backend via session context
 - [ ] **LANG-05**: Respostas fora de escopo são tratadas educadamente redirecionando ao acadêmico
 - [ ] **LANG-06**: Falha de atendimento ativa intervenção humana automaticamente
 - [ ] **LANG-07**: System prompt define persona, instruções operacionais e ações disponíveis
-- [ ] **LANG-08**: Mídia recebida (imagem/áudio) recebe rejeição educada e criativa
+- [x] **LANG-08**: Mídia recebida (imagem/áudio) recebe rejeição educada e criativa
 - [ ] **LANG-09**: Prompt injection defense via hardening + sanitização + canary tokens
 - [ ] **LANG-10**: Logging estruturado para RAG (chunks recuperados, similarity score)
 - [ ] **LANG-11**: Logging estruturado para MCP (tool call, params, resultado, latência)
@@ -181,14 +181,14 @@ Requirements for milestone v3.0. Each maps to roadmap phases.
 | SFUX-23 | Phase 19 | Pending |
 | SFUX-24 | Phase 19 | Pending |
 | SFUX-25 | Phase 19 | Pending |
-| LANG-01 | Phase 20 | Pending |
+| LANG-01 | Phase 20 | Complete |
 | LANG-02 | Phase 20 | Pending |
 | LANG-03 | Phase 20 | Pending |
 | LANG-04 | Phase 20 | Pending |
 | LANG-05 | Phase 20 | Pending |
 | LANG-06 | Phase 20 | Pending |
 | LANG-07 | Phase 20 | Pending |
-| LANG-08 | Phase 20 | Pending |
+| LANG-08 | Phase 20 | Complete |
 | LANG-09 | Phase 20 | Pending |
 | LANG-10 | Phase 20 | Pending |
 | LANG-11 | Phase 20 | Pending |
