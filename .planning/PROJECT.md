@@ -53,14 +53,14 @@ Aluno envia mensagem no WhatsApp e recebe resposta precisa sobre sua situação 
 - [ ] Staff Cadastro de Alunos: tela CRUD completa (novo)
 
 **Pontos Importantes Pendentes:**
-- [ ] Workflow LangChain completo (welcome/goodbye, RAG, MCP, off-scope, falha, intervenção)
-- [ ] System prompt finalizado (persona + instruções operacionais)
-- [ ] Tratamento de mídia recebida (rejeição educada)
-- [ ] Proteção contra prompt injection
-- [ ] Logging/debug RAG + MCP + fluxo LangChain
+- [x] Workflow LangChain completo (welcome/goodbye, RAG, MCP, off-scope, falha, intervenção) — Validated in Phase 20
+- [x] System prompt finalizado (persona + instruções operacionais) — Validated in Phase 20
+- [x] Tratamento de mídia recebida (rejeição educada) — Validated in Phase 20
+- [x] Proteção contra prompt injection — Validated in Phase 20
+- [x] Logging/debug RAG + MCP + fluxo LangChain — Validated in Phase 20
 - [ ] Expansão de roles: student/staff/provider com CRUDs hierárquicos
-- [ ] Lazy loading OTP no WhatsApp
-- [ ] Log do RAG nos chats (chunks, similarity score)
+- [x] Lazy loading OTP no WhatsApp — Validated in Phase 20
+- [x] Log do RAG nos chats (chunks, similarity score) — Validated in Phase 20
 - [ ] Splash screen customizada
 - [ ] FCM push notifications (registro token, envio por evento, barra do celular)
 
