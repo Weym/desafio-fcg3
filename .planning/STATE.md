@@ -1,33 +1,33 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.0
-milestone_name: Flutter Frontend
-status: complete
-last_updated: "2026-05-07T23:20:00.000Z"
-last_activity: 2026-05-07 -- Milestone v2.0 archived
+milestone: v3.0
+milestone_name: "Correções, Melhorias & Features"
+status: active
+last_updated: "2026-05-08T00:00:00.000Z"
+last_activity: 2026-05-08 -- Milestone v3.0 started
 progress:
-  total_phases: 11
-  completed_phases: 11
-  total_plans: 30
-  completed_plans: 30
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
 
 ## Current Position
 
-Milestone: v2.0 (Flutter Frontend) — SHIPPED 2026-05-07
-All phases complete. No active work.
-
-Progress: [██████████] 100% (11/11 phases, 30/30 plans)
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-05-08 — Milestone v3.0 started
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-07)
+See: .planning/PROJECT.md (updated 2026-05-08)
 
 **Core value:** Aluno envia mensagem no WhatsApp e recebe resposta precisa sobre sua situação acadêmica — com ações concretas executadas em tempo real.
-**Current focus:** Project delivered. No active milestone.
+**Current focus:** v3.0 — Correções, Melhorias & Features
 
 ## Milestones Shipped
 
@@ -45,7 +45,14 @@ See: .planning/PROJECT.md (updated 2026-05-07)
 - All API calls use `Authorization: Bearer {token}` header
 - Two separate PostgreSQL drivers: `asyncpg` for FastAPI + MCP; `psycopg3` for LangChain service
 
+## Accumulated Context
+
+- v1.0 + v2.0 shipped: 17 phases, 77 plans, ~35,907 LOC
+- Flutter uses Riverpod + GoRouter + Dio with QueuedInterceptor
+- Glassmorphism UI (Alpha Connect) with Plus Jakarta Sans + Inter
+- Docker 5-service stack (fastapi:8000, langchain:8001, mcp:8002, postgres:5432, flutter-web:3000)
+- DEV_MASTER_OTP bypass available for dev/testing
+
 ## Session Continuity
 
-To resume work: read this file, then `.planning/ROADMAP.md` for milestone history.
-Both milestones (v1.0 + v2.0) are complete. If starting a new milestone, run `/gsd-new-milestone`.
+To resume work: read this file, then `.planning/ROADMAP.md` for phase details.

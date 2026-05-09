@@ -37,9 +37,37 @@ Aluno envia mensagem no WhatsApp e recebe resposta precisa sobre sua situação 
 
 ### Active
 
-- [ ] Webhook WhatsApp: validação HMAC-SHA256 end-to-end (parcial)
-- [ ] Push notifications via FCM (registro de token, envio por tipo de evento)
-- [ ] Testes: cobertura dos fluxos críticos (matrícula, webhook, middleware IDOR)
+**Correções Imediatas:**
+- [ ] Correções de navegação e ações rápidas (Student: agendamentos, documentos, mentor)
+- [ ] Chat: rename sessão, filtro ativas/inativas, ordenação por data
+- [ ] Documentos: drawer para detalhes, tipo/data visíveis, drawer para adicionar
+- [ ] Avisos: estado lido/não lido, filtro, marcar todos, reposicionar no header
+- [ ] Recursos Student: detalhes via drawer
+- [ ] Suporte: acesso via header
+- [ ] Staff Dashboard: truncamento, filtros docs pendentes e chats hoje
+- [ ] Staff Agendamentos: detalhamento, card corrigido, confirm fix, search
+- [ ] Staff Chats: tab navegação, identificação aluno, header informativo
+- [ ] Staff Intervenção: padrão visual, search, tab concluídos
+- [ ] Staff Documentos: tabs estado, filtro tipo, visualização dados, drawer padrão, mensagem erro
+- [ ] Staff Recursos: toggle ativar/desativar, opção deletar
+- [ ] Staff Cadastro de Alunos: tela CRUD completa (novo)
+
+**Pontos Importantes Pendentes:**
+- [ ] Workflow LangChain completo (welcome/goodbye, RAG, MCP, off-scope, falha, intervenção)
+- [ ] System prompt finalizado (persona + instruções operacionais)
+- [ ] Tratamento de mídia recebida (rejeição educada)
+- [ ] Proteção contra prompt injection
+- [ ] Logging/debug RAG + MCP + fluxo LangChain
+- [ ] Expansão de roles: student/staff/provider com CRUDs hierárquicos
+- [ ] Lazy loading OTP no WhatsApp
+- [ ] Log do RAG nos chats (chunks, similarity score)
+- [ ] Splash screen customizada
+- [ ] FCM push notifications (registro token, envio por evento, barra do celular)
+
+**Features Novas:**
+- [ ] Cardápio semanal (texto, visualização por dia, staff/provider cadastra)
+- [ ] Perfil (dados app + dados acadêmicos)
+- [ ] Grade curricular (horário, professor, descrição, integração Google Calendar)
 
 ### Out of Scope
 
@@ -87,6 +115,17 @@ Aluno envia mensagem no WhatsApp e recebe resposta precisa sobre sua situação 
 | DEV_MASTER_OTP bypass | Dev/testing sem dependência Resend | ✓ Validated v2.0 |
 | Derived notifications (no backend endpoint) | Aggregates from documents + appointments | ✓ Validated v2.0 |
 
+## Current Milestone: v3.0 Correções, Melhorias & Features
+
+**Goal:** Corrigir navegação e UX quebrados em ambas as visões, completar workflow LangChain, expandir roles para provider, implementar FCM push notifications, e adicionar features novas (cardápio, perfil, grade curricular).
+
+**Target features:**
+- Correções imediatas de navegação e UX (Student + Staff, ~40 itens)
+- Workflow LangChain completo com sessões, defesas e intervenção humana
+- Expansão de roles (student/staff/provider) com CRUDs hierárquicos
+- FCM push notifications end-to-end
+- Cardápio semanal, perfil do aluno, grade curricular com Google Calendar
+
 ## Current State
 
 **Both milestones delivered:**
@@ -97,6 +136,25 @@ Aluno envia mensagem no WhatsApp e recebe resposta precisa sobre sua situação 
 
 Project is feature-complete for the desafio scope. No active milestone.
 
+## Evolution
+
+This document evolves at phase transitions and milestone boundaries.
+
+**After each phase transition** (via `/gsd-transition`):
+
+1. Requirements invalidated? → Move to Out of Scope with reason
+2. Requirements validated? → Move to Validated with phase reference
+3. New requirements emerged? → Add to Active
+4. Decisions to log? → Add to Key Decisions
+5. "What This Is" still accurate? → Update if drifted
+
+**After each milestone** (via `/gsd-complete-milestone`):
+
+1. Full review of all sections
+2. Core Value check — still the right priority?
+3. Audit Out of Scope — reasons still valid?
+4. Update Context with current state
+
 ---
 
-_Last updated: 2026-05-07 after v2.0 milestone_
+_Last updated: 2026-05-08 after v3.0 milestone started_
