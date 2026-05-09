@@ -120,7 +120,15 @@ GROUP 4 — Polish (depends on all above):
   3. Off-scope questions receive polite redirection; media messages receive creative rejection; failures trigger human intervention
   4. Prompt injection attempts are detected and neutralized without disrupting legitimate conversation
   5. Staff can see RAG debug info (chunks, scores) in chat logs; system logs capture full LangChain decision traceability
-**Plans**: TBD
+**Plans:** 6 plans
+
+Plans:
+- [ ] 20-01-PLAN.md — System prompt + Alpha persona + off-scope + media enhancement
+- [ ] 20-02-PLAN.md — RAG observability (rag_logs table) + LangSmith tracing
+- [ ] 20-03-PLAN.md — RAG ingest on Docker bootstrap
+- [ ] 20-04-PLAN.md — Lazy OTP strategy + webhook flow modification
+- [ ] 20-05-PLAN.md — Prompt injection defense (4 layers)
+- [ ] 20-06-PLAN.md — Session lifecycle (welcome/goodbye/idle timeout)
 
 ### Phase 21: Roles & Auth Expansion
 
@@ -187,7 +195,7 @@ GROUP 4 — Polish (depends on all above):
 |-------|-----------|----------------|--------|-----------|
 | 18. Student UX Corrections | v3.0 | 0/TBD | Not started | - |
 | 19. Staff UX Corrections | v3.0 | 0/TBD | Not started | - |
-| 20. LangChain Workflow | v3.0 | 0/TBD | Not started | - |
+| 20. LangChain Workflow | v3.0 | 0/6 | Planned | - |
 | 21. Roles & Auth Expansion | v3.0 | 0/TBD | Not started | - |
 | 22. FCM Push Notifications | v3.0 | 0/TBD | Not started | - |
 | 23. New Features | v3.0 | 0/TBD | Not started | - |
