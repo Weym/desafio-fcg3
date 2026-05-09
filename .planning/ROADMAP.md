@@ -98,7 +98,7 @@ Plans:
 - [x] 18-03-PLAN.md — Documents type/date display + detail drawer
 - [x] 18-04-PLAN.md — Notifications read/unread state + filters + mark-as-read
 - [x] 18-05-PLAN.md — Appointment detail drawer + wiring
-- [ ] 18-06-PLAN.md — GAP: Agendamentos quick action → navigate to resources tab + card onTap
+- [x] 18-06-PLAN.md — GAP: Agendamentos quick action → navigate to resources tab + card onTap
 - [ ] 18-07-PLAN.md — GAP: Chat rename backend endpoint + Flutter error handling
 
 **UI hint**: yes

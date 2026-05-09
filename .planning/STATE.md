@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Correções, Melhorias & Features
 status: All plans executed
-last_updated: "2026-05-09T03:34:22.628Z"
+last_updated: "2026-05-09T22:35:18Z"
 last_activity: 2026-05-09
 progress:
   total_phases: 7
@@ -27,7 +27,7 @@ Last activity: 2026-05-09
 See: .planning/PROJECT.md (updated 2026-05-08)
 
 **Core value:** Aluno envia mensagem no WhatsApp e recebe resposta precisa sobre sua situação acadêmica — com ações concretas executadas em tempo real.
-**Current focus:** Phase 19 — staff-ux-corrections
+**Current focus:** Phase 18 Plan 06 completed — Agendamentos navigation + appointment card onTap
 
 ## Milestones Shipped
 
@@ -106,6 +106,9 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 - **19-06:** StaffCadastroScreen: full CRUD with ExpansionTile cards, status dots (green/red), FAB + form sheet
 - **19-06:** StaffStudentModel + StaffCadastroService (5 CRUD methods) + provider with filter/search
 - **19-06:** Router updated: /staff/cadastro now points to StaffCadastroScreen (was placeholder)
+- **18-06:** Agendamentos quick action navigates to /client/resources?tab=1 (not modal)
+- **18-06:** _AppointmentCard GlassCard has onTap → showAppointmentDetailSheet
+- **18-06:** ClientResourcesScreen accepts initialTabIndex param from query param ?tab=N
 
 ## Session Continuity
 
