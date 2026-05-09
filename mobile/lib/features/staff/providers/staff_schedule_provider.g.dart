@@ -78,9 +78,8 @@ final staffScheduleFilterProvider =
     );
 
 typedef _$StaffScheduleFilter = AutoDisposeNotifier<String?>;
-
 String _$staffScheduleSearchHash() =>
-    r'a1c9e8f2d3b4567890abcdef1234567890abcdef';
+    r'e5a32ce4c1c7c9f9769b29f1ddb59de89b6cc04e';
 
 /// See also [StaffScheduleSearch].
 @ProviderFor(StaffScheduleSearch)

@@ -25,6 +25,7 @@ import '../../features/staff/screens/staff_documents_screen.dart';
 import '../../features/staff/screens/staff_resources_screen.dart';
 import '../../features/staff/screens/staff_intervention_screen.dart';
 import '../../features/staff/screens/staff_intervention_chat_screen.dart';
+import '../../features/staff/screens/staff_cadastro_screen.dart';
 import '../../features/client/models/appointment_model.dart';
 import 'route_names.dart';
 
@@ -201,10 +202,7 @@ GoRouter appRouter(Ref ref) {
           GoRoute(
             path: RoutePaths.staffCadastro,
             name: RouteNames.staffCadastro,
-            builder: (context, state) => Scaffold(
-              appBar: AppBar(title: const Text('Cadastro de Alunos')),
-              body: const Center(child: Text('Em construção')),
-            ),
+            builder: (context, state) => const StaffCadastroScreen(),
           ),
           GoRoute(
             path: RoutePaths.staffDocuments,

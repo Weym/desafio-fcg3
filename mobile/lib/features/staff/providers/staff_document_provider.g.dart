@@ -205,7 +205,7 @@ final staffDocumentFilterProvider =
 
 typedef _$StaffDocumentFilter = AutoDisposeNotifier<String?>;
 String _$staffDocumentTypeFilterHash() =>
-    r'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0';
+    r'75d88dc161c6a51c93765035459dec49c4e971a4';
 
 /// See also [StaffDocumentTypeFilter].
 @ProviderFor(StaffDocumentTypeFilter)
