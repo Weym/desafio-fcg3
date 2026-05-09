@@ -62,15 +62,22 @@ class _StaffMemberFormScreenState extends ConsumerState<StaffMemberFormScreen> {
       'role': _selectedRole,
     };
 
-    // Include optional fields only if non-empty
+    // Include optional fields: send null to clear, value to set
     final phone = _phoneController.text.trim();
-    if (phone.isNotEmpty) data['phone'] = phone;
-
     final position = _positionController.text.trim();
-    if (position.isNotEmpty) data['position'] = position;
-
     final workSchedule = _workScheduleController.text.trim();
-    if (workSchedule.isNotEmpty) data['work_schedule'] = workSchedule;
+
+    if (_isEditMode) {
+      // Edit mode: explicitly include nullable fields so the user can clear them
+      data['phone'] = phone.isEmpty ? null : phone;
+      data['position'] = position.isEmpty ? null : position;
+      data['work_schedule'] = workSchedule.isEmpty ? null : workSchedule;
+    } else {
+      // Create mode: only include non-empty optional fields
+      if (phone.isNotEmpty) data['phone'] = phone;
+      if (position.isNotEmpty) data['position'] = position;
+      if (workSchedule.isNotEmpty) data['work_schedule'] = workSchedule;
+    }
 
     try {
       if (_isEditMode) {
