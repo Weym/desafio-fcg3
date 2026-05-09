@@ -20,23 +20,59 @@ from src.features.webhook.service import WebhookService
 class TestVerificationStateMachine:
     """Full verification state machine per D-01/D-02."""
 
-    async def test_unverified_transitions_to_awaiting_email(
+    async def test_unverified_skips_verification_flow(
         self, db_session, test_student, unverified_session
     ):
-        """New unverified session → ask for email → state becomes awaiting_email."""
+        """Unverified session is NOT handled by verification flow (lazy OTP D-13/D-14).
+
+        With lazy OTP, unverified students go directly to the AI agent for read-only
+        operations. The verification flow only handles awaiting_email/awaiting_code.
+        This test confirms handle_verification_flow is a no-op for unverified state.
+        """
         svc = WebhookService()
         wa_client = AsyncMock()
         wa_client.send_text_message = AsyncMock(return_value=True)
 
+        # handle_verification_flow does nothing for unverified — it only handles
+        # awaiting_email and awaiting_code per the lazy OTP design.
         await svc.handle_verification_flow(
             unverified_session, "Oi", "5521999999999", db_session, wa_client
         )
         await db_session.flush()
 
-        assert unverified_session.verification_state == "awaiting_email"
-        wa_client.send_text_message.assert_called_once()
-        sent = wa_client.send_text_message.call_args[0][1]
-        assert "email institucional" in sent.lower()
+        # State remains unverified — no transition happened
+        assert unverified_session.verification_state == "unverified"
+        # No message sent — the function is a no-op for this state
+        wa_client.send_text_message.assert_not_called()
+
+    async def test_stale_otp_state_resets_to_unverified(
+        self, db_session, test_student
+    ):
+        """Stale awaiting_email (>5 min old) resets to unverified on session reuse.
+
+        Regression test for UAT Test 12: timezone-naive updated_at must not crash
+        when compared with timezone-aware datetime.now(timezone.utc).
+        """
+        # Create session with stale awaiting_email state (6 minutes ago)
+        session = ChatSession(
+            id=uuid.uuid4(),
+            student_id=test_student.id,
+            whatsapp_phone="5521999999999",
+            status="active",
+            verification_state="awaiting_email",
+            updated_at=datetime.now(timezone.utc) - timedelta(minutes=6),
+        )
+        db_session.add(session)
+        await db_session.flush()
+
+        svc = WebhookService()
+        reused_session, is_new = await svc.get_or_create_session(
+            test_student.id, "5521999999999", db_session
+        )
+
+        assert is_new is False
+        assert reused_session.id == session.id
+        assert reused_session.verification_state == "unverified"
 
     async def test_valid_email_transitions_to_awaiting_code(
         self, db_session, test_student
