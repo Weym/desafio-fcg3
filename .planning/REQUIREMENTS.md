@@ -30,10 +30,10 @@ Requirements for milestone v3.0. Each maps to roadmap phases.
 - [x] **SFUX-01**: Dashboard — taxa de resolução automatizada com truncamento de casas decimais
 - [x] **SFUX-02**: Dashboard — "Docs pendentes" aplica filtro automaticamente ao navegar
 - [x] **SFUX-03**: Dashboard — "Chats hoje" aplica filtro de data automaticamente ao navegar
-- [ ] **SFUX-04**: Agendamentos — detalhamento mostra Nome, RA, data emissão, recurso
-- [ ] **SFUX-05**: Agendamentos — card exibe nome e recurso (não motivo)
-- [ ] **SFUX-06**: Agendamentos — confirmar agendamento funciona corretamente
-- [ ] **SFUX-07**: Agendamentos — search por RA ou nome de aluno
+- [x] **SFUX-04**: Agendamentos — detalhamento mostra Nome, RA, data emissão, recurso
+- [x] **SFUX-05**: Agendamentos — card exibe nome e recurso (não motivo)
+- [x] **SFUX-06**: Agendamentos — confirmar agendamento funciona corretamente
+- [x] **SFUX-07**: Agendamentos — search por RA ou nome de aluno
 - [ ] **SFUX-08**: Chats — tab de navegação para tela de chats no menu
 - [ ] **SFUX-09**: Chats — identificação mostra nome do aluno + número formatado
 - [ ] **SFUX-10**: Chats — header ao entrar no chat com nome, RA e dados da sessão
@@ -159,10 +159,10 @@ Requirements for milestone v3.0. Each maps to roadmap phases.
 | SFUX-01 | Phase 19 | Complete |
 | SFUX-02 | Phase 19 | Complete |
 | SFUX-03 | Phase 19 | Complete |
-| SFUX-04 | Phase 19 | Pending |
-| SFUX-05 | Phase 19 | Pending |
-| SFUX-06 | Phase 19 | Pending |
-| SFUX-07 | Phase 19 | Pending |
+| SFUX-04 | Phase 19 | Complete |
+| SFUX-05 | Phase 19 | Complete |
+| SFUX-06 | Phase 19 | Complete |
+| SFUX-07 | Phase 19 | Complete |
 | SFUX-08 | Phase 19 | Pending |
 | SFUX-09 | Phase 19 | Pending |
 | SFUX-10 | Phase 19 | Pending |

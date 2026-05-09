@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Correções, Melhorias & Features
 status: executing
-last_updated: "2026-05-09T02:37:52.277Z"
+last_updated: "2026-05-09T02:47:02.894Z"
 last_activity: 2026-05-09
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 11
-  completed_plans: 6
-  percent: 55
+  completed_plans: 7
+  percent: 64
 ---
 
 # Project State
@@ -18,7 +18,7 @@ progress:
 ## Current Position
 
 Phase: 19 (staff-ux-corrections) — EXECUTING
-Plan: 2 of 6
+Plan: 3 of 6
 Status: Ready to execute
 Last activity: 2026-05-09
 
@@ -84,6 +84,12 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 - **19-01:** staffCadastro route placeholder (Plan 06 will implement)
 - **19-01:** KPI cards use query params for pre-applied filters (?filter=hoje, ?filter=pendentes)
 - **19-01:** "Ações Rápidas" section on dashboard with Gerenciar Alunos button
+- **19-02:** StaffSearchBar reusable widget in shared/widgets for staff screens
+- **19-02:** Appointment cards redesigned: CircleAvatar + studentName (title) + resourceName (subtitle)
+- **19-02:** AppointmentModel extended with studentName, studentRa, resourceName nullable fields
+- **19-02:** StaffScheduleSearch provider for client-side filtering by name/RA
+- **19-02:** Detail screen shows Nome, RA, Data emissão, Recurso, Status badge, Motivo
+- **19-02:** Confirm/cancel actions with try/catch error handling and colored SnackBar
 
 ## Session Continuity
 
