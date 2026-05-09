@@ -14,6 +14,7 @@ Staff:
 
 from __future__ import annotations
 
+import asyncio
 import os
 import uuid as uuid_mod
 from uuid import UUID
@@ -22,6 +23,7 @@ from fastapi import APIRouter, Depends, Query, UploadFile, File, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.infrastructure.database import get_db_session
+from src.features.notifications.services import notification_service
 from src.shared.dependencies import (
     UserContext,
     check_ownership,
@@ -143,6 +145,20 @@ async def update_document_status(
         db, document_id=document_id, data=data,
     )
     await db.commit()
+
+    # FCM: Notify student when document status becomes "ready"
+    if data.status == "ready":
+        async def _send_notification():
+            async for fresh_db in get_db_session():
+                try:
+                    await notification_service.notify_document_ready(
+                        fresh_db, document.student_id, document.type, document.id
+                    )
+                finally:
+                    await fresh_db.close()
+
+        asyncio.create_task(_send_notification())
+
     return DocumentResponse.model_validate(document)
 
 

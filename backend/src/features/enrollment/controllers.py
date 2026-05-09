@@ -19,12 +19,14 @@ Staff:
 
 from __future__ import annotations
 
+import asyncio
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.infrastructure.database import get_db_session
+from src.features.notifications.services import notification_service
 from src.shared.dependencies import (
     UserContext,
     check_ownership,
@@ -134,6 +136,19 @@ async def confirm_enrollment(
         db, enrollment_id=enrollment_id, student_id=user.id,
     )
     await db.commit()
+
+    # FCM: Notify student that enrollment was confirmed
+    async def _send_notification():
+        async for fresh_db in get_db_session():
+            try:
+                await notification_service.notify_enrollment_confirmed(
+                    fresh_db, user.id, enrollment_id
+                )
+            finally:
+                await fresh_db.close()
+
+    asyncio.create_task(_send_notification())
+
     return result
 
 

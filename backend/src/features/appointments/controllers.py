@@ -15,6 +15,7 @@ Appointments (dual-auth for MCP access):
 
 from __future__ import annotations
 
+import asyncio
 import os
 import uuid as uuid_mod
 from datetime import date
@@ -24,6 +25,7 @@ from fastapi import APIRouter, Depends, Query, UploadFile, File
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.infrastructure.database import get_db_session
+from src.features.notifications.services import notification_service
 from src.shared.dependencies import (
     UserContext,
     get_current_user_or_service,
@@ -132,6 +134,19 @@ async def book_appointment(
         db, student_id=user.id, data=data,
     )
     await db.commit()
+
+    # FCM: Notify student that appointment was confirmed/booked
+    async def _send_notification():
+        async for fresh_db in get_db_session():
+            try:
+                await notification_service.notify_appointment_confirmed(
+                    fresh_db, user.id, result.id
+                )
+            finally:
+                await fresh_db.close()
+
+    asyncio.create_task(_send_notification())
+
     return result
 
 
