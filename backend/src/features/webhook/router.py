@@ -3,6 +3,10 @@
 GET: Webhook verification challenge per WH-01.
 POST: Receive WhatsApp messages per WH-02, WH-03, WH-04.
 
+Lazy OTP (D-13/D-14): Unverified students reach the AI agent for read-only
+operations. Only awaiting_email/awaiting_code states route to verification flow.
+Mutating actions are gated by the agent + MCP middleware (D-15/D-21).
+
 CRITICAL-1: Raw body is read FIRST before any JSON parsing for HMAC validation.
 CRITICAL-3: Background tasks use add_done_callback for error visibility.
 CRITICAL-4: Background tasks open their OWN DB session (not request-scoped).
@@ -19,7 +23,7 @@ from fastapi.responses import PlainTextResponse, Response
 
 from src.features.webhook.background import (
     _handle_task_result,
-    process_verified_message,
+    process_message,
 )
 from src.features.webhook.dependencies import get_whatsapp_client, get_webhook_service
 from src.features.webhook.schemas import WhatsAppWebhookPayload
@@ -167,15 +171,18 @@ async def whatsapp_webhook(request: Request) -> Response:
                     if msg is None:
                         continue  # duplicate wamid, skip
 
-                    # Verification state machine per D-02
-                    if session.verification_state != "verified":
+                    # Lazy OTP routing per D-13/D-14:
+                    # - "awaiting_email" / "awaiting_code": OTP in progress → verification flow
+                    # - "unverified" / "verified": route to agent (reads trust phone identity;
+                    #   mutating actions gated by agent + MCP middleware per D-15/D-21)
+                    if session.verification_state in ("awaiting_email", "awaiting_code"):
                         await webhook_service.handle_verification_flow(
                             session, text_content, phone, db, wa_client
                         )
                         await db.commit()
                         continue
 
-                    # Verified: dispatch to background task (Plan 02)
+                    # Unverified or verified: dispatch to AI agent
                     await db.commit()
 
                     # HI-01: Skip AI dispatch if session is under human intervention
@@ -188,7 +195,7 @@ async def whatsapp_webhook(request: Request) -> Response:
                         continue
 
                     task = asyncio.create_task(
-                        process_verified_message(
+                        process_message(
                             session.id, text_content, phone, wa_client
                         )
                     )

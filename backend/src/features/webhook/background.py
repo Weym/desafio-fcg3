@@ -120,13 +120,21 @@ async def _escalate_session(
     await wa_client.send_text_message(phone, ESCALATION_ACK_MESSAGE)
 
 
-async def process_verified_message(
+async def process_message(
     session_id: UUID,
     message_text: str,
     phone: str,
     wa_client: WhatsAppClient,
 ) -> None:
-    """Process a verified student's text message.
+    """Process a student's text message (verified and unverified).
+
+    Handles both verified and unverified students. The AI agent + MCP layer
+    gates mutating actions — if the student tries a mutating action while
+    unverified, the agent will request verification mid-conversation per D-15.
+
+    Read-only operations (RAG queries, read-only MCP tools) trust phone-based
+    identity per D-14. The phone→student lookup provides student_id which is
+    injected by the MCP server via session context.
 
     1. Check escalation keywords — if matched, escalate without AI (HI-01)
     2. Acquire per-session lock (D-09)
@@ -252,3 +260,7 @@ async def process_verified_message(
     # Clean up lock if no other coroutine is waiting on it (prevent memory leak)
     if not lock.locked():
         _session_locks.pop(lock_key, None)
+
+
+# Backward-compatible alias for existing imports
+process_verified_message = process_message
