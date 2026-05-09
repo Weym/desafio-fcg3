@@ -44,13 +44,13 @@ Aluno envia mensagem no WhatsApp e recebe resposta precisa sobre sua situação 
 - [ ] Avisos: estado lido/não lido, filtro, marcar todos, reposicionar no header
 - [ ] Recursos Student: detalhes via drawer
 - [ ] Suporte: acesso via header
-- [ ] Staff Dashboard: truncamento, filtros docs pendentes e chats hoje
-- [ ] Staff Agendamentos: detalhamento, card corrigido, confirm fix, search
-- [ ] Staff Chats: tab navegação, identificação aluno, header informativo
-- [ ] Staff Intervenção: padrão visual, search, tab concluídos
-- [ ] Staff Documentos: tabs estado, filtro tipo, visualização dados, drawer padrão, mensagem erro
-- [ ] Staff Recursos: toggle ativar/desativar, opção deletar
-- [ ] Staff Cadastro de Alunos: tela CRUD completa (novo)
+- [x] Staff Dashboard: truncamento, filtros docs pendentes e chats hoje — Validated in Phase 19
+- [x] Staff Agendamentos: detalhamento, card corrigido, confirm fix, search — Validated in Phase 19
+- [x] Staff Chats: tab navegação, identificação aluno, header informativo — Validated in Phase 19
+- [x] Staff Intervenção: padrão visual, search, tab concluídos — Validated in Phase 19 (merged into unified Chats)
+- [x] Staff Documentos: tabs estado, filtro tipo, visualização dados, drawer padrão, mensagem erro — Validated in Phase 19
+- [x] Staff Recursos: toggle ativar/desativar, opção deletar — Validated in Phase 19
+- [x] Staff Cadastro de Alunos: tela CRUD completa (novo) — Validated in Phase 19
 
 **Pontos Importantes Pendentes:**
 - [ ] Workflow LangChain completo (welcome/goodbye, RAG, MCP, off-scope, falha, intervenção)
@@ -128,13 +128,15 @@ Aluno envia mensagem no WhatsApp e recebe resposta precisa sobre sua situação 
 
 ## Current State
 
-**Both milestones delivered:**
+**Milestones delivered:**
 - v1.0 (Backend + AI + MCP): 6 phases, 47 plans — shipped 2026-05-04
 - v2.0 (Flutter Frontend): 11 phases, 30 plans — shipped 2026-05-07
 
-**Total:** 17 phases, 77 plans, ~557 commits across 30 days.
+**v3.0 in progress:**
+- Phase 18 (Student UX Corrections): Complete
+- Phase 19 (Staff UX Corrections): Complete — 6 plans, 2 waves, all 25 SFUX requirements satisfied
 
-Project is feature-complete for the desafio scope. No active milestone.
+**Total:** 19 phases, 83 plans executed.
 
 ## Evolution
 
@@ -157,4 +159,4 @@ This document evolves at phase transitions and milestone boundaries.
 
 ---
 
-_Last updated: 2026-05-08 after v3.0 milestone started_
+_Last updated: 2026-05-09 after Phase 19 (Staff UX Corrections) completed_
