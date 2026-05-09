@@ -24,14 +24,14 @@ from src.infrastructure.whatsapp_client import WhatsAppClient
 
 logger = logging.getLogger(__name__)
 
-# Media type responses per docs/chatbot.md — hardcoded, no LLM
+# Media type responses — hardcoded, no LLM. Tone matches Alpha persona (D-17, D-24).
 MEDIA_RESPONSES: dict[str, str] = {
-    "audio": "Nao consigo processar audios ainda. Por favor, descreva sua duvida em texto.",
-    "image": "Nao consigo analisar imagens ainda. Por favor, descreva o que precisa em texto.",
-    "document": "Recebi um documento, mas nao consigo processa-lo ainda. Descreva sua solicitacao em texto.",
-    "sticker": "Por favor, descreva sua duvida em texto para que eu possa te ajudar.",
-    "location": "Nao preciso da sua localizacao. Como posso te ajudar? Digite sua duvida.",
-    "video": "Nao consigo processar videos. Por favor, descreva sua solicitacao em texto.",
+    "audio": "Ainda nao consigo ouvir audios, mas estou aqui para te ajudar! Descreva sua duvida em texto e vou resolver.",
+    "image": "Nao tenho como analisar imagens por enquanto. Me conta em texto o que voce precisa e vamos resolver juntos!",
+    "document": "Recebi seu documento, mas nao consigo processa-lo diretamente. Me descreva a solicitacao em texto — se precisar enviar documentos oficiais, posso te orientar pelo processo correto.",
+    "sticker": "Haha, entendi o sentimento! Mas para te ajudar melhor, me conta em texto o que precisa.",
+    "location": "Obrigado pela localizacao, mas nao preciso dela para te ajudar. Me diz: o que posso fazer por voce hoje?",
+    "video": "Videos ainda nao estao no meu repertorio. Descreve em texto o que precisa e eu te ajudo!",
 }
 
 # Session close keywords per D-11.
