@@ -141,13 +141,93 @@ Requirements for milestone v3.0. Each maps to roadmap phases.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (To be filled by roadmapper) | — | — |
+| STUX-01 | Phase 18 | Pending |
+| STUX-02 | Phase 18 | Pending |
+| STUX-03 | Phase 18 | Pending |
+| STUX-04 | Phase 18 | Pending |
+| STUX-05 | Phase 18 | Pending |
+| STUX-06 | Phase 18 | Pending |
+| STUX-07 | Phase 18 | Pending |
+| STUX-08 | Phase 18 | Pending |
+| STUX-09 | Phase 18 | Pending |
+| STUX-10 | Phase 18 | Pending |
+| STUX-11 | Phase 18 | Pending |
+| STUX-12 | Phase 18 | Pending |
+| STUX-13 | Phase 18 | Pending |
+| STUX-14 | Phase 18 | Pending |
+| STUX-15 | Phase 18 | Pending |
+| SFUX-01 | Phase 19 | Pending |
+| SFUX-02 | Phase 19 | Pending |
+| SFUX-03 | Phase 19 | Pending |
+| SFUX-04 | Phase 19 | Pending |
+| SFUX-05 | Phase 19 | Pending |
+| SFUX-06 | Phase 19 | Pending |
+| SFUX-07 | Phase 19 | Pending |
+| SFUX-08 | Phase 19 | Pending |
+| SFUX-09 | Phase 19 | Pending |
+| SFUX-10 | Phase 19 | Pending |
+| SFUX-11 | Phase 19 | Pending |
+| SFUX-12 | Phase 19 | Pending |
+| SFUX-13 | Phase 19 | Pending |
+| SFUX-14 | Phase 19 | Pending |
+| SFUX-15 | Phase 19 | Pending |
+| SFUX-16 | Phase 19 | Pending |
+| SFUX-17 | Phase 19 | Pending |
+| SFUX-18 | Phase 19 | Pending |
+| SFUX-19 | Phase 19 | Pending |
+| SFUX-20 | Phase 19 | Pending |
+| SFUX-21 | Phase 19 | Pending |
+| SFUX-22 | Phase 19 | Pending |
+| SFUX-23 | Phase 19 | Pending |
+| SFUX-24 | Phase 19 | Pending |
+| SFUX-25 | Phase 19 | Pending |
+| LANG-01 | Phase 20 | Pending |
+| LANG-02 | Phase 20 | Pending |
+| LANG-03 | Phase 20 | Pending |
+| LANG-04 | Phase 20 | Pending |
+| LANG-05 | Phase 20 | Pending |
+| LANG-06 | Phase 20 | Pending |
+| LANG-07 | Phase 20 | Pending |
+| LANG-08 | Phase 20 | Pending |
+| LANG-09 | Phase 20 | Pending |
+| LANG-10 | Phase 20 | Pending |
+| LANG-11 | Phase 20 | Pending |
+| LANG-12 | Phase 20 | Pending |
+| LANG-13 | Phase 20 | Pending |
+| LANG-14 | Phase 20 | Pending |
+| ROLE-01 | Phase 21 | Pending |
+| ROLE-02 | Phase 21 | Pending |
+| ROLE-03 | Phase 21 | Pending |
+| ROLE-04 | Phase 21 | Pending |
+| ROLE-05 | Phase 21 | Pending |
+| ROLE-06 | Phase 21 | Pending |
+| ROLE-07 | Phase 21 | Pending |
+| FCM-01 | Phase 22 | Pending |
+| FCM-02 | Phase 22 | Pending |
+| FCM-03 | Phase 22 | Pending |
+| FCM-04 | Phase 22 | Pending |
+| FCM-05 | Phase 22 | Pending |
+| FCM-06 | Phase 22 | Pending |
+| FCM-07 | Phase 22 | Pending |
+| FCM-08 | Phase 22 | Pending |
+| CARD-01 | Phase 23 | Pending |
+| CARD-02 | Phase 23 | Pending |
+| CARD-03 | Phase 23 | Pending |
+| PERF-01 | Phase 23 | Pending |
+| PERF-02 | Phase 23 | Pending |
+| PERF-03 | Phase 23 | Pending |
+| GRAD-01 | Phase 23 | Pending |
+| GRAD-02 | Phase 23 | Pending |
+| GRAD-03 | Phase 23 | Pending |
+| UIPOL-01 | Phase 24 | Pending |
+| UIPOL-02 | Phase 24 | Pending |
+| UIPOL-03 | Phase 24 | Pending |
 
 **Coverage:**
-- v3.0 requirements: 68 total
-- Mapped to phases: 0
-- Unmapped: 68
+- v3.0 requirements: 81 total (corrected from initial 68 estimate)
+- Mapped to phases: 81
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-05-08*
-*Last updated: 2026-05-08 after initial definition*
+*Last updated: 2026-05-08 — traceability mapped by roadmapper*
