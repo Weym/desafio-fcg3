@@ -48,11 +48,17 @@ ESCALATION_BOT_PHRASES = [
 ESCALATION_ACK_MESSAGE = "Vou transferir voce para um atendente. Aguarde um momento."
 
 # Farewell detection indicators (D-02 Layer 1, D-04)
-# Agent farewell responses typically contain 2+ of these phrases.
-FAREWELL_INDICATORS = [
-    "ate mais", "ate logo", "tchau", "adeus",
-    "bom estudo", "boa sorte", "se precisar",
-    "foi um prazer", "ate a proxima",
+# Uses tiered strong/weak indicators for farewell detection.
+
+# Strong farewell indicators — 1 match is sufficient (explicit goodbye intent)
+STRONG_FAREWELL_INDICATORS = [
+    "tchau", "adeus", "ate mais", "ate logo", "ate a proxima",
+]
+
+# Weak farewell indicators — need 2+ matches (polite closings that may appear mid-conversation)
+WEAK_FAREWELL_INDICATORS = [
+    "bom estudo", "bons estudos", "boa sorte", "se precisar",
+    "foi um prazer", "estou a disposicao",
 ]
 
 
@@ -91,12 +97,16 @@ def _strip_markdown(text: str) -> str:
 def _is_farewell_response(response: str) -> bool:
     """Check if agent response is a farewell (indicating session should close).
 
-    Uses a 2+ indicator threshold to avoid false positives on casual mentions.
+    Uses tiered indicators:
+    - Strong indicators (tchau, adeus, etc.): 1 match is sufficient
+    - Weak indicators (boa sorte, se precisar, etc.): need 2+ matches
     D-02 Layer 1: Agent recognizes farewell intent naturally.
     Accent normalization ensures accented LLM output matches unaccented indicators.
     """
     normalized = _strip_accents(response.lower())
-    return sum(1 for phrase in FAREWELL_INDICATORS if phrase in normalized) >= 2
+    if any(phrase in normalized for phrase in STRONG_FAREWELL_INDICATORS):
+        return True
+    return sum(1 for phrase in WEAK_FAREWELL_INDICATORS if phrase in normalized) >= 2
 
 
 def _handle_task_result(task: asyncio.Task) -> None:
