@@ -142,8 +142,11 @@ async def book_appointment(
                 await notification_service.notify_appointment_confirmed(
                     fresh_db, user.id, result.id
                 )
-            finally:
-                await fresh_db.close()
+            except Exception as exc:
+                import logging
+                logging.getLogger(__name__).error(
+                    "FCM notification failed in background task: %s", exc
+                )
 
     asyncio.create_task(_send_notification())
 

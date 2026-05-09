@@ -154,8 +154,11 @@ async def update_document_status(
                     await notification_service.notify_document_ready(
                         fresh_db, document.student_id, document.type, document.id
                     )
-                finally:
-                    await fresh_db.close()
+                except Exception as exc:
+                    import logging
+                    logging.getLogger(__name__).error(
+                        "FCM notification failed in background task: %s", exc
+                    )
 
         asyncio.create_task(_send_notification())
 

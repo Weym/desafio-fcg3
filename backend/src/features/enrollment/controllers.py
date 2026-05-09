@@ -138,14 +138,20 @@ async def confirm_enrollment(
     await db.commit()
 
     # FCM: Notify student that enrollment was confirmed
+    student_id_for_notification = user.id
+    enrollment_id_for_notification = enrollment_id
+
     async def _send_notification():
         async for fresh_db in get_db_session():
             try:
                 await notification_service.notify_enrollment_confirmed(
-                    fresh_db, user.id, enrollment_id
+                    fresh_db, student_id_for_notification, enrollment_id_for_notification
                 )
-            finally:
-                await fresh_db.close()
+            except Exception as exc:
+                import logging
+                logging.getLogger(__name__).error(
+                    "FCM notification failed in background task: %s", exc
+                )
 
     asyncio.create_task(_send_notification())
 
