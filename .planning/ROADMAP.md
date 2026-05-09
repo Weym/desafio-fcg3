@@ -90,11 +90,11 @@ GROUP 4 — Polish (depends on all above):
   3. Student can view full document details in a drawer, see type/date on each item, and add documents via drawer
   4. Student notifications show read/unread state, can be filtered, individually marked as read, and bulk-marked
   5. Student accesses support via header icon and views agendamento details via drawer
-**Plans:** 1/5 plans executed
+**Plans:** 2/5 plans executed
 
 Plans:
 - [x] 18-01-PLAN.md — Fix home quick actions + add support/notifications to header
-- [ ] 18-02-PLAN.md — Chat rename, active/inactive filter, date ordering
+- [x] 18-02-PLAN.md — Chat rename, active/inactive filter, date ordering
 - [ ] 18-03-PLAN.md — Documents type/date display + detail drawer
 - [ ] 18-04-PLAN.md — Notifications read/unread state + filters + mark-as-read
 - [ ] 18-05-PLAN.md — Appointment detail drawer + wiring
@@ -193,7 +193,7 @@ Plans:
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 18. Student UX Corrections | v3.0 | 1/5 | In Progress|  |
+| 18. Student UX Corrections | v3.0 | 2/5 | In Progress|  |
 | 19. Staff UX Corrections | v3.0 | 0/TBD | Not started | - |
 | 20. LangChain Workflow | v3.0 | 0/TBD | Not started | - |
 | 21. Roles & Auth Expansion | v3.0 | 0/TBD | Not started | - |

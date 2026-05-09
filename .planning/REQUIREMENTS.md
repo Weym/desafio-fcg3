@@ -13,9 +13,9 @@ Requirements for milestone v3.0. Each maps to roadmap phases.
 - [x] **STUX-02**: Botão "Solicitar documentos" redireciona para tela de documentos com drawer de adicionar já aberto
 - [x] **STUX-03**: Ação rápida "Conversar com mentor" removida da tela principal
 - [x] **STUX-04**: Tab de suporte adicionada ao header da aplicação
-- [ ] **STUX-05**: Chat permite renomear sessão (nome default gerado pela IA)
-- [ ] **STUX-06**: Chat possui filtro entre sessões ativas e inativas
-- [ ] **STUX-07**: Chat possui ordenação por data
+- [x] **STUX-05**: Chat permite renomear sessão (nome default gerado pela IA)
+- [x] **STUX-06**: Chat possui filtro entre sessões ativas e inativas
+- [x] **STUX-07**: Chat possui ordenação por data
 - [ ] **STUX-08**: Documentos exibem tipo e data com hora em cada item
 - [ ] **STUX-09**: Clique no documento abre drawer com informações completas
 - [ ] **STUX-10**: Adicionar documento usa drawer (mesmo design da tela de recursos)
@@ -145,9 +145,9 @@ Requirements for milestone v3.0. Each maps to roadmap phases.
 | STUX-02 | Phase 18 | Complete |
 | STUX-03 | Phase 18 | Complete |
 | STUX-04 | Phase 18 | Complete |
-| STUX-05 | Phase 18 | Pending |
-| STUX-06 | Phase 18 | Pending |
-| STUX-07 | Phase 18 | Pending |
+| STUX-05 | Phase 18 | Complete |
+| STUX-06 | Phase 18 | Complete |
+| STUX-07 | Phase 18 | Complete |
 | STUX-08 | Phase 18 | Pending |
 | STUX-09 | Phase 18 | Pending |
 | STUX-10 | Phase 18 | Pending |
