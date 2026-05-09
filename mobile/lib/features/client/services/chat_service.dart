@@ -39,6 +39,14 @@ class ChatService {
         .toList();
   }
 
+  /// PUT /chat-sessions/{id}
+  Future<void> renameSession(String sessionId, String newName) async {
+    await _client.dio.put(
+      '/chat-sessions/$sessionId',
+      data: {'name': newName},
+    );
+  }
+
   /// GET /chat-sessions/{id}/action-logs
   Future<List<ActionLogModel>> getActionLogs(String sessionId) async {
     final response = await _client.dio.get(

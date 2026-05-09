@@ -20,6 +20,8 @@ class ChatSessionModel {
   final DateTime? updatedAt;
   @JsonKey(name: 'message_count')
   final int? messageCount;
+  @JsonKey(name: 'name')
+  final String? name;
 
   const ChatSessionModel({
     required this.id,
@@ -31,6 +33,7 @@ class ChatSessionModel {
     this.endedAt,
     this.updatedAt,
     this.messageCount,
+    this.name,
   });
 
   factory ChatSessionModel.fromJson(Map<String, dynamic> json) =>

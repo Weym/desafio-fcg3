@@ -34,3 +34,10 @@ Future<List<ActionLogModel>> actionLogs(Ref ref, String sessionId) async {
   final service = ref.watch(chatServiceProvider);
   return service.getActionLogs(sessionId);
 }
+
+@riverpod
+Future<void> renameChatSession(Ref ref, String sessionId, String newName) async {
+  final service = ref.watch(chatServiceProvider);
+  await service.renameSession(sessionId, newName);
+  ref.invalidate(chatSessionsProvider);
+}
