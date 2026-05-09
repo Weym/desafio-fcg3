@@ -99,17 +99,13 @@ class NotificationHandler extends _$NotificationHandler {
   }
 
   /// Check if app was opened from a notification (cold start) (D-19).
+  /// Stores the deep-link as pending — auth flow consumes it via
+  /// consumePendingDeepLink() after successful authentication (D-18).
   Future<void> _checkInitialMessage() async {
     final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
     if (initialMessage != null) {
       // Store as pending deep-link — auth redirect will pick it up (D-18)
       _pendingDeepLink = NotificationRouter.routeFor(initialMessage.data);
-
-      // Navigate after router has initialized
-      final router = ref.read(appRouterProvider);
-      await Future.delayed(const Duration(milliseconds: 500));
-      router.go(_pendingDeepLink!);
-      _pendingDeepLink = null;
     }
   }
 
