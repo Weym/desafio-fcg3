@@ -20,6 +20,7 @@ import '../../features/staff/screens/staff_dashboard_screen.dart';
 import '../../features/staff/screens/staff_schedule_screen.dart';
 import '../../features/staff/screens/staff_appointment_detail_screen.dart';
 import '../../features/staff/screens/staff_ai_screen.dart';
+import '../../features/staff/screens/staff_chats_screen.dart';
 import '../../features/staff/screens/staff_chat_detail_screen.dart';
 import '../../features/staff/screens/staff_documents_screen.dart';
 import '../../features/staff/screens/staff_resources_screen.dart';
@@ -197,7 +198,17 @@ GoRouter appRouter(Ref ref) {
           GoRoute(
             path: RoutePaths.staffChats,
             name: RouteNames.staffChats,
-            builder: (context, state) => const StaffAiScreen(),
+            builder: (context, state) => const StaffChatsScreen(),
+            routes: [
+              GoRoute(
+                path: ':sessionId',
+                name: 'staff-chats-detail',
+                builder: (context, state) {
+                  final sessionId = state.pathParameters['sessionId']!;
+                  return StaffChatDetailScreen(sessionId: sessionId);
+                },
+              ),
+            ],
           ),
           GoRoute(
             path: RoutePaths.staffCadastro,
