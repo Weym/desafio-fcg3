@@ -69,7 +69,7 @@ GROUP 4 — Polish (depends on all above):
 
 ## Phases
 
-- [x] **Phase 18: Student UX Corrections** - Fix navigation, chat UX, documents, notifications on student screens (completed 2026-05-09)
+- [ ] **Phase 18: Student UX Corrections** - Fix navigation, chat UX, documents, notifications on student screens (gap closure)
 - [x] **Phase 19: Staff UX Corrections** - Fix dashboard, agendamentos, chats, intervenção, documentos, recursos, cadastro (completed 2026-05-09)
 - [ ] **Phase 20: LangChain Workflow** - Complete agent lifecycle, RAG, MCP, defenses, logging
 - [ ] **Phase 21: Roles & Auth Expansion** - Add provider role with hierarchical CRUDs
@@ -90,7 +90,7 @@ GROUP 4 — Polish (depends on all above):
   3. Student can view full document details in a drawer, see type/date on each item, and add documents via drawer
   4. Student notifications show read/unread state, can be filtered, individually marked as read, and bulk-marked
   5. Student accesses support via header icon and views agendamento details via drawer
-**Plans:** 5/5 plans complete
+**Plans:** 7 plans (5 complete + 2 gap closure)
 
 Plans:
 - [x] 18-01-PLAN.md — Fix home quick actions + add support/notifications to header
@@ -98,6 +98,8 @@ Plans:
 - [x] 18-03-PLAN.md — Documents type/date display + detail drawer
 - [x] 18-04-PLAN.md — Notifications read/unread state + filters + mark-as-read
 - [x] 18-05-PLAN.md — Appointment detail drawer + wiring
+- [ ] 18-06-PLAN.md — GAP: Agendamentos quick action → navigate to resources tab + card onTap
+- [ ] 18-07-PLAN.md — GAP: Chat rename backend endpoint + Flutter error handling
 
 **UI hint**: yes
 
@@ -202,7 +204,7 @@ Plans:
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 18. Student UX Corrections | v3.0 | 5/5 | Complete    | 2026-05-09 |
+| 18. Student UX Corrections | v3.0 | 5/7 | Gap closure | - |
 | 19. Staff UX Corrections | v3.0 | 6/6 | Complete    | 2026-05-09 |
 | 20. LangChain Workflow | v3.0 | 0/TBD | Not started | - |
 | 21. Roles & Auth Expansion | v3.0 | 0/TBD | Not started | - |
