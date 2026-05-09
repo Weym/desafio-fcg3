@@ -31,6 +31,14 @@ class StaffDocumentFilter extends _$StaffDocumentFilter {
 }
 
 @riverpod
+class StaffDocumentTypeFilter extends _$StaffDocumentTypeFilter {
+  @override
+  String? build() => null; // null = "Todos"
+
+  void setFilter(String? type) => state = type;
+}
+
+@riverpod
 Future<List<StudentSummaryModel>> studentSearch(Ref ref, String query) async {
   if (query.length < 2) return [];
   final service = ref.watch(staffDocumentServiceProvider);

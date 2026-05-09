@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/app_bar_actions.dart';
 import '../../../shared/widgets/app_skeleton_list.dart';
@@ -12,12 +13,33 @@ import '../providers/staff_document_provider.dart';
 import 'widgets/send_document_sheet.dart';
 import 'widgets/update_status_sheet.dart';
 
-class StaffDocumentsScreen extends ConsumerWidget {
+class StaffDocumentsScreen extends ConsumerStatefulWidget {
   const StaffDocumentsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<StaffDocumentsScreen> createState() =>
+      _StaffDocumentsScreenState();
+}
+
+class _StaffDocumentsScreenState extends ConsumerState<StaffDocumentsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final queryFilter =
+          GoRouterState.of(context).uri.queryParameters['filter'];
+      if (queryFilter == 'pendentes') {
+        ref
+            .read(staffDocumentFilterProvider.notifier)
+            .setFilter('processing');
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final filter = ref.watch(staffDocumentFilterProvider);
+    final typeFilter = ref.watch(staffDocumentTypeFilterProvider);
     final documentsAsync = ref.watch(staffDocumentsProvider);
     final colors = Theme.of(context).colorScheme;
 
@@ -33,7 +55,7 @@ class StaffDocumentsScreen extends ConsumerWidget {
       ),
       body: Column(
         children: [
-          // Segmented filter
+          // Status filter tabs
           Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: 20,
@@ -55,12 +77,12 @@ class StaffDocumentsScreen extends ConsumerWidget {
                         .setFilter(null),
                   ),
                   _FilterTab(
-                    label: 'Pendentes',
-                    isSelected: filter == 'requested',
+                    label: 'Processando',
+                    isSelected: filter == 'processing',
                     onTap: () => ref
                         .read(staffDocumentFilterProvider.notifier)
                         .setFilter(
-                            filter == 'requested' ? null : 'requested'),
+                            filter == 'processing' ? null : 'processing'),
                   ),
                   _FilterTab(
                     label: 'Prontos',
@@ -73,6 +95,75 @@ class StaffDocumentsScreen extends ConsumerWidget {
               ),
             ),
           ),
+          // Type filter pills
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: SizedBox(
+              height: 36,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                children: [
+                  _TypePill(
+                    label: 'Todos',
+                    isSelected: typeFilter == null,
+                    onTap: () => ref
+                        .read(staffDocumentTypeFilterProvider.notifier)
+                        .setFilter(null),
+                  ),
+                  const SizedBox(width: 8),
+                  _TypePill(
+                    label: 'Histórico',
+                    isSelected: typeFilter == 'transcript',
+                    onTap: () => ref
+                        .read(staffDocumentTypeFilterProvider.notifier)
+                        .setFilter(typeFilter == 'transcript'
+                            ? null
+                            : 'transcript'),
+                  ),
+                  const SizedBox(width: 8),
+                  _TypePill(
+                    label: 'Declaração',
+                    isSelected: typeFilter == 'declaration',
+                    onTap: () => ref
+                        .read(staffDocumentTypeFilterProvider.notifier)
+                        .setFilter(typeFilter == 'declaration'
+                            ? null
+                            : 'declaration'),
+                  ),
+                  const SizedBox(width: 8),
+                  _TypePill(
+                    label: 'Atestado',
+                    isSelected: typeFilter == 'enrollment_proof',
+                    onTap: () => ref
+                        .read(staffDocumentTypeFilterProvider.notifier)
+                        .setFilter(typeFilter == 'enrollment_proof'
+                            ? null
+                            : 'enrollment_proof'),
+                  ),
+                  const SizedBox(width: 8),
+                  _TypePill(
+                    label: 'Diploma',
+                    isSelected: typeFilter == 'certificate',
+                    onTap: () => ref
+                        .read(staffDocumentTypeFilterProvider.notifier)
+                        .setFilter(typeFilter == 'certificate'
+                            ? null
+                            : 'certificate'),
+                  ),
+                  const SizedBox(width: 8),
+                  _TypePill(
+                    label: 'Outros',
+                    isSelected: typeFilter == 'other',
+                    onTap: () => ref
+                        .read(staffDocumentTypeFilterProvider.notifier)
+                        .setFilter(
+                            typeFilter == 'other' ? null : 'other'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
           Expanded(
             child: documentsAsync.when(
               loading: () => const ResponsiveContainer(
@@ -86,7 +177,7 @@ class StaffDocumentsScreen extends ConsumerWidget {
                 ),
               ),
               data: (documents) {
-                final filtered = _applyFilter(documents, filter);
+                final filtered = _applyFilter(documents, filter, typeFilter);
                 if (filtered.isEmpty) {
                   return const AppEmptyState(
                     icon: Icons.folder_open,
@@ -115,7 +206,7 @@ class StaffDocumentsScreen extends ConsumerWidget {
                             itemBuilder: (context, index) =>
                                 _StaffDocumentCard(
                               document: filtered[index],
-                              onTap: () => showUpdateStatusSheet(
+                              onTap: () => _showStaffDocumentDetailSheet(
                                   context, ref, filtered[index]),
                             ),
                           ),
@@ -134,10 +225,236 @@ class StaffDocumentsScreen extends ConsumerWidget {
 
   List<DocumentModel> _applyFilter(
     List<DocumentModel> documents,
-    String? filter,
+    String? statusFilter,
+    String? typeFilter,
   ) {
-    if (filter == null) return documents;
-    return documents.where((d) => d.status == filter).toList();
+    var result = documents;
+    if (statusFilter != null) {
+      result = result.where((d) => d.status == statusFilter).toList();
+    }
+    if (typeFilter != null) {
+      if (typeFilter == 'other') {
+        final knownTypes = [
+          'transcript',
+          'enrollment_proof',
+          'declaration',
+          'certificate'
+        ];
+        result = result.where((d) => !knownTypes.contains(d.type)).toList();
+      } else {
+        result = result.where((d) => d.type == typeFilter).toList();
+      }
+    }
+    return result;
+  }
+}
+
+/// Shows full document detail in a bottom sheet for staff.
+void _showStaffDocumentDetailSheet(
+    BuildContext context, WidgetRef ref, DocumentModel document) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    useSafeArea: true,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+    ),
+    builder: (ctx) => _StaffDocumentDetailContent(document: document, ref: ref),
+  );
+}
+
+class _StaffDocumentDetailContent extends StatelessWidget {
+  final DocumentModel document;
+  final WidgetRef ref;
+
+  const _StaffDocumentDetailContent({
+    required this.document,
+    required this.ref,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final isProcessing = document.status == 'processing' ||
+        document.status == 'requested';
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        24,
+        24,
+        24,
+        MediaQuery.of(context).viewInsets.bottom + 40,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: colors.primaryContainer.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+                ),
+                child:
+                    Icon(Icons.description, color: colors.primary, size: 24),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  _typeLabel(document.type),
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+
+          // Detail rows
+          _DetailRow(label: 'Tipo', value: _typeLabel(document.type)),
+          _DetailRow(
+            label: 'Status',
+            value: _statusLabel(document.status),
+          ),
+          _DetailRow(
+            label: 'Data solicitação',
+            value: _formatDateTime(document.requestedAt),
+          ),
+          if (document.completedAt != null)
+            _DetailRow(
+              label: 'Concluído em',
+              value: _formatDateTime(document.completedAt!),
+            ),
+          if (document.notes != null && document.notes!.isNotEmpty)
+            _DetailRow(label: 'Observações', value: document.notes!),
+
+          const SizedBox(height: 24),
+
+          // Action buttons
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  icon: const Icon(Icons.edit),
+                  label: const Text('Atualizar Status'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    showUpdateStatusSheet(context, ref, document);
+                  },
+                ),
+              ),
+              if (isProcessing) ...[
+                const SizedBox(width: 12),
+                Expanded(
+                  child: FilledButton.icon(
+                    icon: const Icon(Icons.upload_file),
+                    label: const Text('Enviar Arquivo'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      showUpdateStatusSheet(context, ref, document);
+                    },
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatDateTime(DateTime date) {
+    final day = date.day.toString().padLeft(2, '0');
+    final month = date.month.toString().padLeft(2, '0');
+    final year = date.year;
+    final hour = date.hour.toString().padLeft(2, '0');
+    final minute = date.minute.toString().padLeft(2, '0');
+    return '$day/$month/$year $hour:$minute';
+  }
+}
+
+class _DetailRow extends StatelessWidget {
+  final String label;
+  final String value;
+  const _DetailRow({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 130,
+            child: Text(
+              label,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: colors.onSurfaceVariant,
+                  ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: colors.onSurface,
+                  ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TypePill extends StatelessWidget {
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _TypePill({
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? colors.primary.withValues(alpha: 0.12)
+              : colors.surfaceContainerHigh,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+          border: Border.all(
+            color: isSelected
+                ? colors.primary.withValues(alpha: 0.3)
+                : colors.outlineVariant.withValues(alpha: 0.5),
+          ),
+        ),
+        child: Text(
+          label,
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: isSelected ? colors.primary : colors.onSurfaceVariant,
+              ),
+        ),
+      ),
+    );
   }
 }
 
