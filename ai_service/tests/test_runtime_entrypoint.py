@@ -38,11 +38,14 @@ def test_compose_uses_package_entrypoint_and_bind_mount() -> None:
     service_section = compose_text.split("\n  langchain-service:\n", 1)[1].split(
         "\n  mcp-server:\n", 1
     )[0]
-    mcp_section = compose_text.split("\n  mcp-server:\n", 1)[1].split(
-        "\nnetworks:\n", 1
-    )[0]
+    # mcp-server section ends at the next service or networks block
+    mcp_rest = compose_text.split("\n  mcp-server:\n", 1)[1]
+    # Split at the next 2-space indented service (flutter-web or any other)
+    import re
+    mcp_parts = re.split(r"\n  \w[\w-]*:\n", mcp_rest, maxsplit=1)
+    mcp_section = mcp_parts[0]
 
-    assert "command: python -m ai_service.main" in service_section
+    assert "command: bash /app/entrypoint.sh" in service_section
     assert "- ./ai_service:/app/ai_service" in service_section
     assert "- ./ai_service:/app\n" not in service_section
     assert "uvicorn main:app" not in service_section
@@ -69,7 +72,7 @@ def test_compose_limits_ai_service_env_to_runtime_dependencies() -> None:
     assert "OPENAI_API_KEY: ${OPENAI_API_KEY}" in service_section
     assert "GEMINI_API_KEY: ${GEMINI_API_KEY}" in service_section
     assert "OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}" in service_section
-    assert "MCP_SERVER_URL: http://mcp-server:8002/mcp" in service_section
+    assert "MCP_SERVER_URL: ${MCP_URL}" in service_section
     assert "JWT_SECRET:" not in service_section
     assert "WHATSAPP_TOKEN:" not in service_section
     assert "RESEND_API_KEY:" not in service_section

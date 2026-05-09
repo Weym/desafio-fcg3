@@ -100,25 +100,26 @@ def test_ingest_processes_known_documents_and_writes_audit_summary(
     output = capsys.readouterr().out
     audit = json.loads(audit_path.read_text(encoding="utf-8"))
 
-    assert summary["documents_processed"] == 5
-    assert summary["total_chunks"] == 10
+    assert summary["documents_processed"] == 6
+    assert summary["total_chunks"] == 12
     assert summary["chunks_by_category"] == {
         "agendamento": 2,
         "curriculo": 2,
+        "documentos": 2,
         "faq": 2,
         "regras_matricula": 2,
         "regulamento": 2,
     }
     assert audit["embedding_model"] == "text-embedding-3-small"
-    assert "Documents processed: 5" in output
-    assert "Total chunks: 10" in output
-    assert fake_connection.commit_count == 5
+    assert "Documents processed: 6" in output
+    assert "Total chunks: 12" in output
+    assert fake_connection.commit_count == 6
 
     deletes = [statement for statement in fake_connection.cursor_instance.statements if statement[0].startswith("DELETE FROM knowledge_base_chunks")]
     inserts = [statement for statement in fake_connection.cursor_instance.statements if statement[0].startswith("INSERT INTO knowledge_base_chunks")]
 
-    assert len(deletes) == 5
-    assert len(inserts) == 10
+    assert len(deletes) == 6
+    assert len(inserts) == 12
     assert deletes[0][1] == ["matricula.md"]
     inserted_categories = {statement[1][3] for statement in inserts}
     assert inserted_categories == set(ingest.CATEGORY_MAP.values())

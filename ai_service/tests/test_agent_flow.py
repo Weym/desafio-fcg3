@@ -24,7 +24,7 @@ async def test_student_gets_portuguese_response_with_mcp_and_rag_tools_wired(
         calls["embeddings"] = settings.EMBEDDING_PROVIDER
         return SimpleNamespace(name="fake_embeddings")
 
-    def fake_create_rag_tool(db_pool, embeddings, similarity_threshold=0.45):
+    def fake_create_rag_tool(db_pool, embeddings, similarity_threshold=0.45, session_id=None):
         calls["rag"] = (db_pool, embeddings, similarity_threshold)
         return SimpleNamespace(name="search_knowledge_base")
 
