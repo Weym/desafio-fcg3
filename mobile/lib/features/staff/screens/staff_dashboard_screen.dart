@@ -109,7 +109,7 @@ class StaffDashboardScreen extends ConsumerWidget {
                                 value:
                                     dashboard.activeChatSessions.toString(),
                                 label: 'Chats Hoje',
-                                onTap: () => context.go(RoutePaths.staffAI),
+                                onTap: () => context.go('${RoutePaths.staffChats}?filter=hoje'),
                               ),
                               _KpiCard(
                                 icon: Icons.warning_amber_outlined,
@@ -119,7 +119,7 @@ class StaffDashboardScreen extends ConsumerWidget {
                                     dashboard.pendingDocuments.toString(),
                                 label: 'Docs Pendentes',
                                 onTap: () =>
-                                    context.go(RoutePaths.staffDocuments),
+                                    context.go('${RoutePaths.staffDocuments}?filter=pendentes'),
                               ),
                               _KpiCard(
                                 icon: Icons.calendar_today_outlined,
@@ -202,6 +202,60 @@ class StaffDashboardScreen extends ConsumerWidget {
                               ],
                             ),
                           ),
+                          const SizedBox(height: AppSpacing.lg),
+
+                          // Ações Rápidas section
+                          Text(
+                            'Ações Rápidas',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: colors.onSurface,
+                                ),
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          GlassCard(
+                            onTap: () => context.go(RoutePaths.staffCadastro),
+                            padding: const EdgeInsets.all(AppSpacing.md),
+                            child: Row(
+                              children: [
+                                Icon(Icons.people_outlined,
+                                    color: colors.primary),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Gerenciar Alunos',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleSmall
+                                            ?.copyWith(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                      ),
+                                      Text(
+                                        'Cadastrar, editar e gerenciar alunos',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall
+                                            ?.copyWith(
+                                              color:
+                                                  colors.onSurfaceVariant,
+                                            ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Icon(Icons.chevron_right,
+                                    color: colors.onSurfaceVariant),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -218,7 +272,7 @@ class StaffDashboardScreen extends ConsumerWidget {
   double _calculateAiRate(StaffDashboardModel dashboard) {
     final total = dashboard.activeChatSessions + 10; // mock baseline
     if (total == 0) return 0;
-    return ((total - 1) / total * 100).clamp(0, 100);
+    return double.parse(((total - 1) / total * 100).clamp(0, 100).toStringAsFixed(1));
   }
 }
 
