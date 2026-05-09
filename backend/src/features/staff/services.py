@@ -1,23 +1,27 @@
-"""Dashboard KPI aggregation service (STAFF-01).
+"""Staff feature services (STAFF-01, ROLE-03, ROLE-07).
 
-Executes 6 efficient COUNT queries across all domain tables to build
-the staff dashboard response. Uses SQLAlchemy ``func.count()`` with
-filtered conditions for each KPI.
+Contains:
+- DashboardService: KPI aggregation for GET /staff/dashboard
+- StaffManagementService: CRUD operations for staff members (provider only)
 """
 
 from __future__ import annotations
 
 from datetime import date
+from uuid import UUID
 
-from sqlalchemy import and_, func, select
+from sqlalchemy import and_, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.features.auth.models import Student
+from src.features.auth.models import Staff, Student
 from src.features.chat.models import ChatSession
 from src.features.documents.models import Document
 from src.features.enrollment.models import Enrollment, EnrollmentPeriod
 from src.features.scheduling.models import Appointment, SchedulingSlot
-from src.features.staff.schemas import DashboardResponse, EnrollmentPeriodSummary
+from src.features.staff.schemas import DashboardResponse, EnrollmentPeriodSummary, StaffCreate, StaffUpdate
+from src.shared.base_service import BaseService
+from src.shared.exceptions import ConflictException, ForbiddenException
+from src.shared.pagination import PaginationParams
 
 
 class DashboardService:
@@ -128,3 +132,182 @@ class DashboardService:
 
 
 dashboard_service = DashboardService()
+
+
+# ---------------------------------------------------------------------------
+# ROLE-03, ROLE-07: Staff Management CRUD (provider only)
+# ---------------------------------------------------------------------------
+
+
+class StaffManagementService(BaseService[Staff]):
+    """Service layer for staff CRUD operations (ROLE-03, ROLE-07).
+
+    All methods are called by provider-only endpoints.
+    Provider record is hidden from list results (D-17).
+    Self-operation is blocked on update and delete (D-21).
+    """
+
+    def __init__(self) -> None:
+        super().__init__(Staff)
+
+    # ------------------------------------------------------------------
+    # List staff (D-16, D-17)
+    # ------------------------------------------------------------------
+
+    async def list_staff(
+        self,
+        db: AsyncSession,
+        params: PaginationParams,
+        search: str | None = None,
+        status: str | None = None,
+    ) -> tuple[list[Staff], int]:
+        """List staff members with pagination, search, and status filter.
+
+        Always filters WHERE role != 'provider' (D-17 — provider hidden from list).
+        Search: ILIKE on name OR email columns.
+        """
+        from sqlalchemy import asc, desc
+
+        # Base queries — always exclude provider from results (D-17)
+        query = select(Staff).where(Staff.role != "provider")
+        count_query = select(func.count()).select_from(Staff).where(Staff.role != "provider")
+
+        # Apply search filter (ILIKE on name OR email)
+        if search:
+            search_pattern = f"%{search}%"
+            search_filter = or_(
+                Staff.name.ilike(search_pattern),
+                Staff.email.ilike(search_pattern),
+            )
+            query = query.where(search_filter)
+            count_query = count_query.where(search_filter)
+
+        # Apply status equality filter
+        if status is not None:
+            query = query.where(Staff.status == status)
+            count_query = count_query.where(Staff.status == status)
+
+        # Total count
+        total_result = await db.execute(count_query)
+        total = total_result.scalar_one()
+
+        # Sorting (validated by BaseService)
+        sort_column = self._get_sort_column(params.sort_by)
+        order_func = asc if params.order == "asc" else desc
+        query = query.order_by(order_func(sort_column))
+
+        # Pagination
+        query = query.offset(params.offset).limit(params.limit)
+
+        result = await db.execute(query)
+        items = list(result.scalars().all())
+
+        return items, total
+
+    # ------------------------------------------------------------------
+    # Get staff member (D-16)
+    # ------------------------------------------------------------------
+
+    async def get_staff_member(self, db: AsyncSession, staff_id: UUID) -> Staff:
+        """Get staff member by ID or raise 404."""
+        return await self.get_or_404(db, staff_id, "staff")
+
+    # ------------------------------------------------------------------
+    # Create staff (D-18, D-19)
+    # ------------------------------------------------------------------
+
+    async def create_staff(
+        self,
+        db: AsyncSession,
+        data: StaffCreate,
+    ) -> Staff:
+        """Create a new staff member.
+
+        - Email uniqueness enforced (T-21-10)
+        - Role restricted to staff/coordinator/secretary by schema (T-21-06)
+        - Status defaults to 'active'
+        - Per D-19: email in staff table = can do OTP login immediately
+        """
+        # Check email uniqueness
+        existing = await db.execute(
+            select(Staff.id).where(Staff.email == data.email)
+        )
+        if existing.scalar_one_or_none() is not None:
+            raise ConflictException(
+                code="EMAIL_JA_CADASTRADO",
+                message="Email ja esta em uso",
+            )
+
+        # Build staff data — status defaults to 'active'
+        staff_data = data.model_dump()
+        staff_data["status"] = "active"
+
+        return await self.create(db, staff_data)
+
+    # ------------------------------------------------------------------
+    # Update staff (D-16, D-21)
+    # ------------------------------------------------------------------
+
+    async def update_staff(
+        self,
+        db: AsyncSession,
+        staff_id: UUID,
+        data: StaffUpdate,
+        current_user_id: UUID,
+    ) -> Staff:
+        """Update staff member fields (partial).
+
+        Blocks self-edit (D-21, T-21-08).
+        Checks email uniqueness if email is changed (T-21-10).
+        """
+        # D-21: Provider cannot edit own record
+        if staff_id == current_user_id:
+            raise ForbiddenException(
+                "Provider nao pode editar o proprio registro",
+            )
+
+        staff = await self.get_or_404(db, staff_id, "staff")
+        update_data = data.model_dump(exclude_unset=True)
+
+        # Check email uniqueness if email is being changed
+        if "email" in update_data and update_data["email"] is not None:
+            existing = await db.execute(
+                select(Staff.id).where(
+                    Staff.email == update_data["email"],
+                    Staff.id != staff_id,
+                )
+            )
+            if existing.scalar_one_or_none() is not None:
+                raise ConflictException(
+                    code="EMAIL_JA_CADASTRADO",
+                    message="Email ja esta em uso",
+                )
+
+        return await self.update(db, staff, update_data)
+
+    # ------------------------------------------------------------------
+    # Soft delete staff (D-20, D-21)
+    # ------------------------------------------------------------------
+
+    async def soft_delete_staff(
+        self,
+        db: AsyncSession,
+        staff_id: UUID,
+        current_user_id: UUID,
+    ) -> None:
+        """Soft-delete (deactivate) a staff member.
+
+        Sets status='inactive'. Blocks self-deactivation (D-21, T-21-08).
+        """
+        # D-21: Provider cannot deactivate own record
+        if staff_id == current_user_id:
+            raise ForbiddenException(
+                "Provider nao pode desativar o proprio registro",
+            )
+
+        staff = await self.get_or_404(db, staff_id, "staff")
+        staff.status = "inactive"
+        await db.flush()
+
+
+staff_management_service = StaffManagementService()
