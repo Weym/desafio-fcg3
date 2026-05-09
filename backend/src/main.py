@@ -48,6 +48,11 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
     resend_api_key = os.getenv("RESEND_API_KEY", "")
     if resend_api_key.startswith("re_"):
         resend.api_key = resend_api_key
+
+    # Initialize Firebase Admin SDK for FCM push notifications
+    from src.features.notifications.services import init_firebase
+    init_firebase()
+
     yield
 
 
