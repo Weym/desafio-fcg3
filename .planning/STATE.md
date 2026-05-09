@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Correções, Melhorias & Features
 status: executing
-last_updated: "2026-05-09T01:44:07.274Z"
+last_updated: "2026-05-09T01:49:19.721Z"
 last_activity: 2026-05-09
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 5
-  completed_plans: 2
-  percent: 40
+  completed_plans: 3
+  percent: 60
 ---
 
 # Project State
@@ -18,7 +18,7 @@ progress:
 ## Current Position
 
 Phase: 18 (Student UX Corrections) — EXECUTING
-Plan: 3 of 5
+Plan: 4 of 5
 Status: Ready to execute
 Last activity: 2026-05-09
 
@@ -71,6 +71,8 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 - **18-02:** Chat sessions: rename via long-press, filter tabs (Todas/Ativas/Inativas), date ordering label
 - **18-02:** GlassCard now supports onLongPress for contextual actions
 - **18-02:** ChatFilterNotifier pattern for client-side filtering (no extra API call)
+- **18-03:** Document cards show date+time (DD/MM/YYYY HH:MM), tap opens detail bottom sheet
+- **18-03:** showDocumentDetailSheet pattern with _DetailRow for key-value display in sheets
 
 ## Session Continuity
 

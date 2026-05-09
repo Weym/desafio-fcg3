@@ -16,9 +16,9 @@ Requirements for milestone v3.0. Each maps to roadmap phases.
 - [x] **STUX-05**: Chat permite renomear sessão (nome default gerado pela IA)
 - [x] **STUX-06**: Chat possui filtro entre sessões ativas e inativas
 - [x] **STUX-07**: Chat possui ordenação por data
-- [ ] **STUX-08**: Documentos exibem tipo e data com hora em cada item
-- [ ] **STUX-09**: Clique no documento abre drawer com informações completas
-- [ ] **STUX-10**: Adicionar documento usa drawer (mesmo design da tela de recursos)
+- [x] **STUX-08**: Documentos exibem tipo e data com hora em cada item
+- [x] **STUX-09**: Clique no documento abre drawer com informações completas
+- [x] **STUX-10**: Adicionar documento usa drawer (mesmo design da tela de recursos)
 - [ ] **STUX-11**: Avisos possuem estado de visualizado/não visualizado com filtro
 - [ ] **STUX-12**: Botão "visualizar todos" marca todas notificações como lidas
 - [ ] **STUX-13**: Notificação só marca como visualizada ao clicar diretamente nela
@@ -148,9 +148,9 @@ Requirements for milestone v3.0. Each maps to roadmap phases.
 | STUX-05 | Phase 18 | Complete |
 | STUX-06 | Phase 18 | Complete |
 | STUX-07 | Phase 18 | Complete |
-| STUX-08 | Phase 18 | Pending |
-| STUX-09 | Phase 18 | Pending |
-| STUX-10 | Phase 18 | Pending |
+| STUX-08 | Phase 18 | Complete |
+| STUX-09 | Phase 18 | Complete |
+| STUX-10 | Phase 18 | Complete |
 | STUX-11 | Phase 18 | Pending |
 | STUX-12 | Phase 18 | Pending |
 | STUX-13 | Phase 18 | Pending |
