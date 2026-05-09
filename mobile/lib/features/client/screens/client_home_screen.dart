@@ -14,6 +14,7 @@ import '../providers/document_provider.dart';
 import '../providers/appointment_provider.dart';
 import '../models/chat_session_model.dart';
 import '../models/appointment_model.dart';
+import 'widgets/appointment_detail_sheet.dart';
 
 String _formatDateTime(DateTime dt) {
   final day = dt.day.toString().padLeft(2, '0');
@@ -297,8 +298,6 @@ class ClientHomeScreen extends ConsumerWidget {
     WidgetRef ref,
     AsyncValue<List<AppointmentModel>> appointmentsAsync,
   ) {
-    final colors = Theme.of(context).colorScheme;
-
     appointmentsAsync.whenData((appointments) {
       final upcoming = appointments.where((a) => a.isUpcoming).toList();
       if (upcoming.isEmpty) {
@@ -317,64 +316,7 @@ class ClientHomeScreen extends ConsumerWidget {
         return (a.slotStartTime ?? '').compareTo(b.slotStartTime ?? '');
       });
 
-      final nearest = upcoming.first;
-
-      showModalBottomSheet(
-        context: context,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-        ),
-        builder: (ctx) => Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: colors.secondaryContainer,
-                      borderRadius:
-                          BorderRadius.circular(AppSpacing.radiusFull),
-                    ),
-                    child: Icon(Icons.calendar_today,
-                        color: colors.onSecondaryContainer),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      'Próximo Agendamento',
-                      style:
-                          Theme.of(ctx).textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              _appointmentDetailRow(
-                  ctx, 'Motivo', nearest.reason, colors),
-              const SizedBox(height: 12),
-              _appointmentDetailRow(
-                  ctx, 'Data', nearest.slotDate ?? '-', colors),
-              const SizedBox(height: 12),
-              _appointmentDetailRow(
-                ctx,
-                'Horário',
-                '${nearest.slotStartTime ?? '-'} — ${nearest.endTime ?? '-'}',
-                colors,
-              ),
-              const SizedBox(height: 12),
-              _appointmentDetailRow(
-                  ctx, 'Status', nearest.status, colors),
-              const SizedBox(height: 24),
-            ],
-          ),
-        ),
-      );
+      showAppointmentDetailSheet(context, upcoming.first);
     });
 
     // If data isn't loaded yet, show a snackbar
@@ -389,36 +331,6 @@ class ClientHomeScreen extends ConsumerWidget {
     }
   }
 
-  Widget _appointmentDetailRow(
-    BuildContext context,
-    String label,
-    String value,
-    ColorScheme colors,
-  ) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          width: 80,
-          child: Text(
-            label,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: colors.onSurfaceVariant,
-                  fontWeight: FontWeight.w600,
-                ),
-          ),
-        ),
-        Expanded(
-          child: Text(
-            value,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: colors.onSurface,
-                ),
-          ),
-        ),
-      ],
-    );
-  }
 }
 
 class _SummaryGlassCard extends StatelessWidget {

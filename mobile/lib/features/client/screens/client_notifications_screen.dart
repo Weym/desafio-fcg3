@@ -10,6 +10,7 @@ import '../../../shared/widgets/responsive_container.dart';
 import '../providers/notification_provider.dart';
 import '../providers/document_provider.dart';
 import '../providers/appointment_provider.dart';
+import 'widgets/appointment_detail_sheet.dart';
 
 class ClientNotificationsScreen extends ConsumerWidget {
   const ClientNotificationsScreen({super.key});
@@ -176,16 +177,35 @@ class ClientNotificationsScreen extends ConsumerWidget {
                             itemCount: filtered.length,
                             separatorBuilder: (_, __) =>
                                 const SizedBox(height: AppSpacing.md),
-                            itemBuilder: (context, index) =>
-                                _NotificationCard(
-                              notification: filtered[index],
-                              isRead:
-                                  readIds.contains(filtered[index].id),
-                              onTap: () => ref
-                                  .read(
-                                      readNotificationIdsProvider.notifier)
-                                  .markAsRead(filtered[index].id),
-                            ),
+                            itemBuilder: (context, index) {
+                              final notification = filtered[index];
+                              return _NotificationCard(
+                                notification: notification,
+                                isRead: readIds.contains(notification.id),
+                                onTap: () => ref
+                                    .read(readNotificationIdsProvider
+                                        .notifier)
+                                    .markAsRead(notification.id),
+                                onDetailTap: notification.type ==
+                                        NotificationType.appointmentReminder
+                                    ? () {
+                                        final appointments = ref
+                                                .read(appointmentsProvider)
+                                                .valueOrNull ??
+                                            [];
+                                        final aptId = notification.id
+                                            .replaceFirst('apt-', '');
+                                        final apt = appointments
+                                            .where((a) => a.id == aptId)
+                                            .firstOrNull;
+                                        if (apt != null) {
+                                          showAppointmentDetailSheet(
+                                              context, apt);
+                                        }
+                                      }
+                                    : null,
+                              );
+                            },
                           ),
                         ),
                 ),
@@ -202,11 +222,13 @@ class _NotificationCard extends StatelessWidget {
   final DerivedNotification notification;
   final bool isRead;
   final VoidCallback onTap;
+  final VoidCallback? onDetailTap;
 
   const _NotificationCard({
     required this.notification,
     required this.isRead,
     required this.onTap,
+    this.onDetailTap,
   });
 
   @override
@@ -216,7 +238,10 @@ class _NotificationCard extends StatelessWidget {
     return Opacity(
       opacity: isRead ? 0.6 : 1.0,
       child: GlassCard(
-        onTap: onTap,
+        onTap: () {
+          onTap();
+          if (onDetailTap != null) onDetailTap!();
+        },
         padding: const EdgeInsets.all(AppSpacing.md),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
