@@ -2,24 +2,24 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Correções, Melhorias & Features
-status: executing
-last_updated: "2026-05-09T03:00:19.617Z"
+status: verifying
+last_updated: "2026-05-09T03:11:46.575Z"
 last_activity: 2026-05-09
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 11
-  completed_plans: 9
-  percent: 82
+  completed_plans: 10
+  percent: 91
 ---
 
 # Project State
 
 ## Current Position
 
-Phase: 19 (staff-ux-corrections) — EXECUTING
+Phase: 19 (staff-ux-corrections) — EXECUTING (last plan complete, ready for verification)
 Plan: 6 of 6
-Status: Ready to execute
+Status: All plans executed
 Last activity: 2026-05-09
 
 ## Project Reference
@@ -98,6 +98,9 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 - **19-05:** _ResourceCard converted to ConsumerWidget for direct ref access (toggle/delete)
 - **19-05:** Switch widget replaces static availability dot for toggle ativar/desativar
 - **19-05:** PopupMenu has Editar + dynamic Ativar/Desativar + Deletar (with confirmation dialog)
+- **19-06:** StaffCadastroScreen: full CRUD with ExpansionTile cards, status dots (green/red), FAB + form sheet
+- **19-06:** StaffStudentModel + StaffCadastroService (5 CRUD methods) + provider with filter/search
+- **19-06:** Router updated: /staff/cadastro now points to StaffCadastroScreen (was placeholder)
 
 ## Session Continuity
 

@@ -47,11 +47,11 @@ Requirements for milestone v3.0. Each maps to roadmap phases.
 - [x] **SFUX-18**: Documentos — mensagem de erro clara ao finalizar sem arquivo anexado
 - [x] **SFUX-19**: Recursos — toggle ativar/desativar com feedback visual correto
 - [x] **SFUX-20**: Recursos — opção de deletar recurso
-- [ ] **SFUX-21**: Cadastro — tela CRUD completa para alunos (cadastrar, visualizar, editar, remover, ativar/desativar)
-- [ ] **SFUX-22**: Cadastro — lista de alunos como cards com menu 3 pontos (editar, excluir, ativar/desativar) e indicador de estado
-- [ ] **SFUX-23**: Cadastro — botão flutuante "+" para adicionar aluno
-- [ ] **SFUX-24**: Cadastro — expansão do card mostra informações pessoais
-- [ ] **SFUX-25**: Cadastro — search por nome + filtro estado + filtro avançado (RA, número, nome)
+- [x] **SFUX-21**: Cadastro — tela CRUD completa para alunos (cadastrar, visualizar, editar, remover, ativar/desativar)
+- [x] **SFUX-22**: Cadastro — lista de alunos como cards com menu 3 pontos (editar, excluir, ativar/desativar) e indicador de estado
+- [x] **SFUX-23**: Cadastro — botão flutuante "+" para adicionar aluno
+- [x] **SFUX-24**: Cadastro — expansão do card mostra informações pessoais
+- [x] **SFUX-25**: Cadastro — search por nome + filtro estado + filtro avançado (RA, número, nome)
 
 ### LangChain Workflow
 
@@ -176,11 +176,11 @@ Requirements for milestone v3.0. Each maps to roadmap phases.
 | SFUX-18 | Phase 19 | Complete |
 | SFUX-19 | Phase 19 | Complete |
 | SFUX-20 | Phase 19 | Complete |
-| SFUX-21 | Phase 19 | Pending |
-| SFUX-22 | Phase 19 | Pending |
-| SFUX-23 | Phase 19 | Pending |
-| SFUX-24 | Phase 19 | Pending |
-| SFUX-25 | Phase 19 | Pending |
+| SFUX-21 | Phase 19 | Complete |
+| SFUX-22 | Phase 19 | Complete |
+| SFUX-23 | Phase 19 | Complete |
+| SFUX-24 | Phase 19 | Complete |
+| SFUX-25 | Phase 19 | Complete |
 | LANG-01 | Phase 20 | Pending |
 | LANG-02 | Phase 20 | Pending |
 | LANG-03 | Phase 20 | Pending |

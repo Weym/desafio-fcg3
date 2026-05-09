@@ -114,7 +114,7 @@ Plans:
   5. Staff documentos have state tabs, type filter, full data view, drawer pattern, and error on missing file
   6. Staff recursos toggle ativar/desativar works and delete option exists
   7. Staff cadastro de alunos is a full CRUD with cards, 3-dot menu, floating add button, expandable details, and search/filters
-**Plans:** 4/6 plans executed
+**Plans:** 5/6 plans executed
 
 Plans:
 - [x] 19-01-PLAN.md — Dashboard KPI navigation + nav rename + Ações Rápidas
@@ -122,7 +122,7 @@ Plans:
 - [ ] 19-03-PLAN.md — Unified Chats screen (AI + Intervention merged)
 - [x] 19-04-PLAN.md — Documents tabs + type filter + detail sheet
 - [x] 19-05-PLAN.md — Resources toggle + delete option
-- [ ] 19-06-PLAN.md — Cadastro de Alunos full CRUD screen
+- [x] 19-06-PLAN.md — Cadastro de Alunos full CRUD screen
 
 **UI hint**: yes
 
@@ -203,7 +203,7 @@ Plans:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 18. Student UX Corrections | v3.0 | 5/5 | Complete    | 2026-05-09 |
-| 19. Staff UX Corrections | v3.0 | 4/6 | In Progress|  |
+| 19. Staff UX Corrections | v3.0 | 5/6 | In Progress|  |
 | 20. LangChain Workflow | v3.0 | 0/TBD | Not started | - |
 | 21. Roles & Auth Expansion | v3.0 | 0/TBD | Not started | - |
 | 22. FCM Push Notifications | v3.0 | 0/TBD | Not started | - |
