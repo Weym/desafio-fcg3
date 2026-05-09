@@ -3,8 +3,10 @@ import 'package:dio/dio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/models/user_model.dart';
 import '../../../core/providers/fcm_provider.dart';
+import '../../../core/providers/notification_handler_provider.dart';
 import '../../../core/providers/storage_provider.dart';
 import '../../../core/providers/dio_provider.dart';
+import '../../../core/router/app_router.dart';
 import '../services/auth_service.dart';
 import 'auth_state.dart';
 
@@ -77,6 +79,17 @@ class Auth extends _$Auth {
         // Register FCM token (immediately after login)
         if (user.isStudent) {
           ref.read(fcmServiceProvider.notifier).registerToken(user.id);
+        }
+
+        // D-18: Navigate to pending deep-link from notification tap during expired JWT
+        final pendingLink = ref
+            .read(notificationHandlerProvider.notifier)
+            .consumePendingDeepLink();
+        if (pendingLink != null) {
+          // Small delay so router redirect completes first
+          Future.delayed(const Duration(milliseconds: 300), () {
+            ref.read(appRouterProvider).go(pendingLink);
+          });
         }
 
         return AuthVerifyResult.success;
