@@ -21,6 +21,9 @@ ChatSessionModel _$ChatSessionModelFromJson(Map<String, dynamic> json) =>
           ? null
           : DateTime.parse(json['updated_at'] as String),
       messageCount: (json['message_count'] as num?)?.toInt(),
+      name: json['name'] as String?,
+      studentName: json['student_name'] as String?,
+      studentRa: json['student_ra'] as String?,
     );
 
 Map<String, dynamic> _$ChatSessionModelToJson(ChatSessionModel instance) =>
@@ -34,4 +37,7 @@ Map<String, dynamic> _$ChatSessionModelToJson(ChatSessionModel instance) =>
       'ended_at': instance.endedAt?.toIso8601String(),
       'updated_at': instance.updatedAt?.toIso8601String(),
       'message_count': instance.messageCount,
+      'name': instance.name,
+      'student_name': instance.studentName,
+      'student_ra': instance.studentRa,
     };

@@ -17,6 +17,12 @@ class AppointmentModel {
   final String? endTime;
   @JsonKey(name: 'created_at')
   final DateTime createdAt;
+  @JsonKey(name: 'student_name')
+  final String? studentName;
+  @JsonKey(name: 'student_ra')
+  final String? studentRa;
+  @JsonKey(name: 'resource_name')
+  final String? resourceName;
 
   const AppointmentModel({
     required this.id,
@@ -27,6 +33,9 @@ class AppointmentModel {
     this.slotStartTime,
     this.endTime,
     required this.createdAt,
+    this.studentName,
+    this.studentRa,
+    this.resourceName,
   });
 
   factory AppointmentModel.fromJson(Map<String, dynamic> json) =>

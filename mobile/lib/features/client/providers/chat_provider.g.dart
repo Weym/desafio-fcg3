@@ -303,5 +303,155 @@ class _ActionLogsProviderElement
   String get sessionId => (origin as ActionLogsProvider).sessionId;
 }
 
+String _$renameChatSessionHash() => r'd7a0c88f3e54d8c819e432324fb9a29b44e62937';
+
+/// See also [renameChatSession].
+@ProviderFor(renameChatSession)
+const renameChatSessionProvider = RenameChatSessionFamily();
+
+/// See also [renameChatSession].
+class RenameChatSessionFamily extends Family<AsyncValue<void>> {
+  /// See also [renameChatSession].
+  const RenameChatSessionFamily();
+
+  /// See also [renameChatSession].
+  RenameChatSessionProvider call(String sessionId, String newName) {
+    return RenameChatSessionProvider(sessionId, newName);
+  }
+
+  @override
+  RenameChatSessionProvider getProviderOverride(
+    covariant RenameChatSessionProvider provider,
+  ) {
+    return call(provider.sessionId, provider.newName);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'renameChatSessionProvider';
+}
+
+/// See also [renameChatSession].
+class RenameChatSessionProvider extends AutoDisposeFutureProvider<void> {
+  /// See also [renameChatSession].
+  RenameChatSessionProvider(String sessionId, String newName)
+    : this._internal(
+        (ref) =>
+            renameChatSession(ref as RenameChatSessionRef, sessionId, newName),
+        from: renameChatSessionProvider,
+        name: r'renameChatSessionProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$renameChatSessionHash,
+        dependencies: RenameChatSessionFamily._dependencies,
+        allTransitiveDependencies:
+            RenameChatSessionFamily._allTransitiveDependencies,
+        sessionId: sessionId,
+        newName: newName,
+      );
+
+  RenameChatSessionProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.sessionId,
+    required this.newName,
+  }) : super.internal();
+
+  final String sessionId;
+  final String newName;
+
+  @override
+  Override overrideWith(
+    FutureOr<void> Function(RenameChatSessionRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: RenameChatSessionProvider._internal(
+        (ref) => create(ref as RenameChatSessionRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        sessionId: sessionId,
+        newName: newName,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<void> createElement() {
+    return _RenameChatSessionProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is RenameChatSessionProvider &&
+        other.sessionId == sessionId &&
+        other.newName == newName;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, sessionId.hashCode);
+    hash = _SystemHash.combine(hash, newName.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin RenameChatSessionRef on AutoDisposeFutureProviderRef<void> {
+  /// The parameter `sessionId` of this provider.
+  String get sessionId;
+
+  /// The parameter `newName` of this provider.
+  String get newName;
+}
+
+class _RenameChatSessionProviderElement
+    extends AutoDisposeFutureProviderElement<void>
+    with RenameChatSessionRef {
+  _RenameChatSessionProviderElement(super.provider);
+
+  @override
+  String get sessionId => (origin as RenameChatSessionProvider).sessionId;
+  @override
+  String get newName => (origin as RenameChatSessionProvider).newName;
+}
+
+String _$chatFilterNotifierHash() =>
+    r'2786f654cf1909dc0851739127ec07e425f2afd6';
+
+/// See also [ChatFilterNotifier].
+@ProviderFor(ChatFilterNotifier)
+final chatFilterNotifierProvider =
+    AutoDisposeNotifierProvider<ChatFilterNotifier, ChatStatusFilter>.internal(
+      ChatFilterNotifier.new,
+      name: r'chatFilterNotifierProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$chatFilterNotifierHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+typedef _$ChatFilterNotifier = AutoDisposeNotifier<ChatStatusFilter>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

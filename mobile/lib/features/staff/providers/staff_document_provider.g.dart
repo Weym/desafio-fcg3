@@ -204,5 +204,22 @@ final staffDocumentFilterProvider =
     );
 
 typedef _$StaffDocumentFilter = AutoDisposeNotifier<String?>;
+String _$staffDocumentTypeFilterHash() =>
+    r'75d88dc161c6a51c93765035459dec49c4e971a4';
+
+/// See also [StaffDocumentTypeFilter].
+@ProviderFor(StaffDocumentTypeFilter)
+final staffDocumentTypeFilterProvider =
+    AutoDisposeNotifierProvider<StaffDocumentTypeFilter, String?>.internal(
+      StaffDocumentTypeFilter.new,
+      name: r'staffDocumentTypeFilterProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$staffDocumentTypeFilterHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+typedef _$StaffDocumentTypeFilter = AutoDisposeNotifier<String?>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

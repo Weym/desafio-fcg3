@@ -10,13 +10,32 @@ import '../../../shared/widgets/glass_card.dart';
 import '../../../shared/widgets/responsive_container.dart';
 import '../models/document_model.dart';
 import '../providers/document_provider.dart';
+import 'widgets/document_detail_sheet.dart';
 import 'widgets/document_request_sheet.dart';
 
-class ClientDocumentsScreen extends ConsumerWidget {
+class ClientDocumentsScreen extends ConsumerStatefulWidget {
   const ClientDocumentsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ClientDocumentsScreen> createState() =>
+      _ClientDocumentsScreenState();
+}
+
+class _ClientDocumentsScreenState extends ConsumerState<ClientDocumentsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final autoOpen = ref.read(documentAutoOpenDrawerProvider);
+      if (autoOpen) {
+        ref.read(documentAutoOpenDrawerProvider.notifier).state = false;
+        showDocumentRequestSheet(context, ref);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final filter = ref.watch(documentFilterProvider);
     final documentsAsync = ref.watch(documentsProvider);
     final colors = Theme.of(context).colorScheme;
@@ -237,6 +256,7 @@ class _DocumentCard extends StatelessWidget {
     final isReady = document.status == 'ready';
 
     return GlassCard(
+      onTap: () => showDocumentDetailSheet(context, document),
       padding: const EdgeInsets.all(AppSpacing.md),
       child: Row(
         children: [
@@ -269,7 +289,7 @@ class _DocumentCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  _formatDate(document.requestedAt),
+                  'Solicitado em ${_formatDateTime(document.requestedAt)}',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: colors.onSurfaceVariant,
                       ),
@@ -335,10 +355,12 @@ class _DocumentCard extends StatelessWidget {
     );
   }
 
-  String _formatDate(DateTime date) {
+  String _formatDateTime(DateTime date) {
     final day = date.day.toString().padLeft(2, '0');
     final month = date.month.toString().padLeft(2, '0');
     final year = date.year;
-    return '$day/$month/$year';
+    final hour = date.hour.toString().padLeft(2, '0');
+    final minute = date.minute.toString().padLeft(2, '0');
+    return '$day/$month/$year $hour:$minute';
   }
 }

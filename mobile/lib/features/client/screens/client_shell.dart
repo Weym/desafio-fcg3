@@ -39,9 +39,8 @@ class _ClientShellState extends ConsumerState<ClientShell> {
     final location = GoRouterState.of(context).matchedLocation;
     if (location.startsWith(RoutePaths.clientChat)) return 1;
     if (location.startsWith(RoutePaths.clientDocuments)) return 2;
-    if (location.startsWith(RoutePaths.clientNotifications)) return 3;
-    if (location.startsWith(RoutePaths.clientResources)) return 4;
-    if (location.startsWith(RoutePaths.clientSupport)) return 5;
+    if (location.startsWith(RoutePaths.clientResources)) return 3;
+    if (location.startsWith(RoutePaths.clientSupport)) return 3; // fallback
     return 0;
   }
 
@@ -54,11 +53,7 @@ class _ClientShellState extends ConsumerState<ClientShell> {
       case 2:
         context.go(RoutePaths.clientDocuments);
       case 3:
-        context.go(RoutePaths.clientNotifications);
-      case 4:
         context.go(RoutePaths.clientResources);
-      case 5:
-        context.go(RoutePaths.clientSupport);
     }
   }
 
@@ -66,7 +61,6 @@ class _ClientShellState extends ConsumerState<ClientShell> {
     _NavItem(icon: Icons.home_outlined, activeIcon: Icons.home, label: 'Início'),
     _NavItem(icon: Icons.chat_outlined, activeIcon: Icons.chat, label: 'Chat'),
     _NavItem(icon: Icons.description_outlined, activeIcon: Icons.description, label: 'Docs'),
-    _NavItem(icon: Icons.notifications_outlined, activeIcon: Icons.notifications, label: 'Avisos'),
     _NavItem(icon: Icons.meeting_room_outlined, activeIcon: Icons.meeting_room, label: 'Recursos'),
   ];
 
@@ -85,11 +79,6 @@ class _ClientShellState extends ConsumerState<ClientShell> {
       icon: Icon(Icons.description_outlined),
       selectedIcon: Icon(Icons.description),
       label: Text('Documentos'),
-    ),
-    NavigationRailDestination(
-      icon: Icon(Icons.notifications_outlined),
-      selectedIcon: Icon(Icons.notifications),
-      label: Text('Notificações'),
     ),
     NavigationRailDestination(
       icon: Icon(Icons.meeting_room_outlined),

@@ -28,9 +28,44 @@ class _ClientChatScreenState extends ConsumerState<ClientChatScreen> {
     await ref.read(chatSessionsProvider.future);
   }
 
+  void _showRenameDialog(BuildContext context, WidgetRef ref, ChatSessionModel session) {
+    final controller = TextEditingController(text: session.name ?? '');
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Renomear conversa'),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(
+            labelText: 'Nome da conversa',
+            hintText: 'Digite um nome para esta conversa',
+          ),
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            onPressed: () async {
+              final newName = controller.text.trim();
+              if (newName.isNotEmpty) {
+                await ref.read(renameChatSessionProvider(session.id, newName).future);
+                if (ctx.mounted) Navigator.of(ctx).pop();
+              }
+            },
+            child: const Text('Salvar'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final sessionsAsync = ref.watch(chatSessionsProvider);
+    final filter = ref.watch(chatFilterNotifierProvider);
     final isDesktop = AppBreakpoints.isDesktop(MediaQuery.sizeOf(context).width);
     final colors = Theme.of(context).colorScheme;
 
@@ -69,11 +104,25 @@ class _ClientChatScreenState extends ConsumerState<ClientChatScreen> {
           final sorted = List<ChatSessionModel>.from(sessions)
             ..sort((a, b) => b.startedAt.compareTo(a.startedAt));
 
+          final filtered = switch (filter) {
+            ChatStatusFilter.all => sorted,
+            ChatStatusFilter.active => sorted.where((s) => s.isActive).toList(),
+            ChatStatusFilter.inactive => sorted.where((s) => !s.isActive).toList(),
+          };
+
           if (isDesktop) {
             return Column(
               children: [
                 if (sessionsAsync.isRefreshing)
                   const LinearProgressIndicator(),
+                // Filter tabs
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                    vertical: AppSpacing.sm,
+                  ),
+                  child: _buildFilterTabs(colors, ref, filter),
+                ),
                 Expanded(
                   child: Row(
                     children: [
@@ -86,30 +135,51 @@ class _ClientChatScreenState extends ConsumerState<ClientChatScreen> {
                               padding: const EdgeInsets.all(AppSpacing.md),
                               child: _SearchBar(),
                             ),
-                            Expanded(
-                              child: RefreshIndicator(
-                                onRefresh: _onRefresh,
-                                child: ListView.separated(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: AppSpacing.md,
-                                  ),
-                                  itemCount: sorted.length,
-                                  separatorBuilder: (_, __) =>
-                                      const SizedBox(height: AppSpacing.sm),
-                                  itemBuilder: (context, index) {
-                                    final session = sorted[index];
-                                    return _SessionCard(
-                                      session: session,
-                                      selected:
-                                          session.id == _selectedSessionId,
-                                      onTap: () {
-                                        setState(() =>
-                                            _selectedSessionId = session.id);
-                                      },
-                                    );
-                                  },
+                            // Ordering label
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  'Ordenado por: Mais recentes',
+                                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                        color: colors.onSurfaceVariant,
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                 ),
                               ),
+                            ),
+                            const SizedBox(height: AppSpacing.sm),
+                            Expanded(
+                              child: filtered.isEmpty
+                                  ? const AppEmptyState(
+                                      icon: Icons.chat_bubble_outline,
+                                      message: 'Nenhuma conversa neste filtro',
+                                    )
+                                  : RefreshIndicator(
+                                      onRefresh: _onRefresh,
+                                      child: ListView.separated(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: AppSpacing.md,
+                                        ),
+                                        itemCount: filtered.length,
+                                        separatorBuilder: (_, __) =>
+                                            const SizedBox(height: AppSpacing.sm),
+                                        itemBuilder: (context, index) {
+                                          final session = filtered[index];
+                                          return _SessionCard(
+                                            session: session,
+                                            selected:
+                                                session.id == _selectedSessionId,
+                                            onTap: () {
+                                              setState(() =>
+                                                  _selectedSessionId = session.id);
+                                            },
+                                            onLongPress: () => _showRenameDialog(context, ref, session),
+                                          );
+                                        },
+                                      ),
+                                    ),
                             ),
                           ],
                         ),
@@ -147,6 +217,14 @@ class _ClientChatScreenState extends ConsumerState<ClientChatScreen> {
           return Column(
             children: [
               if (sessionsAsync.isRefreshing) const LinearProgressIndicator(),
+              // Filter tabs
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: AppSpacing.sm,
+                ),
+                child: _buildFilterTabs(colors, ref, filter),
+              ),
               // Search bar
               Padding(
                 padding: const EdgeInsets.symmetric(
@@ -155,47 +233,135 @@ class _ClientChatScreenState extends ConsumerState<ClientChatScreen> {
                 ),
                 child: _SearchBar(),
               ),
-              // Section header
+              // Ordering label
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'CONVERSAS RECENTES',
+                    'Ordenado por: Mais recentes',
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.5,
                           color: colors.onSurfaceVariant,
+                          fontWeight: FontWeight.w500,
                         ),
                   ),
                 ),
               ),
               const SizedBox(height: AppSpacing.sm),
               Expanded(
-                child: RefreshIndicator(
-                  onRefresh: _onRefresh,
-                  child: ResponsiveContainer(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: ListView.separated(
-                      itemCount: sorted.length,
-                      separatorBuilder: (_, __) =>
-                          const SizedBox(height: AppSpacing.md),
-                      itemBuilder: (context, index) {
-                        final session = sorted[index];
-                        return _SessionCard(
-                          session: session,
-                          selected: false,
-                          onTap: () =>
-                              context.go('/client/chat/${session.id}'),
-                        );
-                      },
-                    ),
-                  ),
-                ),
+                child: filtered.isEmpty
+                    ? const AppEmptyState(
+                        icon: Icons.chat_bubble_outline,
+                        message: 'Nenhuma conversa neste filtro',
+                      )
+                    : RefreshIndicator(
+                        onRefresh: _onRefresh,
+                        child: ResponsiveContainer(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: ListView.separated(
+                            itemCount: filtered.length,
+                            separatorBuilder: (_, __) =>
+                                const SizedBox(height: AppSpacing.md),
+                            itemBuilder: (context, index) {
+                              final session = filtered[index];
+                              return _SessionCard(
+                                session: session,
+                                selected: false,
+                                onTap: () =>
+                                    context.go('/client/chat/${session.id}'),
+                                onLongPress: () => _showRenameDialog(context, ref, session),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
               ),
             ],
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildFilterTabs(ColorScheme colors, WidgetRef ref, ChatStatusFilter filter) {
+    return Container(
+      padding: const EdgeInsets.all(6),
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
+      ),
+      child: Row(
+        children: [
+          _FilterTab(
+            label: 'Todas',
+            isSelected: filter == ChatStatusFilter.all,
+            onTap: () => ref
+                .read(chatFilterNotifierProvider.notifier)
+                .setFilter(ChatStatusFilter.all),
+          ),
+          _FilterTab(
+            label: 'Ativas',
+            isSelected: filter == ChatStatusFilter.active,
+            onTap: () => ref
+                .read(chatFilterNotifierProvider.notifier)
+                .setFilter(ChatStatusFilter.active),
+          ),
+          _FilterTab(
+            label: 'Inativas',
+            isSelected: filter == ChatStatusFilter.inactive,
+            onTap: () => ref
+                .read(chatFilterNotifierProvider.notifier)
+                .setFilter(ChatStatusFilter.inactive),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FilterTab extends StatelessWidget {
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _FilterTab({
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            color: isSelected ? colors.surfaceContainerLowest : Colors.transparent,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: colors.primary.withValues(alpha: 0.06),
+                      blurRadius: 4,
+                      offset: const Offset(0, 1),
+                    ),
+                  ]
+                : null,
+          ),
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: isSelected ? colors.primary : colors.onSurfaceVariant,
+                ),
+          ),
+        ),
       ),
     );
   }
@@ -465,12 +631,14 @@ class _MessageBubble extends StatelessWidget {
 class _SessionCard extends StatelessWidget {
   final ChatSessionModel session;
   final VoidCallback onTap;
+  final VoidCallback? onLongPress;
   final bool selected;
 
   const _SessionCard({
     required this.session,
     required this.onTap,
     required this.selected,
+    this.onLongPress,
   });
 
   String _formatDate(DateTime dt) {
@@ -488,6 +656,7 @@ class _SessionCard extends StatelessWidget {
 
     return GlassCard(
       onTap: onTap,
+      onLongPress: onLongPress,
       padding: const EdgeInsets.all(AppSpacing.md),
       borderRadius: BorderRadius.circular(
         selected ? AppSpacing.radiusXl : AppSpacing.radiusLg,
@@ -522,7 +691,7 @@ class _SessionCard extends StatelessWidget {
                   children: [
                     Flexible(
                       child: Text(
-                        'Sessão ${_formatDate(session.startedAt)}',
+                        session.name ?? 'Sessão ${_formatDate(session.startedAt)}',
                         style:
                             Theme.of(context).textTheme.titleSmall?.copyWith(
                                   fontWeight: FontWeight.bold,

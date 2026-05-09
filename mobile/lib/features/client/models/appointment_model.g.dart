@@ -16,6 +16,9 @@ AppointmentModel _$AppointmentModelFromJson(Map<String, dynamic> json) =>
       slotStartTime: json['slot_start_time'] as String?,
       endTime: json['end_time'] as String?,
       createdAt: DateTime.parse(json['created_at'] as String),
+      studentName: json['student_name'] as String?,
+      studentRa: json['student_ra'] as String?,
+      resourceName: json['resource_name'] as String?,
     );
 
 Map<String, dynamic> _$AppointmentModelToJson(AppointmentModel instance) =>
@@ -28,4 +31,7 @@ Map<String, dynamic> _$AppointmentModelToJson(AppointmentModel instance) =>
       'slot_start_time': instance.slotStartTime,
       'end_time': instance.endTime,
       'created_at': instance.createdAt.toIso8601String(),
+      'student_name': instance.studentName,
+      'student_ra': instance.studentRa,
+      'resource_name': instance.resourceName,
     };

@@ -67,7 +67,12 @@ class StaffResourceService {
     return ResourceModel.fromJson(response.data as Map<String, dynamic>);
   }
 
-  /// DELETE /resources/{id} — soft-delete (sets is_available=false)
+  /// PUT /resources/{id} — toggle availability
+  Future<void> toggleAvailability(String id, bool isAvailable) async {
+    await _client.dio.put('/resources/$id', data: {'is_available': isAvailable});
+  }
+
+  /// DELETE /resources/{id} — permanently removes the resource
   Future<void> deleteResource(String id) async {
     await _client.dio.delete('/resources/$id');
   }

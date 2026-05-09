@@ -9,6 +9,8 @@ import '../services/chat_service.dart';
 
 part 'chat_provider.g.dart';
 
+enum ChatStatusFilter { all, active, inactive }
+
 @Riverpod(keepAlive: true)
 ChatService chatService(Ref ref) {
   final client = ref.watch(dioClientProvider);
@@ -33,4 +35,19 @@ Future<List<ChatMessageModel>> chatMessages(Ref ref, String sessionId) async {
 Future<List<ActionLogModel>> actionLogs(Ref ref, String sessionId) async {
   final service = ref.watch(chatServiceProvider);
   return service.getActionLogs(sessionId);
+}
+
+@riverpod
+Future<void> renameChatSession(Ref ref, String sessionId, String newName) async {
+  final service = ref.watch(chatServiceProvider);
+  await service.renameSession(sessionId, newName);
+  ref.invalidate(chatSessionsProvider);
+}
+
+@riverpod
+class ChatFilterNotifier extends _$ChatFilterNotifier {
+  @override
+  ChatStatusFilter build() => ChatStatusFilter.all;
+
+  void setFilter(ChatStatusFilter filter) => state = filter;
 }

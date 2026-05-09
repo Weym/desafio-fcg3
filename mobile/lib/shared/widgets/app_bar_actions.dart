@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import '../../core/router/route_names.dart';
 import '../../core/theme/theme_provider.dart';
 import '../../features/auth/providers/auth_provider.dart';
 
-/// Standard app bar actions (theme toggle + logout) used across all screens.
+/// Standard app bar actions (support + theme toggle + logout) used across all screens.
 ///
 /// Keeps the UI consistent and avoids duplicating logic.
 class AppBarActions extends ConsumerWidget {
@@ -17,6 +19,16 @@ class AppBarActions extends ConsumerWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
+        IconButton(
+          icon: Icon(Icons.support_agent_outlined, color: colors.primary),
+          onPressed: () => GoRouter.of(context).go(RoutePaths.clientSupport),
+          tooltip: 'Suporte',
+        ),
+        IconButton(
+          icon: Icon(Icons.notifications_outlined, color: colors.primary),
+          onPressed: () => GoRouter.of(context).go(RoutePaths.clientNotifications),
+          tooltip: 'Notificações',
+        ),
         IconButton(
           icon: Icon(
             isDark ? Icons.light_mode : Icons.dark_mode,

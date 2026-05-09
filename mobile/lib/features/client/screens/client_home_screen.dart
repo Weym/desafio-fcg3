@@ -13,8 +13,8 @@ import '../providers/chat_provider.dart';
 import '../providers/document_provider.dart';
 import '../providers/appointment_provider.dart';
 import '../models/chat_session_model.dart';
-import '../models/document_model.dart';
 import '../models/appointment_model.dart';
+import 'widgets/appointment_detail_sheet.dart';
 
 String _formatDateTime(DateTime dt) {
   final day = dt.day.toString().padLeft(2, '0');
@@ -45,7 +45,6 @@ class ClientHomeScreen extends ConsumerWidget {
     final colors = Theme.of(context).colorScheme;
 
     final chatSessionsAsync = ref.watch(chatSessionsProvider);
-    final documentsAsync = ref.watch(documentsProvider);
     final appointmentsAsync = ref.watch(appointmentsProvider);
 
     return Scaffold(
@@ -135,7 +134,7 @@ class ClientHomeScreen extends ConsumerWidget {
                       ),
                 ),
                 const SizedBox(height: AppSpacing.md),
-                _buildQuickActions(context, documentsAsync),
+                _buildQuickActions(context, ref, appointmentsAsync),
               ],
             ),
           ),
@@ -225,34 +224,32 @@ class ClientHomeScreen extends ConsumerWidget {
 
   Widget _buildQuickActions(
     BuildContext context,
-    AsyncValue<List<DocumentModel>> documentsAsync,
+    WidgetRef ref,
+    AsyncValue<List<AppointmentModel>> appointmentsAsync,
   ) {
     final colors = Theme.of(context).colorScheme;
 
     final actions = [
       _QuickAction(
-        label: 'Solicitar documento',
-        icon: Icons.description_outlined,
-        color: colors.primary,
-        onTap: () => context.go(RoutePaths.clientDocuments),
+        label: 'Agendamentos',
+        icon: Icons.calendar_today_outlined,
+        color: colors.secondary,
+        onTap: () => _showNearestAppointment(context, ref, appointmentsAsync),
       ),
       _QuickAction(
-        label: 'Conversar com Mentor',
-        icon: Icons.chat_outlined,
-        color: colors.secondary,
-        onTap: () => context.go(RoutePaths.clientChat),
+        label: 'Solicitar documentos',
+        icon: Icons.description_outlined,
+        color: colors.primary,
+        onTap: () {
+          ref.read(documentAutoOpenDrawerProvider.notifier).state = true;
+          context.go(RoutePaths.clientDocuments);
+        },
       ),
       _QuickAction(
         label: 'Notificações',
         icon: Icons.notifications_outlined,
         color: colors.tertiary,
         onTap: () => context.go(RoutePaths.clientNotifications),
-      ),
-      _QuickAction(
-        label: 'Suporte',
-        icon: Icons.support_agent_outlined,
-        color: colors.error,
-        onTap: () => context.go(RoutePaths.clientSupport),
       ),
     ];
 
@@ -295,6 +292,45 @@ class ClientHomeScreen extends ConsumerWidget {
       }).toList(),
     );
   }
+
+  void _showNearestAppointment(
+    BuildContext context,
+    WidgetRef ref,
+    AsyncValue<List<AppointmentModel>> appointmentsAsync,
+  ) {
+    appointmentsAsync.whenData((appointments) {
+      final upcoming = appointments.where((a) => a.isUpcoming).toList();
+      if (upcoming.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Sem agendamentos próximos')),
+        );
+        return;
+      }
+
+      // Sort by slotDate to find the nearest
+      upcoming.sort((a, b) {
+        final dateA = a.slotDate ?? '';
+        final dateB = b.slotDate ?? '';
+        final cmp = dateA.compareTo(dateB);
+        if (cmp != 0) return cmp;
+        return (a.slotStartTime ?? '').compareTo(b.slotStartTime ?? '');
+      });
+
+      showAppointmentDetailSheet(context, upcoming.first);
+    });
+
+    // If data isn't loaded yet, show a snackbar
+    if (appointmentsAsync is AsyncLoading) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Carregando agendamentos...')),
+      );
+    } else if (appointmentsAsync is AsyncError) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Erro ao carregar agendamentos')),
+      );
+    }
+  }
+
 }
 
 class _SummaryGlassCard extends StatelessWidget {

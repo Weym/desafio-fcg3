@@ -40,3 +40,11 @@ Future<Map<String, dynamic>> staffChatStatistics(Ref ref) async {
   final service = ref.watch(staffChatServiceProvider);
   return service.getStatistics();
 }
+
+@riverpod
+class StaffChatsSearch extends _$StaffChatsSearch {
+  @override
+  String build() => '';
+
+  void setQuery(String query) => state = query;
+}

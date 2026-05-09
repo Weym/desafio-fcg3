@@ -8,6 +8,7 @@ import '../../../shared/widgets/app_empty_state.dart';
 import '../../../shared/widgets/app_error_state.dart';
 import '../../../shared/widgets/glass_card.dart';
 import '../../../shared/widgets/responsive_container.dart';
+import '../../../shared/widgets/staff_search_bar.dart';
 import '../../client/models/appointment_model.dart';
 import '../providers/staff_schedule_provider.dart';
 import 'widgets/create_slot_sheet.dart';
@@ -18,6 +19,7 @@ class StaffScheduleScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final filter = ref.watch(staffScheduleFilterProvider);
+    final searchQuery = ref.watch(staffScheduleSearchProvider);
     final appointmentsAsync = ref.watch(staffAppointmentsProvider);
     final colors = Theme.of(context).colorScheme;
 
@@ -33,6 +35,13 @@ class StaffScheduleScreen extends ConsumerWidget {
       ),
       body: Column(
         children: [
+          // Search bar above filter tabs
+          StaffSearchBar(
+            hintText: 'Buscar por nome ou RA...',
+            onChanged: (q) => ref
+                .read(staffScheduleSearchProvider.notifier)
+                .setQuery(q),
+          ),
           // Segmented filter
           Padding(
             padding: const EdgeInsets.symmetric(
@@ -87,7 +96,7 @@ class StaffScheduleScreen extends ConsumerWidget {
                 ),
               ),
               data: (appointments) {
-                final filtered = _applyFilter(appointments, filter);
+                final filtered = _applyFilter(appointments, filter, searchQuery);
                 if (filtered.isEmpty) {
                   return const AppEmptyState(
                     icon: Icons.calendar_today,
@@ -138,9 +147,27 @@ class StaffScheduleScreen extends ConsumerWidget {
   List<AppointmentModel> _applyFilter(
     List<AppointmentModel> appointments,
     String? filter,
+    String searchQuery,
   ) {
-    if (filter == null) return appointments;
-    return appointments.where((a) => a.status == filter).toList();
+    var result = appointments;
+
+    // Apply status filter
+    if (filter != null) {
+      result = result.where((a) => a.status == filter).toList();
+    }
+
+    // Apply search query (client-side, by name or RA)
+    if (searchQuery.isNotEmpty) {
+      final query = searchQuery.toLowerCase();
+      result = result.where((a) {
+        final nameMatch =
+            a.studentName?.toLowerCase().contains(query) ?? false;
+        final raMatch = a.studentRa?.contains(query) ?? false;
+        return nameMatch || raMatch;
+      }).toList();
+    }
+
+    return result;
   }
 }
 
@@ -223,16 +250,15 @@ class _AppointmentCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.md),
       child: Row(
         children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: colors.tertiaryContainer.withValues(alpha: 0.3),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
-            ),
-            child: Icon(
-              Icons.calendar_today,
-              color: colors.tertiary,
+          CircleAvatar(
+            radius: 24,
+            backgroundColor: colors.primaryContainer,
+            child: Text(
+              appointment.studentName?[0].toUpperCase() ?? '?',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: colors.primary,
+              ),
             ),
           ),
           const SizedBox(width: AppSpacing.md),
@@ -241,7 +267,7 @@ class _AppointmentCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  appointment.reason,
+                  appointment.studentName ?? 'Aluno',
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: colors.onSurface,
@@ -249,11 +275,21 @@ class _AppointmentCard extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 2),
+                Text(
+                  appointment.resourceName ?? 'Recurso não definido',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: colors.onSurfaceVariant,
+                      ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 2),
                 Text(
                   _buildDateTimeText(),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: colors.onSurfaceVariant,
+                        color: colors.onSurfaceVariant.withValues(alpha: 0.7),
+                        fontSize: 11,
                       ),
                 ),
               ],

@@ -78,5 +78,22 @@ final staffScheduleFilterProvider =
     );
 
 typedef _$StaffScheduleFilter = AutoDisposeNotifier<String?>;
+String _$staffScheduleSearchHash() =>
+    r'e5a32ce4c1c7c9f9769b29f1ddb59de89b6cc04e';
+
+/// See also [StaffScheduleSearch].
+@ProviderFor(StaffScheduleSearch)
+final staffScheduleSearchProvider =
+    AutoDisposeNotifierProvider<StaffScheduleSearch, String>.internal(
+      StaffScheduleSearch.new,
+      name: r'staffScheduleSearchProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$staffScheduleSearchHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+typedef _$StaffScheduleSearch = AutoDisposeNotifier<String>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
