@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Correções, Melhorias & Features
 status: executing
-last_updated: "2026-05-09T01:49:19.721Z"
+last_updated: "2026-05-09T01:56:23.165Z"
 last_activity: 2026-05-09
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 5
-  completed_plans: 3
-  percent: 60
+  completed_plans: 4
+  percent: 80
 ---
 
 # Project State
@@ -18,7 +18,7 @@ progress:
 ## Current Position
 
 Phase: 18 (Student UX Corrections) — EXECUTING
-Plan: 4 of 5
+Plan: 5 of 5
 Status: Ready to execute
 Last activity: 2026-05-09
 
@@ -73,6 +73,9 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 - **18-02:** ChatFilterNotifier pattern for client-side filtering (no extra API call)
 - **18-03:** Document cards show date+time (DD/MM/YYYY HH:MM), tap opens detail bottom sheet
 - **18-03:** showDocumentDetailSheet pattern with _DetailRow for key-value display in sheets
+- **18-04:** Notifications: read/unread state via client-side Set<String> (ReadNotificationIds provider)
+- **18-04:** Filter tabs (Todas/Não lidas/Lidas) and "Visualizar todos" bulk mark-as-read
+- **18-04:** Individual notification marked as read only on direct tap (not on scroll/view)
 
 ## Session Continuity
 

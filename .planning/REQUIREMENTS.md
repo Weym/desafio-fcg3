@@ -19,9 +19,9 @@ Requirements for milestone v3.0. Each maps to roadmap phases.
 - [x] **STUX-08**: Documentos exibem tipo e data com hora em cada item
 - [x] **STUX-09**: Clique no documento abre drawer com informações completas
 - [x] **STUX-10**: Adicionar documento usa drawer (mesmo design da tela de recursos)
-- [ ] **STUX-11**: Avisos possuem estado de visualizado/não visualizado com filtro
-- [ ] **STUX-12**: Botão "visualizar todos" marca todas notificações como lidas
-- [ ] **STUX-13**: Notificação só marca como visualizada ao clicar diretamente nela
+- [x] **STUX-11**: Avisos possuem estado de visualizado/não visualizado com filtro
+- [x] **STUX-12**: Botão "visualizar todos" marca todas notificações como lidas
+- [x] **STUX-13**: Notificação só marca como visualizada ao clicar diretamente nela
 - [ ] **STUX-14**: Tela de avisos reposicionada para botão no header (removida do menu inferior)
 - [ ] **STUX-15**: Agendamentos do student mostram detalhes via drawer ao clicar
 
@@ -151,9 +151,9 @@ Requirements for milestone v3.0. Each maps to roadmap phases.
 | STUX-08 | Phase 18 | Complete |
 | STUX-09 | Phase 18 | Complete |
 | STUX-10 | Phase 18 | Complete |
-| STUX-11 | Phase 18 | Pending |
-| STUX-12 | Phase 18 | Pending |
-| STUX-13 | Phase 18 | Pending |
+| STUX-11 | Phase 18 | Complete |
+| STUX-12 | Phase 18 | Complete |
+| STUX-13 | Phase 18 | Complete |
 | STUX-14 | Phase 18 | Pending |
 | STUX-15 | Phase 18 | Pending |
 | SFUX-01 | Phase 19 | Pending |
