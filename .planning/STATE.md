@@ -3,31 +3,31 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Correções, Melhorias & Features
 status: executing
-last_updated: "2026-05-09T02:29:37.310Z"
-last_activity: 2026-05-09 -- Phase 19 planning complete
+last_updated: "2026-05-09T02:37:52.277Z"
+last_activity: 2026-05-09
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 11
-  completed_plans: 5
-  percent: 45
+  completed_plans: 6
+  percent: 55
 ---
 
 # Project State
 
 ## Current Position
 
-Phase: 19
-Plan: Not started
+Phase: 19 (staff-ux-corrections) — EXECUTING
+Plan: 2 of 6
 Status: Ready to execute
-Last activity: 2026-05-09 -- Phase 19 planning complete
+Last activity: 2026-05-09
 
 ## Project Reference
 
 See: .planning/PROJECT.md (updated 2026-05-08)
 
 **Core value:** Aluno envia mensagem no WhatsApp e recebe resposta precisa sobre sua situação acadêmica — com ações concretas executadas em tempo real.
-**Current focus:** Phase 18 — Student UX Corrections
+**Current focus:** Phase 19 — staff-ux-corrections
 
 ## Milestones Shipped
 
@@ -79,6 +79,11 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 - **18-05:** showAppointmentDetailSheet: reusable appointment detail bottom sheet widget
 - **18-05:** Refactored home screen inline sheet to use shared widget (DRY)
 - **18-05:** onDetailTap pattern: combined mark-as-read + open detail on notification tap
+- **19-01:** Bottom nav tab "Intervenção" renamed to "Chats" (chat_bubble icon) at position 2
+- **19-01:** staffChats route temporarily points to StaffAiScreen (Plan 03 will replace)
+- **19-01:** staffCadastro route placeholder (Plan 06 will implement)
+- **19-01:** KPI cards use query params for pre-applied filters (?filter=hoje, ?filter=pendentes)
+- **19-01:** "Ações Rápidas" section on dashboard with Gerenciar Alunos button
 
 ## Session Continuity
 

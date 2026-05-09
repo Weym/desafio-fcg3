@@ -27,9 +27,9 @@ Requirements for milestone v3.0. Each maps to roadmap phases.
 
 ### Staff UX Corrections
 
-- [ ] **SFUX-01**: Dashboard — taxa de resolução automatizada com truncamento de casas decimais
-- [ ] **SFUX-02**: Dashboard — "Docs pendentes" aplica filtro automaticamente ao navegar
-- [ ] **SFUX-03**: Dashboard — "Chats hoje" aplica filtro de data automaticamente ao navegar
+- [x] **SFUX-01**: Dashboard — taxa de resolução automatizada com truncamento de casas decimais
+- [x] **SFUX-02**: Dashboard — "Docs pendentes" aplica filtro automaticamente ao navegar
+- [x] **SFUX-03**: Dashboard — "Chats hoje" aplica filtro de data automaticamente ao navegar
 - [ ] **SFUX-04**: Agendamentos — detalhamento mostra Nome, RA, data emissão, recurso
 - [ ] **SFUX-05**: Agendamentos — card exibe nome e recurso (não motivo)
 - [ ] **SFUX-06**: Agendamentos — confirmar agendamento funciona corretamente
@@ -156,9 +156,9 @@ Requirements for milestone v3.0. Each maps to roadmap phases.
 | STUX-13 | Phase 18 | Complete |
 | STUX-14 | Phase 18 | Complete |
 | STUX-15 | Phase 18 | Complete |
-| SFUX-01 | Phase 19 | Pending |
-| SFUX-02 | Phase 19 | Pending |
-| SFUX-03 | Phase 19 | Pending |
+| SFUX-01 | Phase 19 | Complete |
+| SFUX-02 | Phase 19 | Complete |
+| SFUX-03 | Phase 19 | Complete |
 | SFUX-04 | Phase 19 | Pending |
 | SFUX-05 | Phase 19 | Pending |
 | SFUX-06 | Phase 19 | Pending |
