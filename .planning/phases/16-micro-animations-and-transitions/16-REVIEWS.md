@@ -1,214 +1,309 @@
 ---
 phase: 16
 reviewers: [gemini, claude]
-reviewed_at: 2026-05-10T00:00:00Z
+reviewed_at: 2026-05-10T17:00:00Z
+review_cycle: 2
 plans_reviewed: [16-01-PLAN.md, 16-02-PLAN.md, 16-03-PLAN.md]
 ---
 
 # Cross-AI Plan Review — Phase 16
 
-## Gemini Review
+> **Cycle 2** — Plans unchanged since Cycle 1. Focus is on persistence of previously raised concerns and new findings.
 
-# Plan Review: Phase 16 — Micro-Animations & Transitions
+---
+
+## Cycle 1 Summary (for reference)
+
+| Concern | Cycle 1 Severity | Raised By |
+|---------|-----------------|-----------|
+| Future.delayed lifecycle safety | MEDIUM-HIGH | Both |
+| Stagger delay semantics unclear | MEDIUM-HIGH | Both |
+| Duplicate _GlassBottomNav | MEDIUM | Both |
+| Plan 16-03 scope ambiguity | MEDIUM-HIGH | Both |
+| ListView.builder virtualization | HIGH | Claude |
+| Test impact from animations | MEDIUM | Claude |
+
+---
+
+## Gemini Review (Cycle 2)
+
+# Phase 16 Plan Review (Cycle 2)
+
+This review evaluates the implementation plans for **Phase 16: Micro-Animations & Transitions**. As noted, the plans remain unchanged from Cycle 1; therefore, the primary focus is on the persistence of previously identified risks and the identification of new technical gaps.
+
+---
 
 ## 1. Summary
-The implementation plans for Phase 16 are well-structured and highly focused on improving the "Cyber-Academic" aesthetic through polished micro-interactions. The strategy correctly prioritizes foundation (centralized constants) before moving to systemic changes (navigation and routing) and finally broad screen integration. The inclusion of accessibility support via `MediaQuery.disableAnimations` and performance considerations (stagger capping) demonstrates a mature approach to Flutter development.
+The plans establish a structured approach to fulfilling the "Cyber-Academic" visual requirements through centralized constants and a reusable entrance widget. However, they **ignore critical architectural and lifecycle safety concerns** raised in the first review cycle. The implementation of `AnimatedEntrance` remains prone to memory leaks/crashes, and the lack of refactoring for duplicated navigation components increases technical debt. While the addition of accessibility checks is commendable, the plans lack the necessary technical depth to ensure these animations perform smoothly in virtualized lists.
 
 ---
 
 ## 2. Strengths
-- **Centralized Design Tokens**: Creating `app_animations.dart` ensures visual consistency across the entire app and makes future tuning easy.
-- **Accessibility-First**: Explicitly checking `disableAnimations` at the foundation level (`AnimatedEntrance`) and in navigation transitions is an excellent practice that addresses NFR-02.
-- **Performance Guardrails**: Capping the stagger index at 5 in Plan 16-03 is a critical optimization that prevents "timer storms" and ensures the UI remains responsive even in long lists.
-- **Staggered Orchestration**: The use of index-based delays for grid and list items will create a high-quality "rhythmic" loading experience typical of premium apps.
+*   **Centralized Constants**: Moving animation values to `app_animations.dart` ensures design system consistency and simplifies future tuning.
+*   **Accessibility First**: Explicitly checking `MediaQuery.disableAnimations` and defaulting to `Duration.zero` is a high-quality standard for inclusive design.
+*   **Safety Thresholds**: Capping the stagger index at 5 prevents "timer storms" and excessively long wait times for bottom-of-screen content.
+*   **Automated Verification**: The commitment to keeping 38+ tests passing while adding 4+ targeted widget tests ensures no regressions in core functionality.
 
 ---
 
 ## 3. Concerns
-- **Duplicate Logic (MEDIUM)**: `_GlassBottomNav` is currently duplicated in `client_shell.dart` and `staff_shell.dart`. Plan 16-02 proposes modifying both. This is an ideal time to refactor this into a shared widget in `shared/widgets/` to avoid future maintenance divergence.
-- **State Safety in AnimatedEntrance (LOW)**: If `AnimatedEntrance` uses `Future.delayed` to trigger a `setState` for staggering, it must ensure the widget is still `mounted` before calling `setState`.
-- **Timer Management (LOW)**: While capping at index 5 helps, many simultaneous `Future.delayed` calls across multiple screens (if they persist) could slightly impact memory. Ensure the timers are canceled if the widget is disposed before they fire.
+
+### UNRESOLVED: Lifecycle & Memory Safety (HIGH)
+*   **Status:** **UNRESOLVED** from Cycle 1.
+*   **Issue:** Plan 16-01 still specifies using `Future.delayed` in `initState`. In Flutter, if a widget is removed from the tree before the delay completes, triggering `_visible = true` (and thus `setState`) will cause a crash.
+*   **Impact:** Frequent "setState() called after dispose()" errors in logs and potential application instability during fast navigation.
+
+### UNRESOLVED: Component Duplication (MEDIUM)
+*   **Status:** **UNRESOLVED** from Cycle 1.
+*   **Issue:** Plan 16-02 still proposes modifying `_GlassBottomNav` in *both* `client_shell.dart` and `staff_shell.dart`. This component should be refactored into `mobile/lib/shared/widgets/`.
+*   **Impact:** Higher maintenance cost and potential for visual drift between the client and staff experiences.
+
+### NEW: Virtualization & Stagger Logic (HIGH)
+*   **Issue:** Plan 16-03 applies index-based stagger to list items (e.g., `client_documents_screen`). In a `ListView.builder`, indices are absolute. If a user scrolls quickly, items entering the viewport will calculate delays based on their index.
+*   **Risk:** Even with a cap at index 5, the "stagger" effect is only desirable on the *first* load. If animations re-trigger every time a list item is rebuilt during scrolling, it creates visual "jank" and unnecessary CPU overhead.
+
+### PARTIALLY RESOLVED: Stagger Semantics (MEDIUM)
+*   **Status:** **PARTIALLY RESOLVED** (via rule definition).
+*   **Issue:** While a "cap at 5" rule was added, the exact mathematical formula (e.g., `Duration(milliseconds: index * 200)`) is still not explicitly defined in the foundation plan (16-01).
+*   **Impact:** Inconsistent "rhythm" if developers implement the stagger differently across the 10 targeted screens.
 
 ---
 
 ## 4. Suggestions
-- **Shared Nav Widget**: Instead of modifying the shell files separately, create `mobile/lib/shared/widgets/glass_bottom_nav.dart` and use it in both shells. This aligns with the project's "shared" architecture pattern seen in `app_offline_banner.dart`.
-- **Mounted Check**: In `AnimatedEntrance`, implement the delay like this:
-  ```dart
-  Future.delayed(widget.delay, () {
-    if (mounted) setState(() => _visible = true);
-  });
-  ```
-- **Implicit Staggering**: For `ListView.builder` integration, consider adding a helper to `AppAnimations` that calculates the delay: `AppAnimations.stagger(index)`.
-- **Curve Variety**: While `easeOutBack` is great for icons, consider `Curves.easeOutCubic` or `Curves.easeInOutQuart` for large surface transitions (page slides) to keep them feeling "fluid" rather than "bouncy," as requested in the Cyber-Academic guide.
+
+1.  **Hardened Lifecycle**: Replace the `Future.delayed` in `AnimatedEntrance` with a `Timer` that is stored in a private variable and explicitly canceled in `dispose()`. Alternatively, ensure every `setState` call is guarded by `if (mounted)`.
+2.  **Shared Navigation**: Create `lib/shared/widgets/glass_bottom_nav.dart` and migrate the logic there before applying animations. This follows the DRY (Don't Repeat Yourself) principle.
+3.  **Viewport-Aware Stagger**: For list items, the `AnimatedEntrance` should ideally only animate if the item is appearing for the first time *and* is within the initial viewport. At a minimum, the "stagger" should be calculated relative to the *visible* index, not the absolute data index, to prevent delayed entries for items scrolled into view later.
+4.  **Centralize Stagger Formula**: Add a static method to `AppAnimations` like `getEntranceDelay(int index)` to ensure the `min(index, 5) * 150ms` logic is consistent everywhere.
 
 ---
 
 ## 5. Risk Assessment
-**Overall Risk: LOW**
 
-**Justification:**
-- The changes are purely visual and do not modify business logic, API integrations, or state management providers.
-- The use of `CustomTransitionPage` in GoRouter is a standard and safe way to handle navigation animations.
-- The performance risks associated with animations are mitigated by the proposed capping strategy and the use of built-in Flutter animation primitives (`TweenAnimationBuilder`).
-- The threat model correctly identifies that there is no network or security impact.
+**Overall Risk: MEDIUM-HIGH**
 
----
+### Justification:
+The risk is not related to business logic failure, but to **runtime stability and performance**.
+1.  **Stability**: The `initState` delay pattern is a known anti-pattern that leads to crashes.
+2.  **Performance**: Adding 10+ timers/animations per screen across 10 screens without careful lifecycle management or virtualization awareness can lead to dropped frames (jank), especially on lower-end devices.
+3.  **Maintenance**: Failing to refactor the bottom nav now will make future UI updates (like adding a third role or changing glow colors) twice as expensive.
 
-**Verdict:** The plans are **approved for execution** with a strong recommendation to refactor `_GlassBottomNav` into a shared widget during Plan 16-02.
-
----
-
-## Claude Review
-
-# Phase 16 Plan Review: Micro-Animations & Transitions
-
-## Plan 16-01: Animation Foundation (Wave 1)
-
-### Summary
-This plan establishes a solid foundation for animations by centralizing constants and creating a reusable entrance widget with accessibility support. The approach is clean and follows existing patterns (like `AppSpacing`). However, the plan has critical gaps around `AnimatedEntrance` implementation details and insufficient test coverage for edge cases.
-
-### Strengths
-- **Consolidates animation logic** into a single source of truth (`AppAnimations` class), preventing drift and enabling consistent animations across the codebase
-- **Accessibility-first design** — correctly checks `MediaQuery.disableAnimations` before animating, respecting system-level motion preferences (WCAG compliant)
-- **Stateful widget approach** using `Future.delayed` for stagger timing is correct and follows Flutter conventions
-- **Clear pattern mapping** to existing `AppSpacing` class demonstrates coherent architecture
-- **Bounded timing** — entrance animation is fixed at 800ms, preventing runaway animations
-
-### Concerns
-
-| Issue | Severity | Details |
-|-------|----------|---------|
-| **TweenAnimationBuilder lifecycle not specified** | HIGH | Plan says "uses TweenAnimationBuilder (0.0->1.0)" but doesn't specify: does the animation restart on widget rebuild? Should `autoRepeat` be false? What happens if child changes mid-animation? This needs explicit API design. |
-| **Future.delayed resource leak risk** | HIGH | Using `Future.delayed` in `initState` creates a floating timer if the widget is disposed before the delay completes. Plan must specify how to cancel this with `willPop` or store the Future as a member variable. |
-| **Stagger delay semantics unclear** | MEDIUM | Plan says "200ms stagger delay" as a constant, but doesn't explain: is this the increment *per index* or a fixed delay? If per-index, who calculates the index (parent widget? AnimatedEntrance?)? Plan 16-03 will apply this; dependency is unclear. |
-| **Transform.translate slide offset sign** | MEDIUM | Plan specifies "20px slide offset" but doesn't clarify direction: is it 20px upward (1 - value means 0px when complete) or 20px downward? Animation reference uses 20 * (1 - value), meaning upward is correct, but plan should be explicit. |
-| **Test suite doesn't validate performance** | MEDIUM | Tests check behavior but not animation jank — no performance profiling or frame-rate assertions. TweenAnimationBuilder with Opacity + Transform on large lists (Plan 16-03) could drop frames if not optimized. |
-| **No mention of `AnimatedEntrance` disposal** | LOW | If used in a large scrolling list (Plan 16-03), many instances could accumulate in memory. Plan doesn't specify if widget properly disposes tweens or if any cleanup is needed. |
-
-### Suggestions
-1. **Explicitly specify `AnimatedEntrance` parameters:**
-   - Document that `TweenAnimationBuilder` uses `repeat: false` (single animation, no loop)
-   - Clarify if stagger delay is passed per widget by parent or calculated internally
-   - Specify that child widget must be const or have stable key to avoid mid-animation rebuilds
-
-2. **Add lifecycle safety:**
-   - Store `Future<void>` as an instance variable to allow cancellation in `dispose()` if needed, or use `addPostFrameCallback` instead of `Future.delayed` for more predictable timing
-
-3. **Enhance test coverage:**
-   - Add test: "animation respects unchanged delay when widget rebuilds" (ensure TweenAnimationBuilder doesn't retrigger)
-   - Add test: "animation completes within 800ms +/- 50ms" (performance baseline)
-
-4. **Clarify stagger delegation:**
-   - If parent calculates index-based delay, specify formula: `delay = Duration(milliseconds: index * 200)` with max index = 5
-   - Add example usage in plan: `AnimatedEntrance(delay: Duration(milliseconds: 0), child: widget0)`
+**Recommendation:** Do not proceed with implementation until the `AnimatedEntrance` lifecycle safety and `_GlassBottomNav` refactoring are explicitly included in the plans.
 
 ---
 
-## Plan 16-02: Nav Bar Glow Transitions + GoRouter Page Transitions (Wave 2)
+## Claude Review (Cycle 2)
 
-### Summary
-This plan tackles two distinct concerns: enhancing the bottom nav bar with glow animations and adding custom page transitions to GoRouter. The nav bar changes are well-scoped and low-risk (isolated to `_GlassBottomNav`), but the GoRouter integration is underspecified and carries architectural risk around page transition consistency across 12+ routes.
+# Cross-AI Plan Review — Phase 16 (Cycle 2)
 
-### Strengths
-- **Splits nav bar and page transitions** into clear, independent concerns — both can be tested and verified separately
-- **Leverages existing nav structure** — modifies only animation timing/curves, not layout or nav logic
-- **GoRouter CustomTransitionPage pattern** is Flutter-idiomatic and avoids reinventing page transitions
-- **Reduced-motion support** — includes `MediaQuery.disableAnimations` checks for both nav and page transitions
-- **Defines concrete transition semantics:** fade-through for tabs (300ms), slide for push (250ms)
-- **Applies to both client and staff shells** — ensures consistency across user roles
+## Executive Summary
 
-### Concerns
+**Status: Plans remain UNCHANGED from Cycle 1** — no revisions have been made to address the previous round of feedback. This Cycle 2 review assesses persistence and severity of Cycle 1 concerns and identifies whether they remain blockers to execution.
 
-| Issue | Severity | Details |
-|-------|----------|---------|
-| **CustomTransitionPage implementation incomplete** | HIGH | Plan says "add helper functions `_fadeThroughPage` and `_slidePage`" but doesn't specify: what is the signature of these functions? Do they return `CustomTransitionPage<T>`? How do they integrate with GoRouter's `pageBuilder`? Are there generics involved? Without this detail, implementer may struggle with type signatures. |
-| **Transition assignment to 12+ routes** | HIGH | Plan lists "~12 tab routes and ~4 detail routes" but doesn't enumerate them explicitly. Risk: implementer might miss a route, leaving inconsistent transitions. Should list every route that gets `_fadeThroughPage` vs. `_slidePage`. |
-| **Fade-through vs. slide decision criteria undefined** | MEDIUM | Plan says "fade-through for tab-level routes" and "slide for push/detail routes" but this isn't automated — implementer must manually choose for each route. No rule is given for ambiguous cases. |
-| **No transition state management** | MEDIUM | If user rapidly taps bottom nav, multiple page transitions could fire simultaneously. Plan doesn't specify if GoRouter handles this or if explicit `canPop()` checks are needed. |
-| **Icon size animation not coordinated with glow** | MEDIUM | Plan says "icon size animates (24->28px)" and "shadow spread animates" but doesn't specify if these use the same duration/curve or separate tweens. Uncoordinated timing looks janky. |
-| **Splash/login routes "remain unchanged"** | LOW | Plan correctly excludes splash/login, but doesn't specify *why*. Should be explicit. |
-| **No fallback for reduced-motion in page transitions** | LOW | Plan includes `MediaQuery.disableAnimations` check but doesn't specify what happens: does `Duration.zero` skip animation, or does it use a minimal duration? |
-
-### Suggestions
-1. **Define CustomTransitionPage helper signatures explicitly**
-2. **Enumerate all routes with transition type** — List each tab route and detail route explicitly
-3. **Coordinate icon and glow animations** — Ensure both use same duration and curve
-4. **Add transition conflict mitigation** — Specify that rapid nav taps are handled by GoRouter built-in
-5. **Add note on performance** — Consider profiling on low-end devices
+**Key Finding:** The four agreed HIGH-MEDIUM concerns from Cycle 1 **remain UNRESOLVED**. The plans have not been updated to address them. This represents a significant risk if execution proceeds without remediation.
 
 ---
 
-## Plan 16-03: Screen Integration (Wave 2 — depends on Plan 01)
+## Cycle 1 Concerns: Resolution Status
 
-### Summary
-This plan applies `AnimatedEntrance` to dashboard cards, stat cards, and list items across 10 screens. The scope is ambitious but well-defined with clear rules (only wrap data content, cap stagger at index 5). However, the plan lacks specifics on *which* cards/items get animated, creating ambiguity for implementer, and the index-based stagger formula is not defined.
+### 1. Future.delayed Lifecycle Safety (MEDIUM-HIGH) — UNRESOLVED
 
-### Strengths
-- **Clear scope boundaries** — explicitly excludes AppBar, Scaffold, loading skeletons, error states, filters, empty states
-- **Stagger cap at index 5** prevents timer accumulation on large lists (max 1200ms delay)
-- **Applies to both client and staff** with consistent pattern
-- **Modular approach** — each screen treated as independent, allowing parallel work
-- **Full test validation** specified: flutter analyze + flutter test must pass with 38+ tests
+**Cycle 1 Status:** Both reviewers flagged that `Future.delayed` in `initState` creates a floating timer if widget is disposed before delay completes.
 
-### Concerns
+**Cycle 2 Assessment:** NOT ADDRESSED
 
-| Issue | Severity | Details |
-|-------|----------|---------|
-| **"Data content" not precisely defined** | HIGH | Plan says "only wrap DATA content" but doesn't specify for each screen: which widgets exactly? |
-| **Stagger formula not specified** | HIGH | Plan says "index-based stagger, capped at index 5" but doesn't give the formula. |
-| **List view virtualization not addressed** | HIGH | If using ListView.builder on a long list, only visible items exist at once — index-based stagger will produce incorrect delays as user scrolls. |
-| **No guidance on nested list items** | MEDIUM | Some screens may have grouped lists (section header + items). Should nested items use the same index or restart? |
-| **38+ tests must pass but no new tests added** | MEDIUM | Wrapping widgets in AnimatedEntrance could indirectly affect test expectations. |
-| **Screen inventory incomplete** | MEDIUM | Plan lists 10 screens but additional screens exist. Are they deliberately excluded? |
-| **"Run full test suite" timing not specified** | LOW | If 38+ tests each include animations, total test time could be excessive. |
+The plan (16-01, line 214-216) still uses bare `Future.delayed`:
+```dart
+Future.delayed(widget.delay, () {
+  if (mounted) setState(() => _visible = true);
+});
+```
 
-### Suggestions
-1. **Define content to animate per screen** — Create a table showing each screen, components, and stagger pattern
-2. **Define stagger formula explicitly** — `delay = Duration(milliseconds: min(index, 5) * 200)`
-3. **Address virtualized lists** — Use fixed delay per item type for ListView.builder
-4. **Enumerate all screens and justify inclusions/exclusions**
-5. **Add test adjustment guidance** — Specify `pumpAndSettle()` or `disableAnimations: true` for tests
-6. **Clarify grouped list behavior**
+While this includes the `mounted` check (good), it does **not** handle:
+- What if widget is disposed while Future is pending? The timer still fires but context is gone
+- No mechanism to cancel the Future if widget disposes early
+- No cleanup in `dispose()` method
 
-### Risk Assessment by Plan
+**Why This Matters:** In Plan 16-03, if users navigate away from a screen before staggered items finish loading, orphaned timers accumulate. On mobile with memory constraints, this is a real leak vector.
 
-| Plan | Risk Level | Justification |
-|------|-----------|---------------|
-| **16-01** | **MEDIUM** | Foundation plan with lifecycle/Future.delayed safety concerns and underspecified API |
-| **16-02** | **MEDIUM** | GoRouter integration underspecified (missing function signatures and route enumeration) |
-| **16-03** | **HIGH** | Ambitious scope (10 screens) with high ambiguity about which widgets to wrap and stagger formula |
+**Recommendation:** Use `Timer` with `.cancel()` in `dispose()`:
+```dart
+late Timer? _delayTimer;
+
+@override
+void initState() {
+  super.initState();
+  _delayTimer = Timer(widget.delay, () {
+    if (mounted) setState(() => _visible = true);
+  });
+}
+
+@override
+void dispose() {
+  _delayTimer?.cancel();
+  super.dispose();
+}
+```
 
 ---
 
-## Consensus Summary
+### 2. Stagger Delay Semantics Unclear (MEDIUM-HIGH) — UNRESOLVED
 
-### Agreed Strengths
+**Cycle 2 Assessment:** NOT ADDRESSED
 
-- **Centralized animation constants** (AppAnimations) — Both reviewers praise the single-source-of-truth approach following existing patterns (AppSpacing), ensuring consistency and easy tuning
-- **Accessibility-first design** — Both reviewers highlight the `MediaQuery.disableAnimations` reduced-motion support as excellent practice (WCAG compliant)
-- **Performance guardrails** — Stagger capping at index 5 recognized by both as critical optimization to prevent timer storms
-- **Foundation-first strategy** — Correct wave ordering (constants first, then nav/page transitions, then screen integration) praised as mature approach
-- **No functional impact** — Both agree changes are purely visual with no business logic, API, or auth modifications
+The constant is defined (16-01, line 113):
+```dart
+static const Duration staggerDelay = Duration(milliseconds: 200);
+```
 
-### Agreed Concerns
+But Plan 16-03 says only:
+- "wrap each document card/list item with AnimatedEntrance using index-based stagger"
+- "delay: AppAnimations.staggerDelay * (index + 1)"
+- "Cap the delay at index 5 to avoid very late animations"
 
-1. **Future.delayed lifecycle safety (MEDIUM-HIGH)** — Both reviewers flag that `Future.delayed` in `initState` creates a floating timer risk if widget is disposed before delay completes. Must use `mounted` check and consider storing Future for cancellation in `dispose()`.
+**What's missing:**
+- The formula `staggerDelay * (index + 1)` is shown in code examples but NOT formally defined in the task description
+- No explicit statement: "The stagger formula is: `delay = Duration(milliseconds: 200 * min(index, 5) + 1)`"
+- No guidance on who calculates the index — parent screen must pass it to AnimatedEntrance (implicit coupling)
+- No examples in Plan 16-01 showing how parent passes index-based delay
 
-2. **Stagger delay semantics unclear (MEDIUM-HIGH)** — Both note the stagger formula is not explicitly defined. Is it `index * 200ms`? Who calculates the index — parent or widget? Capping at index 5 is good but formula needs documentation.
+---
 
-3. **Duplicate _GlassBottomNav (MEDIUM)** — Both implicitly flag the duplication across client_shell and staff_shell. Gemini explicitly suggests refactoring to a shared widget. Claude notes the coordination risk of modifying both independently.
+### 3. Duplicate _GlassBottomNav (MEDIUM) — UNRESOLVED
 
-4. **Plan 16-03 scope ambiguity (MEDIUM-HIGH)** — Both reviewers note the plan lacks specifics on *which* widgets to wrap per screen and the exact stagger formula, creating implementer confusion.
+Plan 16-02 (Task 1, line 113) explicitly states:
+> "Both files have identical `_GlassBottomNav` classes. Apply the same changes to both."
 
-### Divergent Views
+This means the plan **acknowledges** the duplication but **chooses to perpetuate it** rather than refactor.
 
-| Topic | Gemini | Claude |
+**Risks:**
+- Bugs found in glow animation later require fixing both files independently
+- Future nav bar enhancements require coordinating changes across two files
+- Code review complexity doubles
+
+---
+
+### 4. Plan 16-03 Scope Ambiguity (MEDIUM-HIGH) — PARTIALLY ADDRESSED
+
+**What was added (vs. Cycle 1):**
+- Specific screens listed (10 total: 5 client + 5 staff)
+- Code examples for client_home_screen (greeting, summary cards, quick actions)
+- Examples for staff_dashboard_screen (KPI grid)
+- "Cap stagger index at 5" rule repeated
+
+**What's still missing:**
+- Complete screen-by-screen widget target table
+- client_resources_screen ambiguity: grid or list? How should stagger apply?
+- staff_schedule_screen: which exact widgets are "appointment cards"?
+- Grouped/nested lists not addressed
+
+**ListView.builder virtualization concern (from Cycle 1):**
+If implementer wraps `ListView.builder` items with staggered delays based on current index, **only visible items get delays**. When user scrolls down, newly visible items appear instantly or with wrong timing.
+
+---
+
+## NEW Concerns (Cycle 2)
+
+### 5. Plan 16-02: Missing Route Enumeration (HIGH) — NEW
+
+Plan 16-02 claims to apply CustomTransitionPage to "~12 tab routes and ~4 detail routes" but **does not enumerate them explicitly**. Risk: implementer misses routes or applies wrong transition type.
+
+**Recommendation:** Add explicit route table:
+
+| Route Path | Route Name | Transition Type | Nested Detail Routes |
+|---|---|---|---|
+| /client | clientHome | fade-through | (none) |
+| /client/chat | clientChat | fade-through | :sessionId -> slide |
+| /client/documents | clientDocuments | fade-through | (none) |
+| ... | ... | ... | ... |
+
+---
+
+### 6. AnimatedEntrance Rebuild Behavior (MEDIUM) — NEW
+
+Plan 16-01 doesn't specify what happens if `AnimatedEntrance` parent rebuilds or `child` widget changes. If parent is a `StreamBuilder` that rebuilds frequently, does the `Future.delayed` retrigger?
+
+---
+
+### 7. Test Suite Timing Impact (MEDIUM) — NEW
+
+Plan 16-03 requires all 38+ tests to pass, but animations add delays. Tests may need `MediaQueryData(disableAnimations: true)` or `pumpAndSettle()` to avoid timeouts.
+
+---
+
+## Risk Assessment Summary
+
+| Concern | Cycle 1 Status | Cycle 2 Status | Severity |
+|---------|---|---|---|
+| Future.delayed lifecycle safety | UNRESOLVED | UNRESOLVED | **HIGH** |
+| Stagger formula unclear | UNRESOLVED | UNRESOLVED | **MEDIUM-HIGH** |
+| Duplicate _GlassBottomNav | UNRESOLVED | UNRESOLVED | **MEDIUM** |
+| Plan 16-03 scope ambiguity | PARTIALLY | PARTIALLY | **MEDIUM-HIGH** |
+| Route enumeration missing | NEW | NEW | **HIGH** |
+| ListView.builder virtualization | Raised Cycle 1 | UNRESOLVED | **HIGH** |
+| Rebuild behavior | NEW | NEW | **MEDIUM** |
+| Test timing impact | NEW | NEW | **MEDIUM** |
+
+**Overall Risk: MEDIUM-HIGH -> HIGH**
+
+**Verdict:** Recommend pausing execution pending plan updates. The plans are well-structured but need greater specification precision in lifecycle safety (Plan 16-01), route mapping (Plan 16-02), and widget targeting + virtualization (Plan 16-03).
+
+---
+
+## Consensus Summary (Cycle 2)
+
+### Agreed Strengths (Both Reviewers, Both Cycles)
+
+- **Centralized animation constants** (AppAnimations) — single-source-of-truth following existing patterns (AppSpacing)
+- **Accessibility-first design** — `MediaQuery.disableAnimations` support is WCAG compliant
+- **Performance guardrails** — stagger cap at index 5 prevents timer storms
+- **Foundation-first strategy** — correct wave ordering (constants -> nav/page -> screen integration)
+- **No functional impact** — purely visual changes with no business logic, API, or auth modifications
+- **Automated verification** — commitment to keeping 38+ tests passing
+
+### Agreed Concerns (Both Reviewers, Cycle 2)
+
+1. **Future.delayed lifecycle safety (HIGH)** — UNRESOLVED across both cycles. Both reviewers now agree this is HIGH severity. Plan must specify `Timer` with `cancel()` in `dispose()` or equivalent lifecycle-safe pattern. The `mounted` check alone is insufficient.
+
+2. **Stagger formula not formally specified (MEDIUM-HIGH)** — UNRESOLVED. Code examples show the pattern but no formal definition exists. Both suggest centralizing via `AppAnimations.getEntranceDelay(int index)` or equivalent.
+
+3. **Duplicate _GlassBottomNav (MEDIUM)** — UNRESOLVED. Both reviewers continue to flag this. Gemini explicitly recommends refactoring to shared widget before applying animations.
+
+4. **ListView.builder virtualization (HIGH)** — NEW consensus. Gemini now independently raises this in Cycle 2 (was only Claude in Cycle 1). Index-based stagger breaks with virtualized lists — items scrolled into view get wrong delays or re-animate.
+
+5. **Plan 16-03 scope ambiguity (MEDIUM-HIGH)** — PARTIALLY RESOLVED. Code examples help but per-screen widget target table and grouped list handling still missing.
+
+### Divergent Views (Cycle 2)
+
+| Topic | Gemini (Cycle 2) | Claude (Cycle 2) |
 |-------|--------|--------|
-| **Overall risk** | LOW — plans are approved for execution | MEDIUM-HIGH — address blockers before proceeding |
-| **Plan detail level** | Considers plans sufficiently detailed | Wants explicit function signatures, route enumeration tables, per-screen animation targets |
-| **ListView.builder handling** | Not raised as concern | Flags as HIGH — index-based stagger breaks with virtualized lists |
-| **Test impact** | Not raised | Flags MEDIUM — existing tests may break due to animation delays |
-| **Performance profiling** | Not required | Recommends low-end device testing and frame-rate assertions |
+| **Overall risk** | MEDIUM-HIGH (upgraded from LOW) | HIGH (unchanged) |
+| **Execution recommendation** | Do not proceed until lifecycle + refactoring addressed | Block execution pending plan updates |
+| **Route enumeration** | Not raised | Flags as HIGH — explicit route table needed |
+| **Rebuild behavior** | Not raised | Flags as MEDIUM — AnimatedEntrance rebuild semantics unclear |
+| **Test timing** | Not raised | Flags as MEDIUM — animation delays may affect test execution time |
 
-**Key takeaway:** Gemini views these as standard low-risk Flutter animation plans; Claude applies more rigorous specification standards and identifies edge cases around list virtualization and test timing that warrant attention before execution.
+**Key shift from Cycle 1:** Gemini upgraded overall risk from LOW to MEDIUM-HIGH, aligning closer to Claude's assessment. Both reviewers now agree that lifecycle safety and virtualization concerns are blockers. The divergence narrowed significantly.
+
+### Unresolved HIGH Concerns (Cycle 2)
+
+| # | Concern | Plans Affected | Recommended Fix |
+|---|---------|---------------|-----------------|
+| H1 | Future.delayed lifecycle safety | 16-01, 16-03 | Replace with `Timer` + `cancel()` in `dispose()` |
+| H2 | ListView.builder virtualization | 16-03 | Clarify stagger strategy for virtualized lists (viewport-relative or fixed delay) |
+| H3 | Route enumeration missing | 16-02 | Add explicit route-to-transition-type table |
+
+---
+
+## Cycle Comparison
+
+| Metric | Cycle 1 | Cycle 2 |
+|--------|---------|---------|
+| Reviewers | Gemini + Claude | Gemini + Claude |
+| HIGH concerns | 2 (Claude only) | 3 (consensus) |
+| MEDIUM-HIGH concerns | 3 | 2 |
+| MEDIUM concerns | 3 | 3 |
+| Gemini risk rating | LOW | MEDIUM-HIGH |
+| Claude risk rating | MEDIUM-HIGH | HIGH |
+| Consensus | Divergent | Converging on MEDIUM-HIGH+ |
+| Execution recommendation | Split (approve vs. block) | Both recommend addressing blockers first |
