@@ -76,6 +76,16 @@ Plans:
 
 ---
 
+### Phase 15.2: Add Alpha Connect SVG logos to the app (INSERTED)
+
+**Goal:** Replace text-based logo (Greek α via Google Fonts) with real Adobe Illustrator SVG logos — full logo (α + ALPHA CONNECT text) and short logo (α mark only) — rendered via flutter_svg with theme-adaptive color tinting.
+**Requirements**: UI-NFR-02
+**Depends on:** Phase 15
+**Plans:** 1 plan
+
+Plans:
+- [ ] 15.2-01-PLAN.md — Add flutter_svg + SVG assets, rewrite AlphaConnectLogo widget, verify tests
+
 ### Phase 15.1: Fix logo — ugly, not as agreed, and tilted (INSERTED)
 
 **Goal:** Rewrite the CustomPainter α mark to accurately match the reference JPEG (circular O-body + X-tail) and remove the unwanted Transform.rotate tilt from the login screen.
