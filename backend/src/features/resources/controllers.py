@@ -14,7 +14,7 @@ from __future__ import annotations
 
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.infrastructure.database import get_db_session
@@ -123,15 +123,15 @@ async def update_resource(
 # DELETE /resources/{id} — soft-delete (staff only)
 # ------------------------------------------------------------------
 
-@resources_router.delete("/{resource_id}", response_model=ResourceResponse)
+@resources_router.delete("/{resource_id}", status_code=204)
 async def delete_resource(
     resource_id: UUID,
     user: UserContext = Depends(get_current_user_or_service),
     db: AsyncSession = Depends(get_db_session),
-) -> ResourceResponse:
-    """Soft-delete a resource by marking as unavailable (staff only)."""
+) -> Response:
+    """Soft-delete a resource by marking is_deleted=True (staff only)."""
     require_staff(user)
 
-    result = await resource_service.soft_delete_resource(db, resource_id)
+    await resource_service.soft_delete_resource(db, resource_id)
     await db.commit()
-    return result
+    return Response(status_code=204)

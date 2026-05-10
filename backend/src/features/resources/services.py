@@ -37,8 +37,8 @@ class ResourceService:
         Students are auto-filtered to is_available=True only.
         Staff can see all resources regardless of availability.
         """
-        query = select(Resource)
-        count_query = select(func.count()).select_from(Resource)
+        query = select(Resource).where(Resource.is_deleted.is_(False))
+        count_query = select(func.count()).select_from(Resource).where(Resource.is_deleted.is_(False))
 
         # Students always see only available resources
         if user_role != "staff":
@@ -133,8 +133,11 @@ class ResourceService:
         self,
         db: AsyncSession,
         resource_id: UUID,
-    ) -> ResourceResponse:
-        """Soft-delete a resource by setting is_available=False (staff only)."""
+    ) -> None:
+        """Soft-delete a resource by setting is_deleted=True (staff only).
+
+        Distinct from toggling is_available — deleted resources are permanently hidden.
+        """
         result = await db.execute(
             select(Resource).where(Resource.id == resource_id)
         )
@@ -143,11 +146,8 @@ class ResourceService:
         if resource is None:
             raise NotFoundException("resource", resource_id)
 
-        resource.is_available = False
+        resource.is_deleted = True
         await db.flush()
-        await db.refresh(resource)
-
-        return ResourceResponse.model_validate(resource)
 
 
 # Module-level singleton
