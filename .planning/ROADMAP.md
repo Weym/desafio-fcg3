@@ -76,6 +76,16 @@ Plans:
 
 ---
 
+### Phase 15.3: change/create a copy of the current logos so that they match both the light and the dark mode of the app (INSERTED)
+
+**Goal:** Create light-mode and dark-mode SVG logo variants with appropriate fill colors, and update AlphaConnectLogo widget to select the correct variant based on theme brightness — removing the single-color tint approach.
+**Requirements**: UI-NFR-02
+**Depends on:** Phase 15.2
+**Plans:** 1 plans
+
+Plans:
+- [ ] 15.3-01-PLAN.md — Light/dark SVG variants + brightness-aware AlphaConnectLogo widget
+
 ### Phase 15.2: Add Alpha Connect SVG logos to the app (INSERTED)
 
 **Goal:** Replace text-based logo (Greek α via Google Fonts) with real Adobe Illustrator SVG logos — full logo (α + ALPHA CONNECT text) and short logo (α mark only) — rendered via flutter_svg with theme-adaptive color tinting.
@@ -273,3 +283,4 @@ Plans:
 | 15. Cyber-Academic Visual Redesign | 0/3 | Planned | — |
 | 15.1. Fix logo | 1/1 | Complete | 2026-05-10 |
 | 15.2. Add Alpha Connect SVG logos | 1/1 | Complete | 2026-05-10 |
+| 15.3. Logo light/dark mode variants | 0/1 | Planned | — |
