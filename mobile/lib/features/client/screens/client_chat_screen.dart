@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/responsive/breakpoints.dart';
+import '../../../core/theme/app_animations.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../shared/widgets/animated_entrance.dart';
 import '../../../shared/widgets/app_bar_actions.dart';
 import '../../../shared/widgets/app_skeleton_list.dart';
 import '../../../shared/widgets/app_empty_state.dart';
@@ -98,14 +100,17 @@ class _ClientChatScreenState extends ConsumerState<ClientChatScreen> {
                                       const SizedBox(height: AppSpacing.sm),
                                   itemBuilder: (context, index) {
                                     final session = sorted[index];
-                                    return _SessionCard(
-                                      session: session,
-                                      selected:
-                                          session.id == _selectedSessionId,
-                                      onTap: () {
-                                        setState(() =>
-                                            _selectedSessionId = session.id);
-                                      },
+                                    return AnimatedEntrance(
+                                      delay: AppAnimations.getEntranceDelay(index),
+                                      child: _SessionCard(
+                                        session: session,
+                                        selected:
+                                            session.id == _selectedSessionId,
+                                        onTap: () {
+                                          setState(() =>
+                                              _selectedSessionId = session.id);
+                                        },
+                                      ),
                                     );
                                   },
                                 ),
@@ -182,11 +187,14 @@ class _ClientChatScreenState extends ConsumerState<ClientChatScreen> {
                           const SizedBox(height: AppSpacing.md),
                       itemBuilder: (context, index) {
                         final session = sorted[index];
-                        return _SessionCard(
-                          session: session,
-                          selected: false,
-                          onTap: () =>
-                              context.go('/client/chat/${session.id}'),
+                        return AnimatedEntrance(
+                          delay: AppAnimations.getEntranceDelay(index),
+                          child: _SessionCard(
+                            session: session,
+                            selected: false,
+                            onTap: () =>
+                                context.go('/client/chat/${session.id}'),
+                          ),
                         );
                       },
                     ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/theme/app_animations.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../shared/widgets/animated_entrance.dart';
 import '../../../shared/widgets/app_bar_actions.dart';
 import '../../../shared/widgets/app_skeleton_list.dart';
 import '../../../shared/widgets/app_empty_state.dart';
@@ -170,12 +172,15 @@ class _AvailableResourcesTab extends ConsumerWidget {
                           itemCount: resources.length,
                           separatorBuilder: (_, __) =>
                               const SizedBox(height: AppSpacing.md),
-                          itemBuilder: (context, index) => _ResourceCard(
-                            resource: resources[index],
-                            onTap: () => showBookingFlowSheet(
-                              context,
-                              ref,
-                              resources[index],
+                          itemBuilder: (context, index) => AnimatedEntrance(
+                            delay: AppAnimations.getEntranceDelay(index),
+                            child: _ResourceCard(
+                              resource: resources[index],
+                              onTap: () => showBookingFlowSheet(
+                                context,
+                                ref,
+                                resources[index],
+                              ),
                             ),
                           ),
                         ),
@@ -345,11 +350,14 @@ class _MyAppointmentsTab extends ConsumerWidget {
                     itemCount: appointments.length,
                     separatorBuilder: (_, __) =>
                         const SizedBox(height: AppSpacing.md),
-                    itemBuilder: (context, index) => _AppointmentCard(
-                      appointment: appointments[index],
-                      onCancel: appointments[index].isUpcoming
-                          ? () => _confirmCancel(context, ref, appointments[index])
-                          : null,
+                    itemBuilder: (context, index) => AnimatedEntrance(
+                      delay: AppAnimations.getEntranceDelay(index),
+                      child: _AppointmentCard(
+                        appointment: appointments[index],
+                        onCancel: appointments[index].isUpcoming
+                            ? () => _confirmCancel(context, ref, appointments[index])
+                            : null,
+                      ),
                     ),
                   ),
                 ),
