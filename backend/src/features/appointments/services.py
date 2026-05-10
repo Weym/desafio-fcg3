@@ -77,7 +77,21 @@ def _build_appointment_response(appointment: Appointment) -> AppointmentResponse
 
 
 def _build_appointment_list_item(appointment: Appointment) -> AppointmentListItem:
-    """Build AppointmentListItem from an Appointment with loaded slot."""
+    """Build AppointmentListItem from an Appointment with loaded slot+student."""
+    student_name = None
+    student_ra = None
+    resource_name = None
+
+    # Extract student data if relationship loaded
+    if hasattr(appointment, "student") and appointment.student is not None:
+        student_name = appointment.student.name
+        student_ra = appointment.student.registration_number
+
+    # Extract resource data from slot.resource
+    if hasattr(appointment, "slot") and appointment.slot is not None:
+        if hasattr(appointment.slot, "resource") and appointment.slot.resource is not None:
+            resource_name = appointment.slot.resource.name
+
     return AppointmentListItem(
         id=appointment.id,
         slot_date=appointment.slot.date,
@@ -86,6 +100,9 @@ def _build_appointment_list_item(appointment: Appointment) -> AppointmentListIte
         status=appointment.status,
         authorization_file_url=appointment.authorization_file_url,
         created_at=appointment.created_at,
+        student_name=student_name,
+        student_ra=student_ra,
+        resource_name=resource_name,
     )
 
 
@@ -402,6 +419,7 @@ class AppointmentService:
             select(Appointment)
             .options(
                 joinedload(Appointment.slot).joinedload(SchedulingSlot.resource),
+                joinedload(Appointment.student),
             )
         )
         count_query = select(func.count()).select_from(Appointment)

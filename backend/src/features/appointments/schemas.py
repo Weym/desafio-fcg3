@@ -107,6 +107,7 @@ class AppointmentListItem(BaseModel):
     """Response for appointment list items (APPT-04).
 
     Lighter representation for list endpoints — slot info inlined.
+    Includes student/resource names for staff appointment cards.
     """
 
     id: UUID
@@ -116,5 +117,8 @@ class AppointmentListItem(BaseModel):
     status: str
     authorization_file_url: str | None = None
     created_at: datetime
+    student_name: str | None = None
+    student_ra: str | None = None
+    resource_name: str | None = None
 
     model_config = {"from_attributes": True}
