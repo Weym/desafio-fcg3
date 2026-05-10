@@ -28,7 +28,8 @@
  (completed 2026-05-06)
 - [x] **Phase 15: Cyber-Academic Visual Redesign** — Apply Cyber-Academic design system (obsidian palette, neon accents, Montserrat typography, glassmorphism) to make the app more attractive and modern
  (completed 2026-05-08)
-- [ ] **Phase 16: Micro-Animations & Transitions** — Staggered entrance animations for cards/sections, enhanced nav bar glow transitions, and smooth page transitions
+- [x] **Phase 16: Micro-Animations & Transitions** — Staggered entrance animations for cards/sections, enhanced nav bar glow transitions, and smooth page transitions
+ (completed 2026-05-10)
 
 ---
 
@@ -142,12 +143,12 @@ Plans:
 5. All 38+ existing widget tests continue to pass; `flutter analyze` reports no new issues.
 6. Animations respect `MediaQuery.disableAnimations` / reduced-motion accessibility setting.
 
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 
 Plans:
 - [x] 16-01-PLAN.md — Animation foundation: app_animations.dart constants + AnimatedEntrance widget + tests
 - [x] 16-02-PLAN.md — Nav bar glow transitions (easeOutBack) + GoRouter CustomTransitionPage
-- [ ] 16-03-PLAN.md — Screen integration: apply AnimatedEntrance to all client + staff screens
+- [x] 16-03-PLAN.md — Screen integration: apply AnimatedEntrance to all client + staff screens
 
 ---
 
