@@ -1,162 +1,187 @@
 ---
 phase: 20-langchain-workflow
-reviewed: 2026-05-09T04:15:00Z
+reviewed: 2026-05-09T21:56:45Z
 depth: standard
-files_reviewed: 16
+files_reviewed: 9
 files_reviewed_list:
-  - ai_service/prompts/system_prompt.txt
-  - ai_service/config.py
-  - ai_service/rag.py
-  - ai_service/main.py
   - ai_service/agent.py
-  - ai_service/Dockerfile
-  - ai_service/entrypoint.sh
-  - ai_service/security/__init__.py
-  - ai_service/security/input_sanitizer.py
-  - ai_service/security/output_filter.py
-  - backend/src/features/webhook/service.py
+  - ai_service/main.py
+  - ai_service/prompts/system_prompt.txt
   - backend/src/features/webhook/background.py
+  - backend/src/features/webhook/service.py
   - backend/src/features/webhook/router.py
-  - backend/src/features/webhook/idle_monitor.py
-  - backend/alembic/versions/014_add_rag_logs_table.py
-  - docker-compose.yml
+  - backend/tests/features/webhook/test_verification_state.py
+  - mcp_server/middleware.py
+  - mcp_server/dependencies.py
 findings:
-  critical: 1
-  warning: 5
-  info: 3
-  total: 9
+  critical: 0
+  warning: 3
+  info: 4
+  total: 7
 status: issues_found
 ---
 
 # Phase 20: Code Review Report
 
-**Reviewed:** 2026-05-09T04:15:00Z
+**Reviewed:** 2026-05-09T21:56:45Z
 **Depth:** standard
-**Files Reviewed:** 16
+**Files Reviewed:** 9
 **Status:** issues_found
 
 ## Summary
 
-Phase 20 implements the LangChain agent workflow including system prompt, input sanitization, output filtering, RAG tool, webhook background processing, idle monitoring, and Docker infrastructure. The code is generally well-structured with good separation of concerns, proper error handling, and thoughtful security layers (defense-in-depth with canary token, input sanitizer, output filter).
+Reviewed changes from plans 20-09 (welcome/farewell fixes), 20-10 (stale OTP timezone defense), and 20-11 (lazy OTP verification gate + verification_state end-to-end flow). The code is well-structured with clear intent, good documentation, and proper defense-in-depth design. The MCP middleware verification gate correctly blocks mutating tools for unverified students and the system prompt aligns with the lazy OTP architecture.
 
-Key concerns: the output filter uses overly broad regex patterns that will produce false positives on common English words that happen to be database table names (blocking legitimate agent responses), and the input sanitizer logs the raw user message content which could be a PII/audit concern.
+Three warnings identified: (1) the verification gate raises before the audit logging block, creating an audit gap for blocked mutating calls; (2) silent exception swallowing in annotation lookup hides debugging information; (3) message ordering when both welcome and verification contexts are injected may cause LLM priority confusion. Four informational items related to code quality and maintainability.
 
-## Critical Issues
-
-### CR-01: Output filter false-positive on common English words used as table names
-
-**File:** `ai_service/security/output_filter.py:34-38`
-**Issue:** The `BLOCKED_OUTPUT_PATTERNS` regex matches bare English words like `grades`, `documents`, `appointments`, `courses`, `enrollments`, `sessions` which are also database table names. If the LLM ever uses these English words in a response (e.g., "Your grades are excellent" or "I found your enrollment"), the entire response is replaced with the generic error message. Given the system prompt instructs the agent to respond in Portuguese, the English words are less likely — but `grades` and `documents` are common enough in mixed-language contexts (e.g., bilingual students, the agent explaining concepts) to cause real user-facing failures. This will silently eat valid responses and replace them with "Desculpe, tive um problema ao formular a resposta."
-
-**Fix:** Use word-boundary patterns that require underscore context (actual table name format) or prefix/suffix patterns that indicate code identifiers rather than natural language:
-```python
-# Database table names — require snake_case context (underscore neighbor)
-re.compile(
-    r"\b(chat_sessions|chat_messages|knowledge_base_chunks|mcp_action_logs|"
-    r"rag_logs|verification_codes|enrollment_items|enrollment_periods|fcm_tokens)\b"
-),
-# Single-word table names — only block when they look like identifiers
-# (preceded/followed by period, backtick, or in a SQL-like context)
-re.compile(
-    r"(?:FROM|INTO|UPDATE|JOIN|TABLE)\s+(students|enrollments|courses|grades|documents|appointments|sessions)\b",
-    re.IGNORECASE,
-),
-```
+No critical security issues found. The security design is sound — `student_id` never leaks to the agent, the verification gate reads from the DB (authoritative source) not from the HTTP request body, and the fail-closed pattern in annotation lookup is correct.
 
 ## Warnings
 
-### WR-01: Input sanitizer logs raw message content (PII exposure)
+### WR-01: Verification gate blocks BEFORE audit logging — blocked calls are not logged
 
-**File:** `ai_service/security/input_sanitizer.py:54`
-**Issue:** When an injection pattern is detected, the raw user message is logged (truncated to 100 chars): `logger.warning("Injection pattern detected in message: %s", message[:100])`. This logs user-provided content to application logs. While truncated, it may still contain PII (student names, emails mentioned in conversation). For a security-focused module, logging the input that triggered the detection is useful for forensics — but it should be noted that this content will end up in container logs that may have broader access than the database.
+**File:** `mcp_server/middleware.py:60`
+**Issue:** `_enforce_verification_gate()` raises `ToolError` at line 60, which is BEFORE `start = time.monotonic()` at line 62 and the `try/finally` block that logs to `mcp_action_logs`. When an unverified student attempts a mutating tool, the call is correctly blocked but produces zero audit trail in `mcp_action_logs`. Per CONVENTIONS.md: "Every MCP tool call must be logged with: tool_name, input_params, ...". This creates a gap — staff/admins cannot see how often unverified students attempt mutating actions, which is valuable security telemetry.
+**Fix:** Move the verification gate inside the try/finally block, or add a dedicated log entry before raising:
 
-**Fix:** Log only the pattern that matched rather than the raw content, or ensure log aggregation has appropriate access controls:
 ```python
-# Option A: Log which pattern matched (safer)
-for pattern in INJECTION_PATTERNS:
-    if pattern.search(message):
-        logger.warning("Injection pattern matched: %s (session context only)", pattern.pattern[:60])
-        break
+async def on_call_tool(self, context: MiddlewareContext, call_next):
+    tool_name = context.message.name
+    input_params = _sanitize_input_params(context.message.arguments or {})
+    headers = get_http_headers(include={"x-chat-session-id"})
+    raw_chat_session_id = headers.get("x-chat-session-id")
+    fastmcp_context = context.fastmcp_context
+    if fastmcp_context is None:
+        raise RuntimeError("FastMCP context unavailable for audit logging.")
+
+    chat_session_id = validate_chat_session_id(raw_chat_session_id)
+    db_pool = get_db_pool(fastmcp_context.lifespan_context)
+    session_data = await validate_active_chat_session(db_pool, chat_session_id)
+
+    start = time.monotonic()
+    result: Any = None
+    status = "success"
+
+    try:
+        # D-15/D-21: Enforce verification gate on mutating tools
+        await self._enforce_verification_gate(context, session_data)
+        result = await call_next(context)
+    except ToolError:
+        status = "error"
+        raise
+    except Exception:
+        status = "error"
+        raise
+    finally:
+        latency_ms = int((time.monotonic() - start) * 1000)
+        await self._log_call(
+            context=context,
+            tool_name=tool_name,
+            input_params=input_params,
+            db_pool=db_pool,
+            chat_session_id=chat_session_id,
+            result=result,
+            latency_ms=latency_ms,
+            status=status,
+        )
+
+    return result
 ```
 
-### WR-02: Session lock cleanup has race condition
+### WR-02: Silent exception swallowing in annotation lookup hides errors
 
-**File:** `backend/src/features/webhook/background.py:313-315`
-**Issue:** The lock cleanup logic `if not lock.locked(): _session_locks.pop(lock_key, None)` runs immediately after exiting the `async with lock:` block. At this exact point, the lock is guaranteed to be unlocked (we just released it). However, between releasing the lock and this check, another coroutine could have called `_session_locks.setdefault(lock_key, asyncio.Lock())` and acquired it. Since `setdefault` returns the existing lock (not creating a new one), the pop would remove a lock that another coroutine is actively holding, making it unreachable from `_session_locks`. The next message for that session would then create a NEW lock, breaking the per-session serialization guarantee.
+**File:** `mcp_server/middleware.py:105-106`
+**Issue:** The bare `except Exception: pass` in `_enforce_verification_gate` silently swallows any error from `context.fastmcp_context.fastmcp.get_tool(tool_name)`. While the fail-closed behavior (block by default) is the correct security posture, completely suppressing the exception makes it invisible during debugging. If the FastMCP API changes or a bug appears in tool registry lookup, this would silently block ALL tools for unverified students with no log trail explaining why.
+**Fix:** Add a warning log so the fail-closed behavior is visible:
 
-**Fix:** Use a more robust cleanup strategy — only pop if the lock reference is still the same one AND it's not locked:
 ```python
-# After async with lock:
-if _session_locks.get(lock_key) is lock and not lock.locked():
-    _session_locks.pop(lock_key, None)
-```
-
-### WR-03: RAG tool `_log_rag_invocation` can leave dangling connections on error
-
-**File:** `ai_service/rag.py:27-47`
-**Issue:** The `_log_rag_invocation` function uses `with db_pool.connection() as conn:` which properly releases back to pool, and `conn.commit()` is called. However, if an exception occurs between the INSERT and `conn.commit()`, the `with` block will return the connection with an uncommitted transaction. While psycopg3's context manager does issue an implicit rollback on `__exit__` when there's an active transaction, the explicit `try/except` at line 46 catches ALL exceptions silently (just logs a warning). If the pool is exhausted or the connection is broken, the warning-level log may not surface the issue adequately in production debugging.
-
-**Fix:** This is acceptable for a non-critical observability path (the docstring says "Non-blocking"), but consider adding `exc_info=True` to the warning for production debugging:
-```python
+try:
+    tool = await context.fastmcp_context.fastmcp.get_tool(tool_name)
+    annotations = getattr(tool, "annotations", None)
+    if annotations and getattr(annotations, "readOnlyHint", False):
+        return  # Read-only tool, allowed for unverified students
 except Exception as exc:
-    logger.warning("Failed to log RAG invocation: %s", exc, exc_info=True)
+    # Fail closed: if we can't determine, block by default (safe side)
+    import logging
+    logging.getLogger(__name__).warning(
+        "Could not resolve annotations for tool '%s' (blocking by default): %s",
+        tool_name,
+        exc,
+    )
 ```
 
-### WR-04: Dockerfile does not use entrypoint.sh by default
+### WR-03: Message ordering conflict when both welcome and verification contexts are injected
 
-**File:** `ai_service/Dockerfile:17` and `docker-compose.yml:126`
-**Issue:** The Dockerfile's `CMD` is `["python", "-m", "ai_service.main"]`, but `docker-compose.yml` overrides with `command: bash /app/entrypoint.sh` which runs RAG ingest first. If the container is run outside docker-compose (e.g., in CI, k8s, or directly via `docker run`), the `entrypoint.sh` (which handles RAG ingest) would be skipped. The Dockerfile copies `entrypoint.sh` and `chmod +x` it, suggesting it was intended as the default entrypoint.
+**File:** `ai_service/agent.py:156-179`
+**Issue:** When `is_new_session=True` AND `verification_state != "verified"` (which is the default case for new sessions), line 165 builds `all_messages = [welcome_instruction, *history_messages, HumanMessage(...)]`, then line 179 prepends: `all_messages = [verification_context, *all_messages]`. The final order is `[verification_context, welcome_instruction, history..., user_msg]`. The verification context at position 0 becomes the highest-priority system instruction, potentially causing the LLM to focus on verification warnings rather than the welcome greeting. On a new session with a read-only question, the student should get a warm welcome — not a verification-focused response.
+**Fix:** Inject the verification context AFTER the welcome instruction so welcome takes priority on new sessions:
 
-**Fix:** Make `entrypoint.sh` the default in Dockerfile so behavior is consistent regardless of orchestration:
-```dockerfile
-CMD ["/app/entrypoint.sh"]
-```
-
-### WR-05: Output filter blocks word "container" which has legitimate Portuguese usage
-
-**File:** `ai_service/security/output_filter.py:40`
-**Issue:** The pattern `\b(docker-compose|container|microservice|fastapi|langchain|mcp.server)\b` with `re.IGNORECASE` will match the word "container" which, while uncommon in academic Portuguese conversations, could appear if the agent discusses logistics, storage, or shipping contexts. More importantly, `mcp.server` uses `.` which in regex matches ANY character — so `mcp server`, `mcpXserver`, etc. would also match.
-
-**Fix:** Escape the dot and consider removing overly generic words or requiring multi-word context:
 ```python
-re.compile(r"\b(docker-compose|microservice|fastapi|langchain|mcp\.server)\b", re.IGNORECASE),
-# "container" only in Docker context:
-re.compile(r"\b(docker\s+)?container(s|ized)?\b", re.IGNORECASE),
+# D-14/D-15: Inject verification state context so agent knows student status
+if verification_state != "verified":
+    verification_context = SystemMessage(
+        content=(
+            "Estado de verificacao do aluno: NAO VERIFICADO. "
+            "Operacoes de leitura estao liberadas. "
+            "Se o aluno solicitar uma acao que altere dados e a ferramenta retornar erro de verificacao, "
+            "solicite o email institucional do aluno para enviar o codigo de verificacao."
+        )
+    )
+    # Insert after welcome (if present) but before history, so welcome takes priority
+    if is_new_session:
+        # all_messages is [welcome_instruction, *history, HumanMessage]
+        all_messages = [all_messages[0], verification_context, *all_messages[1:]]
+    else:
+        all_messages = [verification_context, *all_messages]
 ```
 
 ## Info
 
-### IN-01: Settings dataclass evaluates env vars at class definition (import) time
+### IN-01: `load_chat_history` is synchronous and blocks the event loop
 
-**File:** `ai_service/config.py:15-38`
-**Issue:** The `@dataclass(frozen=True)` class uses `os.environ.get(...)` as default values, which are evaluated when the module is first imported — not when `Settings()` is instantiated. This works correctly in Docker (env vars set before process starts) but makes the settings class non-testable without patching at import time or using `importlib.reload`. The `__post_init__` hook partially addresses this for `DATABASE_URL`, but other fields have the same pattern.
+**File:** `ai_service/agent.py:149-153`
+**Issue:** `load_chat_history()` (defined in `ai_service/database.py:26`) uses a synchronous psycopg3 `ConnectionPool` with `pool.connection()` context manager. This blocks the asyncio event loop during the DB query. Called from the async `invoke_agent()`, this prevents other coroutines from progressing while chat history loads. Pre-existing issue (not introduced by plans 20-09/10/11), but worth noting as it runs on every chat request.
+**Fix:** Either use `asyncio.to_thread(load_chat_history, ...)` to offload to a thread, or migrate to an async pool (`psycopg_pool.AsyncConnectionPool`).
 
-**Fix:** This is acceptable for the current Docker-only deployment, but if testability becomes important, consider using a factory function or `pydantic.BaseSettings` which evaluates at instantiation time.
+### IN-02: `reload=True` hardcoded in `uvicorn.run` for AI service
 
-### IN-02: `reload=True` left in production uvicorn config
+**File:** `ai_service/main.py:106`
+**Issue:** `uvicorn.run(..., reload=True)` is hardcoded. In a Docker production container, file-watching reload wastes resources and could cause unexpected restarts. This is pre-existing and not introduced by plan 20-11, but the `main()` function is in scope.
+**Fix:** Make reload configurable via an environment variable:
 
-**File:** `ai_service/main.py:104`
-**Issue:** The `main()` function passes `reload=True` to uvicorn. In the Docker container, the `command` in docker-compose uses `entrypoint.sh` which calls `python -m ai_service.main`, triggering this code path. File watching for reload adds CPU overhead in production. In Docker with volume mounts this is useful for dev, but in production deployments it should be disabled.
-
-**Fix:** Make reload conditional on an environment variable:
 ```python
 uvicorn.run(
     "ai_service.main:app",
     host="0.0.0.0",
     port=8001,
-    reload=os.environ.get("RELOAD", "false").lower() == "true",
+    reload=os.environ.get("UVICORN_RELOAD", "false").lower() == "true",
 )
 ```
 
-### IN-03: Unused import `Request` not needed in main.py chat endpoint
+### IN-03: `import os as _os` inside lifespan function
 
-**File:** `ai_service/main.py:11`
-**Issue:** `Request` is imported from FastAPI and used in the `health_check` endpoint (line 109), so it's not truly unused. However, `status` is imported but could be accessed via `HTTPException(status_code=401)` directly. Minor — no action needed, just noting that all imports are used.
+**File:** `ai_service/main.py:70`
+**Issue:** `os` is imported as `_os` inside the `lifespan()` function body with a leading underscore alias. The underscore convention suggests a private/unused name, but it's actively used on lines 73-76 to set environment variables. This is a minor readability issue — the module could simply `import os` at the top level.
+**Fix:** Move `import os` to the module-level imports (alongside `logging`, `hmac`, etc.) and use `os` directly instead of `_os`.
 
-**Fix:** No fix needed — all imports are used upon closer inspection.
+### IN-04: Test file module docstring mentions old state machine flow
+
+**File:** `backend/tests/features/webhook/test_verification_state.py:4`
+**Issue:** The module docstring on line 4 says `unverified -> awaiting_email -> awaiting_code -> verified`, but with lazy OTP (D-13/D-14), the `unverified -> awaiting_email` transition no longer goes through `handle_verification_flow`. The test `test_unverified_skips_verification_flow` was correctly updated (line 23), but the module docstring still describes the old flow.
+**Fix:** Update the module docstring to reflect the lazy OTP design:
+
+```python
+"""Verification state machine tests (D-01, D-02, D-13/D-14).
+
+Tests the verification flow lifecycle:
+awaiting_email -> awaiting_code -> verified
+Plus: unverified students skip verification flow (lazy OTP).
+Including invalid paths: wrong email, wrong code, max attempts.
+"""
+```
 
 ---
 
-_Reviewed: 2026-05-09T04:15:00Z_
+_Reviewed: 2026-05-09T21:56:45Z_
 _Reviewer: the agent (gsd-code-reviewer)_
 _Depth: standard_
