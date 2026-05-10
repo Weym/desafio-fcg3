@@ -26,6 +26,8 @@ class ChatSessionResponse(BaseModel):
     started_at: datetime
     ended_at: Optional[datetime] = None
     updated_at: datetime
+    student_name: str | None = None
+    student_ra: str | None = None
 
     model_config = {"from_attributes": True}
 

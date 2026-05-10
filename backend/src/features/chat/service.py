@@ -36,7 +36,7 @@ class ChatService:
         Per docs/api.md: ?student_id=uuid&status=active
         Returns (sessions, total_count) for pagination.
         """
-        query = select(ChatSession)
+        query = select(ChatSession).options(selectinload(ChatSession.student))
         count_query = select(func.count(ChatSession.id))
 
         if student_id:
@@ -131,16 +131,17 @@ class ChatService:
         query = select(ChatSession).options(selectinload(ChatSession.student))
 
         if staff_id:
-            # Staff sees: all pending + only their own active
+            # Staff sees: all pending + only their own active + their own closed
             query = query.where(
                 or_(
                     ChatSession.status == "human_needed",
                     (ChatSession.status == "human_active") & (ChatSession.assigned_staff_id == staff_id),
+                    (ChatSession.status == "closed") & (ChatSession.assigned_staff_id == staff_id),
                 )
             )
         else:
             query = query.where(
-                ChatSession.status.in_(["human_needed", "human_active"])
+                ChatSession.status.in_(["human_needed", "human_active", "closed"])
             )
 
         query = query.order_by(ChatSession.escalated_at.asc())
