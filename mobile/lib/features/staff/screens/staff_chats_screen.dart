@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
+import 'package:go_router/go_router.dart';  // Still needed for context.push
 import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/app_bar_actions.dart';
 import '../../../shared/widgets/app_skeleton_list.dart';
@@ -9,7 +9,6 @@ import '../../../shared/widgets/app_error_state.dart';
 import '../../../shared/widgets/glass_card.dart';
 import '../../../shared/widgets/responsive_container.dart';
 import '../../../shared/widgets/staff_search_bar.dart';
-import '../../client/models/chat_session_model.dart';
 import '../models/intervention_session_model.dart';
 import '../providers/staff_chat_provider.dart';
 import '../providers/staff_intervention_provider.dart';
@@ -17,7 +16,8 @@ import '../providers/staff_intervention_provider.dart';
 /// Unified Chats screen with 4 sub-tabs:
 /// Todos, Pendentes, Em atendimento, Concluídos
 class StaffChatsScreen extends ConsumerStatefulWidget {
-  const StaffChatsScreen({super.key});
+  final String? initialFilter;
+  const StaffChatsScreen({super.key, this.initialFilter});
 
   @override
   ConsumerState<StaffChatsScreen> createState() => _StaffChatsScreenState();
@@ -31,16 +31,7 @@ class _StaffChatsScreenState extends ConsumerState<StaffChatsScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
-
-    // Check for query param filter
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final goRouterState = GoRouterState.of(context);
-      final filter = goRouterState.uri.queryParameters['filter'];
-      if (filter == 'hoje') {
-        // Stay on "Todos" tab (index 0) — filtering handled in list
-        _tabController.animateTo(0);
-      }
-    });
+    // initialFilter is now passed directly via constructor — no async timing issues
   }
 
   @override
@@ -55,7 +46,20 @@ class _StaffChatsScreenState extends ConsumerState<StaffChatsScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Chats'),
+        title: widget.initialFilter == 'hoje'
+            ? Row(mainAxisSize: MainAxisSize.min, children: [
+                const Text('Chats'),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text('Hoje', style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.primary)),
+                ),
+              ])
+            : const Text('Chats'),
         actions: const [AppBarActions()],
         bottom: TabBar(
           controller: _tabController,
@@ -79,7 +83,7 @@ class _StaffChatsScreenState extends ConsumerState<StaffChatsScreen>
             child: TabBarView(
               controller: _tabController,
               children: [
-                _AllSessionsTab(searchQuery: searchQuery),
+                _AllSessionsTab(searchQuery: searchQuery, initialFilter: widget.initialFilter),
                 _FilteredInterventionTab(
                   filter: (s) => s.isPending,
                   emptyMessage: 'Nenhuma conversa pendente',
@@ -112,18 +116,17 @@ class _StaffChatsScreenState extends ConsumerState<StaffChatsScreen>
 /// "Todos" tab: merges chat sessions + intervention sessions
 class _AllSessionsTab extends ConsumerWidget {
   final String searchQuery;
+  final String? initialFilter;
 
-  const _AllSessionsTab({required this.searchQuery});
+  const _AllSessionsTab({required this.searchQuery, this.initialFilter});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final chatSessionsAsync = ref.watch(staffChatSessionsProvider);
     final interventionAsync = ref.watch(interventionSessionsProvider);
 
-    // Check for ?filter=hoje
-    final goRouterState = GoRouterState.of(context);
-    final filterHoje =
-        goRouterState.uri.queryParameters['filter'] == 'hoje';
+    // Check for initialFilter passed from router
+    final filterHoje = initialFilter == 'hoje';
 
     return chatSessionsAsync.when(
       loading: () => const ResponsiveContainer(

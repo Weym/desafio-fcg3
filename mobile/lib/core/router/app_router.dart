@@ -202,7 +202,10 @@ GoRouter appRouter(Ref ref) {
           GoRoute(
             path: RoutePaths.staffChats,
             name: RouteNames.staffChats,
-            builder: (context, state) => const StaffChatsScreen(),
+            builder: (context, state) {
+              final filter = state.uri.queryParameters['filter'];
+              return StaffChatsScreen(initialFilter: filter);
+            },
             routes: [
               GoRoute(
                 path: ':sessionId',
@@ -222,7 +225,10 @@ GoRouter appRouter(Ref ref) {
           GoRoute(
             path: RoutePaths.staffDocuments,
             name: RouteNames.staffDocuments,
-            builder: (context, state) => const StaffDocumentsScreen(),
+            builder: (context, state) {
+              final filter = state.uri.queryParameters['filter'];
+              return StaffDocumentsScreen(initialFilter: filter);
+            },
           ),
           GoRoute(
             path: RoutePaths.staffResources,

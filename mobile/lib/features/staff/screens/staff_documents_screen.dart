@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/app_bar_actions.dart';
 import '../../../shared/widgets/app_skeleton_list.dart';
@@ -14,7 +13,8 @@ import 'widgets/send_document_sheet.dart';
 import 'widgets/update_status_sheet.dart';
 
 class StaffDocumentsScreen extends ConsumerStatefulWidget {
-  const StaffDocumentsScreen({super.key});
+  final String? initialFilter;
+  const StaffDocumentsScreen({super.key, this.initialFilter});
 
   @override
   ConsumerState<StaffDocumentsScreen> createState() =>
@@ -25,15 +25,12 @@ class _StaffDocumentsScreenState extends ConsumerState<StaffDocumentsScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final queryFilter =
-          GoRouterState.of(context).uri.queryParameters['filter'];
-      if (queryFilter == 'pendentes') {
-        ref
-            .read(staffDocumentFilterProvider.notifier)
-            .setFilter('processing');
-      }
-    });
+    // Apply filter synchronously from constructor param — no GoRouterState race condition
+    if (widget.initialFilter == 'pendentes') {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(staffDocumentFilterProvider.notifier).setFilter('processing');
+      });
+    }
   }
 
   @override
@@ -45,7 +42,20 @@ class _StaffDocumentsScreenState extends ConsumerState<StaffDocumentsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Documentos'),
+        title: widget.initialFilter == 'pendentes'
+            ? Row(mainAxisSize: MainAxisSize.min, children: [
+                const Text('Documentos'),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: colors.primaryContainer,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text('Pendentes', style: TextStyle(fontSize: 12, color: colors.primary)),
+                ),
+              ])
+            : const Text('Documentos'),
         actions: const [AppBarActions()],
       ),
       floatingActionButton: FloatingActionButton(
