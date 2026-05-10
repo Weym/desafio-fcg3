@@ -328,7 +328,7 @@ final staffChatStatisticsProvider =
 // ignore: unused_element
 typedef StaffChatStatisticsRef =
     AutoDisposeFutureProviderRef<Map<String, dynamic>>;
-String _$staffChatsSearchHash() => r'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0';
+String _$staffChatsSearchHash() => r'ccfbf436c50da0b1a1e07f9b2fb9f9720e79208e';
 
 /// See also [StaffChatsSearch].
 @ProviderFor(StaffChatsSearch)
