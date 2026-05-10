@@ -70,7 +70,7 @@ GROUP 4 — Polish (depends on all above):
 ## Phases
 
 - [x] **Phase 18: Student UX Corrections** - Fix navigation, chat UX, documents, notifications on student screens (gap closure) (completed 2026-05-09)
-- [x] **Phase 19: Staff UX Corrections** - Fix dashboard, agendamentos, chats, intervenção, documentos, recursos, cadastro (completed 2026-05-09)
+- [ ] **Phase 19: Staff UX Corrections** - Fix dashboard, agendamentos, chats, intervenção, documentos, recursos, cadastro (gap closure in progress)
 - [ ] **Phase 20: LangChain Workflow** - Complete agent lifecycle, RAG, MCP, defenses, logging
 - [ ] **Phase 21: Roles & Auth Expansion** - Add provider role with hierarchical CRUDs
 - [ ] **Phase 22: FCM Push Notifications** - End-to-end push infrastructure (backend + Flutter)
@@ -116,7 +116,7 @@ Plans:
   5. Staff documentos have state tabs, type filter, full data view, drawer pattern, and error on missing file
   6. Staff recursos toggle ativar/desativar works and delete option exists
   7. Staff cadastro de alunos is a full CRUD with cards, 3-dot menu, floating add button, expandable details, and search/filters
-**Plans:** 6/6 plans complete
+**Plans:** 9 plans (6 complete + 3 gap closure)
 
 Plans:
 - [x] 19-01-PLAN.md — Dashboard KPI navigation + nav rename + Ações Rápidas
@@ -125,6 +125,9 @@ Plans:
 - [x] 19-04-PLAN.md — Documents tabs + type filter + detail sheet
 - [x] 19-05-PLAN.md — Resources toggle + delete option
 - [x] 19-06-PLAN.md — Cadastro de Alunos full CRUD screen
+- [ ] 19-07-PLAN.md — GAP: Appointment data + confirm endpoint (Tests 4, 5)
+- [ ] 19-08-PLAN.md — GAP: Chat student data + intervention closed + resource delete (Tests 6, 7, 11)
+- [ ] 19-09-PLAN.md — GAP: KPI filter nav + chat tab fix + cadastro field mapping (Tests 2, 6, 12, 13)
 
 **UI hint**: yes
 
@@ -205,7 +208,7 @@ Plans:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 18. Student UX Corrections | v3.0 | 7/7 | Complete    | 2026-05-09 |
-| 19. Staff UX Corrections | v3.0 | 6/6 | Complete    | 2026-05-09 |
+| 19. Staff UX Corrections | v3.0 | 6/9 | Gap closure | - |
 | 20. LangChain Workflow | v3.0 | 0/TBD | Not started | - |
 | 21. Roles & Auth Expansion | v3.0 | 0/TBD | Not started | - |
 | 22. FCM Push Notifications | v3.0 | 0/TBD | Not started | - |
