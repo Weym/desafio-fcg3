@@ -3,24 +3,24 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Correções, Melhorias & Features
 status: executing
-last_updated: "2026-05-10T00:27:30.583Z"
+last_updated: "2026-05-10T00:36:13.831Z"
 last_activity: 2026-05-10
 progress:
   total_phases: 7
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 16
-  completed_plans: 15
-  percent: 94
+  completed_plans: 16
+  percent: 100
 ---
 
 # Project State
 
 ## Current Position
 
-Phase: 19 (staff-ux-corrections) — EXECUTING
-Plan: 3 of 9
-Status: Ready to execute
-Last activity: 2026-05-10 -- Completed 19-08-PLAN.md
+Phase: 19 (staff-ux-corrections) — COMPLETE
+Plan: 9 of 9 (all complete)
+Status: Phase complete
+Last activity: 2026-05-10 -- Completed 19-09-PLAN.md
 
 ## Project Reference
 
@@ -118,6 +118,11 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 - **19-08:** Intervention query includes closed sessions (for Concluídos tab)
 - **19-08:** Resource is_deleted column for true soft-delete (distinct from is_available toggle), DELETE returns 204
 - **19-08:** Alembic 015a migration adds is_deleted to resources table
+- **19-09:** initialFilter constructor param pattern replaces GoRouterState.of(context) async reads
+- **19-09:** Concluídos tab uses 'closed' only (phantom 'resolved' removed)
+- **19-09:** StaffStudentModel @JsonKey maps ra→registration_number, semester as int (not String)
+- **19-09:** Backend StudentListItem includes phone field
+- **19-09:** Cadastro form removes address/campus (don't exist in DB), sends registration_number/semester
 
 ## Session Continuity
 
