@@ -351,14 +351,12 @@ class _StudentCard extends ConsumerWidget {
               child: Column(
                 children: [
                   _DetailRow(label: 'Email', value: student.email),
-                  if (student.phone != null)
+                  if (student.phone != null && student.phone!.isNotEmpty)
                     _DetailRow(label: 'Telefone', value: student.phone!),
-                  if (student.address != null)
-                    _DetailRow(label: 'Endereço', value: student.address!),
-                  if (student.period != null)
-                    _DetailRow(label: 'Período', value: student.period!),
-                  if (student.campus != null)
-                    _DetailRow(label: 'Campus', value: student.campus!),
+                  if (student.ra != null && student.ra!.isNotEmpty)
+                    _DetailRow(label: 'RA', value: student.ra!),
+                  if (student.semester != null)
+                    _DetailRow(label: 'Período', value: '${student.semester}º'),
                 ],
               ),
             ),
@@ -513,10 +511,8 @@ class _StudentFormSheetState extends State<_StudentFormSheet> {
   late final TextEditingController _nameCtrl;
   late final TextEditingController _emailCtrl;
   late final TextEditingController _phoneCtrl;
-  late final TextEditingController _addressCtrl;
   late final TextEditingController _raCtrl;
   late final TextEditingController _periodCtrl;
-  late final TextEditingController _campusCtrl;
   bool _loading = false;
 
   @override
@@ -525,10 +521,8 @@ class _StudentFormSheetState extends State<_StudentFormSheet> {
     _nameCtrl = TextEditingController(text: widget.student?.name ?? '');
     _emailCtrl = TextEditingController(text: widget.student?.email ?? '');
     _phoneCtrl = TextEditingController(text: widget.student?.phone ?? '');
-    _addressCtrl = TextEditingController(text: widget.student?.address ?? '');
     _raCtrl = TextEditingController(text: widget.student?.ra ?? '');
-    _periodCtrl = TextEditingController(text: widget.student?.period ?? '');
-    _campusCtrl = TextEditingController(text: widget.student?.campus ?? '');
+    _periodCtrl = TextEditingController(text: widget.student?.semester?.toString() ?? '');
   }
 
   @override
@@ -536,10 +530,8 @@ class _StudentFormSheetState extends State<_StudentFormSheet> {
     _nameCtrl.dispose();
     _emailCtrl.dispose();
     _phoneCtrl.dispose();
-    _addressCtrl.dispose();
     _raCtrl.dispose();
     _periodCtrl.dispose();
-    _campusCtrl.dispose();
     super.dispose();
   }
 
@@ -554,17 +546,11 @@ class _StudentFormSheetState extends State<_StudentFormSheet> {
       if (_phoneCtrl.text.trim().isNotEmpty) {
         data['phone'] = _phoneCtrl.text.trim();
       }
-      if (_addressCtrl.text.trim().isNotEmpty) {
-        data['address'] = _addressCtrl.text.trim();
-      }
       if (_raCtrl.text.trim().isNotEmpty) {
-        data['ra'] = _raCtrl.text.trim();
+        data['registration_number'] = _raCtrl.text.trim();
       }
       if (_periodCtrl.text.trim().isNotEmpty) {
-        data['period'] = _periodCtrl.text.trim();
-      }
-      if (_campusCtrl.text.trim().isNotEmpty) {
-        data['campus'] = _campusCtrl.text.trim();
+        data['semester'] = int.tryParse(_periodCtrl.text.trim());
       }
       await widget.onSubmit(data);
       if (mounted) Navigator.of(context).pop();
@@ -679,11 +665,6 @@ class _StudentFormSheetState extends State<_StudentFormSheet> {
                         ),
                         const SizedBox(height: AppSpacing.md),
                         _buildField(
-                          controller: _addressCtrl,
-                          label: 'Endereço',
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                        _buildField(
                           controller: _raCtrl,
                           label: 'RA',
                         ),
@@ -691,11 +672,7 @@ class _StudentFormSheetState extends State<_StudentFormSheet> {
                         _buildField(
                           controller: _periodCtrl,
                           label: 'Período',
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                        _buildField(
-                          controller: _campusCtrl,
-                          label: 'Campus',
+                          keyboardType: TextInputType.number,
                         ),
                         const SizedBox(height: AppSpacing.lg),
                         SizedBox(

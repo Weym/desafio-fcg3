@@ -12,10 +12,8 @@ StaffStudentModel _$StaffStudentModelFromJson(Map<String, dynamic> json) =>
       name: json['name'] as String,
       email: json['email'] as String,
       phone: json['phone'] as String?,
-      address: json['address'] as String?,
-      ra: json['ra'] as String?,
-      period: json['period'] as String?,
-      campus: json['campus'] as String?,
+      ra: json['registration_number'] as String?,
+      semester: (json['semester'] as num?)?.toInt(),
       status: json['status'] as String,
       createdAt: json['created_at'] == null
           ? null
@@ -28,10 +26,8 @@ Map<String, dynamic> _$StaffStudentModelToJson(StaffStudentModel instance) =>
       'name': instance.name,
       'email': instance.email,
       'phone': instance.phone,
-      'address': instance.address,
-      'ra': instance.ra,
-      'period': instance.period,
-      'campus': instance.campus,
+      'registration_number': instance.ra,
+      'semester': instance.semester,
       'status': instance.status,
       'created_at': instance.createdAt?.toIso8601String(),
     };

@@ -8,10 +8,9 @@ class StaffStudentModel {
   final String name;
   final String email;
   final String? phone;
-  final String? address;
+  @JsonKey(name: 'registration_number')
   final String? ra;
-  final String? period;
-  final String? campus;
+  final int? semester;
   final String status; // 'active' or 'inactive'
   @JsonKey(name: 'created_at')
   final DateTime? createdAt;
@@ -21,15 +20,16 @@ class StaffStudentModel {
     required this.name,
     required this.email,
     this.phone,
-    this.address,
     this.ra,
-    this.period,
-    this.campus,
+    this.semester,
     required this.status,
     this.createdAt,
   });
 
   bool get isActive => status == 'active';
+
+  /// Display period as string for UI
+  String? get period => semester?.toString();
 
   factory StaffStudentModel.fromJson(Map<String, dynamic> json) =>
       _$StaffStudentModelFromJson(json);
