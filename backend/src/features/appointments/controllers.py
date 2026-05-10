@@ -1,6 +1,6 @@
 """Route handlers for the Appointments feature slice.
 
-5 endpoints covering all APPT-* requirements:
+6 endpoints covering all APPT-* requirements:
 
 Scheduling (dual-auth for MCP access):
 - GET /scheduling/slots — available slots with date/resource filters (APPT-01)
@@ -10,6 +10,7 @@ Appointments (dual-auth for MCP access):
 - POST /appointments — book a slot with SELECT FOR UPDATE (APPT-02)
 - GET /appointments — list appointments with status filter (APPT-04)
 - PUT /appointments/{id}/cancel — cancel appointment (APPT-03)
+- PUT /appointments/{id}/confirm — confirm appointment (scheduled → completed)
 - POST /appointments/{id}/authorization — upload authorization file
 """
 
@@ -184,6 +185,27 @@ async def cancel_appointment(
     Accepts X-Service-Token for MCP access.
     """
     result = await appointment_service.cancel_appointment(
+        db,
+        appointment_id=appointment_id,
+        user_id=user.id,
+        user_role=user.role,
+    )
+    await db.commit()
+    return result
+
+
+# ------------------------------------------------------------------
+# PUT /appointments/{id}/confirm — staff confirms appointment
+# ------------------------------------------------------------------
+
+@appointments_router.put("/{appointment_id}/confirm", response_model=AppointmentResponse)
+async def confirm_appointment(
+    appointment_id: UUID,
+    user: UserContext = Depends(get_current_user_or_service),
+    db: AsyncSession = Depends(get_db_session),
+) -> AppointmentResponse:
+    """Confirm an appointment (scheduled → completed). Staff only."""
+    result = await appointment_service.confirm_appointment(
         db,
         appointment_id=appointment_id,
         user_id=user.id,

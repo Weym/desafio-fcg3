@@ -400,6 +400,50 @@ class AppointmentService:
         return _build_appointment_response(appointment)
 
     # ------------------------------------------------------------------
+    # Confirm appointment (scheduled → completed)
+    # ------------------------------------------------------------------
+
+    async def confirm_appointment(
+        self,
+        db: AsyncSession,
+        appointment_id: UUID,
+        user_id: UUID,
+        user_role: str,
+    ) -> AppointmentResponse:
+        """Confirm an appointment (scheduled → completed). Staff only."""
+        result = await db.execute(
+            select(Appointment)
+            .options(
+                joinedload(Appointment.slot).joinedload(SchedulingSlot.resource),
+            )
+            .where(Appointment.id == appointment_id)
+        )
+        appointment = result.scalar_one_or_none()
+
+        if appointment is None:
+            raise NotFoundException("appointment", appointment_id)
+
+        if user_role != "staff":
+            raise ForbiddenException(
+                "Apenas staff pode confirmar agendamentos",
+            )
+
+        if appointment.status != "scheduled":
+            raise ConflictException(
+                code="CONFIRMACAO_INVALIDA",
+                message=(
+                    f"Apenas agendamentos com status 'scheduled' podem ser confirmados. "
+                    f"Status atual: '{appointment.status}'."
+                ),
+            )
+
+        appointment.status = "completed"
+        await db.flush()
+        await db.refresh(appointment)
+
+        return _build_appointment_response(appointment)
+
+    # ------------------------------------------------------------------
     # APPT-04: List appointments
     # ------------------------------------------------------------------
 
