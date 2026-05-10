@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Correções, Melhorias & Features
 status: executing
-last_updated: "2026-05-10T00:21:31.557Z"
+last_updated: "2026-05-10T00:27:30.583Z"
 last_activity: 2026-05-10
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 16
-  completed_plans: 14
-  percent: 88
+  completed_plans: 15
+  percent: 94
 ---
 
 # Project State
@@ -18,9 +18,9 @@ progress:
 ## Current Position
 
 Phase: 19 (staff-ux-corrections) — EXECUTING
-Plan: 2 of 9
-Status: Executing Phase 19
-Last activity: 2026-05-10 -- Completed 19-07-PLAN.md
+Plan: 3 of 9
+Status: Ready to execute
+Last activity: 2026-05-10 -- Completed 19-08-PLAN.md
 
 ## Project Reference
 
@@ -114,6 +114,10 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 - **19-07:** AppointmentListItem extended with student_name, student_ra, resource_name (Optional[str])
 - **19-07:** joinedload(Appointment.student) added to list_appointments query
 - **19-07:** PUT /appointments/{id}/confirm endpoint (staff-only, scheduled → completed)
+- **19-08:** ChatSessionResponse extended with student_name, student_ra (from joined Student via selectinload)
+- **19-08:** Intervention query includes closed sessions (for Concluídos tab)
+- **19-08:** Resource is_deleted column for true soft-delete (distinct from is_available toggle), DELETE returns 204
+- **19-08:** Alembic 015a migration adds is_deleted to resources table
 
 ## Session Continuity
 
