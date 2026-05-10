@@ -307,4 +307,4 @@ Plans:
 | 15.1. Fix logo | 1/1 | Complete | 2026-05-10 |
 | 15.2. Add Alpha Connect SVG logos | 1/1 | Complete | 2026-05-10 |
 | 15.3. Logo light/dark mode variants | 1/1 | Complete    | 2026-05-10 |
-| 16. Micro-Animations & Transitions | 2/3 | In Progress|  |
+| 16. Micro-Animations & Transitions | 3/3 | Complete    | 2026-05-10 |
