@@ -3,24 +3,24 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-05-10T21:39:59.129Z"
-last_activity: 2026-05-10 -- Phase 15.2 planning complete
+last_updated: "2026-05-10T22:00:00.000Z"
+last_activity: 2026-05-10 -- Phase 15.2 execution complete
 progress:
   total_phases: 11
-  completed_phases: 6
-  total_plans: 32
-  completed_plans: 28
-  percent: 88
+  completed_phases: 7
+  total_plans: 33
+  completed_plans: 30
+  percent: 91
 ---
 
 # Project State
 
 ## Current Position
 
-Phase: 15.1 (fix-logo-ugly-not-as-agreed-and-tilted) — EXECUTING
+Phase: 15.2 (add-alpha-connect-svg-logos-to-the-app) — COMPLETE
 Plan: 1 of 1
-Status: Ready to execute
-Last activity: 2026-05-10 -- Phase 15.2 planning complete
+Status: Verified (5/5 must-haves passed)
+Last activity: 2026-05-10 -- Phase 15.2 execution complete
 
 Progress: [██████████] 100%
 
@@ -37,10 +37,12 @@ Progress: [██████████] 100%
 | 13 | Resource Allocation | complete |
 | 14 | Human Intervention | complete |
 | 15 | Cyber-Academic Visual Redesign | complete |
+| 15.1 | Fix logo | complete |
+| 15.2 | Add Alpha Connect SVG logos | complete |
 
 ## Current Focus
 
-**All phases delivered (7-15). 9 phases, 31 plans executed.**
+**All phases delivered (7-15.2). 11 phases, 33 plans executed.**
 Previous milestone (M1 Backend + AI + MCP) delivered 6 phases, 47 plans.
 
 Branches:
@@ -57,6 +59,8 @@ Next action: Merge branches to main or start next milestone.
 Recent decisions affecting current work:
 
 - [Phase 15]: JPEG logo replaced with CustomPainter vector widget (α mark + "ALPHA CONNECT" text)
+- [Phase 15.2]: Text-based logo (Playfair Display α) replaced with real Adobe Illustrator SVG assets via flutter_svg
+- [Phase 15.2]: Full logo (α mark + text) at size > 40, short logo (α mark only) at size <= 40
 - [Phase 15]: Cyber-Academic design system: Electric Teal #00E5FF primary, Obsidian #111317 dark surface
 - [Phase 15]: Typography switched to Montserrat + JetBrains Mono
 - [Phase 15]: GlassCard enhanced with 20px blur, 5% fill, neon outer glow, 3 elevation levels

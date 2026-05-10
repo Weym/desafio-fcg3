@@ -81,10 +81,10 @@ Plans:
 **Goal:** Replace text-based logo (Greek α via Google Fonts) with real Adobe Illustrator SVG logos — full logo (α + ALPHA CONNECT text) and short logo (α mark only) — rendered via flutter_svg with theme-adaptive color tinting.
 **Requirements**: UI-NFR-02
 **Depends on:** Phase 15
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
-- [ ] 15.2-01-PLAN.md — Add flutter_svg + SVG assets, rewrite AlphaConnectLogo widget, verify tests
+- [x] 15.2-01-PLAN.md — Add flutter_svg + SVG assets, rewrite AlphaConnectLogo widget, verify tests
 
 ### Phase 15.1: Fix logo — ugly, not as agreed, and tilted (INSERTED)
 
@@ -271,3 +271,5 @@ Plans:
 | 13. Resource Allocation | 3/3 | Complete | 2026-05-06 |
 | 14. Human Intervention | 2/2 | Complete | 2026-05-06 |
 | 15. Cyber-Academic Visual Redesign | 0/3 | Planned | — |
+| 15.1. Fix logo | 1/1 | Complete | 2026-05-10 |
+| 15.2. Add Alpha Connect SVG logos | 1/1 | Complete | 2026-05-10 |
