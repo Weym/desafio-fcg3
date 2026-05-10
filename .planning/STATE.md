@@ -2,32 +2,32 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Correções, Melhorias & Features
-status: All plans executed
-last_updated: "2026-05-09T22:58:01.374Z"
-last_activity: 2026-05-09
+status: executing
+last_updated: "2026-05-10T00:21:31.557Z"
+last_activity: 2026-05-10
 progress:
   total_phases: 7
-  completed_phases: 2
-  total_plans: 13
-  completed_plans: 13
-  percent: 100
+  completed_phases: 1
+  total_plans: 16
+  completed_plans: 14
+  percent: 88
 ---
 
 # Project State
 
 ## Current Position
 
-Phase: 19
-Plan: Not started
-Status: All plans executed
-Last activity: 2026-05-09
+Phase: 19 (staff-ux-corrections) — EXECUTING
+Plan: 2 of 9
+Status: Executing Phase 19
+Last activity: 2026-05-10 -- Completed 19-07-PLAN.md
 
 ## Project Reference
 
 See: .planning/PROJECT.md (updated 2026-05-08)
 
 **Core value:** Aluno envia mensagem no WhatsApp e recebe resposta precisa sobre sua situação acadêmica — com ações concretas executadas em tempo real.
-**Current focus:** Phase 18 Plan 07 completed — Chat session rename backend + Flutter error handling
+**Current focus:** Phase 19 — staff-ux-corrections
 
 ## Milestones Shipped
 
@@ -111,6 +111,9 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 - **18-06:** ClientResourcesScreen accepts initialTabIndex param from query param ?tab=N
 - **18-07:** PUT /chat-sessions/{id} rename endpoint with name column, IDOR ownership check, Alembic 014a migration
 - **18-07:** Flutter Salvar handler try/catch with red error SnackBar on rename failure
+- **19-07:** AppointmentListItem extended with student_name, student_ra, resource_name (Optional[str])
+- **19-07:** joinedload(Appointment.student) added to list_appointments query
+- **19-07:** PUT /appointments/{id}/confirm endpoint (staff-only, scheduled → completed)
 
 ## Session Continuity
 
