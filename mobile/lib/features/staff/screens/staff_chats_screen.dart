@@ -97,9 +97,7 @@ class _StaffChatsScreenState extends ConsumerState<StaffChatsScreen>
                   searchQuery: searchQuery,
                 ),
                 _FilteredInterventionTab(
-                  filter: (s) =>
-                      s.status == 'closed' ||
-                      s.status == 'resolved',
+                  filter: (s) => s.status == 'closed',
                   emptyMessage: 'Nenhuma conversa concluída',
                   emptyIcon: Icons.done_all,
                   searchQuery: searchQuery,
@@ -501,7 +499,6 @@ class _StatusBadge extends StatelessWidget {
             : colors.primary.withValues(alpha: 0.1);
         textColor = colors.primary;
         break;
-      case 'resolved':
       case 'closed':
         label = 'CONCLUÍDO';
         bgColor = isDark

@@ -9,7 +9,7 @@ class InterventionSessionModel {
   final String? studentId;
   @JsonKey(name: 'whatsapp_phone')
   final String? whatsappPhone;
-  final String status; // 'human_needed', 'human_active', 'resolved'
+  final String status; // 'human_needed', 'human_active', 'closed'
   @JsonKey(name: 'assigned_staff_id')
   final String? assignedStaffId;
   @JsonKey(name: 'escalation_reason')
@@ -46,7 +46,7 @@ class InterventionSessionModel {
 
   bool get isPending => status == 'human_needed';
   bool get isActive => status == 'human_active';
-  bool get isResolved => status == 'resolved';
+  bool get isResolved => status == 'closed';
 
   /// Display name: student name or phone or truncated ID
   String get displayName =>
