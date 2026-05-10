@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/responsive/breakpoints.dart';
 import '../../../core/router/route_names.dart';
+import '../../../core/theme/app_animations.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../shared/widgets/animated_entrance.dart';
 import '../../../shared/widgets/app_bar_actions.dart';
 import '../../../shared/widgets/app_skeleton_card.dart';
 import '../../../shared/widgets/app_error_state.dart';
@@ -65,23 +67,29 @@ class StaffDashboardScreen extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           // Header
-                          Text(
-                            'Visão estratégica da instituição.',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(
-                                  color: colors.onSurfaceVariant,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                          AnimatedEntrance(
+                            delay: AppAnimations.getEntranceDelay(0),
+                            child: Text(
+                              'Visão estratégica da instituição.',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                    color: colors.onSurfaceVariant,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                            ),
                           ),
                           const SizedBox(height: AppSpacing.lg),
 
                           // Enrollment Period Banner
                           if (dashboard.enrollmentPeriod != null &&
                               dashboard.enrollmentPeriod!.isActive) ...[
-                            _EnrollmentBanner(
-                                period: dashboard.enrollmentPeriod!),
+                            AnimatedEntrance(
+                              delay: AppAnimations.getEntranceDelay(1),
+                              child: _EnrollmentBanner(
+                                  period: dashboard.enrollmentPeriod!),
+                            ),
                             const SizedBox(height: AppSpacing.lg),
                           ],
 
@@ -94,49 +102,63 @@ class StaffDashboardScreen extends ConsumerWidget {
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
                             children: [
-                              _KpiCard(
-                                icon: Icons.people_outlined,
-                                iconColor: colors.primary,
-                                containerColor: colors.primaryContainer,
-                                value: dashboard.totalStudents.toString(),
-                                label: 'Alunos',
-                                onTap: null,
+                              AnimatedEntrance(
+                                delay: AppAnimations.getEntranceDelay(2),
+                                child: _KpiCard(
+                                  icon: Icons.people_outlined,
+                                  iconColor: colors.primary,
+                                  containerColor: colors.primaryContainer,
+                                  value: dashboard.totalStudents.toString(),
+                                  label: 'Alunos',
+                                  onTap: null,
+                                ),
                               ),
-                              _KpiCard(
-                                icon: Icons.chat_bubble_outlined,
-                                iconColor: colors.secondary,
-                                containerColor: colors.secondaryContainer,
-                                value:
-                                    dashboard.activeChatSessions.toString(),
-                                label: 'Chats Hoje',
-                                onTap: () => context.go(RoutePaths.staffAI),
+                              AnimatedEntrance(
+                                delay: AppAnimations.getEntranceDelay(3),
+                                child: _KpiCard(
+                                  icon: Icons.chat_bubble_outlined,
+                                  iconColor: colors.secondary,
+                                  containerColor: colors.secondaryContainer,
+                                  value:
+                                      dashboard.activeChatSessions.toString(),
+                                  label: 'Chats Hoje',
+                                  onTap: () => context.go(RoutePaths.staffAI),
+                                ),
                               ),
-                              _KpiCard(
-                                icon: Icons.warning_amber_outlined,
-                                iconColor: colors.error,
-                                containerColor: colors.errorContainer,
-                                value:
-                                    dashboard.pendingDocuments.toString(),
-                                label: 'Docs Pendentes',
-                                onTap: () =>
-                                    context.go(RoutePaths.staffDocuments),
+                              AnimatedEntrance(
+                                delay: AppAnimations.getEntranceDelay(4),
+                                child: _KpiCard(
+                                  icon: Icons.warning_amber_outlined,
+                                  iconColor: colors.error,
+                                  containerColor: colors.errorContainer,
+                                  value:
+                                      dashboard.pendingDocuments.toString(),
+                                  label: 'Docs Pendentes',
+                                  onTap: () =>
+                                      context.go(RoutePaths.staffDocuments),
+                                ),
                               ),
-                              _KpiCard(
-                                icon: Icons.calendar_today_outlined,
-                                iconColor: colors.tertiary,
-                                containerColor: colors.tertiaryContainer,
-                                value: dashboard.upcomingAppointments
-                                    .toString(),
-                                label: 'Agendamentos',
-                                onTap: () =>
-                                    context.go(RoutePaths.staffSchedule),
+                              AnimatedEntrance(
+                                delay: AppAnimations.getEntranceDelay(5),
+                                child: _KpiCard(
+                                  icon: Icons.calendar_today_outlined,
+                                  iconColor: colors.tertiary,
+                                  containerColor: colors.tertiaryContainer,
+                                  value: dashboard.upcomingAppointments
+                                      .toString(),
+                                  label: 'Agendamentos',
+                                  onTap: () =>
+                                      context.go(RoutePaths.staffSchedule),
+                                ),
                               ),
                             ],
                           ),
                           const SizedBox(height: AppSpacing.lg),
 
                           // AI Insights section
-                          GlassCard(
+                          AnimatedEntrance(
+                            delay: AppAnimations.getEntranceDelay(5),
+                            child: GlassCard(
                             padding: const EdgeInsets.all(AppSpacing.lg),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -197,6 +219,7 @@ class StaffDashboardScreen extends ConsumerWidget {
                                 ),
                               ],
                             ),
+                          ),
                           ),
                         ],
                       ),

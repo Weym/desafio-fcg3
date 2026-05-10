@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/theme/app_animations.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../shared/widgets/animated_entrance.dart';
 import '../../../shared/widgets/app_bar_actions.dart';
 import '../../../shared/widgets/app_skeleton_list.dart';
 import '../../../shared/widgets/app_empty_state.dart';
@@ -113,10 +115,13 @@ class StaffDocumentsScreen extends ConsumerWidget {
                             separatorBuilder: (_, __) =>
                                 const SizedBox(height: AppSpacing.md),
                             itemBuilder: (context, index) =>
-                                _StaffDocumentCard(
-                              document: filtered[index],
-                              onTap: () => showUpdateStatusSheet(
-                                  context, ref, filtered[index]),
+                                AnimatedEntrance(
+                              delay: AppAnimations.getEntranceDelay(index),
+                              child: _StaffDocumentCard(
+                                document: filtered[index],
+                                onTap: () => showUpdateStatusSheet(
+                                    context, ref, filtered[index]),
+                              ),
                             ),
                           ),
                         ),

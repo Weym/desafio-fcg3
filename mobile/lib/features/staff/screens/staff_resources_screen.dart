@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/theme/app_animations.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../shared/widgets/animated_entrance.dart';
 import '../../../shared/widgets/app_bar_actions.dart';
 import '../../../shared/widgets/app_skeleton_list.dart';
 import '../../../shared/widgets/app_empty_state.dart';
@@ -147,15 +149,18 @@ class StaffResourcesScreen extends ConsumerWidget {
                             separatorBuilder: (_, _) =>
                                 const SizedBox(height: AppSpacing.md),
                             itemBuilder: (context, index) =>
-                                _ResourceCard(
-                              resource: filtered[index],
-                              onEdit: () => showResourceFormSheet(
-                                context,
-                                ref,
+                                AnimatedEntrance(
+                              delay: AppAnimations.getEntranceDelay(index),
+                              child: _ResourceCard(
                                 resource: filtered[index],
+                                onEdit: () => showResourceFormSheet(
+                                  context,
+                                  ref,
+                                  resource: filtered[index],
+                                ),
+                                onDeactivate: () =>
+                                    _deactivateResource(context, ref, filtered[index]),
                               ),
-                              onDeactivate: () =>
-                                  _deactivateResource(context, ref, filtered[index]),
                             ),
                           ),
                         ),
