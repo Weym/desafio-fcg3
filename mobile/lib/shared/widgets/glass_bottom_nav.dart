@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import '../../core/theme/app_animations.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
 
@@ -32,6 +33,7 @@ class GlassBottomNav extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
+    final reduceMotion = MediaQuery.of(context).disableAnimations;
 
     return ClipRRect(
       child: BackdropFilter(
@@ -70,8 +72,8 @@ class GlassBottomNav extends StatelessWidget {
                 onTap: () => onTap(index),
                 behavior: HitTestBehavior.opaque,
                 child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  curve: Curves.easeInOut,
+                  duration: reduceMotion ? Duration.zero : AppAnimations.navTransitionDuration,
+                  curve: AppAnimations.navTransitionCurve,
                   padding: const EdgeInsets.symmetric(
                     horizontal: AppSpacing.md,
                     vertical: AppSpacing.sm,
@@ -84,9 +86,9 @@ class GlassBottomNav extends StatelessWidget {
                     boxShadow: isSelected
                         ? [
                             BoxShadow(
-                              color: AppColors.neonTeal.withValues(alpha: 0.3),
-                              blurRadius: 12,
-                              spreadRadius: 0,
+                              color: AppColors.neonTeal.withValues(alpha: 0.35),
+                              blurRadius: AppAnimations.navGlowBlurSelected,
+                              spreadRadius: AppAnimations.navGlowSpreadSelected,
                             ),
                           ]
                         : null,
@@ -95,12 +97,22 @@ class GlassBottomNav extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
-                        isSelected ? item.activeIcon : item.icon,
-                        size: 24,
-                        color: isSelected
-                            ? AppColors.neonTeal
-                            : colors.onSurfaceVariant,
+                      TweenAnimationBuilder<double>(
+                        tween: Tween(
+                          begin: AppAnimations.navIconSizeDefault,
+                          end: isSelected ? AppAnimations.navIconSizeSelected : AppAnimations.navIconSizeDefault,
+                        ),
+                        duration: reduceMotion ? Duration.zero : AppAnimations.navTransitionDuration,
+                        curve: AppAnimations.navTransitionCurve,
+                        builder: (context, size, child) {
+                          return Icon(
+                            isSelected ? item.activeIcon : item.icon,
+                            size: size,
+                            color: isSelected
+                                ? AppColors.neonTeal
+                                : colors.onSurfaceVariant,
+                          );
+                        },
                       ),
                       const SizedBox(height: 2),
                       Text(
