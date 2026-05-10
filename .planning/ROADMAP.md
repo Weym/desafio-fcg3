@@ -28,6 +28,7 @@
  (completed 2026-05-06)
 - [x] **Phase 15: Cyber-Academic Visual Redesign** — Apply Cyber-Academic design system (obsidian palette, neon accents, Montserrat typography, glassmorphism) to make the app more attractive and modern
  (completed 2026-05-08)
+- [ ] **Phase 16: Micro-Animations & Transitions** — Staggered entrance animations for cards/sections, enhanced nav bar glow transitions, and smooth page transitions
 
 ---
 
@@ -126,6 +127,27 @@ Plans:
 - [x] 13-01-PLAN.md — Backend: migration, resources CRUD endpoints, upload endpoint, seed expansion
 - [x] 13-02-PLAN.md — Frontend staff: resources screen with CRUD + navigation wiring
 - [x] 13-03-PLAN.md — Frontend client: resource booking flow with upload + my appointments
+
+### Phase 16: Micro-Animations & Transitions
+
+**Goal:** Add polished micro-animations inspired by design reference (`design ideas/animations.md`) — reusable `AnimatedEntrance` widget (fade + slide-up with staggered delays) for card/section loading rhythm, enhanced bottom nav glow transitions (scale + glow on selection using `easeOutBack`), and custom page transitions (fade-through for tab switches, slide for push navigation). No changes to functionality or API integrations.
+**Depends on:** Phase 15
+**Requirements:** UI-NFR-02 (visual consistency), UI-NFR-04 (dark mode support)
+
+### Success Criteria
+1. Reusable `AnimatedEntrance` widget (fade + slide-up, configurable delay/duration/curve) lives in `shared/widgets/` and is applied to dashboard cards, stat cards, list items across client and staff screens with staggered delays.
+2. Bottom nav bar selection uses `easeOutBack` curve with neon glow scaling (shadow spread animates alongside icon size change), matching Cyber-Academic design tokens.
+3. GoRouter page transitions use `CustomTransitionPage` — fade-through (300ms) for same-level tab navigation, horizontal slide (250ms) for push routes.
+4. Animation constants (durations, curves, offsets) are centralized in a shared `app_animations.dart` file for consistency.
+5. All 38+ existing widget tests continue to pass; `flutter analyze` reports no new issues.
+6. Animations respect `MediaQuery.disableAnimations` / reduced-motion accessibility setting.
+
+**Plans:** 3 plans
+
+Plans:
+- [ ] 16-01-PLAN.md — Animation foundation: app_animations.dart constants + AnimatedEntrance widget + tests
+- [ ] 16-02-PLAN.md — Nav bar glow transitions (easeOutBack) + GoRouter CustomTransitionPage
+- [ ] 16-03-PLAN.md — Screen integration: apply AnimatedEntrance to all client + staff screens
 
 ---
 
@@ -284,3 +306,4 @@ Plans:
 | 15.1. Fix logo | 1/1 | Complete | 2026-05-10 |
 | 15.2. Add Alpha Connect SVG logos | 1/1 | Complete | 2026-05-10 |
 | 15.3. Logo light/dark mode variants | 1/1 | Complete    | 2026-05-10 |
+| 16. Micro-Animations & Transitions | 0/3 | Planned | — |
