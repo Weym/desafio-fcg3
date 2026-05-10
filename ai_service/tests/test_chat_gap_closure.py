@@ -65,7 +65,7 @@ async def test_chat_invokes_agent_and_returns_response_without_persisting(
     """
 
     async def fake_invoke_agent(
-        *, settings, db_pool, system_prompt, session_id, user_message, is_new_session=False, student_name=None
+        *, settings, db_pool, system_prompt, session_id, user_message, is_new_session=False, student_name=None, verification_state="unverified"
     ) -> str:
         assert db_pool is app.state.db_pool
         assert system_prompt == app.state.system_prompt
@@ -102,7 +102,7 @@ async def test_chat_returns_fallback_after_agent_error_without_persisting(
     """
 
     async def fake_invoke_agent(
-        *, settings, db_pool, system_prompt, session_id, user_message, is_new_session=False, student_name=None
+        *, settings, db_pool, system_prompt, session_id, user_message, is_new_session=False, student_name=None, verification_state="unverified"
     ) -> str:
         raise RuntimeError("boom")
 

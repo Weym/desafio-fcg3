@@ -108,6 +108,7 @@ async def test_agent_rebuilds_last_twenty_messages_in_chronological_order(
         system_prompt="prompt",
         session_id="session-memory",
         user_message="mensagem-atual",
+        verification_state="verified",
     )
 
     assert response == "Resposta final"

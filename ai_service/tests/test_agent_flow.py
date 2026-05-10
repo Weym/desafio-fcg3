@@ -75,6 +75,7 @@ async def test_student_gets_portuguese_response_with_mcp_and_rag_tools_wired(
         system_prompt="Sempre responda em portugues brasileiro.",
         session_id="session-pt",
         user_message="Qual é a minha situação acadêmica?",
+        verification_state="verified",
     )
 
     assert response == "Olá! Consultei seus dados e sua matrícula está ativa."
