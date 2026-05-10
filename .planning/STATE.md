@@ -3,24 +3,24 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-05-10T23:17:36.909Z"
-last_activity: 2026-05-10 -- Phase 16 planning complete
+last_updated: "2026-05-10T23:34:39.757Z"
+last_activity: 2026-05-10
 progress:
   total_phases: 13
   completed_phases: 8
   total_plans: 36
-  completed_plans: 30
-  percent: 83
+  completed_plans: 31
+  percent: 86
 ---
 
 # Project State
 
 ## Current Position
 
-Phase: 15.3
-Plan: Not started
+Phase: 16 (micro-animations-and-transitions) — EXECUTING
+Plan: 2 of 3
 Status: Ready to execute
-Last activity: 2026-05-10 -- Phase 16 planning complete
+Last activity: 2026-05-10
 
 Progress: [██████████] 100%
 
@@ -104,6 +104,9 @@ Recent decisions affecting current work:
 - [Phase 09]: StaffHomeScreen deprecated (kept for compatibility), StaffDashboardScreen is now the default /staff route
 - [Phase 10]: Shimmer uses colorScheme.surfaceContainerHighest/surface for M3 dark-mode compatibility
 - [Phase 12]: Integration tests use real seeded emails (ana.silva@usp.br, roberto@icmc.usp.br) with DEV_MASTER_OTP=000000 bypass
+- [Phase 16]: Timer replaces Future.delayed for lifecycle-safe stagger delays (H1 fix)
+- [Phase 16]: GlassBottomNav extracted as single shared widget from client and staff shells
+- [Phase 16]: AppAnimations static const class with getEntranceDelay() stagger formula (cap at index 5)
 
 ### Key Decisions Resolved
 
