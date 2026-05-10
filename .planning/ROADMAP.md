@@ -142,11 +142,11 @@ Plans:
 5. All 38+ existing widget tests continue to pass; `flutter analyze` reports no new issues.
 6. Animations respect `MediaQuery.disableAnimations` / reduced-motion accessibility setting.
 
-**Plans:** 1/3 plans executed
+**Plans:** 2/3 plans executed
 
 Plans:
 - [x] 16-01-PLAN.md — Animation foundation: app_animations.dart constants + AnimatedEntrance widget + tests
-- [ ] 16-02-PLAN.md — Nav bar glow transitions (easeOutBack) + GoRouter CustomTransitionPage
+- [x] 16-02-PLAN.md — Nav bar glow transitions (easeOutBack) + GoRouter CustomTransitionPage
 - [ ] 16-03-PLAN.md — Screen integration: apply AnimatedEntrance to all client + staff screens
 
 ---
@@ -306,4 +306,4 @@ Plans:
 | 15.1. Fix logo | 1/1 | Complete | 2026-05-10 |
 | 15.2. Add Alpha Connect SVG logos | 1/1 | Complete | 2026-05-10 |
 | 15.3. Logo light/dark mode variants | 1/1 | Complete    | 2026-05-10 |
-| 16. Micro-Animations & Transitions | 1/3 | In Progress|  |
+| 16. Micro-Animations & Transitions | 2/3 | In Progress|  |

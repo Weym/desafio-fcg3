@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-05-10T23:34:39.757Z"
+last_updated: "2026-05-10T23:40:52.644Z"
 last_activity: 2026-05-10
 progress:
   total_phases: 13
   completed_phases: 8
   total_plans: 36
-  completed_plans: 31
-  percent: 86
+  completed_plans: 32
+  percent: 89
 ---
 
 # Project State
@@ -18,7 +18,7 @@ progress:
 ## Current Position
 
 Phase: 16 (micro-animations-and-transitions) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-05-10
 
@@ -107,6 +107,8 @@ Recent decisions affecting current work:
 - [Phase 16]: Timer replaces Future.delayed for lifecycle-safe stagger delays (H1 fix)
 - [Phase 16]: GlassBottomNav extracted as single shared widget from client and staff shells
 - [Phase 16]: AppAnimations static const class with getEntranceDelay() stagger formula (cap at index 5)
+- [Phase 16]: Explicit route-to-transition mapping: 12 tab routes = fade-through 300ms, 4 detail routes = slide 250ms, 2 system routes unchanged
+- [Phase 16]: easeOutBack curve on GlassBottomNav for springy glow transitions with icon scaling 24->28px
 
 ### Key Decisions Resolved
 
