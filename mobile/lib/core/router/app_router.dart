@@ -26,9 +26,57 @@ import '../../features/staff/screens/staff_resources_screen.dart';
 import '../../features/staff/screens/staff_intervention_screen.dart';
 import '../../features/staff/screens/staff_intervention_chat_screen.dart';
 import '../../features/client/models/appointment_model.dart';
+import '../theme/app_animations.dart';
 import 'route_names.dart';
 
 part 'app_router.g.dart';
+
+/// Fade-through transition for tab-level routes (300ms).
+CustomTransitionPage<void> _fadeThroughPage({
+  required LocalKey key,
+  required Widget child,
+}) {
+  return CustomTransitionPage<void>(
+    key: key,
+    child: child,
+    transitionDuration: AppAnimations.fadeThroughDuration,
+    reverseTransitionDuration: AppAnimations.fadeThroughDuration,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      if (MediaQuery.of(context).disableAnimations) {
+        return child;
+      }
+      return FadeTransition(
+        opacity: CurveTween(curve: AppAnimations.pageTransitionCurve)
+            .animate(animation),
+        child: child,
+      );
+    },
+  );
+}
+
+/// Horizontal slide transition for push/detail routes (250ms).
+CustomTransitionPage<void> _slidePage({
+  required LocalKey key,
+  required Widget child,
+}) {
+  return CustomTransitionPage<void>(
+    key: key,
+    child: child,
+    transitionDuration: AppAnimations.slideDuration,
+    reverseTransitionDuration: AppAnimations.slideDuration,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      if (MediaQuery.of(context).disableAnimations) {
+        return child;
+      }
+      final tween = Tween(begin: const Offset(1.0, 0.0), end: Offset.zero)
+          .chain(CurveTween(curve: AppAnimations.pageTransitionCurve));
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
 
 @riverpod
 GoRouter appRouter(Ref ref) {
@@ -109,19 +157,28 @@ GoRouter appRouter(Ref ref) {
           GoRoute(
             path: RoutePaths.clientHome,
             name: RouteNames.clientHome,
-            builder: (context, state) => const ClientHomeScreen(),
+            pageBuilder: (context, state) => _fadeThroughPage(
+              key: state.pageKey,
+              child: const ClientHomeScreen(),
+            ),
           ),
           GoRoute(
             path: RoutePaths.clientChat,
             name: RouteNames.clientChat,
-            builder: (context, state) => const ClientChatScreen(),
+            pageBuilder: (context, state) => _fadeThroughPage(
+              key: state.pageKey,
+              child: const ClientChatScreen(),
+            ),
             routes: [
               GoRoute(
                 path: ':sessionId',
                 name: RouteNames.clientChatDetail,
-                builder: (context, state) {
+                pageBuilder: (context, state) {
                   final sessionId = state.pathParameters['sessionId']!;
-                  return ClientChatDetailScreen(sessionId: sessionId);
+                  return _slidePage(
+                    key: state.pageKey,
+                    child: ClientChatDetailScreen(sessionId: sessionId),
+                  );
                 },
               ),
             ],
@@ -129,26 +186,34 @@ GoRouter appRouter(Ref ref) {
           GoRoute(
             path: RoutePaths.clientDocuments,
             name: RouteNames.clientDocuments,
-            builder: (context, state) =>
-                const ClientDocumentsScreen(),
+            pageBuilder: (context, state) => _fadeThroughPage(
+              key: state.pageKey,
+              child: const ClientDocumentsScreen(),
+            ),
           ),
           GoRoute(
             path: RoutePaths.clientNotifications,
             name: RouteNames.clientNotifications,
-            builder: (context, state) =>
-                const ClientNotificationsScreen(),
+            pageBuilder: (context, state) => _fadeThroughPage(
+              key: state.pageKey,
+              child: const ClientNotificationsScreen(),
+            ),
           ),
           GoRoute(
             path: RoutePaths.clientSupport,
             name: RouteNames.clientSupport,
-            builder: (context, state) =>
-                const ClientSupportScreen(),
+            pageBuilder: (context, state) => _fadeThroughPage(
+              key: state.pageKey,
+              child: const ClientSupportScreen(),
+            ),
           ),
           GoRoute(
             path: RoutePaths.clientResources,
             name: RouteNames.clientResources,
-            builder: (context, state) =>
-                const ClientResourcesScreen(),
+            pageBuilder: (context, state) => _fadeThroughPage(
+              key: state.pageKey,
+              child: const ClientResourcesScreen(),
+            ),
           ),
         ],
       ),
@@ -160,20 +225,29 @@ GoRouter appRouter(Ref ref) {
           GoRoute(
             path: RoutePaths.staffDashboard,
             name: RouteNames.staffDashboard,
-            builder: (context, state) => const StaffDashboardScreen(),
+            pageBuilder: (context, state) => _fadeThroughPage(
+              key: state.pageKey,
+              child: const StaffDashboardScreen(),
+            ),
           ),
           GoRoute(
             path: RoutePaths.staffSchedule,
             name: RouteNames.staffSchedule,
-            builder: (context, state) => const StaffScheduleScreen(),
+            pageBuilder: (context, state) => _fadeThroughPage(
+              key: state.pageKey,
+              child: const StaffScheduleScreen(),
+            ),
             routes: [
               GoRoute(
                 path: ':appointmentId',
                 name: RouteNames.staffAppointmentDetail,
-                builder: (context, state) {
+                pageBuilder: (context, state) {
                   final appointment = state.extra as AppointmentModel;
-                  return StaffAppointmentDetailScreen(
-                      appointment: appointment);
+                  return _slidePage(
+                    key: state.pageKey,
+                    child: StaffAppointmentDetailScreen(
+                        appointment: appointment),
+                  );
                 },
               ),
             ],
@@ -181,14 +255,20 @@ GoRouter appRouter(Ref ref) {
           GoRoute(
             path: RoutePaths.staffAI,
             name: RouteNames.staffAI,
-            builder: (context, state) => const StaffAiScreen(),
+            pageBuilder: (context, state) => _fadeThroughPage(
+              key: state.pageKey,
+              child: const StaffAiScreen(),
+            ),
             routes: [
               GoRoute(
                 path: ':sessionId',
                 name: RouteNames.staffChatDetail,
-                builder: (context, state) {
+                pageBuilder: (context, state) {
                   final sessionId = state.pathParameters['sessionId']!;
-                  return StaffChatDetailScreen(sessionId: sessionId);
+                  return _slidePage(
+                    key: state.pageKey,
+                    child: StaffChatDetailScreen(sessionId: sessionId),
+                  );
                 },
               ),
             ],
@@ -196,24 +276,36 @@ GoRouter appRouter(Ref ref) {
           GoRoute(
             path: RoutePaths.staffDocuments,
             name: RouteNames.staffDocuments,
-            builder: (context, state) => const StaffDocumentsScreen(),
+            pageBuilder: (context, state) => _fadeThroughPage(
+              key: state.pageKey,
+              child: const StaffDocumentsScreen(),
+            ),
           ),
           GoRoute(
             path: RoutePaths.staffResources,
             name: RouteNames.staffResources,
-            builder: (context, state) => const StaffResourcesScreen(),
+            pageBuilder: (context, state) => _fadeThroughPage(
+              key: state.pageKey,
+              child: const StaffResourcesScreen(),
+            ),
           ),
           GoRoute(
             path: RoutePaths.staffIntervention,
             name: RouteNames.staffIntervention,
-            builder: (context, state) => const StaffInterventionScreen(),
+            pageBuilder: (context, state) => _fadeThroughPage(
+              key: state.pageKey,
+              child: const StaffInterventionScreen(),
+            ),
             routes: [
               GoRoute(
                 path: ':sessionId',
                 name: RouteNames.staffInterventionChat,
-                builder: (context, state) {
+                pageBuilder: (context, state) {
                   final sessionId = state.pathParameters['sessionId']!;
-                  return StaffInterventionChatScreen(sessionId: sessionId);
+                  return _slidePage(
+                    key: state.pageKey,
+                    child: StaffInterventionChatScreen(sessionId: sessionId),
+                  );
                 },
               ),
             ],
