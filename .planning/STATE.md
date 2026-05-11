@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-05-11T00:45:26.007Z"
+last_updated: "2026-05-11T00:49:22.668Z"
 last_activity: 2026-05-11
 progress:
   total_phases: 14
   completed_phases: 9
   total_plans: 39
-  completed_plans: 34
-  percent: 87
+  completed_plans: 35
+  percent: 90
 ---
 
 # Project State
@@ -18,7 +18,7 @@ progress:
 ## Current Position
 
 Phase: 17 (ui-polish-nav-animations-glows-logo) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-05-11
 
@@ -114,6 +114,8 @@ Recent decisions affecting current work:
 - [Phase 16]: All stagger delays use AppAnimations.getEntranceDelay(index) exclusively — no inline computation
 - [Phase 17]: Replaced implicit animations (AnimatedContainer + TweenAnimationBuilder) with explicit AnimationController to survive GoRouter widget tree reconstruction
 - [Phase 17]: Single AnimationController per GlassBottomNav with _previousIndex tracking for incoming/outgoing item animation
+- [Phase 17]: Used AppColors.primaryContainer for light-mode neon glow (neonTealLight doesn't exist)
+- [Phase 17]: showTagline param fully removed from AlphaConnectLogo (never wired, SVG bakes tagline)
 
 ### Key Decisions Resolved
 
