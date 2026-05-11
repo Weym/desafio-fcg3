@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ project.name }} — Artefatos Scrum</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+  @page { size: A4; margin: 20mm 18mm; }
+  @media print {
+    .section { page-break-before: always; }
+    .section:first-of-type { page-break-before: avoid; }
+    .card, .epic-card, .task-card, .dod-item, .deliverable-row { page-break-inside: avoid; }
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; font-size: 15px; color: #374151; background: #fff; line-height: 1.5; }
+  code, .mono { font-family: 'JetBrains Mono', monospace; }
+  h1 { font-size: 32px; font-weight: 800; color: #111827; }
+  h2 { font-size: 24px; font-weight: 700; color: #111827; margin-bottom: 6px; }
+  h3 { font-size: 20px; font-weight: 600; color: #374151; }
+  small { font-size: 13px; }
+  .caption { font-size: 12px; color: #6B7280; }
+  .gradient-text { background: linear-gradient(135deg, #6C3FE0 0%, #00C9A7 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .section-title { position: relative; padding-bottom: 10px; margin-bottom: 24px; }
+  .section-title::after { content: ''; position: absolute; bottom: 0; left: 0; width: 80px; height: 4px; border-radius: 2px; background: linear-gradient(135deg, #6C3FE0 0%, #00C9A7 100%); }
+  .card { background: #fff; border: 1px solid #E5E7EB; border-radius: 8px; padding: 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+
+  /* Cover */
+  .cover { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; background: linear-gradient(135deg, #6C3FE0 0%, #00C9A7 100%); color: #fff; padding: 40px; border-radius: 0; }
+  .cover h1 { color: #fff; font-size: 44px; margin-bottom: 12px; }
+  .cover .subtitle { font-size: 20px; opacity: 0.9; margin-bottom: 8px; }
+  .cover .category { font-size: 14px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; opacity: 0.75; margin-bottom: 40px; }
+  .cover .meta { font-size: 14px; opacity: 0.85; }
+  .cover .sprints-info { margin-top: 32px; font-size: 13px; opacity: 0.7; }
+
+  /* Metrics */
+  .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+  .metric-box { background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 12px; padding: 20px; text-align: center; }
+  .metric-value { font-size: 48px; font-weight: 800; background: linear-gradient(135deg, #6C3FE0 0%, #00C9A7 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.1; }
+  .metric-label { font-size: 13px; color: #6B7280; margin-top: 4px; }
+  .progress-bar-track { width: 100%; height: 14px; background: #F3F4F6; border-radius: 7px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #6C3FE0, #00C9A7); border-radius: 7px; }
+
+  /* Epics */
+  .stacked-bar { display: flex; height: 28px; border-radius: 6px; overflow: hidden; margin-bottom: 20px; }
+  .stacked-bar span { display: block; height: 100%; }
+  .epic-card { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border: 1px solid #E5E7EB; border-radius: 8px; margin-bottom: 10px; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+  .epic-card .left { display: flex; align-items: center; gap: 12px; }
+  .epic-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .epic-card .right { display: flex; align-items: center; gap: 12px; }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+  .badge-done { background: #ECFDF5; color: #10B981; }
+  .badge-pending { background: #FFFBEB; color: #F59E0B; }
+  .badge-sp { background: #EDE9FE; color: #5B21B6; font-family: 'JetBrains Mono', monospace; }
+
+  /* Deliverables (Sprint 1 Planning) */
+  .deliverables-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+  .deliverables-table th { text-align: left; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #6B7280; padding: 10px 12px; border-bottom: 2px solid #E5E7EB; }
+  .deliverables-table td { padding: 12px; border-bottom: 1px solid #F3F4F6; font-size: 14px; }
+  .deliverables-table .commits-col { text-align: center; font-family: 'JetBrains Mono', monospace; font-weight: 600; color: #0072B2; }
+  .timeline-dot { width: 10px; height: 10px; border-radius: 50%; background: linear-gradient(135deg, #6C3FE0, #00C9A7); display: inline-block; margin-right: 8px; }
+
+  /* Line Charts — Accessible palette (Wong 2011, colorblind-safe) */
+  .line-chart-container { margin: 16px 0; }
+  .line-chart-svg { width: 100%; height: 338px; overflow: visible; }
+  .line-chart-svg .grid-line { stroke: #E5E7EB; stroke-width: 1; }
+  .line-chart-svg .axis-line { stroke: #9CA3AF; stroke-width: 1.5; }
+  .line-chart-svg .line-real { fill: none; stroke: #0072B2; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+  .line-chart-svg .line-ideal { fill: none; stroke: #009E73; stroke-width: 2; stroke-dasharray: 6 4; stroke-linecap: round; }
+  .line-chart-svg .line-projected { fill: none; stroke: #CC79A7; stroke-width: 2.5; stroke-dasharray: 4 3; stroke-linecap: round; stroke-linejoin: round; }
+  .line-chart-svg .line-scope { fill: none; stroke: #E69F00; stroke-width: 2; stroke-dasharray: 8 4; stroke-linecap: round; }
+  .line-chart-svg .line-done { fill: none; stroke: #009E73; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+  .line-chart-svg .line-sp { fill: none; stroke: #E69F00; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .line-chart-svg .dot { r: 4; }
+  .line-chart-svg .dot-real { fill: #0072B2; }
+  .line-chart-svg .dot-ideal { fill: #009E73; }
+  .line-chart-svg .dot-projected { fill: #CC79A7; }
+  .line-chart-svg .dot-done { fill: #009E73; }
+  .line-chart-svg .dot-scope { fill: #E69F00; }
+  .line-chart-svg .dot-sp { fill: #E69F00; }
+  .line-chart-svg .val-label { font-size: 10px; font-weight: 600; fill: #374151; text-anchor: middle; }
+  .line-chart-svg .x-label { font-size: 11px; fill: #6B7280; text-anchor: middle; }
+  .line-chart-svg .y-label { font-size: 10px; fill: #9CA3AF; text-anchor: end; }
+  .line-chart-svg .area-real { fill: url(#gradientReal); opacity: 0.15; }
+  .line-chart-svg .area-done { fill: url(#gradientDone); opacity: 0.12; }
+  .burn-legend { display: flex; gap: 20px; margin-top: 12px; font-size: 13px; color: #6B7280; }
+  .burn-legend i { display: inline-block; width: 24px; height: 4px; border-radius: 2px; vertical-align: middle; margin-right: 6px; }
+  .burn-legend .real { background: #0072B2; }
+  .burn-legend .ideal { background: #009E73; border: 1px dashed #009E73; }
+  .burn-legend .proj { background: #CC79A7; border: 1px dashed #CC79A7; }
+  .burn-legend .done-line { background: #009E73; }
+  .burn-legend .scope-line { background: #E69F00; border: 1px dashed #E69F00; }
+  .burn-legend .sp-line { background: #E69F00; }
+  .burn-stats { display: flex; gap: 24px; margin-top: 16px; }
+  .burn-stats .stat { text-align: center; }
+  .burn-stats .stat-val { font-size: 24px; font-weight: 800; color: #0072B2; }
+
+  /* Kanban */
+  .kanban { display: flex; gap: 10px; }
+  .kanban-col { flex: 1; background: #F9FAFB; border-radius: 8px; padding: 10px; min-height: 180px; }
+  .kanban-col .col-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding-bottom: 8px; border-top: 3px solid var(--col-color, #6C3FE0); padding-top: 8px; }
+  .kanban-col .col-header h3 { font-size: 13px; font-weight: 700; text-transform: uppercase; }
+  .count-badge { background: #E5E7EB; color: #374151; font-size: 11px; font-weight: 700; padding: 1px 8px; border-radius: 10px; }
+  .task-card { background: #fff; border: 1px solid #E5E7EB; border-radius: 6px; padding: 10px; margin-bottom: 8px; font-size: 13px; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+  .task-card.done { opacity: 0.6; }
+  .task-card .assignee { font-size: 11px; color: #6B7280; margin-top: 4px; }
+  .task-card .sp-badge { display: inline-block; background: #F3F4F6; font-size: 11px; font-weight: 600; padding: 1px 6px; border-radius: 4px; color: #0072B2; float: right; }
+
+  /* DoD */
+  .dod-list { list-style: none; }
+  .dod-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid #F3F4F6; }
+  .dod-item::before { content: "\2713"; display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: #ECFDF5; color: #10B981; font-weight: 700; font-size: 14px; flex-shrink: 0; }
+
+  /* Retro */
+  .retro-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .retro-card { border-radius: 8px; padding: 16px; border-top: 4px solid; }
+  .retro-card.start { border-color: #10B981; background: #ECFDF5; }
+  .retro-card.stop { border-color: #EF4444; background: #FEF2F2; }
+  .retro-card.continue { border-color: #6C3FE0; background: #F5F3FF; }
+  .retro-card h3 { margin-bottom: 10px; }
+  .retro-card ul { list-style: disc; padding-left: 18px; font-size: 14px; }
+  .retro-card li { margin-bottom: 6px; }
+
+  .section { padding: 32px 40px; }
+  .sub-info { font-size: 14px; color: #6B7280; margin-bottom: 16px; }
+  .sprint-badge { display: inline-block; padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; margin-bottom: 12px; }
+  .sprint-badge--planning { background: #EDE9FE; color: #5B21B6; }
+  .sprint-badge--execution { background: #ECFDF5; color: #065F46; }
+  .sprint-badge--demo { background: #FFFBEB; color: #92400E; }
+  .sprint-badge--polish { background: #ECFDF5; color: #065F46; }
+</style>
+</head>
+<body>
+<!-- 1. Cover -->
+<div class="section cover">
+  <div class="category">Artefatos Scrum</div>
+  <h1>{{ project.name }}</h1>
+  <p class="subtitle">{{ project.subtitle }}</p>
+  <p class="meta">{{ project.date }} &nbsp;|&nbsp; {{ project.team_size }} membros &nbsp;|&nbsp; {{ metrics.sprints_count }} Sprints</p>
+  <p class="meta" style="margin-top:8px; font-size:13px; opacity:0.8;">{{ project.team_members | join(' &bull; ') }}</p>
+  <div class="sprints-info">
+    Sprint 1: Planejamento (15-23/Abr) &nbsp;&bull;&nbsp;
+    Sprint 2: Execucao Backend (23-30/Abr) &nbsp;&bull;&nbsp;
+    Sprint 3: Execucao Frontend (01-06/Mai) &nbsp;&bull;&nbsp;
+    Sprint 4: v3.0 Correcoes &amp; Melhorias (07-14/Mai) — Em andamento
+  </div>
+</div>
+
+<!-- 2. Metrics Overview -->
+<div class="section">
+  <h2 class="section-title">Visao Geral</h2>
+  <div class="metrics-grid">
+    <div class="metric-box"><div class="metric-value">{{ metrics.total_sp }}</div><div class="metric-label">SP Total</div></div>
+    <div class="metric-box"><div class="metric-value">{{ metrics.sp_done }}</div><div class="metric-label">SP Entregues</div></div>
+    <div class="metric-box"><div class="metric-value">{{ metrics.sp_remaining }}</div><div class="metric-label">SP Restantes</div></div>
+    <div class="metric-box"><div class="metric-value">{{ metrics.total_stories }}</div><div class="metric-label">User Stories</div></div>
+    <div class="metric-box"><div class="metric-value">{{ metrics.total_tasks }}</div><div class="metric-label">Tarefas</div></div>
+    <div class="metric-box"><div class="metric-value">{{ metrics.total_commits }}</div><div class="metric-label">Commits</div></div>
+  </div>
+  {% set pct = (metrics.sp_done / metrics.total_sp * 100) | round(1) %}
+  <div class="caption" style="margin-bottom:4px;">Progresso: {{ pct }}%</div>
+  <div class="progress-bar-track"><div class="progress-bar-fill" style="width:{{ pct }}%"></div></div>
+</div>
+
+<!-- 3. Product Backlog — Epicos -->
+<div class="section">
+  <h2 class="section-title">Product Backlog por Epico</h2>
+  <div class="stacked-bar">
+    {% set colors = ['#6C3FE0','#8B5CF6','#00C9A7','#10B981','#F59E0B','#EF4444','#EC4899','#6366F1','#14B8A6','#F97316'] %}
+    {% for epic in epics %}
+    <span style="width:{{ (epic.sp / metrics.total_sp * 100) | round(1) }}%; background:{{ colors[loop.index0 % 10] }};" title="{{ epic.name }}: {{ epic.sp }} SP"></span>
+    {% endfor %}
+  </div>
+  {% for epic in epics %}
+  <div class="epic-card">
+    <div class="left">
+      <span class="epic-dot" style="background:{{ colors[loop.index0 % 10] }};"></span>
+      <div>
+        <strong>{{ epic.name }}</strong>
+        <div class="caption">{{ epic.stories }} stories &middot; {{ epic.sp }} SP</div>
+      </div>
+    </div>
+    <div class="right">
+      {% if epic.done == epic.stories %}
+      <span class="badge badge-done">Concluido</span>
+      {% elif epic.done > 0 %}
+      <span class="badge badge-pending">{{ epic.done }}/{{ epic.stories }}</span>
+      {% else %}
+      <span class="badge badge-pending">Pendente</span>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- 4. Sprint 1 — Planejamento (Deliverables + Burnup) -->
+<div class="section">
+  <h2 class="section-title">Sprint 1 — Planejamento</h2>
+  <span class="sprint-badge sprint-badge--planning">15/04 a 23/04 &bull; 9 dias &bull; Sem SP (sprint de planejamento)</span>
+  <p class="sub-info">{{ sprints.sprint_1.goal }}</p>
+  <table class="deliverables-table">
+    <thead>
+      <tr><th>Data</th><th>Entregavel</th><th>Commits</th></tr>
+    </thead>
+    <tbody>
+      {% for d in sprints.sprint_1.deliverables %}
+      <tr class="deliverable-row">
+        <td><span class="timeline-dot"></span><span class="mono" style="font-size:13px;">{{ d.date[8:] }}/{{ d.date[5:7] }}</span></td>
+        <td>{{ d.item }}</td>
+        <td class="commits-col">{{ d.commits }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- Burnup Chart Sprint 1 — Tasks de Planejamento -->
+  <h3 style="margin-top:28px; margin-bottom:12px;">Burnup — Tasks Definidas no Planejamento</h3>
+  {% set burnup = sprints.sprint_1.burnup %}
+  {% set bu_max = burnup[-1].total %}
+  {% set bu_count = burnup | length %}
+  {% set chart_w = 600 %}
+  {% set chart_h = 260 %}
+  {% set pad_l = 45 %}
+  {% set pad_r = 20 %}
+  {% set pad_t = 30 %}
+  {% set pad_b = 40 %}
+  {% set plot_w = chart_w - pad_l - pad_r %}
+  {% set plot_h = chart_h - pad_t - pad_b %}
+  <div class="line-chart-container">
+    <svg class="line-chart-svg" viewBox="0 0 {{ chart_w }} {{ chart_h }}" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <linearGradient id="gradientDone" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#009E73"/>
+          <stop offset="100%" stop-color="#009E73" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <!-- Grid lines -->
+      {% for i in range(5) %}
+      {% set gy = pad_t + (plot_h / 4 * i) %}
+      <line class="grid-line" x1="{{ pad_l }}" y1="{{ gy }}" x2="{{ pad_l + plot_w }}" y2="{{ gy }}"/>
+      <text class="y-label" x="{{ pad_l - 6 }}" y="{{ gy + 4 }}">{{ ((bu_max - bu_max / 4 * i) | round(0)) | int }}</text>
+      {% endfor %}
+      <!-- Axes -->
+      <line class="axis-line" x1="{{ pad_l }}" y1="{{ pad_t }}" x2="{{ pad_l }}" y2="{{ pad_t + plot_h }}"/>
+      <line class="axis-line" x1="{{ pad_l }}" y1="{{ pad_t + plot_h }}" x2="{{ pad_l + plot_w }}" y2="{{ pad_t + plot_h }}"/>
+      <!-- Scope line (total) -->
+      {% set scope_points = [] %}
+      {% for item in burnup %}
+      {% set px = pad_l + (loop.index0 / (bu_count - 1) * plot_w) %}
+      {% set py = pad_t + plot_h - (item.total / bu_max * plot_h) %}
+      {% set _ = scope_points.append(px | string ~ "," ~ py | string) %}
+      {% endfor %}
+      <polyline class="line-scope" points="{{ scope_points | join(' ') }}"/>
+      <!-- Done line -->
+      {% set done_points = [] %}
+      {% for item in burnup %}
+      {% set px = pad_l + (loop.index0 / (bu_count - 1) * plot_w) %}
+      {% set py = pad_t + plot_h - (item.done / bu_max * plot_h) %}
+      {% set _ = done_points.append(px | string ~ "," ~ py | string) %}
+      {% endfor %}
+      <!-- Area under done line -->
+      {% set area_done = (pad_l | string ~ "," ~ (pad_t + plot_h) | string) ~ " " ~ done_points | join(' ') ~ " " ~ (pad_l + plot_w) | string ~ "," ~ (pad_t + plot_h) | string %}
+      <polygon class="area-done" points="{{ area_done }}"/>
+      <polyline class="line-done" points="{{ done_points | join(' ') }}"/>
+      <!-- Dots and labels -->
+      {% for item in burnup %}
+      {% set px = pad_l + (loop.index0 / (bu_count - 1) * plot_w) %}
+      {% set py_done = pad_t + plot_h - (item.done / bu_max * plot_h) %}
+      <circle class="dot dot-done" cx="{{ px }}" cy="{{ py_done }}"/>
+      <text class="val-label" x="{{ px }}" y="{{ py_done - 10 }}">{{ item.done }}</text>
+      <text class="x-label" x="{{ px }}" y="{{ pad_t + plot_h + 18 }}">{{ item.label }}/Abr</text>
+      {% endfor %}
+    </svg>
+  </div>
+  <div class="burn-legend">
+    <span><i class="done-line"></i>Tasks Definidas (acumulado)</span>
+    <span><i class="scope-line"></i>Escopo Total ({{ bu_max }} tasks)</span>
+  </div>
+  <div class="burn-stats" style="margin-top:20px;">
+    <div class="stat"><div class="stat-val">{{ sprints.sprint_1.deliverables | length }}</div><div class="caption">Entregas</div></div>
+    <div class="stat"><div class="stat-val">9</div><div class="caption">Dias</div></div>
+    <div class="stat"><div class="stat-val">36</div><div class="caption">Commits</div></div>
+    <div class="stat"><div class="stat-val">{{ bu_max }}</div><div class="caption">Tasks Planejadas</div></div>
+  </div>
+</div>
+
+<!-- 5. Sprint 2 — Execucao (Burndown Dual Axis + Burnup) -->
+<div class="section">
+  <h2 class="section-title">Sprint 2 — Burndown (Execucao)</h2>
+  <span class="sprint-badge sprint-badge--execution">23/04 a 30/04 &bull; 8 dias &bull; 193 SP &bull; 71→102 tasks</span>
+  <p class="sub-info">{{ sprints.sprint_2.goal }}</p>
+
+  <!-- Burndown Chart: Tasks (left axis) + SP (right axis) -->
+  {% set bd2 = sprints.sprint_2.burndown %}
+  {% set bd2_max_tasks = sprints.sprint_2.initial_tasks %}
+  {% set bd2_max_sp = sprints.sprint_2.total_sp %}
+  {% set bd2_count = bd2 | length %}
+  {% set chart_w = 640 %}
+  {% set chart_h = 312 %}
+  {% set pad_l = 50 %}
+  {% set pad_r = 50 %}
+  {% set pad_t = 35 %}
+  {% set pad_b = 45 %}
+  {% set plot_w = chart_w - pad_l - pad_r %}
+  {% set plot_h = chart_h - pad_t - pad_b %}
+  <div class="line-chart-container">
+    <svg class="line-chart-svg" viewBox="0 0 {{ chart_w }} {{ chart_h }}" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <linearGradient id="gradientReal" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#0072B2"/>
+          <stop offset="100%" stop-color="#0072B2" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <!-- Grid lines -->
+      {% for i in range(5) %}
+      {% set gy = pad_t + (plot_h / 4 * i) %}
+      <line class="grid-line" x1="{{ pad_l }}" y1="{{ gy }}" x2="{{ pad_l + plot_w }}" y2="{{ gy }}"/>
+      <!-- Left Y axis: Tasks -->
+      <text class="y-label" x="{{ pad_l - 6 }}" y="{{ gy + 4 }}">{{ ((bd2_max_tasks - bd2_max_tasks / 4 * i) | round(0)) | int }}</text>
+      <!-- Right Y axis: SP -->
+      <text class="y-label" x="{{ pad_l + plot_w + 6 }}" y="{{ gy + 4 }}" style="text-anchor:start; fill:#E69F00;">{{ ((bd2_max_sp - bd2_max_sp / 4 * i) | round(0)) | int }}</text>
+      {% endfor %}
+      <!-- Axes -->
+      <line class="axis-line" x1="{{ pad_l }}" y1="{{ pad_t }}" x2="{{ pad_l }}" y2="{{ pad_t + plot_h }}"/>
+      <line class="axis-line" x1="{{ pad_l }}" y1="{{ pad_t + plot_h }}" x2="{{ pad_l + plot_w }}" y2="{{ pad_t + plot_h }}"/>
+      <line class="axis-line" x1="{{ pad_l + plot_w }}" y1="{{ pad_t }}" x2="{{ pad_l + plot_w }}" y2="{{ pad_t + plot_h }}" style="stroke:#E69F00; stroke-width:1; stroke-dasharray:3 2;"/>
+      <!-- Axis labels -->
+      <text x="{{ pad_l - 6 }}" y="{{ pad_t - 10 }}" style="font-size:9px; fill:#0072B2; text-anchor:end; font-weight:600;">Tasks</text>
+      <text x="{{ pad_l + plot_w + 6 }}" y="{{ pad_t - 10 }}" style="font-size:9px; fill:#E69F00; text-anchor:start; font-weight:600;">SP</text>
+      <!-- Ideal line (tasks: linear from initial to 0) -->
+      {% set ideal_points = [] %}
+      {% for item in bd2 %}
+      {% set px = pad_l + (loop.index0 / (bd2_count - 1) * plot_w) %}
+      {% set ideal_val = bd2_max_tasks - (bd2_max_tasks / (bd2_count - 1) * loop.index0) %}
+      {% set py = pad_t + plot_h - (ideal_val / bd2_max_tasks * plot_h) %}
+      {% set _ = ideal_points.append(px | string ~ "," ~ py | string) %}
+      {% endfor %}
+      <polyline class="line-ideal" points="{{ ideal_points | join(' ') }}"/>
+      <!-- SP remaining line (right axis, thinner) -->
+      {% set sp_points = [] %}
+      {% for item in bd2 %}
+      {% set px = pad_l + (loop.index0 / (bd2_count - 1) * plot_w) %}
+      {% set py = pad_t + plot_h - (item.remaining_sp / bd2_max_sp * plot_h) %}
+      {% set _ = sp_points.append(px | string ~ "," ~ py | string) %}
+      {% endfor %}
+      <polyline class="line-sp" points="{{ sp_points | join(' ') }}" style="stroke-width:2; opacity:0.8;"/>
+      <!-- Tasks remaining line (left axis, main) -->
+      {% set task_points = [] %}
+      {% for item in bd2 %}
+      {% set px = pad_l + (loop.index0 / (bd2_count - 1) * plot_w) %}
+      {% set py = pad_t + plot_h - (item.remaining_tasks / bd2_max_tasks * plot_h) %}
+      {% set _ = task_points.append(px | string ~ "," ~ py | string) %}
+      {% endfor %}
+      <!-- Area under tasks line -->
+      {% set area_tasks = (pad_l | string ~ "," ~ (pad_t + plot_h) | string) ~ " " ~ task_points | join(' ') ~ " " ~ (pad_l + plot_w) | string ~ "," ~ (pad_t + plot_h) | string %}
+      <polygon class="area-real" points="{{ area_tasks }}"/>
+      <polyline class="line-real" points="{{ task_points | join(' ') }}"/>
+      <!-- Dots, labels, and scope markers -->
+      {% for item in bd2 %}
+      {% set px = pad_l + (loop.index0 / (bd2_count - 1) * plot_w) %}
+      {% set py_tasks = pad_t + plot_h - (item.remaining_tasks / bd2_max_tasks * plot_h) %}
+      {% set py_sp = pad_t + plot_h - (item.remaining_sp / bd2_max_sp * plot_h) %}
+      <circle class="dot dot-real" cx="{{ px }}" cy="{{ py_tasks }}"/>
+      <circle class="dot dot-sp" cx="{{ px }}" cy="{{ py_sp }}" style="r:3;"/>
+      <text class="val-label" x="{{ px }}" y="{{ py_tasks - 10 }}">{{ item.remaining_tasks }}</text>
+      <!-- Scope added markers -->
+      {% if item.scope_added > 0 %}
+      <text x="{{ px }}" y="{{ pad_t + 12 }}" style="font-size:9px; fill:#D55E00; text-anchor:middle; font-weight:700;">+{{ item.scope_added }}</text>
+      {% endif %}
+      <!-- X labels -->
+      <text class="x-label" x="{{ px }}" y="{{ pad_t + plot_h + 18 }}">{{ item.label }}/Abr</text>
+      {% endfor %}
+    </svg>
+  </div>
+  <div class="burn-legend">
+    <span><i class="real"></i>Tasks Restantes</span>
+    <span><i class="sp-line"></i>SP Restantes</span>
+    <span><i class="ideal"></i>Ideal (linear)</span>
+    <span><i class="scope-line"></i>+N = Scope adicionado (gaps)</span>
+  </div>
+
+  <!-- Burnup Chart Sprint 2 -->
+  <h3 style="margin-top:28px; margin-bottom:12px;">Burnup — Tasks Concluidas vs Escopo</h3>
+  {% set bu2 = sprints.sprint_2.burnup %}
+  {% set bu2_max = sprints.sprint_2.final_tasks %}
+  {% set bu2_count = bu2 | length %}
+  {% set chart_w2 = 640 %}
+  {% set chart_h2 = 286 %}
+  {% set pad_l2 = 50 %}
+  {% set pad_r2 = 20 %}
+  {% set pad_t2 = 30 %}
+  {% set pad_b2 = 45 %}
+  {% set plot_w2 = chart_w2 - pad_l2 - pad_r2 %}
+  {% set plot_h2 = chart_h2 - pad_t2 - pad_b2 %}
+  <div class="line-chart-container">
+    <svg class="line-chart-svg" viewBox="0 0 {{ chart_w2 }} {{ chart_h2 }}" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <linearGradient id="gradientDone2" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#009E73"/>
+          <stop offset="100%" stop-color="#009E73" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <!-- Grid lines -->
+      {% for i in range(5) %}
+      {% set gy = pad_t2 + (plot_h2 / 4 * i) %}
+      <line class="grid-line" x1="{{ pad_l2 }}" y1="{{ gy }}" x2="{{ pad_l2 + plot_w2 }}" y2="{{ gy }}"/>
+      <text class="y-label" x="{{ pad_l2 - 6 }}" y="{{ gy + 4 }}">{{ ((bu2_max - bu2_max / 4 * i) | round(0)) | int }}</text>
+      {% endfor %}
+      <!-- Axes -->
+      <line class="axis-line" x1="{{ pad_l2 }}" y1="{{ pad_t2 }}" x2="{{ pad_l2 }}" y2="{{ pad_t2 + plot_h2 }}"/>
+      <line class="axis-line" x1="{{ pad_l2 }}" y1="{{ pad_t2 + plot_h2 }}" x2="{{ pad_l2 + plot_w2 }}" y2="{{ pad_t2 + plot_h2 }}"/>
+      <!-- Scope line (grows with gaps) -->
+      {% set scope2_points = [] %}
+      {% for item in bu2 %}
+      {% set px = pad_l2 + (loop.index0 / (bu2_count - 1) * plot_w2) %}
+      {% set py = pad_t2 + plot_h2 - (item.scope / bu2_max * plot_h2) %}
+      {% set _ = scope2_points.append(px | string ~ "," ~ py | string) %}
+      {% endfor %}
+      <polyline class="line-scope" points="{{ scope2_points | join(' ') }}"/>
+      <!-- Done line -->
+      {% set done2_points = [] %}
+      {% for item in bu2 %}
+      {% set px = pad_l2 + (loop.index0 / (bu2_count - 1) * plot_w2) %}
+      {% set py = pad_t2 + plot_h2 - (item.done / bu2_max * plot_h2) %}
+      {% set _ = done2_points.append(px | string ~ "," ~ py | string) %}
+      {% endfor %}
+      <!-- Area under done -->
+      {% set area_done2 = (pad_l2 | string ~ "," ~ (pad_t2 + plot_h2) | string) ~ " " ~ done2_points | join(' ') ~ " " ~ (pad_l2 + plot_w2) | string ~ "," ~ (pad_t2 + plot_h2) | string %}
+      <polygon points="{{ area_done2 }}" style="fill:url(#gradientDone2); opacity:0.12;"/>
+      <polyline class="line-done" points="{{ done2_points | join(' ') }}"/>
+      <!-- Dots and labels -->
+      {% for item in bu2 %}
+      {% set px = pad_l2 + (loop.index0 / (bu2_count - 1) * plot_w2) %}
+      {% set py_done = pad_t2 + plot_h2 - (item.done / bu2_max * plot_h2) %}
+      {% set py_scope = pad_t2 + plot_h2 - (item.scope / bu2_max * plot_h2) %}
+      <circle class="dot dot-done" cx="{{ px }}" cy="{{ py_done }}"/>
+      <circle class="dot dot-scope" cx="{{ px }}" cy="{{ py_scope }}" style="r:3;"/>
+      <text class="val-label" x="{{ px }}" y="{{ py_done - 10 }}">{{ item.done }}</text>
+      {% if loop.index0 == 0 or item.scope != bu2[loop.index0 - 1].scope %}
+      <text class="val-label" x="{{ px }}" y="{{ py_scope - 10 }}" style="fill:#E69F00;">{{ item.scope }}</text>
+      {% endif %}
+      <text class="x-label" x="{{ px }}" y="{{ pad_t2 + plot_h2 + 18 }}">{{ item.label }}/Abr</text>
+      {% endfor %}
+    </svg>
+  </div>
+  <div class="burn-legend">
+    <span><i class="done-line"></i>Tasks Concluidas</span>
+    <span><i class="scope-line"></i>Escopo Total (cresce com gaps)</span>
+  </div>
+
+  <div class="burn-stats" style="margin-top:16px;">
+    <div class="stat"><div class="stat-val">{{ sprints.sprint_2.total_sp }}</div><div class="caption">SP Entregues</div></div>
+    <div class="stat"><div class="stat-val">{{ sprints.sprint_2.final_tasks }}</div><div class="caption">Tasks Executadas</div></div>
+    <div class="stat"><div class="stat-val">{{ velocity.sprint_2_days }}</div><div class="caption">Dias</div></div>
+    <div class="stat"><div class="stat-val">{{ velocity.sprint_2_velocity }}</div><div class="caption">SP/dia</div></div>
+    <div class="stat"><div class="stat-val">+31</div><div class="caption">Scope Discovery</div></div>
+  </div>
+</div>
+
+<!-- 5b. Definition of Done -->
+<div class="section">
+  <h2 class="section-title">Definition of Done</h2>
+  <ul class="dod-list">
+    {% for item in dod_summary %}
+    <li class="dod-item">{{ item }}</li>
+    {% endfor %}
+  </ul>
+</div>
+
+<!-- 6. Sprint 3 — Execucao Frontend (Burndown + Burnup) -->
+<div class="section">
+  <h2 class="section-title">Sprint 3 — Burndown &amp; Burnup (Execucao Frontend)</h2>
+  <span class="sprint-badge sprint-badge--execution">01/05 a 06/05 &bull; 6 dias &bull; 38 SP entregues &bull; 54/57 tasks &bull; 6 membros</span>
+  <p class="sub-info">{{ sprints.sprint_3.goal }}</p>
+  {% set bd3 = sprints.sprint_3.burndown %}
+  {% set bd3_max_tasks = sprints.sprint_3.initial_tasks %}
+  {% set bd3_max_sp = sprints.sprint_3.total_sp %}
+  {% set bd3_count = bd3 | length %}
+  {% set chart_w = 640 %}
+  {% set chart_h = 312 %}
+  {% set pad_l = 50 %}
+  {% set pad_r = 50 %}
+  {% set pad_t = 35 %}
+  {% set pad_b = 45 %}
+  {% set plot_w = chart_w - pad_l - pad_r %}
+  {% set plot_h = chart_h - pad_t - pad_b %}
+  <div class="line-chart-container">
+    <svg class="line-chart-svg" viewBox="0 0 {{ chart_w }} {{ chart_h }}" preserveAspectRatio="xMidYMid meet">
+      <!-- Grid lines -->
+      {% for i in range(5) %}
+      {% set gy = pad_t + (plot_h / 4 * i) %}
+      <line class="grid-line" x1="{{ pad_l }}" y1="{{ gy }}" x2="{{ pad_l + plot_w }}" y2="{{ gy }}"/>
+      <text class="y-label" x="{{ pad_l - 6 }}" y="{{ gy + 4 }}">{{ ((bd3_max_tasks - bd3_max_tasks / 4 * i) | round(0)) | int }}</text>
+      <text class="y-label" x="{{ pad_l + plot_w + 6 }}" y="{{ gy + 4 }}" style="text-anchor:start; fill:#E69F00;">{{ ((bd3_max_sp - bd3_max_sp / 4 * i) | round(0)) | int }}</text>
+      {% endfor %}
+      <!-- Axes -->
+      <line class="axis-line" x1="{{ pad_l }}" y1="{{ pad_t }}" x2="{{ pad_l }}" y2="{{ pad_t + plot_h }}"/>
+      <line class="axis-line" x1="{{ pad_l }}" y1="{{ pad_t + plot_h }}" x2="{{ pad_l + plot_w }}" y2="{{ pad_t + plot_h }}"/>
+      <line class="axis-line" x1="{{ pad_l + plot_w }}" y1="{{ pad_t }}" x2="{{ pad_l + plot_w }}" y2="{{ pad_t + plot_h }}" style="stroke:#E69F00; stroke-width:1; stroke-dasharray:3 2;"/>
+      <text x="{{ pad_l - 6 }}" y="{{ pad_t - 10 }}" style="font-size:9px; fill:#0072B2; text-anchor:end; font-weight:600;">Tasks</text>
+      <text x="{{ pad_l + plot_w + 6 }}" y="{{ pad_t - 10 }}" style="font-size:9px; fill:#E69F00; text-anchor:start; font-weight:600;">SP</text>
+      <!-- Ideal line (tasks) -->
+      {% set ideal_points3 = [] %}
+      {% for item in bd3 %}
+      {% set px = pad_l + (loop.index0 / (bd3_count - 1) * plot_w) %}
+      {% set py = pad_t + plot_h - (item.ideal_tasks / bd3_max_tasks * plot_h) %}
+      {% set _ = ideal_points3.append(px | string ~ "," ~ py | string) %}
+      {% endfor %}
+      <polyline class="line-ideal" points="{{ ideal_points3 | join(' ') }}"/>
+      <!-- SP remaining line (right axis) -->
+      {% set sp3_points = [] %}
+      {% for item in bd3 %}
+      {% set px = pad_l + (loop.index0 / (bd3_count - 1) * plot_w) %}
+      {% set py = pad_t + plot_h - (item.remaining_sp / bd3_max_sp * plot_h) %}
+      {% set _ = sp3_points.append(px | string ~ "," ~ py | string) %}
+      {% endfor %}
+      <polyline class="line-sp" points="{{ sp3_points | join(' ') }}" style="stroke-width:2; opacity:0.8;"/>
+      <!-- Tasks remaining line (real portion solid, projected dashed) -->
+      {% set real3_points = [] %}
+      {% set proj3_points = [] %}
+      {% for item in bd3 %}
+      {% set px = pad_l + (loop.index0 / (bd3_count - 1) * plot_w) %}
+      {% set py = pad_t + plot_h - (item.remaining_tasks / bd3_max_tasks * plot_h) %}
+      {% if not item.projected %}
+      {% set _ = real3_points.append(px | string ~ "," ~ py | string) %}
+      {% endif %}
+      {% if item.projected or loop.index0 == bd3_count - (bd3 | selectattr('projected') | list | length) - 1 %}
+      {% set _ = proj3_points.append(px | string ~ "," ~ py | string) %}
+      {% endif %}
+      {% endfor %}
+      {% if real3_points %}
+      <polyline class="line-real" points="{{ real3_points | join(' ') }}"/>
+      {% endif %}
+      {% if proj3_points %}
+      <polyline class="line-projected" points="{{ proj3_points | join(' ') }}" style="stroke-dasharray:4 3;"/>
+      {% endif %}
+      <!-- Dots, labels, scope markers -->
+      {% for item in bd3 %}
+      {% set px = pad_l + (loop.index0 / (bd3_count - 1) * plot_w) %}
+      {% set py_tasks = pad_t + plot_h - (item.remaining_tasks / bd3_max_tasks * plot_h) %}
+      {% set py_sp = pad_t + plot_h - (item.remaining_sp / bd3_max_sp * plot_h) %}
+      {% if item.projected %}
+      <circle class="dot dot-projected" cx="{{ px }}" cy="{{ py_tasks }}"/>
+      {% else %}
+      <circle class="dot dot-real" cx="{{ px }}" cy="{{ py_tasks }}"/>
+      {% endif %}
+      <circle class="dot dot-sp" cx="{{ px }}" cy="{{ py_sp }}" style="r:3;"/>
+      <text class="val-label" x="{{ px }}" y="{{ py_tasks - 10 }}">{{ item.remaining_tasks }}</text>
+      {% if item.scope_added > 0 %}
+      <text x="{{ px }}" y="{{ pad_t + 12 }}" style="font-size:9px; fill:#D55E00; text-anchor:middle; font-weight:700;">+{{ item.scope_added }}</text>
+      {% endif %}
+      <text class="x-label" x="{{ px }}" y="{{ pad_t + plot_h + 18 }}">{{ item.label }}/Mai</text>
+      {% endfor %}
+    </svg>
+  </div>
+  <div class="burn-legend">
+    <span><i class="real"></i>Tasks Restantes (real)</span>
+    <span><i class="proj"></i>Tasks Restantes (projetado)</span>
+    <span><i class="sp-line"></i>SP Restantes</span>
+    <span><i class="ideal"></i>Ideal (linear)</span>
+  </div>
+  <div class="burn-stats">
+    <div class="stat"><div class="stat-val">{{ sprints.sprint_3.total_sp }}</div><div class="caption">SP Planejados</div></div>
+    <div class="stat"><div class="stat-val">38</div><div class="caption">SP Entregues</div></div>
+    <div class="stat"><div class="stat-val">{{ velocity.sprint_3_days }}</div><div class="caption">Dias</div></div>
+    <div class="stat"><div class="stat-val">{{ velocity.sprint_3_members }}</div><div class="caption">Membros</div></div>
+  </div>
+
+  <!-- Burnup Chart Sprint 3 — Tasks Concluidas vs Escopo -->
+  <h3 style="margin-top:28px; margin-bottom:12px;">Burnup — Tasks Concluidas vs Escopo</h3>
+  {% set bu3 = sprints.sprint_3.burnup %}
+  {% set bu3_max = sprints.sprint_3.final_tasks %}
+  {% set bu3_count = bu3 | length %}
+  {% set chart_w3 = 640 %}
+  {% set chart_h3 = 260 %}
+  {% set pad_l3 = 50 %}
+  {% set pad_r3 = 20 %}
+  {% set pad_t3 = 30 %}
+  {% set pad_b3 = 45 %}
+  {% set plot_w3 = chart_w3 - pad_l3 - pad_r3 %}
+  {% set plot_h3 = chart_h3 - pad_t3 - pad_b3 %}
+  <div class="line-chart-container">
+    <svg class="line-chart-svg" viewBox="0 0 {{ chart_w3 }} {{ chart_h3 }}" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <linearGradient id="gradientDone3" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#009E73"/>
+          <stop offset="100%" stop-color="#009E73" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      {% for i in range(5) %}
+      {% set gy = pad_t3 + (plot_h3 / 4 * i) %}
+      <line class="grid-line" x1="{{ pad_l3 }}" y1="{{ gy }}" x2="{{ pad_l3 + plot_w3 }}" y2="{{ gy }}"/>
+      <text class="y-label" x="{{ pad_l3 - 6 }}" y="{{ gy + 4 }}">{{ ((bu3_max - bu3_max / 4 * i) | round(0)) | int }}</text>
+      {% endfor %}
+      <line class="axis-line" x1="{{ pad_l3 }}" y1="{{ pad_t3 }}" x2="{{ pad_l3 }}" y2="{{ pad_t3 + plot_h3 }}"/>
+      <line class="axis-line" x1="{{ pad_l3 }}" y1="{{ pad_t3 + plot_h3 }}" x2="{{ pad_l3 + plot_w3 }}" y2="{{ pad_t3 + plot_h3 }}"/>
+      {% set scope3_points = [] %}
+      {% for item in bu3 %}
+      {% set px = pad_l3 + (loop.index0 / (bu3_count - 1) * plot_w3) %}
+      {% set py = pad_t3 + plot_h3 - (item.scope / bu3_max * plot_h3) %}
+      {% set _ = scope3_points.append(px | string ~ "," ~ py | string) %}
+      {% endfor %}
+      <polyline class="line-scope" points="{{ scope3_points | join(' ') }}"/>
+      {% set done3_points = [] %}
+      {% for item in bu3 %}
+      {% set px = pad_l3 + (loop.index0 / (bu3_count - 1) * plot_w3) %}
+      {% set py = pad_t3 + plot_h3 - (item.done / bu3_max * plot_h3) %}
+      {% set _ = done3_points.append(px | string ~ "," ~ py | string) %}
+      {% endfor %}
+      {% set area_done3 = (pad_l3 | string ~ "," ~ (pad_t3 + plot_h3) | string) ~ " " ~ done3_points | join(' ') ~ " " ~ (pad_l3 + plot_w3) | string ~ "," ~ (pad_t3 + plot_h3) | string %}
+      <polygon points="{{ area_done3 }}" style="fill:url(#gradientDone3); opacity:0.12;"/>
+      <polyline class="line-done" points="{{ done3_points | join(' ') }}"/>
+      {% for item in bu3 %}
+      {% set px = pad_l3 + (loop.index0 / (bu3_count - 1) * plot_w3) %}
+      {% set py_done = pad_t3 + plot_h3 - (item.done / bu3_max * plot_h3) %}
+      {% set py_scope = pad_t3 + plot_h3 - (item.scope / bu3_max * plot_h3) %}
+      <circle class="dot dot-done" cx="{{ px }}" cy="{{ py_done }}"/>
+      <circle class="dot dot-scope" cx="{{ px }}" cy="{{ py_scope }}" style="r:3;"/>
+      <text class="val-label" x="{{ px }}" y="{{ py_done - 10 }}">{{ item.done }}</text>
+      {% if loop.index0 == 0 or item.scope != bu3[loop.index0 - 1].scope %}
+      <text class="val-label" x="{{ px }}" y="{{ py_scope - 10 }}" style="fill:#E69F00;">{{ item.scope }}</text>
+      {% endif %}
+      <text class="x-label" x="{{ px }}" y="{{ pad_t3 + plot_h3 + 18 }}">{{ item.label }}/Mai</text>
+      {% endfor %}
+    </svg>
+  </div>
+  <div class="burn-legend">
+    <span><i class="done-line"></i>Tasks Concluidas</span>
+    <span><i class="scope-line"></i>Escopo Total</span>
+  </div>
+</div>
+
+<!-- 7. Kanban Board -->
+<div class="section">
+  <h2 class="section-title">Sprint 4 — Kanban Board (Atual)</h2>
+  {% set col_map = [
+    {"id": "todo", "label": "To Do", "color": "#6B7280"},
+    {"id": "in_progress", "label": "In Progress", "color": "#F59E0B"},
+    {"id": "review", "label": "In Review", "color": "#8B5CF6"},
+    {"id": "done", "label": "Done", "color": "#10B981"},
+    {"id": "blocked", "label": "Blocked", "color": "#EF4444"}
+  ] %}
+  <div class="kanban">
+    {% for col in col_map %}
+    <div class="kanban-col" style="--col-color:{{ col.color }};">
+      <div class="col-header">
+        <h3>{{ col.label }}</h3>
+        {% set ns = namespace(count=0) %}
+        {% for task in kanban.sample_tasks %}{% if task.status == col.id %}{% set ns.count = ns.count + 1 %}{% endif %}{% endfor %}
+        <span class="count-badge">{{ ns.count }}</span>
+      </div>
+      {% for task in kanban.sample_tasks %}
+        {% if task.status == col.id %}
+        <div class="task-card{% if col.id == 'done' %} done{% endif %}">
+          <span class="sp-badge">{{ task.sp }} SP</span>
+          <div>{{ task.title }}</div>
+          <div class="assignee">{{ task.assignee }}</div>
+        </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- 8. Sprint 4 — v3.0 Correcoes & Melhorias (Burndown + Status) -->
+<div class="section">
+  <h2 class="section-title">Sprint 4 — v3.0 Correcoes &amp; Melhorias</h2>
+  <span class="sprint-badge sprint-badge--execution">07/05 a 14/05 &bull; 8 dias &bull; {{ sprints.sprint_4.total_sp }} SP &bull; 6 membros &bull; Sprint ativa</span>
+  <p class="sub-info">{{ sprints.sprint_4.goal }}</p>
+  {% set bd4 = sprints.sprint_4.burndown %}
+  {% set bd4_max_tasks = sprints.sprint_4.initial_tasks %}
+  {% set bd4_max_sp = sprints.sprint_4.total_sp %}
+  {% set bd4_count = bd4 | length %}
+  {% set chart_w = 640 %}
+  {% set chart_h = 312 %}
+  {% set pad_l = 50 %}
+  {% set pad_r = 50 %}
+  {% set pad_t = 35 %}
+  {% set pad_b = 45 %}
+  {% set plot_w = chart_w - pad_l - pad_r %}
+  {% set plot_h = chart_h - pad_t - pad_b %}
+  <div class="line-chart-container">
+    <svg class="line-chart-svg" viewBox="0 0 {{ chart_w }} {{ chart_h }}" preserveAspectRatio="xMidYMid meet">
+      {% for i in range(5) %}
+      {% set gy = pad_t + (plot_h / 4 * i) %}
+      <line class="grid-line" x1="{{ pad_l }}" y1="{{ gy }}" x2="{{ pad_l + plot_w }}" y2="{{ gy }}"/>
+      <text class="y-label" x="{{ pad_l - 6 }}" y="{{ gy + 4 }}">{{ ((bd4_max_tasks - bd4_max_tasks / 4 * i) | round(0)) | int }}</text>
+      <text class="y-label" x="{{ pad_l + plot_w + 6 }}" y="{{ gy + 4 }}" style="text-anchor:start; fill:#E69F00;">{{ ((bd4_max_sp - bd4_max_sp / 4 * i) | round(0)) | int }}</text>
+      {% endfor %}
+      <line class="axis-line" x1="{{ pad_l }}" y1="{{ pad_t }}" x2="{{ pad_l }}" y2="{{ pad_t + plot_h }}"/>
+      <line class="axis-line" x1="{{ pad_l }}" y1="{{ pad_t + plot_h }}" x2="{{ pad_l + plot_w }}" y2="{{ pad_t + plot_h }}"/>
+      <line class="axis-line" x1="{{ pad_l + plot_w }}" y1="{{ pad_t }}" x2="{{ pad_l + plot_w }}" y2="{{ pad_t + plot_h }}" style="stroke:#E69F00; stroke-width:1; stroke-dasharray:3 2;"/>
+      <text x="{{ pad_l - 6 }}" y="{{ pad_t - 10 }}" style="font-size:9px; fill:#0072B2; text-anchor:end; font-weight:600;">Tasks</text>
+      <text x="{{ pad_l + plot_w + 6 }}" y="{{ pad_t - 10 }}" style="font-size:9px; fill:#E69F00; text-anchor:start; font-weight:600;">SP</text>
+      {% set ideal4_points = [] %}
+      {% for item in bd4 %}
+      {% set px = pad_l + (loop.index0 / (bd4_count - 1) * plot_w) %}
+      {% set py = pad_t + plot_h - (item.ideal_tasks / bd4_max_tasks * plot_h) %}
+      {% set _ = ideal4_points.append(px | string ~ "," ~ py | string) %}
+      {% endfor %}
+      <polyline class="line-ideal" points="{{ ideal4_points | join(' ') }}"/>
+      {% set sp4_points = [] %}
+      {% for item in bd4 %}
+      {% set px = pad_l + (loop.index0 / (bd4_count - 1) * plot_w) %}
+      {% set py = pad_t + plot_h - (item.remaining_sp / bd4_max_sp * plot_h) %}
+      {% set _ = sp4_points.append(px | string ~ "," ~ py | string) %}
+      {% endfor %}
+      <polyline class="line-sp" points="{{ sp4_points | join(' ') }}" style="stroke-width:2; opacity:0.8;"/>
+      {% set real4_points = [] %}
+      {% set proj4_points = [] %}
+      {% for item in bd4 %}
+      {% set px = pad_l + (loop.index0 / (bd4_count - 1) * plot_w) %}
+      {% set py = pad_t + plot_h - (item.remaining_tasks / bd4_max_tasks * plot_h) %}
+      {% if not item.projected %}
+      {% set _ = real4_points.append(px | string ~ "," ~ py | string) %}
+      {% endif %}
+      {% if item.projected or loop.index0 == bd4_count - (bd4 | selectattr('projected') | list | length) - 1 %}
+      {% set _ = proj4_points.append(px | string ~ "," ~ py | string) %}
+      {% endif %}
+      {% endfor %}
+      {% if real4_points %}
+      <polyline class="line-real" points="{{ real4_points | join(' ') }}"/>
+      {% endif %}
+      {% if proj4_points %}
+      <polyline class="line-projected" points="{{ proj4_points | join(' ') }}" style="stroke-dasharray:4 3;"/>
+      {% endif %}
+      {% for item in bd4 %}
+      {% set px = pad_l + (loop.index0 / (bd4_count - 1) * plot_w) %}
+      {% set py_tasks = pad_t + plot_h - (item.remaining_tasks / bd4_max_tasks * plot_h) %}
+      {% set py_sp = pad_t + plot_h - (item.remaining_sp / bd4_max_sp * plot_h) %}
+      {% if item.projected %}
+      <circle class="dot dot-projected" cx="{{ px }}" cy="{{ py_tasks }}"/>
+      {% else %}
+      <circle class="dot dot-real" cx="{{ px }}" cy="{{ py_tasks }}"/>
+      {% endif %}
+      <circle class="dot dot-sp" cx="{{ px }}" cy="{{ py_sp }}" style="r:3;"/>
+      <text class="val-label" x="{{ px }}" y="{{ py_tasks - 10 }}">{{ item.remaining_tasks }}</text>
+      <text class="x-label" x="{{ px }}" y="{{ pad_t + plot_h + 18 }}">{{ item.label }}/Mai</text>
+      {% endfor %}
+    </svg>
+  </div>
+  <div class="burn-legend">
+    <span><i class="real"></i>Tasks Restantes (real)</span>
+    <span><i class="proj"></i>Tasks Restantes (projetado)</span>
+    <span><i class="sp-line"></i>SP Restantes</span>
+    <span><i class="ideal"></i>Ideal (linear)</span>
+  </div>
+  <div class="burn-stats" style="margin-top:16px;">
+    <div class="stat"><div class="stat-val">{{ sprints.sprint_4.total_sp }}</div><div class="caption">SP Planejados</div></div>
+    <div class="stat"><div class="stat-val">{{ velocity.sprint_4_sp_done_partial }}</div><div class="caption">SP Entregues (ate 09/05)</div></div>
+    <div class="stat"><div class="stat-val">{{ velocity.sprint_4_days }}</div><div class="caption">Dias (Sprint)</div></div>
+    <div class="stat"><div class="stat-val">{{ velocity.sprint_4_velocity_partial }}</div><div class="caption">SP/dia (pico)</div></div>
+  </div>
+  <div class="card" style="margin-top:16px; padding:20px;">
+    <h3 style="margin-bottom:14px; font-size:15px;">Fases v3.0 — Status das Branches</h3>
+    <ul style="list-style:none; display:flex; flex-direction:column; gap:8px;">
+      <li style="display:flex; gap:10px; align-items:flex-start; padding:10px; background:#F9FAFB; border-radius:6px; border-left:3px solid #10B981;">
+        <span style="color:#10B981; font-weight:700; flex-shrink:0;">&#10003;</span>
+        <div><strong>Phase 15-17 (07/05)</strong> — Polimento final v2.0: traceability, tech debt, skeleton shimmer<br><span class="caption">10 SP &bull; 6 tasks &bull; 43 commits &bull; Done</span></div>
+      </li>
+      <li style="display:flex; gap:10px; align-items:flex-start; padding:10px; background:#F9FAFB; border-radius:6px; border-left:3px solid #10B981;">
+        <span style="color:#10B981; font-weight:700; flex-shrink:0;">&#10003;</span>
+        <div><strong>Phase 18-19 (08-09/05)</strong> — UX Corrections: student chat/docs/notif, staff chats/docs/cadastro<br><span class="caption">41 SP &bull; 32 tasks &bull; ~70 commits &bull; Done (branch pendente merge)</span></div>
+      </li>
+      <li style="display:flex; gap:10px; align-items:flex-start; padding:10px; background:#F9FAFB; border-radius:6px; border-left:3px solid #10B981;">
+        <span style="color:#10B981; font-weight:700; flex-shrink:0;">&#10003;</span>
+        <div><strong>Phase 20-22 (08-09/05)</strong> — AI Alpha persona + lazy OTP, provider role, FCM push<br><span class="caption">67 SP &bull; 38 tasks &bull; ~108 commits &bull; Done (branches pendentes merge)</span></div>
+      </li>
+      <li style="display:flex; gap:10px; align-items:flex-start; padding:10px; background:#FFF7ED; border-radius:6px; border-left:3px solid #F59E0B;">
+        <span style="color:#F59E0B; font-weight:700; flex-shrink:0;">&#9679;</span>
+        <div><strong>Phase 23-24 (10-14/05)</strong> — Novas features (cardapio, perfil, grade) + UI polish v3.0<br><span class="caption">34 SP &bull; 16 tasks &bull; Planejado &mdash; projecao de entrega: 14/05/2026</span></div>
+      </li>
+    </ul>
+  </div>
+  <div class="card" style="margin-top:16px; padding:16px; background:linear-gradient(135deg,#FFF7ED,#FFFBEB); border:1px solid #FCD34D; text-align:center;">
+    <div style="font-size:14px; font-weight:700; color:#92400E; margin-bottom:4px;">&#9203; SPRINT 4 EM ANDAMENTO — Previsao de entrega: 14/05/2026</div>
+    <div style="font-size:13px; color:#B45309;">Milestone v3.0 &bull; 7 Phases &bull; {{ metrics.sp_done }}/{{ metrics.total_sp }} SP entregues ({{ (metrics.sp_done / metrics.total_sp * 100) | round(0) | int }}%) &bull; ~{{ metrics.total_commits }} Commits</div>
+  </div>
+</div>
+
+<!-- Definition of Done — moved to before Sprint 3 -->
+
+<!-- Retrospectiva — Sprint 2 (comentado, conteudo preservado)
+<div class="section">
+  <h2 class="section-title">Retrospectiva — Sprint 2</h2>
+  <div class="retro-grid">
+    <div class="retro-card start">
+      <h3>Start</h3>
+      <ul>{% for i in retro.start %}<li>{{ i }}</li>{% endfor %}</ul>
+    </div>
+    <div class="retro-card stop">
+      <h3>Stop</h3>
+      <ul>{% for i in retro.stop %}<li>{{ i }}</li>{% endfor %}</ul>
+    </div>
+    <div class="retro-card continue">
+      <h3>Continue</h3>
+      <ul>{% for i in retro.continue %}<li>{{ i }}</li>{% endfor %}</ul>
+    </div>
+  </div>
+</div>
+-->
+</body>
+</html>

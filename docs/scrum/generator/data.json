@@ -1,0 +1,191 @@
+{
+  "project": {
+    "name": "Plataforma de Assistencia Academica",
+    "subtitle": "Chatbot WhatsApp para Servicos Academicos",
+    "team_size": 6,
+    "team_members": ["Caroline Cabral", "Felipe Mello", "Gabriel Rezende", "Henry Gabriel", "Ricardo Rossi", "Weydson Marinho"],
+    "date": "2026-05-11"
+  },
+  "metrics": {
+    "total_stories": 64,
+    "total_sp": 375,
+    "sp_done": 341,
+    "sp_remaining": 34,
+    "total_tasks": 210,
+    "total_commits": 737,
+    "sprints_count": 4
+  },
+  "epics": [
+    {"id": 1, "name": "Infraestrutura e Ambiente", "sp": 24, "stories": 4, "done": 4},
+    {"id": 2, "name": "Autenticacao e Seguranca", "sp": 26, "stories": 5, "done": 5},
+    {"id": 3, "name": "Gestao Academica", "sp": 78, "stories": 13, "done": 13},
+    {"id": 4, "name": "MCP Server", "sp": 32, "stories": 5, "done": 5},
+    {"id": 5, "name": "AI Service (LangChain + RAG)", "sp": 37, "stories": 5, "done": 5},
+    {"id": 6, "name": "WhatsApp Webhook", "sp": 24, "stories": 5, "done": 5},
+    {"id": 7, "name": "Frontend Mobile (v2.0)", "sp": 16, "stories": 3, "done": 3},
+    {"id": 8, "name": "Guardrails e Seguranca", "sp": 8, "stories": 2, "done": 2},
+    {"id": 9, "name": "Deploy e Operacoes", "sp": 10, "stories": 2, "done": 2},
+    {"id": 10, "name": "Testes", "sp": 8, "stories": 3, "done": 3},
+    {"id": 11, "name": "UX Corrections v3.0", "sp": 41, "stories": 7, "done": 7},
+    {"id": 12, "name": "AI/LangChain v2 (Alpha)", "sp": 41, "stories": 2, "done": 2},
+    {"id": 13, "name": "Auth & Roles Expansion", "sp": 13, "stories": 2, "done": 2},
+    {"id": 14, "name": "FCM Push Notifications", "sp": 13, "stories": 2, "done": 2},
+    {"id": 15, "name": "Novas Features (v3.0)", "sp": 21, "stories": 3, "done": 0},
+    {"id": 16, "name": "UI Polish v3.0", "sp": 13, "stories": 1, "done": 0}
+  ],
+  "sprints": {
+    "sprint_1": {
+      "name": "Sprint 1 — Planejamento",
+      "start": "2026-04-15",
+      "end": "2026-04-23",
+      "goal": "Definir escopo, requisitos, arquitetura e 44 plans de execucao detalhados",
+      "total_sp": 0,
+      "total_tasks": 71,
+      "type": "planning",
+      "deliverables": [
+        {"date": "2026-04-15", "item": "Research + Requisitos + Roadmap (6 fases)", "commits": 7},
+        {"date": "2026-04-20", "item": "Contexto fases 1-4", "commits": 8},
+        {"date": "2026-04-22", "item": "Contexto fases 5-6", "commits": 2},
+        {"date": "2026-04-23", "item": "29 plans + validacoes (71 tasks definidas)", "commits": 19}
+      ],
+      "burnup": [
+        {"date": "2026-04-15", "done": 4, "total": 71, "label": "15"},
+        {"date": "2026-04-20", "done": 8, "total": 71, "label": "20"},
+        {"date": "2026-04-22", "done": 10, "total": 71, "label": "22"},
+        {"date": "2026-04-23", "done": 71, "total": 71, "label": "23"}
+      ]
+    },
+    "sprint_2": {
+      "name": "Sprint 2 — Execucao Backend",
+      "start": "2026-04-23",
+      "end": "2026-04-30",
+      "goal": "Backend completo + AI Service + MCP Server + WhatsApp Webhook funcional em Docker",
+      "total_sp": 193,
+      "initial_tasks": 71,
+      "final_tasks": 102,
+      "type": "execution",
+      "burndown": [
+        {"date": "2026-04-23", "remaining_tasks": 71, "remaining_sp": 193, "scope_tasks": 71, "scope_sp": 193, "scope_added": 0, "label": "23"},
+        {"date": "2026-04-24", "remaining_tasks": 39, "remaining_sp": 89, "scope_tasks": 76, "scope_sp": 193, "scope_added": 5, "label": "24"},
+        {"date": "2026-04-25", "remaining_tasks": 16, "remaining_sp": 19, "scope_tasks": 96, "scope_sp": 193, "scope_added": 20, "label": "25"},
+        {"date": "2026-04-26", "remaining_tasks": 16, "remaining_sp": 19, "scope_tasks": 96, "scope_sp": 193, "scope_added": 0, "label": "26"},
+        {"date": "2026-04-27", "remaining_tasks": 16, "remaining_sp": 6, "scope_tasks": 100, "scope_sp": 193, "scope_added": 4, "label": "27"},
+        {"date": "2026-04-28", "remaining_tasks": 16, "remaining_sp": 6, "scope_tasks": 100, "scope_sp": 193, "scope_added": 0, "label": "28"},
+        {"date": "2026-04-29", "remaining_tasks": 16, "remaining_sp": 6, "scope_tasks": 100, "scope_sp": 193, "scope_added": 0, "label": "29"},
+        {"date": "2026-04-30", "remaining_tasks": 0, "remaining_sp": 0, "scope_tasks": 102, "scope_sp": 193, "scope_added": 2, "label": "30"}
+      ],
+      "burnup": [
+        {"date": "2026-04-23", "done": 0, "scope": 71, "label": "23"},
+        {"date": "2026-04-24", "done": 37, "scope": 76, "label": "24"},
+        {"date": "2026-04-25", "done": 80, "scope": 96, "label": "25"},
+        {"date": "2026-04-26", "done": 80, "scope": 96, "label": "26"},
+        {"date": "2026-04-27", "done": 84, "scope": 100, "label": "27"},
+        {"date": "2026-04-28", "done": 84, "scope": 100, "label": "28"},
+        {"date": "2026-04-29", "done": 84, "scope": 100, "label": "29"},
+        {"date": "2026-04-30", "done": 102, "scope": 102, "label": "30"}
+      ]
+    },
+    "sprint_3": {
+      "name": "Sprint 3 — Execucao Frontend",
+      "start": "2026-05-01",
+      "end": "2026-05-06",
+      "goal": "Flutter app completo (client + staff) + Docker full stack + E2E tests + features Resource Allocation e Human Intervention",
+      "total_sp": 40,
+      "total_tasks": 53,
+      "initial_tasks": 53,
+      "final_tasks": 57,
+      "type": "execution",
+      "burndown": [
+        {"date": "2026-05-01", "remaining_tasks": 53, "remaining_sp": 40, "ideal_tasks": 53, "ideal_sp": 40, "scope_tasks": 53, "scope_added": 0, "projected": false, "label": "01"},
+        {"date": "2026-05-02", "remaining_tasks": 42, "remaining_sp": 35, "ideal_tasks": 42, "ideal_sp": 32, "scope_tasks": 57, "scope_added": 4, "projected": false, "label": "02"},
+        {"date": "2026-05-03", "remaining_tasks": 42, "remaining_sp": 35, "ideal_tasks": 32, "ideal_sp": 24, "scope_tasks": 57, "scope_added": 0, "projected": false, "label": "03"},
+        {"date": "2026-05-04", "remaining_tasks": 42, "remaining_sp": 35, "ideal_tasks": 21, "ideal_sp": 16, "scope_tasks": 57, "scope_added": 0, "projected": false, "label": "04"},
+        {"date": "2026-05-05", "remaining_tasks": 18, "remaining_sp": 14, "ideal_tasks": 11, "ideal_sp": 8, "scope_tasks": 57, "scope_added": 0, "projected": false, "label": "05"},
+        {"date": "2026-05-06", "remaining_tasks": 3, "remaining_sp": 2, "ideal_tasks": 0, "ideal_sp": 0, "scope_tasks": 57, "scope_added": 0, "projected": false, "label": "06"}
+      ],
+      "burnup": [
+        {"date": "2026-05-01", "done": 0, "scope": 53, "label": "01"},
+        {"date": "2026-05-02", "done": 15, "scope": 57, "label": "02"},
+        {"date": "2026-05-03", "done": 15, "scope": 57, "label": "03"},
+        {"date": "2026-05-04", "done": 15, "scope": 57, "label": "04"},
+        {"date": "2026-05-05", "done": 39, "scope": 57, "label": "05"},
+        {"date": "2026-05-06", "done": 54, "scope": 57, "label": "06"}
+      ]
+    },
+    "sprint_4": {
+      "name": "Sprint 4 — v3.0 Correcoes & Melhorias",
+      "start": "2026-05-07",
+      "end": "2026-05-14",
+      "goal": "Completar milestone v3.0 — UX corrections (phases 18-19), AI workflow Alpha (phase 20), auth expansion (phase 21), FCM push (phase 22), novas features cardapio/perfil/grade (phase 23), polish final (phase 24)",
+      "total_sp": 152,
+      "total_tasks": 50,
+      "initial_tasks": 50,
+      "final_tasks": 50,
+      "type": "active",
+      "burndown": [
+        {"date": "2026-05-07", "remaining_tasks": 50, "remaining_sp": 152, "ideal_tasks": 50, "ideal_sp": 152, "scope_tasks": 50, "scope_added": 0, "projected": false, "label": "07"},
+        {"date": "2026-05-08", "remaining_tasks": 44, "remaining_sp": 142, "ideal_tasks": 43, "ideal_sp": 130, "scope_tasks": 50, "scope_added": 0, "projected": false, "label": "08"},
+        {"date": "2026-05-09", "remaining_tasks": 28, "remaining_sp": 101, "ideal_tasks": 36, "ideal_sp": 109, "scope_tasks": 50, "scope_added": 0, "projected": false, "label": "09"},
+        {"date": "2026-05-10", "remaining_tasks": 9,  "remaining_sp": 34,  "ideal_tasks": 29, "ideal_sp": 87,  "scope_tasks": 50, "scope_added": 0, "projected": false, "label": "10"},
+        {"date": "2026-05-11", "remaining_tasks": 9,  "remaining_sp": 34,  "ideal_tasks": 22, "ideal_sp": 65,  "scope_tasks": 50, "scope_added": 0, "projected": false, "label": "11"},
+        {"date": "2026-05-12", "remaining_tasks": 6,  "remaining_sp": 24,  "ideal_tasks": 14, "ideal_sp": 43,  "scope_tasks": 50, "scope_added": 0, "projected": true,  "label": "12"},
+        {"date": "2026-05-13", "remaining_tasks": 3,  "remaining_sp": 13,  "ideal_tasks": 7,  "ideal_sp": 22,  "scope_tasks": 50, "scope_added": 0, "projected": true,  "label": "13"},
+        {"date": "2026-05-14", "remaining_tasks": 0,  "remaining_sp": 0,   "ideal_tasks": 0,  "ideal_sp": 0,   "scope_tasks": 50, "scope_added": 0, "projected": true,  "label": "14"}
+      ]
+    }
+  },
+  "kanban": {
+    "columns": [
+      {"name": "To Do", "color": "#6B7280", "tasks": 16},
+      {"name": "In Progress", "color": "#F59E0B", "tasks": 0},
+      {"name": "In Review", "color": "#8B5CF6", "tasks": 41},
+      {"name": "Done", "color": "#10B981", "tasks": 153},
+      {"name": "Blocked", "color": "#EF4444", "tasks": 0}
+    ],
+    "sample_tasks": [
+      {"title": "Flutter App completo (client+staff)", "status": "done", "assignee": "Tech Lead", "sp": 16, "epic": "Frontend v2.0"},
+      {"title": "Auth OTP + JWT", "status": "done", "assignee": "Tech Lead", "sp": 16, "epic": "Auth"},
+      {"title": "35 REST endpoints + 16 MCP tools", "status": "done", "assignee": "Tech Lead", "sp": 78, "epic": "Backend"},
+      {"title": "ReAct agent + RAG + Alpha persona", "status": "done", "assignee": "Tech Lead", "sp": 34, "epic": "AI"},
+      {"title": "Student UX Corrections (Phase 18)", "status": "review", "assignee": "Membro 2+3", "sp": 15, "epic": "UX v3.0"},
+      {"title": "Staff UX Corrections (Phase 19)", "status": "review", "assignee": "Membro 1+4+5", "sp": 26, "epic": "UX v3.0"},
+      {"title": "LangChain Workflow + seguranca (Phase 20)", "status": "review", "assignee": "Tech Lead", "sp": 41, "epic": "AI v2"},
+      {"title": "Provider role + Staff CRUD (Phase 21)", "status": "review", "assignee": "Membro 6", "sp": 13, "epic": "Auth v3"},
+      {"title": "FCM Push Notifications (Phase 22)", "status": "review", "assignee": "Membro 1", "sp": 13, "epic": "FCM"},
+      {"title": "Cardapio do RU (Phase 23)", "status": "todo", "assignee": "A definir", "sp": 7, "epic": "Features"},
+      {"title": "Perfil + Grade Curricular (Phase 23)", "status": "todo", "assignee": "A definir", "sp": 14, "epic": "Features"},
+      {"title": "UI Polish v3.0 + E2E (Phase 24)", "status": "todo", "assignee": "Tech Lead", "sp": 13, "epic": "Polish v3"}
+    ]
+  },
+  "dod_summary": [
+    "Codigo funcional (nao quebra o build)",
+    "Segue convencoes do projeto (PEP 8 / flutter_lints)",
+    "Testado manualmente (evidencia)",
+    "Sem regressoes em funcionalidades existentes",
+    "Sem secrets hardcoded",
+    "Commitado com mensagem descritiva",
+    "Funciona no ambiente Docker local"
+  ],
+  "velocity": {
+    "sprint_1_type": "planning",
+    "sprint_1_days": 9,
+    "sprint_2_sp": 193,
+    "sprint_2_days": 8,
+    "sprint_2_velocity": 24.1,
+    "sprint_3_sp_planned": 40,
+    "sprint_3_sp_delivered": 38,
+    "sprint_3_days": 6,
+    "sprint_3_members": 6,
+    "sprint_3_velocity": 6.3,
+    "sprint_4_sp": 152,
+    "sprint_4_sp_done_partial": 118,
+    "sprint_4_days": 8,
+    "sprint_4_members": 6,
+    "sprint_4_velocity_partial": 39.3
+  },
+  "retro": {
+    "start": ["CI/CD pipeline para Flutter", "Tests automatizados antes de cada feature", "Code review coletivo"],
+    "stop": ["Frontend adiado para ultimo momento", "UAT so no final", "Desenvolvimento centralizado em 1 pessoa"],
+    "continue": ["AI-assisted development para acelerar entregas", "Docker desde o inicio", "Planejamento detalhado de fases antes de codar", "Execucao paralela por grupos"]
+  }
+}
