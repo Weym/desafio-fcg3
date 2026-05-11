@@ -30,7 +30,7 @@
  (completed 2026-05-08)
 - [x] **Phase 16: Micro-Animations & Transitions** — Staggered entrance animations for cards/sections, enhanced nav bar glow transitions, and smooth page transitions
  (completed 2026-05-10)
-- [ ] **Phase 17: UI Polish — Fix bottom nav animations, light mode glow colors, and front page logo readability** — Fix non-functional bottom navbar animations, improve light mode glow colors, and fix unreadable logo on front page (use large or short logo variant)
+- [x] **Phase 17: UI Polish — Fix bottom nav animations, light mode glow colors, and front page logo readability** — Fix non-functional bottom navbar animations, improve light mode glow colors, and fix unreadable logo on front page (use large or short logo variant) (completed 2026-05-11)
 
 ---
 
@@ -164,11 +164,11 @@ Plans:
 4. All existing widget tests continue to pass; `flutter analyze` reports no new issues.
 5. Both light and dark modes visually coherent after changes.
 
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 
 Plans:
 - [x] 17-01-PLAN.md — Fix bottom nav animations (StatefulWidget + AnimationController) + add 6th Support tab
-- [ ] 17-02-PLAN.md — Light mode glow palette (neon color variants + glassmorphism fill/border adaptation)
+- [x] 17-02-PLAN.md — Light mode glow palette (neon color variants + glassmorphism fill/border adaptation)
 - [x] 17-03-PLAN.md — Login logo fix (large size 180px + neon glow + remove dead showTagline param)
 
 ---
@@ -329,4 +329,4 @@ Plans:
 | 15.2. Add Alpha Connect SVG logos | 1/1 | Complete | 2026-05-10 |
 | 15.3. Logo light/dark mode variants | 1/1 | Complete    | 2026-05-10 |
 | 16. Micro-Animations & Transitions | 3/3 | Complete    | 2026-05-10 |
-| 17. UI Polish — Nav animations, glows, logo | 2/3 | In Progress|  |
+| 17. UI Polish — Nav animations, glows, logo | 3/3 | Complete   | 2026-05-11 |
