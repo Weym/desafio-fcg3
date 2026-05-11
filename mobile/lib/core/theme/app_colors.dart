@@ -76,4 +76,10 @@ class AppColors {
   static const Color neonTeal = Color(0xFF00E5FF);
   static const Color neonViolet = Color(0xFF7209B7);
   static const Color neonMagenta = Color(0xFFF72585);
+
+  // === Neon Glow Colors — Light Mode Variants ===
+  // Deeper tones for contrast against light backgrounds (per D-05)
+  static const Color neonTealLight = Color(0xFF00838F);      // Deep teal — readable glow on white
+  static const Color neonVioletLight = Color(0xFF5C007A);     // Deep violet
+  static const Color neonMagentaLight = Color(0xFFC51162);    // Deep magenta
 }
