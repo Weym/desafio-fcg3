@@ -67,6 +67,7 @@ class _ClientShellState extends ConsumerState<ClientShell> {
     NavItem(icon: Icons.description_outlined, activeIcon: Icons.description, label: 'Docs'),
     NavItem(icon: Icons.notifications_outlined, activeIcon: Icons.notifications, label: 'Avisos'),
     NavItem(icon: Icons.meeting_room_outlined, activeIcon: Icons.meeting_room, label: 'Recursos'),
+    NavItem(icon: Icons.headset_mic_outlined, activeIcon: Icons.headset_mic, label: 'Suporte'),
   ];
 
   static const _railDestinations = [
@@ -94,6 +95,11 @@ class _ClientShellState extends ConsumerState<ClientShell> {
       icon: Icon(Icons.meeting_room_outlined),
       selectedIcon: Icon(Icons.meeting_room),
       label: Text('Recursos'),
+    ),
+    NavigationRailDestination(
+      icon: Icon(Icons.headset_mic_outlined),
+      selectedIcon: Icon(Icons.headset_mic),
+      label: Text('Suporte'),
     ),
   ];
 
