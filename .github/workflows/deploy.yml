@@ -70,7 +70,7 @@ jobs:
   # ================================================================
   deploy:
     needs: build-flutter
-    runs-on: [self-hosted, linux, x64, fcg3]
+    runs-on: [self-hosted, linux, x64]
     if: always() && !cancelled()
     defaults:
       run:
