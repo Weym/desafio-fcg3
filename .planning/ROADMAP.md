@@ -30,6 +30,7 @@
  (completed 2026-05-08)
 - [x] **Phase 16: Micro-Animations & Transitions** — Staggered entrance animations for cards/sections, enhanced nav bar glow transitions, and smooth page transitions
  (completed 2026-05-10)
+- [ ] **Phase 17: UI Polish — Fix bottom nav animations, light mode glow colors, and front page logo readability** — Fix non-functional bottom navbar animations, improve light mode glow colors, and fix unreadable logo on front page (use large or short logo variant)
 
 ---
 
@@ -149,6 +150,26 @@ Plans:
 - [x] 16-01-PLAN.md — Animation foundation: app_animations.dart constants + AnimatedEntrance widget + tests
 - [x] 16-02-PLAN.md — Nav bar glow transitions (easeOutBack) + GoRouter CustomTransitionPage
 - [x] 16-03-PLAN.md — Screen integration: apply AnimatedEntrance to all client + staff screens
+
+### Phase 17: UI Polish — Fix bottom nav animations, light mode glow colors, and front page logo readability
+
+**Goal:** Fix three UI regressions/issues discovered after Phase 16 delivery: (1) bottom navbar animations implemented in Phase 16 are not working correctly, (2) glow effect colors in light mode look poor and need retuning to work with the lighter palette, and (3) the logo on the front/login page is at an unreadable size — switch to either the full large logo or the short α mark at an appropriate size.
+**Depends on:** Phase 16
+**Requirements:** UI-NFR-02 (visual consistency), UI-NFR-04 (dark mode support)
+
+### Success Criteria
+1. Bottom navigation bar animations (easeOutBack glow scaling, icon size transitions) function correctly on both client and staff shells — visually verified on phone and web.
+2. Light mode glow colors retuned — neon glow effects use light-appropriate tones (no dark-mode-only colors bleeding into light theme).
+3. Front page / login screen logo uses either the full large logo (α + ALPHA CONNECT text) at readable size or the short logo (α mark only) at appropriate scale — no in-between unreadable size.
+4. All existing widget tests continue to pass; `flutter analyze` reports no new issues.
+5. Both light and dark modes visually coherent after changes.
+
+**Plans:** 3 plans
+
+Plans:
+- [ ] 17-01-PLAN.md — Fix bottom nav animations (StatefulWidget + AnimationController) + add 6th Support tab
+- [ ] 17-02-PLAN.md — Light mode glow palette (neon color variants + glassmorphism fill/border adaptation)
+- [ ] 17-03-PLAN.md — Login logo fix (large size 180px + neon glow + remove dead showTagline param)
 
 ---
 
@@ -308,3 +329,4 @@ Plans:
 | 15.2. Add Alpha Connect SVG logos | 1/1 | Complete | 2026-05-10 |
 | 15.3. Logo light/dark mode variants | 1/1 | Complete    | 2026-05-10 |
 | 16. Micro-Animations & Transitions | 3/3 | Complete    | 2026-05-10 |
+| 17. UI Polish — Nav animations, glows, logo | 0/3 | Planned | — |
