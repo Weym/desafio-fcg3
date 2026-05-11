@@ -130,4 +130,4 @@ Este documento evolui a cada transição de fase e marco de milestone.
 4. Atualizar Context com estado atual
 
 ---
-*Last updated: 2026-05-10 — Phase 16 (Micro-Animations & Transitions) complete, staggered entrance animations, nav glow transitions, and custom page transitions delivered*
+*Last updated: 2026-05-11 — Phase 17 (UI Polish) complete, bottom nav animations fixed (StatefulWidget + AnimationController), light mode glow retuned (neonTealLight #00838F), login logo enlarged to 180px with neon glow*
