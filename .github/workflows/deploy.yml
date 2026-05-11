@@ -1,0 +1,105 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches: [main]
+
+# Prevent concurrent deploys -- cancel in-progress if a new push arrives
+concurrency:
+  group: deploy-production
+  cancel-in-progress: true
+
+jobs:
+  # ================================================================
+  # Job 1: Build Flutter Web (cloud runner)
+  # Only runs when mobile/ files change.
+  # Uploads the build output as a workflow artifact.
+  # ================================================================
+  build-flutter:
+    runs-on: ubuntu-latest
+    outputs:
+      flutter-changed: ${{ steps.changes.outputs.mobile }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Detect mobile/ changes
+        id: changes
+        run: |
+          if git diff --name-only HEAD~1 HEAD | grep -q '^mobile/'; then
+            echo "mobile=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "mobile=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Setup Flutter
+        if: steps.changes.outputs.mobile == 'true'
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.41.6'
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        if: steps.changes.outputs.mobile == 'true'
+        working-directory: mobile
+        run: flutter pub get
+
+      - name: Build Flutter Web
+        if: steps.changes.outputs.mobile == 'true'
+        working-directory: mobile
+        run: |
+          flutter build web --release \
+            --base-href=/server03/ \
+            --dart-define=API_BASE_URL=/server03/api/v1
+
+      - name: Upload Flutter Web artifact
+        if: steps.changes.outputs.mobile == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: flutter-web-build
+          path: mobile/build/web/
+          retention-days: 5
+
+  # ================================================================
+  # Job 2: Deploy to server (self-hosted runner)
+  # Runs after Flutter build (if it ran).
+  # Pulls code, updates deps, migrates DB, restarts services.
+  # ================================================================
+  deploy:
+    needs: build-flutter
+    runs-on: [self-hosted, linux, x64, fcg3]
+    if: always() && !cancelled()
+    defaults:
+      run:
+        working-directory: /home/grupo3/desafio-fcg3
+
+    steps:
+      - name: Pull latest code
+        run: |
+          git fetch origin main
+          git reset --hard origin/main
+
+      - name: Download Flutter Web artifact
+        if: needs.build-flutter.outputs.flutter-changed == 'true' && needs.build-flutter.result == 'success'
+        uses: actions/download-artifact@v4
+        with:
+          name: flutter-web-build
+          path: /home/grupo3/desafio-fcg3/flutter-web-build
+
+      - name: Run deploy script
+        env:
+          FLUTTER_CHANGED: ${{ needs.build-flutter.outputs.flutter-changed }}
+          FLUTTER_SUCCESS: ${{ needs.build-flutter.result }}
+        run: |
+          if [[ "$FLUTTER_CHANGED" == "true" && "$FLUTTER_SUCCESS" == "success" ]]; then
+            bash scripts/ci-deploy.sh
+          else
+            bash scripts/ci-deploy.sh --skip-flutter
+          fi
+
+      - name: Clean up Flutter artifact
+        if: always()
+        run: rm -rf /home/grupo3/desafio-fcg3/flutter-web-build
