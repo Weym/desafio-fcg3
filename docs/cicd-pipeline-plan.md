@@ -507,6 +507,7 @@ Push na main
            - alembic upgrade head
            - systemctl restart fcg3-api fcg3-mcp fcg3-ai
            - Download + extração do Flutter Web (se disponível)
+           - Re-ingestão da knowledge base (se ai_service/knowledge/ mudou)
            - Health checks
 \```
 

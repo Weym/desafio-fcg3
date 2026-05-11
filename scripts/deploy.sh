@@ -32,7 +32,7 @@ if [[ $EUID -ne 0 ]]; then
   err "Execute como root: sudo bash deploy.sh"
 fi
 
-PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 ENV_FILE="$PROJECT_DIR/.env"
 
 if [[ ! -f "$ENV_FILE" ]]; then

@@ -101,6 +101,7 @@ Push to main
                    - systemctl restart fcg3-api fcg3-mcp fcg3-ai
                    - Downloads Flutter artifact (if available)
                    - Extracts to /home/grupo3/desafio-fcg3/frontend
+                   - Re-ingests knowledge base (if ai_service/knowledge/ changed)
                    - Health checks
 ```
 

@@ -135,7 +135,34 @@ deploy_flutter() {
 }
 
 # =============================================================================
-# Step 5: Health checks
+# Step 5: Re-ingest knowledge base (only if knowledge files changed)
+# =============================================================================
+reingest_knowledge() {
+  info "Checking if knowledge base needs re-ingestion..."
+
+  local changed=false
+  if git diff HEAD~1 --name-only 2>/dev/null | grep -q "^ai_service/knowledge/"; then
+    changed=true
+  fi
+
+  if [[ "$changed" == true ]]; then
+    warn "Knowledge base files changed -- re-ingesting embeddings..."
+    cd "$PROJECT_DIR"
+
+    set -a
+    source "$ENV_FILE"
+    set +a
+
+    "$PROJECT_DIR/ai_service/.venv/bin/python" -m ai_service.ingest
+    log "Knowledge base re-ingested."
+    cd "$PROJECT_DIR"
+  else
+    log "Knowledge base: no changes detected"
+  fi
+}
+
+# =============================================================================
+# Step 6: Health checks
 # =============================================================================
 check_health() {
   info "Running health checks..."
@@ -184,6 +211,7 @@ main() {
   run_migrations
   restart_services
   deploy_flutter
+  reingest_knowledge
   check_health
 
   echo ""
