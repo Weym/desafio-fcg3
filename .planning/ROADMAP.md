@@ -329,4 +329,4 @@ Plans:
 | 15.2. Add Alpha Connect SVG logos | 1/1 | Complete | 2026-05-10 |
 | 15.3. Logo light/dark mode variants | 1/1 | Complete    | 2026-05-10 |
 | 16. Micro-Animations & Transitions | 3/3 | Complete    | 2026-05-10 |
-| 17. UI Polish — Nav animations, glows, logo | 3/3 | Complete   | 2026-05-11 |
+| 17. UI Polish — Nav animations, glows, logo | 3/3 | Complete    | 2026-05-11 |
