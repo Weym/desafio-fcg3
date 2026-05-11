@@ -66,11 +66,22 @@ docker compose exec fastapi-app python -m scripts.seed
 
 ## Estrutura
 
-- `backend/` - API FastAPI, Alembic, seed e modelos
-- `ai_service/` - servico de IA
-- `mcp_server/` - servidor MCP
-- `mobile/` - app Flutter
-- `.planning/` - artefatos do workflow GSD
+| Diretorio     | Conteudo                                         |
+| ------------- | ------------------------------------------------ |
+| `backend/`    | API FastAPI, Alembic, seed e modelos             |
+| `ai_service/` | Servico de IA (LangChain)                        |
+| `mcp_server/` | Servidor MCP                                     |
+| `mobile/`     | App Flutter                                      |
+| `scripts/`    | Scripts de deploy e operacao                     |
+| `docs/`       | Documentacao completa ([indice](docs/README.md)) |
+
+## Deploy
+
+O deploy em producao usa CI/CD com GitHub Actions (self-hosted runner). Ver [docs/deploy.md](docs/deploy.md) e [docs/cicd-pipeline-plan.md](docs/cicd-pipeline-plan.md).
+
+## Documentacao
+
+Toda documentacao detalhada esta em [`docs/`](docs/README.md) e em [`.planning/`](.planning/ROADMAP.md).
 
 ## Comandos uteis
 
