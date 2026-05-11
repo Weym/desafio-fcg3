@@ -23,7 +23,7 @@ class GlassCard extends StatelessWidget {
   final BorderRadius? borderRadius;
   final VoidCallback? onTap;
 
-  /// Custom glow color. Defaults to neonTeal in dark mode, primary in light.
+  /// Custom glow color. Defaults to neonTeal in dark mode, neonTealLight in light.
   final Color? glowColor;
 
   /// Glow intensity level: 1 (subtle), 2 (medium), 3 (hero).
@@ -48,7 +48,7 @@ class GlassCard extends StatelessWidget {
     }
 
     final effectiveGlowColor = glowColor ??
-        (isDark ? AppColors.neonTeal : AppColors.primary);
+        (isDark ? AppColors.neonTeal : AppColors.neonTealLight);
 
     final card = ClipRRect(
       borderRadius: effectiveBorderRadius,
@@ -57,10 +57,14 @@ class GlassCard extends StatelessWidget {
         child: Container(
           padding: padding ?? const EdgeInsets.all(AppSpacing.md),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.05),
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.05)
+                : Colors.black.withValues(alpha: 0.03),
             borderRadius: effectiveBorderRadius,
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.12),
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.12)
+                  : Colors.black.withValues(alpha: 0.08),
             ),
             boxShadow: [
               BoxShadow(

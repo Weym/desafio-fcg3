@@ -131,7 +131,12 @@ class _GlassBottomNavState extends State<GlassBottomNav>
     final item = widget.destinations[index];
     final isSelected = index == widget.currentIndex;
     final wasPrevious = index == _previousIndex;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final t = _curvedAnimation.value;
+
+    // Brightness-adaptive neon colors (per D-06)
+    final glowColor = isDark ? AppColors.neonTeal : AppColors.neonTealLight;
+    final selectedColor = isDark ? AppColors.neonTeal : AppColors.neonTealLight;
 
     // Calculate icon size with springy easeOutBack interpolation
     double iconSize;
@@ -175,7 +180,7 @@ class _GlassBottomNavState extends State<GlassBottomNav>
 
     // Icon and label color — instant switch (no lerp)
     final itemColor =
-        isSelected ? AppColors.neonTeal : colors.onSurfaceVariant;
+        isSelected ? selectedColor : colors.onSurfaceVariant;
 
     return GestureDetector(
       onTap: () => widget.onTap(index),
@@ -187,13 +192,13 @@ class _GlassBottomNavState extends State<GlassBottomNav>
         ),
         decoration: BoxDecoration(
           color: bgAlpha > 0.001
-              ? AppColors.neonTeal.withValues(alpha: bgAlpha)
+              ? glowColor.withValues(alpha: bgAlpha)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
           boxShadow: glowAlpha > 0.001
               ? [
                   BoxShadow(
-                    color: AppColors.neonTeal.withValues(alpha: glowAlpha),
+                    color: glowColor.withValues(alpha: glowAlpha),
                     blurRadius: glowBlur,
                     spreadRadius: glowSpread,
                   ),
