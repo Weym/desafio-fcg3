@@ -149,6 +149,7 @@ Recent decisions affecting current work:
 - Phase 15.2 inserted after Phase 15: Add Alpha Connect SVG logos to the app (URGENT)
 - Phase 15.3 inserted after Phase 15: change/create a copy of the current logos so that they match both the light and the dark mode of the app (URGENT)
 - Phase 16 added: Micro-Animations & Transitions (2026-05-10)
+- Phase 17 added: UI Polish — Fix bottom nav animations, light mode glow colors, and front page logo readability (2026-05-10)
 
 ### Quick Tasks Completed
 
