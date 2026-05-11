@@ -10,6 +10,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 /// Full logo (α + ALPHA CONNECT text) when [showText] is true and [size] > 40.
 /// Short logo (α mark only) otherwise.
 ///
+/// The full logo SVG already contains the tagline text baked in — at 160-200px
+/// height the tagline area is approximately 15-20px tall and readable.
+///
 /// When [color] is provided, applies a single-color tint via [ColorFilter.mode]
 /// (override mode). When [color] is null (default), the SVG renders with its
 /// baked-in fill colors — no color filter applied.
@@ -19,7 +22,6 @@ class AlphaConnectLogo extends StatelessWidget {
     required this.size,
     this.color,
     this.showText = true,
-    this.showTagline = false,
   });
 
   /// Height of the logo widget.
@@ -33,10 +35,6 @@ class AlphaConnectLogo extends StatelessWidget {
 
   /// Whether to show the full logo (α + text). Auto-disabled when [size] <= 40.
   final bool showText;
-
-  /// Whether to show the tagline (only relevant with full logo).
-  /// Currently the full logo SVG already contains the tagline text.
-  final bool showTagline;
 
   @override
   Widget build(BuildContext context) {

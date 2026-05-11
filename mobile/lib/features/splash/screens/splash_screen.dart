@@ -40,7 +40,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                   ),
                 ],
               ),
-              child: const AlphaConnectLogo(size: 100, showTagline: true),
+              child: const AlphaConnectLogo(size: 100),
             ),
             const SizedBox(height: AppSpacing.xl),
             SizedBox(

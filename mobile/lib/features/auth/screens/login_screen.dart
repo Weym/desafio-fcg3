@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/models/user_model.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/theme_provider.dart';
 import '../../../shared/widgets/alpha_connect_logo.dart';
@@ -245,6 +246,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Widget _buildEmailStep() {
     final colors = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Form(
       key: _emailFormKey,
@@ -252,8 +254,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         key: const ValueKey('email_step'),
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Logo mark — perfectly upright, no rotation
-          const AlphaConnectLogo(size: 80),
+          // Full logo with neon glow — readable at 180px (D-09, D-12)
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
+              boxShadow: [
+                BoxShadow(
+                  color: (isDark
+                          ? AppColors.neonTeal
+                          : AppColors.primaryContainer)
+                      .withValues(alpha: 0.3),
+                  blurRadius: 40,
+                  spreadRadius: 8,
+                ),
+              ],
+            ),
+            child: const AlphaConnectLogo(size: 180),
+          ),
           const SizedBox(height: AppSpacing.md),
           const SizedBox(height: AppSpacing.xl),
 
